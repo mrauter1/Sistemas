@@ -1,0 +1,14 @@
+1. Fazer tela para criar e editar querys do banco de dados e retornar resultado usando framework mormot e sqlite?
+	1.1: Sempre é retornada uma tabela.
+	1.2 
+
+2. Imprimir resultado em relatório.
+
+3. Criar o gerenciador em si com agendador: O usuario configura quais queries serão executadas por horario/frequencia e dependendo dos resultados destas queries serão executados gatilhos.
+	3.1 Esses gatilhos podem ser envio de email; sms (verificar); skype (verificar); mensagem no computador local; para informar um problema/Situação;
+	3.2 Envio de relatório diários, etc...
+	
+4. Integrar DWScript para manipulação de queries e resultados.
+
+
+

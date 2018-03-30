@@ -1,0 +1,30 @@
+unit uClienteView;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, uClienteControle, uFormCadViewBase, StdCtrls, ExtCtrls, Mask, DBCtrls,
+  ViewBase, DadosView, CadView, Buttons, uInterfacesTesteMVC;
+
+type
+  TClienteView = class(TFormCadViewBase)
+    Panel2: TPanel;
+    Label1: TLabel;
+    Label2: TLabel;
+    DBEdit2: TDBEdit;
+    Label3: TLabel;
+    DBEdit3: TDBEdit;
+    EditCod: TEdit;
+    BtnConsulta: TSpeedButton;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+implementation
+
+{$R *.dfm}
+
+end.

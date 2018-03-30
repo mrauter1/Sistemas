@@ -1,0 +1,77 @@
+unit uClienteControle;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, uClienteModelo, uCadControle, DB, uConexaoBase, uMVCInterfaces,
+  uInterfacesTesteMVC;
+
+type
+  TClienteControle = class(TCadControle, IClienteControle)
+    procedure DataModuleCreate(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    procedure PreparaModelo(Conexao: TConexaoBase);
+    procedure ShowView;
+    function Consulta: Variant;
+    class function CriaConsulta(Conexao: TConexaoBase): Variant;
+  end;
+
+implementation
+
+uses
+  uClienteView, uDadosControleBase;
+
+{$R *.dfm}
+
+function TClienteControle.Consulta: Variant;
+begin
+  ChecaModelo;
+  Result:= TClienteControle.CriaConsulta(DadosModelo.Conexao);
+end;
+
+class function TClienteControle.CriaConsulta(Conexao: TConexaoBase): Variant;
+var
+  Controle: TClienteControle;
+begin
+  Result:= Null;
+  Controle:= TClienteControle.Create(nil);
+  try
+    Controle.PreparaModelo(Conexao);
+    Result:= Controle.AbreConsultaPadrao;
+  finally
+    Controle.Free;
+  end;
+end;
+
+procedure TClienteControle.DataModuleCreate(Sender: TObject);
+begin
+  inherited;
+  CamposFiltro:= 'COD;NOME';
+  CamposResult:= 'COD';
+  CampoDefault:= 'NOME';
+end;
+
+procedure TClienteControle.PreparaModelo(Conexao: TConexaoBase);
+begin
+  DadosModelo:= TClienteModelo.Create(Self);
+  DadosModelo.Conexao:= Conexao;
+  CadModelo.CarregaVazio;
+end;
+
+procedure TClienteControle.ShowView;
+begin
+  if not VerificaPermissao(Consultar) then Exit;
+  if CadView = nil then
+    View:= TClienteView.Create(Self);
+  try
+    CadView.ShowModal;
+  finally
+    FreeView;
+  end;         
+end;
+
+
+end.

@@ -1,0 +1,111 @@
+unit uPedidoControle;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, uDadosControleBase, uModeloBase, DB, uPedidoModelo, DBClient, uMVCInterfaces,
+  uInterfacesTesteMVC, uCadControle, uClienteModelo, uDadosModeloBase, uConexaoBase,
+  uFormCadViewBase, uClienteControle, uConBase;
+
+type
+  TPedidoCtrl = class(TCadControle, IPedidoCtrl)
+    DataSourceCliente: TDataSource;
+    procedure DataModuleCreate(Sender: TObject);
+  private
+
+  protected
+    ClienteControle: TCadControle;
+    procedure SetDadosModelo(Value: TDadosModeloBase); override;
+  public
+    function AbreCliente: Integer;
+    procedure PreparaModelo(Conexao: TConexaoBase);
+    procedure ShowView;
+    function Consulta: Variant;
+    class function CriaConsulta(Conexao: TConexaoBase): Variant;
+  end;
+
+implementation
+
+uses
+  uCadPedido;
+
+{$R *.dfm}
+
+function TPedidoCtrl.Consulta: Variant;
+begin
+  ChecaModelo;
+  Result:= TPedidoCtrl.CriaConsulta(DadosModelo.Conexao);
+end;
+
+class function TPedidoCtrl.CriaConsulta(Conexao: TConexaoBase): Variant;
+var
+  Controle: TPedidoCtrl;
+begin
+  Result:= Null;
+  Controle:= TPedidoCtrl.Create(nil);
+  try
+    Controle.PreparaModelo(Conexao);
+    Result:= Controle.AbreConsultaPadrao;
+  finally
+    Controle.Free;
+  end;
+end;
+
+procedure TPedidoCtrl.SetDadosModelo(Value: TDadosModeloBase);
+begin
+  inherited;
+  DataSourceCliente:= (DadosModelo as TPedidoMD).Cliente.DataSource;
+end;
+
+procedure TPedidoCtrl.PreparaModelo(Conexao: TConexaoBase);
+begin
+  DadosModelo:= TPedidoMD.Create(Self);
+  DadosModelo.Conexao:= Conexao;
+  CadModelo.CarregaVazio;
+end;
+
+procedure TPedidoCtrl.DataModuleCreate(Sender: TObject);
+begin
+  inherited;
+  CamposFiltro:= 'COD;NOME';
+  CamposResult:= 'COD';
+  CampoDefault:= 'NOME';
+end;
+
+procedure TPedidoCtrl.ShowView;
+begin
+  if not VerificaPermissao(Consultar) then Exit;
+  if View = nil then
+    View:= TCadPedido.Create(Self);
+  try
+    CadView.ShowModal;
+  finally
+    FreeView;
+  end;
+end;
+
+function TPedidoCtrl.AbreCliente: Integer;
+var
+  CodConsulta: Variant;
+  Temp: String;
+begin
+  Result:= 1;
+  CodConsulta:= TClienteControle.CriaConsulta(CadModelo.Conexao);;
+  temp:= VarToStrDef(CodConsulta, '');
+  if temp <> '' then
+  begin
+    (CadModelo as TPedidoMD).CODCLIENTE.AsString:= temp;
+  end;
+{  ClienteControle:= TClienteControle.Create(Self);
+  try
+    ClienteControle.Modelo:= (Modelo as TPedidoMD).Cliente;
+    ClienteControle.Permissoes:= ([Editar, Consultar]);
+    ClienteControle.SetPodeNavegar(False);
+    (ClienteControle as TClienteControle).ShowView;
+  finally
+    ClienteControle.Free;
+  end;}
+end;
+
+end.

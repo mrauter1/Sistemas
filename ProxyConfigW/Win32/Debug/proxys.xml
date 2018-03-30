@@ -1,0 +1,1348 @@
+<?xml version="1.0" encoding="utf-8"?>
+<proxycap_ruleset version="525">
+  <proxy_servers>
+    <proxy_server is_default="true" port="8080" auth_method="none" hostname="14.139.162.97" type="https" name="(0)14.139.162.97: 8080-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="181.143.229.122" type="https" name="(1)181.143.229.122: 3128-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="147.91.1.46" type="https" name="(2)147.91.1.46: 3128-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="181.49.36.162" type="http" name="(3)181.49.36.162: 3128-http"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="120.234.15.130" type="socks4" name="(4)120.234.15.130: 1080-socks4"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="95.86.133.70" type="http" name="(5)95.86.133.70: 8080-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="200.55.58.210" type="http" name="(6)200.55.58.210: 8080-http"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="41.33.238.170" type="socks4" name="(7)41.33.238.170: 1080-socks4"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="1.9.171.18" type="https" name="(8)1.9.171.18: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="41.243.8.130" type="https" name="(9)41.243.8.130: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="198.98.101.168" type="https" name="(10)198.98.101.168: 8080-https"/>
+    <proxy_server is_default="false" port="2214" auth_method="none" hostname="221.132.35.5" type="socks5" name="(11)221.132.35.5: 2214-socks5"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="58.147.174.112" type="http" name="(12)58.147.174.112: 8080-http"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="202.100.167.159" type="https" name="(13)202.100.167.159: 80-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="83.142.160.6" type="http" name="(14)83.142.160.6: 3128-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="87.255.70.228" type="https" name="(15)87.255.70.228: 3128-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="145.255.15.37" type="https" name="(16)145.255.15.37: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="70.169.24.2" type="http" name="(17)70.169.24.2: 8080-http"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="186.229.25.114" type="https" name="(18)186.229.25.114: 80-https"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="202.103.241.169" type="socks4" name="(19)202.103.241.169: 1080-socks4"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="210.101.131.231" type="http" name="(20)210.101.131.231: 8080-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="91.121.199.136" type="http" name="(21)91.121.199.136: 3128-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="62.210.115.178" type="https" name="(22)62.210.115.178: 3128-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="77.121.13.12" type="http" name="(23)77.121.13.12: 8080-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="103.13.133.190" type="http" name="(24)103.13.133.190: 8080-http"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="202.100.167.142" type="https" name="(25)202.100.167.142: 80-https"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="188.214.23.5" type="http" name="(26)188.214.23.5: 80-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="203.130.194.149" type="https" name="(27)203.130.194.149: 3128-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="5.39.10.71" type="https" name="(28)5.39.10.71: 3128-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="52.67.10.231" type="https" name="(29)52.67.10.231: 3128-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="163.28.112.100" type="https" name="(30)163.28.112.100: 3128-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="91.121.199.136" type="https" name="(31)91.121.199.136: 3128-https"/>
+    <proxy_server is_default="false" port="8083" auth_method="none" hostname="52.90.219.94" type="https" name="(32)52.90.219.94: 8083-https"/>
+    <proxy_server is_default="false" port="8083" auth_method="none" hostname="52.90.219.94" type="http" name="(33)52.90.219.94: 8083-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="205.202.37.68" type="https" name="(34)205.202.37.68: 8080-https"/>
+    <proxy_server is_default="false" port="50155" auth_method="none" hostname="189.218.126.49" type="socks4" name="(35)189.218.126.49: 50155-socks4"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="185.5.64.70" type="https" name="(36)185.5.64.70: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="103.225.179.251" type="https" name="(37)103.225.179.251: 8080-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="87.237.186.151" type="https" name="(38)87.237.186.151: 3128-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="177.190.209.10" type="http" name="(39)177.190.209.10: 8080-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="27.147.145.250" type="http" name="(40)27.147.145.250: 8080-http"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="177.184.8.123" type="https" name="(41)177.184.8.123: 80-https"/>
+    <proxy_server is_default="false" port="443" auth_method="none" hostname="221.224.163.28" type="https" name="(42)221.224.163.28: 443-https"/>
+    <proxy_server is_default="false" port="18628" auth_method="none" hostname="166.62.97.243" type="socks4" name="(43)166.62.97.243: 18628-socks4"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="103.54.219.18" type="https" name="(44)103.54.219.18: 8080-https"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="81.31.253.50" type="https" name="(45)81.31.253.50: 80-https"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="202.100.167.180" type="https" name="(46)202.100.167.180: 80-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="181.112.156.149" type="https" name="(47)181.112.156.149: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="210.101.131.229" type="https" name="(48)210.101.131.229: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="103.4.166.203" type="https" name="(49)103.4.166.203: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="62.37.237.61" type="https" name="(50)62.37.237.61: 8080-https"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="202.100.167.149" type="https" name="(51)202.100.167.149: 80-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="138.0.89.102" type="http" name="(52)138.0.89.102: 8080-http"/>
+    <proxy_server is_default="false" port="11112" auth_method="none" hostname="58.247.125.205" type="https" name="(53)58.247.125.205: 11112-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="153.146.159.224" type="https" name="(54)153.146.159.224: 8080-https"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="202.100.167.160" type="http" name="(55)202.100.167.160: 80-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="178.18.44.73" type="http" name="(56)178.18.44.73: 8080-http"/>
+    <proxy_server is_default="false" port="18628" auth_method="none" hostname="166.62.97.245" type="socks4" name="(57)166.62.97.245: 18628-socks4"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="123.30.238.16" type="https" name="(58)123.30.238.16: 3128-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="113.53.230.199" type="https" name="(59)113.53.230.199: 3128-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="87.120.162.222" type="http" name="(60)87.120.162.222: 3128-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="159.226.224.180" type="http" name="(61)159.226.224.180: 3128-http"/>
+    <proxy_server is_default="false" port="9999" auth_method="none" hostname="218.202.122.100" type="https" name="(62)218.202.122.100: 9999-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="46.225.239.178" type="http" name="(63)46.225.239.178: 8080-http"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="119.254.84.90" type="http" name="(64)119.254.84.90: 80-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="198.98.101.168" type="http" name="(65)198.98.101.168: 8080-http"/>
+    <proxy_server is_default="false" port="8888" auth_method="none" hostname="106.186.22.65" type="http" name="(66)106.186.22.65: 8888-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="165.138.66.32" type="http" name="(67)165.138.66.32: 8080-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="84.22.46.25" type="http" name="(68)84.22.46.25: 8080-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="105.235.106.62" type="https" name="(69)105.235.106.62: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="62.37.237.66" type="https" name="(70)62.37.237.66: 8080-https"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="202.100.167.142" type="http" name="(71)202.100.167.142: 80-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="190.208.45.221" type="http" name="(72)190.208.45.221: 3128-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="179.184.206.18" type="https" name="(73)179.184.206.18: 3128-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="119.110.71.86" type="https" name="(74)119.110.71.86: 8080-https"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="186.121.206.232" type="socks4" name="(75)186.121.206.232: 1080-socks4"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="62.37.237.63" type="https" name="(76)62.37.237.63: 8080-https"/>
+    <proxy_server is_default="false" port="9797" auth_method="none" hostname="27.131.47.132" type="https" name="(77)27.131.47.132: 9797-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="118.26.226.157" type="http" name="(78)118.26.226.157: 3128-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="89.41.106.99" type="http" name="(79)89.41.106.99: 8080-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="139.162.36.131" type="http" name="(80)139.162.36.131: 8080-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="187.167.88.7" type="https" name="(81)187.167.88.7: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="177.15.8.53" type="https" name="(82)177.15.8.53: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="94.180.115.22" type="http" name="(83)94.180.115.22: 8080-http"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="120.85.132.234" type="http" name="(84)120.85.132.234: 80-http"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="85.185.244.116" type="socks4" name="(85)85.185.244.116: 1080-socks4"/>
+    <proxy_server is_default="false" port="29009" auth_method="none" hostname="189.219.204.138" type="socks4" name="(86)189.219.204.138: 29009-socks4"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="63.150.152.151" type="https" name="(87)63.150.152.151: 3128-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="83.221.192.250" type="https" name="(88)83.221.192.250: 3128-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="185.29.224.11" type="https" name="(89)185.29.224.11: 8080-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="182.61.58.100" type="https" name="(90)182.61.58.100: 3128-https"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="190.120.123.2" type="socks4" name="(91)190.120.123.2: 1080-socks4"/>
+    <proxy_server is_default="false" port="8088" auth_method="none" hostname="5.154.116.178" type="http" name="(92)5.154.116.178: 8088-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="200.192.248.74" type="http" name="(93)200.192.248.74: 8080-http"/>
+    <proxy_server is_default="false" port="8000" auth_method="none" hostname="223.68.1.38" type="http" name="(94)223.68.1.38: 8000-http"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="45.64.166.145" type="socks4" name="(95)45.64.166.145: 1080-socks4"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="139.59.254.28" type="https" name="(96)139.59.254.28: 8080-https"/>
+    <proxy_server is_default="false" port="10200" auth_method="none" hostname="64.31.253.240" type="socks4" name="(97)64.31.253.240: 10200-socks4"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="219.255.197.90" type="https" name="(98)219.255.197.90: 3128-https"/>
+    <proxy_server is_default="false" port="8128" auth_method="none" hostname="137.135.166.225" type="https" name="(99)137.135.166.225: 8128-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="85.187.115.179" type="http" name="(100)85.187.115.179: 8080-http"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="203.234.16.8" type="https" name="(101)203.234.16.8: 80-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="212.98.159.194" type="http" name="(102)212.98.159.194: 8080-http"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="212.15.182.156" type="https" name="(103)212.15.182.156: 80-https"/>
+    <proxy_server is_default="false" port="9797" auth_method="none" hostname="218.29.111.106" type="https" name="(104)218.29.111.106: 9797-https"/>
+    <proxy_server is_default="false" port="24663" auth_method="none" hostname="189.219.221.140" type="socks4" name="(105)189.219.221.140: 24663-socks4"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="162.223.88.243" type="http" name="(106)162.223.88.243: 80-http"/>
+    <proxy_server is_default="false" port="9999" auth_method="none" hostname="113.200.29.10" type="https" name="(107)113.200.29.10: 9999-https"/>
+    <proxy_server is_default="false" port="10298" auth_method="none" hostname="58.247.125.205" type="https" name="(108)58.247.125.205: 10298-https"/>
+    <proxy_server is_default="false" port="8118" auth_method="none" hostname="70.89.14.22" type="http" name="(109)70.89.14.22: 8118-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="31.169.70.193" type="http" name="(110)31.169.70.193: 8080-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="207.87.85.3" type="http" name="(111)207.87.85.3: 8080-http"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="36.250.69.4" type="http" name="(112)36.250.69.4: 80-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="52.77.86.67" type="https" name="(113)52.77.86.67: 3128-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="163.121.187.180" type="https" name="(114)163.121.187.180: 8080-https"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="188.214.23.100" type="http" name="(115)188.214.23.100: 80-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="4.31.142.200" type="https" name="(116)4.31.142.200: 8080-https"/>
+    <proxy_server is_default="false" port="18628" auth_method="none" hostname="166.62.97.238" type="socks4" name="(117)166.62.97.238: 18628-socks4"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="200.46.94.194" type="http" name="(118)200.46.94.194: 3128-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="197.255.225.205" type="https" name="(119)197.255.225.205: 3128-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="1.9.170.226" type="https" name="(120)1.9.170.226: 8080-https"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="112.124.35.165" type="socks4" name="(121)112.124.35.165: 1080-socks4"/>
+    <proxy_server is_default="false" port="8998" auth_method="none" hostname="36.230.161.217" type="https" name="(122)36.230.161.217: 8998-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="205.202.37.68" type="http" name="(123)205.202.37.68: 8080-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="150.129.4.18" type="http" name="(124)150.129.4.18: 8080-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="164.58.68.174" type="https" name="(125)164.58.68.174: 3128-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="152.26.30.150" type="https" name="(126)152.26.30.150: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="62.37.237.33" type="https" name="(127)62.37.237.33: 8080-https"/>
+    <proxy_server is_default="false" port="8088" auth_method="none" hostname="103.19.109.186" type="https" name="(128)103.19.109.186: 8088-https"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="78.158.162.114" type="socks4" name="(129)78.158.162.114: 1080-socks4"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="31.214.144.178" type="http" name="(130)31.214.144.178: 80-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="94.74.148.1" type="https" name="(131)94.74.148.1: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="209.58.178.159" type="https" name="(132)209.58.178.159: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="86.188.142.244" type="https" name="(133)86.188.142.244: 8080-https"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="221.134.239.213" type="https" name="(134)221.134.239.213: 80-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="91.121.132.52" type="http" name="(135)91.121.132.52: 8080-http"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="78.135.114.76" type="socks4" name="(136)78.135.114.76: 1080-socks4"/>
+    <proxy_server is_default="false" port="6006" auth_method="none" hostname="187.49.81.20" type="http" name="(137)187.49.81.20: 6006-http"/>
+    <proxy_server is_default="false" port="8998" auth_method="none" hostname="36.230.161.217" type="http" name="(138)36.230.161.217: 8998-http"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="181.30.11.71" type="socks4" name="(139)181.30.11.71: 1080-socks4"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="202.29.221.90" type="http" name="(140)202.29.221.90: 3128-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="155.133.7.47" type="http" name="(141)155.133.7.47: 8080-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="109.194.18.181" type="http" name="(142)109.194.18.181: 3128-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="92.242.125.177" type="https" name="(143)92.242.125.177: 3128-https"/>
+    <proxy_server is_default="false" port="8128" auth_method="none" hostname="137.135.166.225" type="https" name="(144)137.135.166.225: 8128-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="1.9.83.18" type="https" name="(145)1.9.83.18: 8080-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="58.96.176.83" type="https" name="(146)58.96.176.83: 3128-https"/>
+    <proxy_server is_default="false" port="8888" auth_method="none" hostname="208.108.142.88" type="https" name="(147)208.108.142.88: 8888-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="202.164.38.11" type="http" name="(148)202.164.38.11: 8080-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="158.69.48.22" type="http" name="(149)158.69.48.22: 8080-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="125.209.97.190" type="http" name="(150)125.209.97.190: 8080-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="200.223.91.59" type="http" name="(151)200.223.91.59: 3128-http"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="124.250.236.26" type="https" name="(152)124.250.236.26: 80-https"/>
+    <proxy_server is_default="false" port="10200" auth_method="none" hostname="64.185.11.223" type="socks4" name="(153)64.185.11.223: 10200-socks4"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="94.23.205.32" type="https" name="(154)94.23.205.32: 3128-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="35.58.0.102" type="https" name="(155)35.58.0.102: 3128-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="70.248.28.13" type="https" name="(156)70.248.28.13: 8080-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="202.106.16.36" type="http" name="(157)202.106.16.36: 3128-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="200.240.248.234" type="https" name="(158)200.240.248.234: 3128-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="62.37.237.64" type="https" name="(159)62.37.237.64: 8080-https"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="173.199.124.140" type="http" name="(160)173.199.124.140: 80-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="103.253.146.197" type="https" name="(161)103.253.146.197: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="118.97.42.154" type="http" name="(162)118.97.42.154: 8080-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="45.63.15.234" type="https" name="(163)45.63.15.234: 3128-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="180.211.163.235" type="http" name="(164)180.211.163.235: 8080-http"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="123.124.168.149" type="http" name="(165)123.124.168.149: 80-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="202.106.16.36" type="https" name="(166)202.106.16.36: 3128-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="190.29.22.247" type="http" name="(167)190.29.22.247: 8080-http"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="148.251.188.119" type="https" name="(168)148.251.188.119: 80-https"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="121.40.108.76" type="https" name="(169)121.40.108.76: 80-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="158.181.153.152" type="https" name="(170)158.181.153.152: 3128-https"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="202.100.167.149" type="http" name="(171)202.100.167.149: 80-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="190.151.10.226" type="http" name="(172)190.151.10.226: 8080-http"/>
+    <proxy_server is_default="false" port="8000" auth_method="none" hostname="223.68.1.38" type="https" name="(173)223.68.1.38: 8000-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="1.179.183.109" type="http" name="(174)1.179.183.109: 8080-http"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="62.37.237.32" type="https" name="(175)62.37.237.32: 80-https"/>
+    <proxy_server is_default="false" port="10160" auth_method="none" hostname="58.247.125.205" type="https" name="(176)58.247.125.205: 10160-https"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="103.251.43.53" type="http" name="(177)103.251.43.53: 80-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="190.121.158.114" type="http" name="(178)190.121.158.114: 8080-http"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="83.231.34.133" type="https" name="(179)83.231.34.133: 80-https"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="190.181.18.232" type="http" name="(180)190.181.18.232: 80-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="110.84.128.143" type="https" name="(181)110.84.128.143: 3128-https"/>
+    <proxy_server is_default="false" port="8127" auth_method="none" hostname="137.135.166.225" type="https" name="(182)137.135.166.225: 8127-https"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="218.24.45.194" type="socks5" name="(183)218.24.45.194: 1080-socks5"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="58.248.20.110" type="socks4" name="(184)58.248.20.110: 1080-socks4"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="207.87.85.3" type="https" name="(185)207.87.85.3: 8080-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="218.90.174.167" type="https" name="(186)218.90.174.167: 3128-https"/>
+    <proxy_server is_default="false" port="8083" auth_method="none" hostname="52.90.68.181" type="http" name="(187)52.90.68.181: 8083-http"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="58.216.156.126" type="socks4" name="(188)58.216.156.126: 1080-socks4"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="152.26.91.86" type="https" name="(189)152.26.91.86: 8080-https"/>
+    <proxy_server is_default="false" port="4444" auth_method="none" hostname="52.11.31.207" type="http" name="(190)52.11.31.207: 4444-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="158.69.128.121" type="https" name="(191)158.69.128.121: 8080-https"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="120.132.71.212" type="https" name="(192)120.132.71.212: 80-https"/>
+    <proxy_server is_default="false" port="10000" auth_method="none" hostname="182.253.201.76" type="http" name="(193)182.253.201.76: 10000-http"/>
+    <proxy_server is_default="false" port="10109" auth_method="none" hostname="58.247.125.205" type="https" name="(194)58.247.125.205: 10109-https"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="162.223.88.243" type="https" name="(195)162.223.88.243: 80-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="37.235.24.47" type="http" name="(196)37.235.24.47: 8080-http"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="184.69.67.122" type="http" name="(197)184.69.67.122: 80-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="92.255.187.219" type="http" name="(198)92.255.187.219: 8080-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="43.243.112.79" type="http" name="(199)43.243.112.79: 3128-http"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="221.224.163.28" type="http" name="(200)221.224.163.28: 80-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="141.85.220.108" type="https" name="(201)141.85.220.108: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="203.215.33.62" type="http" name="(202)203.215.33.62: 8080-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="190.107.206.1" type="http" name="(203)190.107.206.1: 8080-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="37.187.101.226" type="https" name="(204)37.187.101.226: 3128-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="201.7.216.85" type="https" name="(205)201.7.216.85: 3128-https"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="62.37.237.25" type="https" name="(206)62.37.237.25: 80-https"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="221.226.11.229" type="socks4" name="(207)221.226.11.229: 1080-socks4"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="196.195.249.150" type="https" name="(208)196.195.249.150: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="178.252.146.6" type="http" name="(209)178.252.146.6: 8080-http"/>
+    <proxy_server is_default="false" port="3129" auth_method="none" hostname="192.3.88.100" type="http" name="(210)192.3.88.100: 3129-http"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="163.28.80.40" type="https" name="(211)163.28.80.40: 80-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="118.97.113.170" type="http" name="(212)118.97.113.170: 8080-http"/>
+    <proxy_server is_default="false" port="9090" auth_method="none" hostname="89.218.214.106" type="https" name="(213)89.218.214.106: 9090-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="101.255.51.47" type="https" name="(214)101.255.51.47: 8080-https"/>
+    <proxy_server is_default="false" port="10032" auth_method="none" hostname="58.247.125.205" type="https" name="(215)58.247.125.205: 10032-https"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="221.214.208.226" type="socks4" name="(216)221.214.208.226: 1080-socks4"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="208.65.53.170" type="https" name="(217)208.65.53.170: 8080-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="177.74.117.142" type="http" name="(218)177.74.117.142: 3128-http"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="202.68.254.99" type="socks4" name="(219)202.68.254.99: 1080-socks4"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="112.124.50.85" type="socks4" name="(220)112.124.50.85: 1080-socks4"/>
+    <proxy_server is_default="false" port="13639" auth_method="none" hostname="189.219.136.156" type="socks4" name="(221)189.219.136.156: 13639-socks4"/>
+    <proxy_server is_default="false" port="55555" auth_method="none" hostname="108.59.10.129" type="http" name="(222)108.59.10.129: 55555-http"/>
+    <proxy_server is_default="false" port="8089" auth_method="none" hostname="199.231.109.1" type="http" name="(223)199.231.109.1: 8089-http"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="190.120.123.3" type="socks4" name="(224)190.120.123.3: 1080-socks4"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="207.91.10.234" type="http" name="(225)207.91.10.234: 8080-http"/>
+    <proxy_server is_default="false" port="9999" auth_method="none" hostname="124.89.35.206" type="http" name="(226)124.89.35.206: 9999-http"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="84.17.27.245" type="socks4" name="(227)84.17.27.245: 1080-socks4"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="51.254.106.64" type="http" name="(228)51.254.106.64: 80-http"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="62.37.237.33" type="https" name="(229)62.37.237.33: 80-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="95.131.181.170" type="https" name="(230)95.131.181.170: 8080-https"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="57.191.0.239" type="https" name="(231)57.191.0.239: 80-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="103.53.169.109" type="https" name="(232)103.53.169.109: 8080-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="86.247.119.65" type="https" name="(233)86.247.119.65: 3128-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="109.235.251.132" type="http" name="(234)109.235.251.132: 3128-http"/>
+    <proxy_server is_default="false" port="8083" auth_method="none" hostname="52.90.70.105" type="http" name="(235)52.90.70.105: 8083-http"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="220.133.248.20" type="https" name="(236)220.133.248.20: 80-https"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="203.234.16.4" type="https" name="(237)203.234.16.4: 80-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="62.37.237.92" type="https" name="(238)62.37.237.92: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="95.86.133.70" type="https" name="(239)95.86.133.70: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="91.144.170.31" type="http" name="(240)91.144.170.31: 8080-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="62.37.237.62" type="https" name="(241)62.37.237.62: 8080-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="87.120.162.222" type="https" name="(242)87.120.162.222: 3128-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="85.142.163.1" type="http" name="(243)85.142.163.1: 3128-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="128.199.108.167" type="https" name="(244)128.199.108.167: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="93.92.197.234" type="http" name="(245)93.92.197.234: 8080-http"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="103.251.43.53" type="https" name="(246)103.251.43.53: 80-https"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="59.39.88.190" type="socks4" name="(247)59.39.88.190: 1080-socks4"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="203.234.18.8" type="https" name="(248)203.234.18.8: 80-https"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="1.82.216.134" type="https" name="(249)1.82.216.134: 80-https"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="221.224.163.28" type="https" name="(250)221.224.163.28: 80-https"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="62.176.77.2" type="socks4" name="(251)62.176.77.2: 1080-socks4"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="58.52.201.119" type="https" name="(252)58.52.201.119: 8080-https"/>
+    <proxy_server is_default="false" port="8145" auth_method="none" hostname="168.63.24.174" type="http" name="(253)168.63.24.174: 8145-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="163.28.80.40" type="https" name="(254)163.28.80.40: 3128-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="200.29.191.149" type="https" name="(255)200.29.191.149: 3128-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="202.164.38.11" type="https" name="(256)202.164.38.11: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="124.122.90.247" type="https" name="(257)124.122.90.247: 8080-https"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="85.185.244.119" type="socks4" name="(258)85.185.244.119: 1080-socks4"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="213.24.60.52" type="http" name="(259)213.24.60.52: 8080-http"/>
+    <proxy_server is_default="false" port="10093" auth_method="none" hostname="58.247.125.205" type="https" name="(260)58.247.125.205: 10093-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="213.81.212.137" type="http" name="(261)213.81.212.137: 8080-http"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="164.64.199.3" type="https" name="(262)164.64.199.3: 80-https"/>
+    <proxy_server is_default="false" port="10167" auth_method="none" hostname="58.247.125.205" type="https" name="(263)58.247.125.205: 10167-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="81.181.81.26" type="https" name="(264)81.181.81.26: 3128-https"/>
+    <proxy_server is_default="false" port="808" auth_method="none" hostname="124.160.35.2" type="socks4" name="(265)124.160.35.2: 808-socks4"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="202.100.167.182" type="http" name="(266)202.100.167.182: 80-http"/>
+    <proxy_server is_default="false" port="81" auth_method="none" hostname="86.100.118.44" type="http" name="(267)86.100.118.44: 81-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="146.185.165.53" type="https" name="(268)146.185.165.53: 3128-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="117.239.26.129" type="http" name="(269)117.239.26.129: 3128-http"/>
+    <proxy_server is_default="false" port="8083" auth_method="none" hostname="52.90.68.181" type="https" name="(270)52.90.68.181: 8083-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="190.144.241.197" type="http" name="(271)190.144.241.197: 3128-http"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="222.188.10.1" type="socks4" name="(272)222.188.10.1: 1080-socks4"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="88.207.210.37" type="http" name="(273)88.207.210.37: 8080-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="46.105.214.133" type="https" name="(274)46.105.214.133: 3128-https"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="125.72.125.14" type="socks5" name="(275)125.72.125.14: 1080-socks5"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="164.132.216.252" type="https" name="(276)164.132.216.252: 3128-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="200.105.148.74" type="http" name="(277)200.105.148.74: 3128-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="189.203.172.82" type="http" name="(278)189.203.172.82: 8080-http"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="61.141.21.34" type="socks4" name="(279)61.141.21.34: 1080-socks4"/>
+    <proxy_server is_default="false" port="8127" auth_method="none" hostname="137.135.166.225" type="https" name="(280)137.135.166.225: 8127-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="210.101.131.231" type="https" name="(281)210.101.131.231: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="202.78.206.83" type="https" name="(282)202.78.206.83: 8080-https"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="219.157.77.102" type="socks4" name="(283)219.157.77.102: 1080-socks4"/>
+    <proxy_server is_default="false" port="8181" auth_method="none" hostname="80.91.190.188" type="socks5" name="(284)80.91.190.188: 8181-socks5"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="1.179.201.18" type="https" name="(285)1.179.201.18: 3128-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="58.84.14.121" type="http" name="(286)58.84.14.121: 8080-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="128.199.96.95" type="https" name="(287)128.199.96.95: 3128-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="164.132.216.253" type="https" name="(288)164.132.216.253: 8080-https"/>
+    <proxy_server is_default="false" port="8000" auth_method="none" hostname="217.150.38.177" type="http" name="(289)217.150.38.177: 8000-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="181.211.145.20" type="https" name="(290)181.211.145.20: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="104.238.149.146" type="https" name="(291)104.238.149.146: 8080-https"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="101.255.17.146" type="socks4" name="(292)101.255.17.146: 1080-socks4"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="87.98.147.195" type="https" name="(293)87.98.147.195: 3128-https"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="80.77.29.22" type="http" name="(294)80.77.29.22: 80-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="114.57.31.210" type="http" name="(295)114.57.31.210: 8080-http"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="204.12.249.229" type="http" name="(296)204.12.249.229: 80-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="182.160.102.146" type="http" name="(297)182.160.102.146: 3128-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="109.69.2.125" type="https" name="(298)109.69.2.125: 8080-https"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="203.234.17.49" type="https" name="(299)203.234.17.49: 80-https"/>
+    <proxy_server is_default="false" port="8083" auth_method="none" hostname="52.90.70.105" type="https" name="(300)52.90.70.105: 8083-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="218.56.132.158" type="http" name="(301)218.56.132.158: 8080-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="121.41.110.73" type="https" name="(302)121.41.110.73: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="202.58.199.182" type="https" name="(303)202.58.199.182: 8080-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="83.231.34.132" type="https" name="(304)83.231.34.132: 3128-https"/>
+    <proxy_server is_default="false" port="8083" auth_method="none" hostname="52.90.38.120" type="http" name="(305)52.90.38.120: 8083-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="94.42.140.10" type="https" name="(306)94.42.140.10: 8080-https"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="179.127.175.210" type="socks4" name="(307)179.127.175.210: 1080-socks4"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="128.199.76.133" type="https" name="(308)128.199.76.133: 8080-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="41.71.112.22" type="http" name="(309)41.71.112.22: 3128-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="203.81.71.25" type="https" name="(310)203.81.71.25: 8080-https"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="200.54.180.226" type="https" name="(311)200.54.180.226: 80-https"/>
+    <proxy_server is_default="false" port="8088" auth_method="none" hostname="103.19.109.186" type="http" name="(312)103.19.109.186: 8088-http"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="203.234.20.179" type="https" name="(313)203.234.20.179: 80-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="114.79.163.161" type="https" name="(314)114.79.163.161: 8080-https"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="103.240.16.13" type="socks5" name="(315)103.240.16.13: 1080-socks5"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="83.231.34.133" type="https" name="(316)83.231.34.133: 3128-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="182.52.104.63" type="https" name="(317)182.52.104.63: 8080-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="202.29.233.110" type="http" name="(318)202.29.233.110: 3128-http"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="212.15.182.143" type="https" name="(319)212.15.182.143: 80-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="150.187.5.100" type="https" name="(320)150.187.5.100: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="180.250.74.210" type="http" name="(321)180.250.74.210: 8080-http"/>
+    <proxy_server is_default="false" port="9999" auth_method="none" hostname="80.96.203.117" type="https" name="(322)80.96.203.117: 9999-https"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="202.100.167.180" type="http" name="(323)202.100.167.180: 80-http"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="190.11.225.222" type="socks4" name="(324)190.11.225.222: 1080-socks4"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="82.193.126.109" type="socks4" name="(325)82.193.126.109: 1080-socks4"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="202.78.206.83" type="http" name="(326)202.78.206.83: 8080-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="139.59.224.164" type="https" name="(327)139.59.224.164: 8080-https"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="5.189.176.106" type="http" name="(328)5.189.176.106: 80-http"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="52.37.81.76" type="https" name="(329)52.37.81.76: 80-https"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="200.82.142.2" type="https" name="(330)200.82.142.2: 80-https"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="110.232.80.174" type="http" name="(331)110.232.80.174: 80-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="185.72.246.41" type="https" name="(332)185.72.246.41: 3128-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="195.244.36.177" type="http" name="(333)195.244.36.177: 8080-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="131.108.164.124" type="http" name="(334)131.108.164.124: 8080-http"/>
+    <proxy_server is_default="false" port="9050" auth_method="none" hostname="81.21.114.52" type="socks5" name="(335)81.21.114.52: 9050-socks5"/>
+    <proxy_server is_default="false" port="10229" auth_method="none" hostname="58.247.125.205" type="https" name="(336)58.247.125.205: 10229-https"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="37.32.44.1" type="socks4" name="(337)37.32.44.1: 1080-socks4"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="62.37.237.68" type="https" name="(338)62.37.237.68: 8080-https"/>
+    <proxy_server is_default="false" port="55555" auth_method="none" hostname="108.59.10.129" type="https" name="(339)108.59.10.129: 55555-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="210.129.22.168" type="https" name="(340)210.129.22.168: 3128-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="207.91.10.234" type="https" name="(341)207.91.10.234: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="175.100.97.41" type="https" name="(342)175.100.97.41: 8080-https"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="115.29.193.119" type="socks4" name="(343)115.29.193.119: 1080-socks4"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="188.166.190.229" type="https" name="(344)188.166.190.229: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="181.48.229.106" type="https" name="(345)181.48.229.106: 8080-https"/>
+    <proxy_server is_default="false" port="10252" auth_method="none" hostname="58.247.125.205" type="https" name="(346)58.247.125.205: 10252-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="5.105.112.144" type="https" name="(347)5.105.112.144: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="221.141.2.52" type="http" name="(348)221.141.2.52: 8080-http"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="59.37.163.176" type="socks4" name="(349)59.37.163.176: 1080-socks4"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="63.150.152.151" type="https" name="(350)63.150.152.151: 8080-https"/>
+    <proxy_server is_default="false" port="60000" auth_method="none" hostname="128.199.78.87" type="https" name="(351)128.199.78.87: 60000-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="124.93.222.95" type="socks4" name="(352)124.93.222.95: 8080-socks4"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="139.162.36.131" type="https" name="(353)139.162.36.131: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="203.81.71.102" type="https" name="(354)203.81.71.102: 8080-https"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="131.221.187.250" type="socks4" name="(355)131.221.187.250: 1080-socks4"/>
+    <proxy_server is_default="false" port="120" auth_method="none" hostname="62.84.66.39" type="https" name="(356)62.84.66.39: 120-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="118.70.81.79" type="http" name="(357)118.70.81.79: 8080-http"/>
+    <proxy_server is_default="false" port="8888" auth_method="none" hostname="109.230.196.90" type="https" name="(358)109.230.196.90: 8888-https"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="103.16.112.213" type="socks4" name="(359)103.16.112.213: 1080-socks4"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="138.97.236.17" type="socks4" name="(360)138.97.236.17: 1080-socks4"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="177.189.240.163" type="http" name="(361)177.189.240.163: 3128-http"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="177.99.167.151" type="socks4" name="(362)177.99.167.151: 1080-socks4"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="81.181.81.27" type="https" name="(363)81.181.81.27: 3128-https"/>
+    <proxy_server is_default="false" port="10241" auth_method="none" hostname="58.247.125.205" type="https" name="(364)58.247.125.205: 10241-https"/>
+    <proxy_server is_default="false" port="41820" auth_method="none" hostname="94.28.107.246" type="socks4" name="(365)94.28.107.246: 41820-socks4"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="125.209.91.190" type="https" name="(366)125.209.91.190: 8080-https"/>
+    <proxy_server is_default="false" port="8146" auth_method="none" hostname="137.135.166.225" type="https" name="(367)137.135.166.225: 8146-https"/>
+    <proxy_server is_default="false" port="49550" auth_method="none" hostname="200.239.9.97" type="socks4" name="(368)200.239.9.97: 49550-socks4"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="103.15.60.21" type="http" name="(369)103.15.60.21: 8080-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="175.100.97.41" type="http" name="(370)175.100.97.41: 8080-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="41.205.231.202" type="http" name="(371)41.205.231.202: 8080-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="31.7.227.78" type="https" name="(372)31.7.227.78: 3128-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="117.102.100.6" type="https" name="(373)117.102.100.6: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="181.112.156.149" type="http" name="(374)181.112.156.149: 8080-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="1.9.170.114" type="https" name="(375)1.9.170.114: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="181.143.48.243" type="https" name="(376)181.143.48.243: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="88.157.149.250" type="http" name="(377)88.157.149.250: 8080-http"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="221.4.140.85" type="socks4" name="(378)221.4.140.85: 1080-socks4"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="109.251.146.164" type="https" name="(379)109.251.146.164: 8080-https"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="58.247.125.205" type="https" name="(380)58.247.125.205: 80-https"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="51.254.106.78" type="https" name="(381)51.254.106.78: 80-https"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="119.18.234.60" type="https" name="(382)119.18.234.60: 80-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="202.173.214.23" type="http" name="(383)202.173.214.23: 8080-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="61.168.11.25" type="https" name="(384)61.168.11.25: 8080-https"/>
+    <proxy_server is_default="false" port="10080" auth_method="none" hostname="58.247.125.205" type="https" name="(385)58.247.125.205: 10080-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="189.90.254.239" type="https" name="(386)189.90.254.239: 3128-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="180.250.91.234" type="http" name="(387)180.250.91.234: 8080-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="185.58.226.40" type="https" name="(388)185.58.226.40: 3128-https"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="62.176.68.1" type="socks4" name="(389)62.176.68.1: 1080-socks4"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="181.211.145.19" type="https" name="(390)181.211.145.19: 8080-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="220.248.230.217" type="https" name="(391)220.248.230.217: 3128-https"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="115.29.192.194" type="socks4" name="(392)115.29.192.194: 1080-socks4"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="218.90.174.167" type="http" name="(393)218.90.174.167: 3128-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="83.231.34.193" type="https" name="(394)83.231.34.193: 3128-https"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="190.119.255.182" type="socks4" name="(395)190.119.255.182: 1080-socks4"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="176.123.129.14" type="http" name="(396)176.123.129.14: 8080-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="91.235.91.62" type="http" name="(397)91.235.91.62: 3128-http"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="202.100.167.144" type="http" name="(398)202.100.167.144: 80-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="176.123.129.14" type="https" name="(399)176.123.129.14: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="83.241.46.175" type="http" name="(400)83.241.46.175: 8080-http"/>
+    <proxy_server is_default="false" port="8090" auth_method="none" hostname="203.160.172.163" type="http" name="(401)203.160.172.163: 8090-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="106.75.197.184" type="https" name="(402)106.75.197.184: 3128-https"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="202.100.167.145" type="https" name="(403)202.100.167.145: 80-https"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="45.64.166.149" type="socks4" name="(404)45.64.166.149: 1080-socks4"/>
+    <proxy_server is_default="false" port="8081" auth_method="none" hostname="177.87.79.101" type="http" name="(405)177.87.79.101: 8081-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="108.166.220.18" type="http" name="(406)108.166.220.18: 8080-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="203.91.121.74" type="http" name="(407)203.91.121.74: 3128-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="1.179.183.27" type="https" name="(408)1.179.183.27: 3128-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="220.101.93.3" type="https" name="(409)220.101.93.3: 3128-https"/>
+    <proxy_server is_default="false" port="3123" auth_method="none" hostname="5.135.176.41" type="https" name="(410)5.135.176.41: 3123-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="219.255.197.90" type="http" name="(411)219.255.197.90: 3128-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="114.57.31.210" type="https" name="(412)114.57.31.210: 8080-https"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="202.100.167.160" type="https" name="(413)202.100.167.160: 80-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="113.53.255.242" type="https" name="(414)113.53.255.242: 3128-https"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="117.169.17.242" type="https" name="(415)117.169.17.242: 80-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="165.138.66.247" type="http" name="(416)165.138.66.247: 8080-http"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="202.100.167.145" type="http" name="(417)202.100.167.145: 80-http"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="58.59.68.91" type="socks4" name="(418)58.59.68.91: 1080-socks4"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="24.196.69.180" type="socks4" name="(419)24.196.69.180: 1080-socks4"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="45.64.166.173" type="socks4" name="(420)45.64.166.173: 1080-socks4"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="87.249.205.103" type="https" name="(421)87.249.205.103: 8080-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="110.168.108.197" type="https" name="(422)110.168.108.197: 3128-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="86.62.71.41" type="http" name="(423)86.62.71.41: 3128-http"/>
+    <proxy_server is_default="false" port="8000" auth_method="none" hostname="220.225.245.109" type="https" name="(424)220.225.245.109: 8000-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="202.166.195.113" type="http" name="(425)202.166.195.113: 8080-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="202.29.233.110" type="https" name="(426)202.29.233.110: 3128-https"/>
+    <proxy_server is_default="false" port="8081" auth_method="none" hostname="64.26.95.14" type="https" name="(427)64.26.95.14: 8081-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="85.187.115.179" type="https" name="(428)85.187.115.179: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="125.209.91.190" type="http" name="(429)125.209.91.190: 8080-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="220.248.229.45" type="https" name="(430)220.248.229.45: 3128-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="177.55.158.18" type="https" name="(431)177.55.158.18: 3128-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="193.232.184.141" type="http" name="(432)193.232.184.141: 8080-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="132.255.22.82" type="https" name="(433)132.255.22.82: 8080-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="144.76.232.58" type="http" name="(434)144.76.232.58: 3128-http"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="173.199.124.140" type="https" name="(435)173.199.124.140: 80-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="62.37.237.90" type="https" name="(436)62.37.237.90: 8080-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="46.97.103.50" type="https" name="(437)46.97.103.50: 3128-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="41.74.78.202" type="http" name="(438)41.74.78.202: 3128-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="202.21.116.13" type="https" name="(439)202.21.116.13: 3128-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="118.69.202.160" type="https" name="(440)118.69.202.160: 3128-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="68.38.88.142" type="http" name="(441)68.38.88.142: 8080-http"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="219.65.81.124" type="https" name="(442)219.65.81.124: 80-https"/>
+    <proxy_server is_default="false" port="10080" auth_method="none" hostname="180.153.87.22" type="socks4" name="(443)180.153.87.22: 10080-socks4"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="61.19.177.42" type="http" name="(444)61.19.177.42: 8080-http"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="103.23.100.135" type="http" name="(445)103.23.100.135: 80-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="109.185.180.87" type="http" name="(446)109.185.180.87: 8080-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="168.1.47.248" type="https" name="(447)168.1.47.248: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="202.159.16.165" type="https" name="(448)202.159.16.165: 8080-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="84.38.2.52" type="http" name="(449)84.38.2.52: 3128-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="41.87.81.138" type="https" name="(450)41.87.81.138: 8080-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="176.31.96.198" type="https" name="(451)176.31.96.198: 3128-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="62.37.237.18" type="https" name="(452)62.37.237.18: 8080-https"/>
+    <proxy_server is_default="false" port="8888" auth_method="none" hostname="159.203.2.1" type="https" name="(453)159.203.2.1: 8888-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="187.19.2.26" type="http" name="(454)187.19.2.26: 8080-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="218.249.198.30" type="https" name="(455)218.249.198.30: 3128-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="79.141.70.78" type="https" name="(456)79.141.70.78: 3128-https"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="202.100.167.182" type="https" name="(457)202.100.167.182: 80-https"/>
+    <proxy_server is_default="false" port="9999" auth_method="none" hostname="113.200.29.10" type="http" name="(458)113.200.29.10: 9999-http"/>
+    <proxy_server is_default="false" port="18628" auth_method="none" hostname="166.62.97.244" type="socks4" name="(459)166.62.97.244: 18628-socks4"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="200.150.68.126" type="http" name="(460)200.150.68.126: 3128-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="180.250.174.250" type="http" name="(461)180.250.174.250: 8080-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="118.70.81.79" type="https" name="(462)118.70.81.79: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="125.16.240.197" type="https" name="(463)125.16.240.197: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="146.120.87.126" type="https" name="(464)146.120.87.126: 8080-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="59.34.2.92" type="https" name="(465)59.34.2.92: 3128-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="46.16.226.10" type="http" name="(466)46.16.226.10: 8080-http"/>
+    <proxy_server is_default="false" port="32797" auth_method="none" hostname="108.35.236.62" type="socks4" name="(467)108.35.236.62: 32797-socks4"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="49.1.244.139" type="http" name="(468)49.1.244.139: 3128-http"/>
+    <proxy_server is_default="false" port="8888" auth_method="none" hostname="183.60.200.171" type="https" name="(469)183.60.200.171: 8888-https"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="190.144.241.197" type="https" name="(470)190.144.241.197: 3128-https"/>
+    <proxy_server is_default="false" port="10000" auth_method="none" hostname="182.253.201.78" type="https" name="(471)182.253.201.78: 10000-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="143.208.29.2" type="http" name="(472)143.208.29.2: 8080-http"/>
+    <proxy_server is_default="false" port="9797" auth_method="none" hostname="218.29.111.106" type="http" name="(473)218.29.111.106: 9797-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="128.199.100.118" type="https" name="(474)128.199.100.118: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="138.94.155.201" type="http" name="(475)138.94.155.201: 8080-http"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="183.57.27.163" type="socks4" name="(476)183.57.27.163: 1080-socks4"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="109.197.188.20" type="https" name="(477)109.197.188.20: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="78.187.73.210" type="https" name="(478)78.187.73.210: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="197.211.45.4" type="http" name="(479)197.211.45.4: 8080-http"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="213.159.214.193" type="http" name="(480)213.159.214.193: 80-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="103.4.250.18" type="http" name="(481)103.4.250.18: 8080-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="104.131.209.138" type="https" name="(482)104.131.209.138: 3128-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="88.157.149.250" type="https" name="(483)88.157.149.250: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="188.166.231.182" type="https" name="(484)188.166.231.182: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="72.252.11.84" type="https" name="(485)72.252.11.84: 8080-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="85.207.68.67" type="https" name="(486)85.207.68.67: 8080-https"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="190.109.164.81" type="socks4" name="(487)190.109.164.81: 1080-socks4"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="62.37.237.88" type="https" name="(488)62.37.237.88: 8080-https"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="46.232.207.166" type="socks4" name="(489)46.232.207.166: 1080-socks4"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="62.37.237.36" type="https" name="(490)62.37.237.36: 8080-https"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="221.1.215.138" type="socks4" name="(491)221.1.215.138: 1080-socks4"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="164.64.199.3" type="http" name="(492)164.64.199.3: 80-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="186.10.5.142" type="http" name="(493)186.10.5.142: 8080-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="118.97.252.154" type="https" name="(494)118.97.252.154: 8080-https"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="202.100.167.159" type="http" name="(495)202.100.167.159: 80-http"/>
+    <proxy_server is_default="false" port="3129" auth_method="none" hostname="213.228.165.18" type="http" name="(496)213.228.165.18: 3129-http"/>
+    <proxy_server is_default="false" port="80" auth_method="none" hostname="202.100.167.144" type="https" name="(497)202.100.167.144: 80-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="91.121.132.52" type="https" name="(498)91.121.132.52: 8080-https"/>
+    <proxy_server is_default="false" port="8008" auth_method="none" hostname="177.39.186.59" type="http" name="(499)177.39.186.59: 8008-http"/>
+    <proxy_server is_default="false" port="3128" auth_method="none" hostname="64.137.252.46" type="https" name="(500)64.137.252.46: 3128-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="200.155.186.122" type="http" name="(501)200.155.186.122: 8080-http"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="103.16.115.18" type="socks4" name="(502)103.16.115.18: 1080-socks4"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="101.255.17.244" type="socks4" name="(503)101.255.17.244: 1080-socks4"/>
+    <proxy_server is_default="false" port="9999" auth_method="none" hostname="123.139.59.85" type="https" name="(504)123.139.59.85: 9999-https"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="84.242.196.13" type="http" name="(505)84.242.196.13: 8080-http"/>
+    <proxy_server is_default="false" port="8080" auth_method="none" hostname="62.37.237.72" type="https" name="(506)62.37.237.72: 8080-https"/>
+    <proxy_server is_default="false" port="1080" auth_method="none" hostname="69.36.65.214" type="socks4" name="(507)69.36.65.214: 1080-socks4"/>
+  </proxy_servers>
+  <routing_rules>
+    <routing_rule disabled="false" name="Rule 1" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(0)14.139.162.97: 8080-https"/>
+      <proxy_or_chain name="(1)181.143.229.122: 3128-https"/>
+      <proxy_or_chain name="(2)147.91.1.46: 3128-https"/>
+      <proxy_or_chain name="(3)181.49.36.162: 3128-http"/>
+      <proxy_or_chain name="(4)120.234.15.130: 1080-socks4"/>
+      <proxy_or_chain name="(5)95.86.133.70: 8080-http"/>
+      <proxy_or_chain name="(6)200.55.58.210: 8080-http"/>
+      <proxy_or_chain name="(7)41.33.238.170: 1080-socks4"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 2" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(8)1.9.171.18: 8080-https"/>
+      <proxy_or_chain name="(9)41.243.8.130: 8080-https"/>
+      <proxy_or_chain name="(10)198.98.101.168: 8080-https"/>
+      <proxy_or_chain name="(11)221.132.35.5: 2214-socks5"/>
+      <proxy_or_chain name="(12)58.147.174.112: 8080-http"/>
+      <proxy_or_chain name="(13)202.100.167.159: 80-https"/>
+      <proxy_or_chain name="(14)83.142.160.6: 3128-http"/>
+      <proxy_or_chain name="(15)87.255.70.228: 3128-https"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 3" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(16)145.255.15.37: 8080-https"/>
+      <proxy_or_chain name="(17)70.169.24.2: 8080-http"/>
+      <proxy_or_chain name="(18)186.229.25.114: 80-https"/>
+      <proxy_or_chain name="(19)202.103.241.169: 1080-socks4"/>
+      <proxy_or_chain name="(20)210.101.131.231: 8080-http"/>
+      <proxy_or_chain name="(21)91.121.199.136: 3128-http"/>
+      <proxy_or_chain name="(22)62.210.115.178: 3128-https"/>
+      <proxy_or_chain name="(23)77.121.13.12: 8080-http"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 4" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(24)103.13.133.190: 8080-http"/>
+      <proxy_or_chain name="(25)202.100.167.142: 80-https"/>
+      <proxy_or_chain name="(26)188.214.23.5: 80-http"/>
+      <proxy_or_chain name="(27)203.130.194.149: 3128-https"/>
+      <proxy_or_chain name="(28)5.39.10.71: 3128-https"/>
+      <proxy_or_chain name="(29)52.67.10.231: 3128-https"/>
+      <proxy_or_chain name="(30)163.28.112.100: 3128-https"/>
+      <proxy_or_chain name="(31)91.121.199.136: 3128-https"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 5" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(32)52.90.219.94: 8083-https"/>
+      <proxy_or_chain name="(33)52.90.219.94: 8083-http"/>
+      <proxy_or_chain name="(34)205.202.37.68: 8080-https"/>
+      <proxy_or_chain name="(35)189.218.126.49: 50155-socks4"/>
+      <proxy_or_chain name="(36)185.5.64.70: 8080-https"/>
+      <proxy_or_chain name="(37)103.225.179.251: 8080-https"/>
+      <proxy_or_chain name="(38)87.237.186.151: 3128-https"/>
+      <proxy_or_chain name="(39)177.190.209.10: 8080-http"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 6" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(40)27.147.145.250: 8080-http"/>
+      <proxy_or_chain name="(41)177.184.8.123: 80-https"/>
+      <proxy_or_chain name="(42)221.224.163.28: 443-https"/>
+      <proxy_or_chain name="(43)166.62.97.243: 18628-socks4"/>
+      <proxy_or_chain name="(44)103.54.219.18: 8080-https"/>
+      <proxy_or_chain name="(45)81.31.253.50: 80-https"/>
+      <proxy_or_chain name="(46)202.100.167.180: 80-https"/>
+      <proxy_or_chain name="(47)181.112.156.149: 8080-https"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 7" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(48)210.101.131.229: 8080-https"/>
+      <proxy_or_chain name="(49)103.4.166.203: 8080-https"/>
+      <proxy_or_chain name="(50)62.37.237.61: 8080-https"/>
+      <proxy_or_chain name="(51)202.100.167.149: 80-https"/>
+      <proxy_or_chain name="(52)138.0.89.102: 8080-http"/>
+      <proxy_or_chain name="(53)58.247.125.205: 11112-https"/>
+      <proxy_or_chain name="(54)153.146.159.224: 8080-https"/>
+      <proxy_or_chain name="(55)202.100.167.160: 80-http"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 8" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(56)178.18.44.73: 8080-http"/>
+      <proxy_or_chain name="(57)166.62.97.245: 18628-socks4"/>
+      <proxy_or_chain name="(58)123.30.238.16: 3128-https"/>
+      <proxy_or_chain name="(59)113.53.230.199: 3128-https"/>
+      <proxy_or_chain name="(60)87.120.162.222: 3128-http"/>
+      <proxy_or_chain name="(61)159.226.224.180: 3128-http"/>
+      <proxy_or_chain name="(62)218.202.122.100: 9999-https"/>
+      <proxy_or_chain name="(63)46.225.239.178: 8080-http"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 9" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(64)119.254.84.90: 80-http"/>
+      <proxy_or_chain name="(65)198.98.101.168: 8080-http"/>
+      <proxy_or_chain name="(66)106.186.22.65: 8888-http"/>
+      <proxy_or_chain name="(67)165.138.66.32: 8080-http"/>
+      <proxy_or_chain name="(68)84.22.46.25: 8080-http"/>
+      <proxy_or_chain name="(69)105.235.106.62: 8080-https"/>
+      <proxy_or_chain name="(70)62.37.237.66: 8080-https"/>
+      <proxy_or_chain name="(71)202.100.167.142: 80-http"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 10" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(72)190.208.45.221: 3128-http"/>
+      <proxy_or_chain name="(73)179.184.206.18: 3128-https"/>
+      <proxy_or_chain name="(74)119.110.71.86: 8080-https"/>
+      <proxy_or_chain name="(75)186.121.206.232: 1080-socks4"/>
+      <proxy_or_chain name="(76)62.37.237.63: 8080-https"/>
+      <proxy_or_chain name="(77)27.131.47.132: 9797-https"/>
+      <proxy_or_chain name="(78)118.26.226.157: 3128-http"/>
+      <proxy_or_chain name="(79)89.41.106.99: 8080-http"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 11" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(80)139.162.36.131: 8080-http"/>
+      <proxy_or_chain name="(81)187.167.88.7: 8080-https"/>
+      <proxy_or_chain name="(82)177.15.8.53: 8080-https"/>
+      <proxy_or_chain name="(83)94.180.115.22: 8080-http"/>
+      <proxy_or_chain name="(84)120.85.132.234: 80-http"/>
+      <proxy_or_chain name="(85)85.185.244.116: 1080-socks4"/>
+      <proxy_or_chain name="(86)189.219.204.138: 29009-socks4"/>
+      <proxy_or_chain name="(87)63.150.152.151: 3128-https"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 12" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(88)83.221.192.250: 3128-https"/>
+      <proxy_or_chain name="(89)185.29.224.11: 8080-https"/>
+      <proxy_or_chain name="(90)182.61.58.100: 3128-https"/>
+      <proxy_or_chain name="(91)190.120.123.2: 1080-socks4"/>
+      <proxy_or_chain name="(92)5.154.116.178: 8088-http"/>
+      <proxy_or_chain name="(93)200.192.248.74: 8080-http"/>
+      <proxy_or_chain name="(94)223.68.1.38: 8000-http"/>
+      <proxy_or_chain name="(95)45.64.166.145: 1080-socks4"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 13" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(96)139.59.254.28: 8080-https"/>
+      <proxy_or_chain name="(97)64.31.253.240: 10200-socks4"/>
+      <proxy_or_chain name="(98)219.255.197.90: 3128-https"/>
+      <proxy_or_chain name="(99)137.135.166.225: 8128-https"/>
+      <proxy_or_chain name="(100)85.187.115.179: 8080-http"/>
+      <proxy_or_chain name="(101)203.234.16.8: 80-https"/>
+      <proxy_or_chain name="(102)212.98.159.194: 8080-http"/>
+      <proxy_or_chain name="(103)212.15.182.156: 80-https"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 14" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(104)218.29.111.106: 9797-https"/>
+      <proxy_or_chain name="(105)189.219.221.140: 24663-socks4"/>
+      <proxy_or_chain name="(106)162.223.88.243: 80-http"/>
+      <proxy_or_chain name="(107)113.200.29.10: 9999-https"/>
+      <proxy_or_chain name="(108)58.247.125.205: 10298-https"/>
+      <proxy_or_chain name="(109)70.89.14.22: 8118-http"/>
+      <proxy_or_chain name="(110)31.169.70.193: 8080-http"/>
+      <proxy_or_chain name="(111)207.87.85.3: 8080-http"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 15" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(112)36.250.69.4: 80-http"/>
+      <proxy_or_chain name="(113)52.77.86.67: 3128-https"/>
+      <proxy_or_chain name="(114)163.121.187.180: 8080-https"/>
+      <proxy_or_chain name="(115)188.214.23.100: 80-http"/>
+      <proxy_or_chain name="(116)4.31.142.200: 8080-https"/>
+      <proxy_or_chain name="(117)166.62.97.238: 18628-socks4"/>
+      <proxy_or_chain name="(118)200.46.94.194: 3128-http"/>
+      <proxy_or_chain name="(119)197.255.225.205: 3128-https"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 16" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(120)1.9.170.226: 8080-https"/>
+      <proxy_or_chain name="(121)112.124.35.165: 1080-socks4"/>
+      <proxy_or_chain name="(122)36.230.161.217: 8998-https"/>
+      <proxy_or_chain name="(123)205.202.37.68: 8080-http"/>
+      <proxy_or_chain name="(124)150.129.4.18: 8080-http"/>
+      <proxy_or_chain name="(125)164.58.68.174: 3128-https"/>
+      <proxy_or_chain name="(126)152.26.30.150: 8080-https"/>
+      <proxy_or_chain name="(127)62.37.237.33: 8080-https"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 17" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(128)103.19.109.186: 8088-https"/>
+      <proxy_or_chain name="(129)78.158.162.114: 1080-socks4"/>
+      <proxy_or_chain name="(130)31.214.144.178: 80-http"/>
+      <proxy_or_chain name="(131)94.74.148.1: 8080-https"/>
+      <proxy_or_chain name="(132)209.58.178.159: 8080-https"/>
+      <proxy_or_chain name="(133)86.188.142.244: 8080-https"/>
+      <proxy_or_chain name="(134)221.134.239.213: 80-https"/>
+      <proxy_or_chain name="(135)91.121.132.52: 8080-http"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 18" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(136)78.135.114.76: 1080-socks4"/>
+      <proxy_or_chain name="(137)187.49.81.20: 6006-http"/>
+      <proxy_or_chain name="(138)36.230.161.217: 8998-http"/>
+      <proxy_or_chain name="(139)181.30.11.71: 1080-socks4"/>
+      <proxy_or_chain name="(140)202.29.221.90: 3128-http"/>
+      <proxy_or_chain name="(141)155.133.7.47: 8080-http"/>
+      <proxy_or_chain name="(142)109.194.18.181: 3128-http"/>
+      <proxy_or_chain name="(143)92.242.125.177: 3128-https"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 19" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(144)137.135.166.225: 8128-https"/>
+      <proxy_or_chain name="(145)1.9.83.18: 8080-https"/>
+      <proxy_or_chain name="(146)58.96.176.83: 3128-https"/>
+      <proxy_or_chain name="(147)208.108.142.88: 8888-https"/>
+      <proxy_or_chain name="(148)202.164.38.11: 8080-http"/>
+      <proxy_or_chain name="(149)158.69.48.22: 8080-http"/>
+      <proxy_or_chain name="(150)125.209.97.190: 8080-http"/>
+      <proxy_or_chain name="(151)200.223.91.59: 3128-http"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 20" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(152)124.250.236.26: 80-https"/>
+      <proxy_or_chain name="(153)64.185.11.223: 10200-socks4"/>
+      <proxy_or_chain name="(154)94.23.205.32: 3128-https"/>
+      <proxy_or_chain name="(155)35.58.0.102: 3128-https"/>
+      <proxy_or_chain name="(156)70.248.28.13: 8080-https"/>
+      <proxy_or_chain name="(157)202.106.16.36: 3128-http"/>
+      <proxy_or_chain name="(158)200.240.248.234: 3128-https"/>
+      <proxy_or_chain name="(159)62.37.237.64: 8080-https"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 21" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(160)173.199.124.140: 80-http"/>
+      <proxy_or_chain name="(161)103.253.146.197: 8080-https"/>
+      <proxy_or_chain name="(162)118.97.42.154: 8080-http"/>
+      <proxy_or_chain name="(163)45.63.15.234: 3128-https"/>
+      <proxy_or_chain name="(164)180.211.163.235: 8080-http"/>
+      <proxy_or_chain name="(165)123.124.168.149: 80-http"/>
+      <proxy_or_chain name="(166)202.106.16.36: 3128-https"/>
+      <proxy_or_chain name="(167)190.29.22.247: 8080-http"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 22" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(168)148.251.188.119: 80-https"/>
+      <proxy_or_chain name="(169)121.40.108.76: 80-https"/>
+      <proxy_or_chain name="(170)158.181.153.152: 3128-https"/>
+      <proxy_or_chain name="(171)202.100.167.149: 80-http"/>
+      <proxy_or_chain name="(172)190.151.10.226: 8080-http"/>
+      <proxy_or_chain name="(173)223.68.1.38: 8000-https"/>
+      <proxy_or_chain name="(174)1.179.183.109: 8080-http"/>
+      <proxy_or_chain name="(175)62.37.237.32: 80-https"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 23" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(176)58.247.125.205: 10160-https"/>
+      <proxy_or_chain name="(177)103.251.43.53: 80-http"/>
+      <proxy_or_chain name="(178)190.121.158.114: 8080-http"/>
+      <proxy_or_chain name="(179)83.231.34.133: 80-https"/>
+      <proxy_or_chain name="(180)190.181.18.232: 80-http"/>
+      <proxy_or_chain name="(181)110.84.128.143: 3128-https"/>
+      <proxy_or_chain name="(182)137.135.166.225: 8127-https"/>
+      <proxy_or_chain name="(183)218.24.45.194: 1080-socks5"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 24" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(184)58.248.20.110: 1080-socks4"/>
+      <proxy_or_chain name="(185)207.87.85.3: 8080-https"/>
+      <proxy_or_chain name="(186)218.90.174.167: 3128-https"/>
+      <proxy_or_chain name="(187)52.90.68.181: 8083-http"/>
+      <proxy_or_chain name="(188)58.216.156.126: 1080-socks4"/>
+      <proxy_or_chain name="(189)152.26.91.86: 8080-https"/>
+      <proxy_or_chain name="(190)52.11.31.207: 4444-http"/>
+      <proxy_or_chain name="(191)158.69.128.121: 8080-https"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 25" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(192)120.132.71.212: 80-https"/>
+      <proxy_or_chain name="(193)182.253.201.76: 10000-http"/>
+      <proxy_or_chain name="(194)58.247.125.205: 10109-https"/>
+      <proxy_or_chain name="(195)162.223.88.243: 80-https"/>
+      <proxy_or_chain name="(196)37.235.24.47: 8080-http"/>
+      <proxy_or_chain name="(197)184.69.67.122: 80-http"/>
+      <proxy_or_chain name="(198)92.255.187.219: 8080-http"/>
+      <proxy_or_chain name="(199)43.243.112.79: 3128-http"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 26" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(200)221.224.163.28: 80-http"/>
+      <proxy_or_chain name="(201)141.85.220.108: 8080-https"/>
+      <proxy_or_chain name="(202)203.215.33.62: 8080-http"/>
+      <proxy_or_chain name="(203)190.107.206.1: 8080-http"/>
+      <proxy_or_chain name="(204)37.187.101.226: 3128-https"/>
+      <proxy_or_chain name="(205)201.7.216.85: 3128-https"/>
+      <proxy_or_chain name="(206)62.37.237.25: 80-https"/>
+      <proxy_or_chain name="(207)221.226.11.229: 1080-socks4"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 27" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(208)196.195.249.150: 8080-https"/>
+      <proxy_or_chain name="(209)178.252.146.6: 8080-http"/>
+      <proxy_or_chain name="(210)192.3.88.100: 3129-http"/>
+      <proxy_or_chain name="(211)163.28.80.40: 80-https"/>
+      <proxy_or_chain name="(212)118.97.113.170: 8080-http"/>
+      <proxy_or_chain name="(213)89.218.214.106: 9090-https"/>
+      <proxy_or_chain name="(214)101.255.51.47: 8080-https"/>
+      <proxy_or_chain name="(215)58.247.125.205: 10032-https"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 28" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(216)221.214.208.226: 1080-socks4"/>
+      <proxy_or_chain name="(217)208.65.53.170: 8080-https"/>
+      <proxy_or_chain name="(218)177.74.117.142: 3128-http"/>
+      <proxy_or_chain name="(219)202.68.254.99: 1080-socks4"/>
+      <proxy_or_chain name="(220)112.124.50.85: 1080-socks4"/>
+      <proxy_or_chain name="(221)189.219.136.156: 13639-socks4"/>
+      <proxy_or_chain name="(222)108.59.10.129: 55555-http"/>
+      <proxy_or_chain name="(223)199.231.109.1: 8089-http"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 29" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(224)190.120.123.3: 1080-socks4"/>
+      <proxy_or_chain name="(225)207.91.10.234: 8080-http"/>
+      <proxy_or_chain name="(226)124.89.35.206: 9999-http"/>
+      <proxy_or_chain name="(227)84.17.27.245: 1080-socks4"/>
+      <proxy_or_chain name="(228)51.254.106.64: 80-http"/>
+      <proxy_or_chain name="(229)62.37.237.33: 80-https"/>
+      <proxy_or_chain name="(230)95.131.181.170: 8080-https"/>
+      <proxy_or_chain name="(231)57.191.0.239: 80-https"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 30" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(232)103.53.169.109: 8080-https"/>
+      <proxy_or_chain name="(233)86.247.119.65: 3128-https"/>
+      <proxy_or_chain name="(234)109.235.251.132: 3128-http"/>
+      <proxy_or_chain name="(235)52.90.70.105: 8083-http"/>
+      <proxy_or_chain name="(236)220.133.248.20: 80-https"/>
+      <proxy_or_chain name="(237)203.234.16.4: 80-https"/>
+      <proxy_or_chain name="(238)62.37.237.92: 8080-https"/>
+      <proxy_or_chain name="(239)95.86.133.70: 8080-https"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 31" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(240)91.144.170.31: 8080-http"/>
+      <proxy_or_chain name="(241)62.37.237.62: 8080-https"/>
+      <proxy_or_chain name="(242)87.120.162.222: 3128-https"/>
+      <proxy_or_chain name="(243)85.142.163.1: 3128-http"/>
+      <proxy_or_chain name="(244)128.199.108.167: 8080-https"/>
+      <proxy_or_chain name="(245)93.92.197.234: 8080-http"/>
+      <proxy_or_chain name="(246)103.251.43.53: 80-https"/>
+      <proxy_or_chain name="(247)59.39.88.190: 1080-socks4"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 32" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(248)203.234.18.8: 80-https"/>
+      <proxy_or_chain name="(249)1.82.216.134: 80-https"/>
+      <proxy_or_chain name="(250)221.224.163.28: 80-https"/>
+      <proxy_or_chain name="(251)62.176.77.2: 1080-socks4"/>
+      <proxy_or_chain name="(252)58.52.201.119: 8080-https"/>
+      <proxy_or_chain name="(253)168.63.24.174: 8145-http"/>
+      <proxy_or_chain name="(254)163.28.80.40: 3128-https"/>
+      <proxy_or_chain name="(255)200.29.191.149: 3128-https"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 33" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(256)202.164.38.11: 8080-https"/>
+      <proxy_or_chain name="(257)124.122.90.247: 8080-https"/>
+      <proxy_or_chain name="(258)85.185.244.119: 1080-socks4"/>
+      <proxy_or_chain name="(259)213.24.60.52: 8080-http"/>
+      <proxy_or_chain name="(260)58.247.125.205: 10093-https"/>
+      <proxy_or_chain name="(261)213.81.212.137: 8080-http"/>
+      <proxy_or_chain name="(262)164.64.199.3: 80-https"/>
+      <proxy_or_chain name="(263)58.247.125.205: 10167-https"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 34" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(264)81.181.81.26: 3128-https"/>
+      <proxy_or_chain name="(265)124.160.35.2: 808-socks4"/>
+      <proxy_or_chain name="(266)202.100.167.182: 80-http"/>
+      <proxy_or_chain name="(267)86.100.118.44: 81-http"/>
+      <proxy_or_chain name="(268)146.185.165.53: 3128-https"/>
+      <proxy_or_chain name="(269)117.239.26.129: 3128-http"/>
+      <proxy_or_chain name="(270)52.90.68.181: 8083-https"/>
+      <proxy_or_chain name="(271)190.144.241.197: 3128-http"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 35" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(272)222.188.10.1: 1080-socks4"/>
+      <proxy_or_chain name="(273)88.207.210.37: 8080-http"/>
+      <proxy_or_chain name="(274)46.105.214.133: 3128-https"/>
+      <proxy_or_chain name="(275)125.72.125.14: 1080-socks5"/>
+      <proxy_or_chain name="(276)164.132.216.252: 3128-https"/>
+      <proxy_or_chain name="(277)200.105.148.74: 3128-http"/>
+      <proxy_or_chain name="(278)189.203.172.82: 8080-http"/>
+      <proxy_or_chain name="(279)61.141.21.34: 1080-socks4"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 36" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(280)137.135.166.225: 8127-https"/>
+      <proxy_or_chain name="(281)210.101.131.231: 8080-https"/>
+      <proxy_or_chain name="(282)202.78.206.83: 8080-https"/>
+      <proxy_or_chain name="(283)219.157.77.102: 1080-socks4"/>
+      <proxy_or_chain name="(284)80.91.190.188: 8181-socks5"/>
+      <proxy_or_chain name="(285)1.179.201.18: 3128-https"/>
+      <proxy_or_chain name="(286)58.84.14.121: 8080-http"/>
+      <proxy_or_chain name="(287)128.199.96.95: 3128-https"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 37" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(288)164.132.216.253: 8080-https"/>
+      <proxy_or_chain name="(289)217.150.38.177: 8000-http"/>
+      <proxy_or_chain name="(290)181.211.145.20: 8080-https"/>
+      <proxy_or_chain name="(291)104.238.149.146: 8080-https"/>
+      <proxy_or_chain name="(292)101.255.17.146: 1080-socks4"/>
+      <proxy_or_chain name="(293)87.98.147.195: 3128-https"/>
+      <proxy_or_chain name="(294)80.77.29.22: 80-http"/>
+      <proxy_or_chain name="(295)114.57.31.210: 8080-http"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 38" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(296)204.12.249.229: 80-http"/>
+      <proxy_or_chain name="(297)182.160.102.146: 3128-http"/>
+      <proxy_or_chain name="(298)109.69.2.125: 8080-https"/>
+      <proxy_or_chain name="(299)203.234.17.49: 80-https"/>
+      <proxy_or_chain name="(300)52.90.70.105: 8083-https"/>
+      <proxy_or_chain name="(301)218.56.132.158: 8080-http"/>
+      <proxy_or_chain name="(302)121.41.110.73: 8080-https"/>
+      <proxy_or_chain name="(303)202.58.199.182: 8080-https"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 39" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(304)83.231.34.132: 3128-https"/>
+      <proxy_or_chain name="(305)52.90.38.120: 8083-http"/>
+      <proxy_or_chain name="(306)94.42.140.10: 8080-https"/>
+      <proxy_or_chain name="(307)179.127.175.210: 1080-socks4"/>
+      <proxy_or_chain name="(308)128.199.76.133: 8080-https"/>
+      <proxy_or_chain name="(309)41.71.112.22: 3128-http"/>
+      <proxy_or_chain name="(310)203.81.71.25: 8080-https"/>
+      <proxy_or_chain name="(311)200.54.180.226: 80-https"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 40" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(312)103.19.109.186: 8088-http"/>
+      <proxy_or_chain name="(313)203.234.20.179: 80-https"/>
+      <proxy_or_chain name="(314)114.79.163.161: 8080-https"/>
+      <proxy_or_chain name="(315)103.240.16.13: 1080-socks5"/>
+      <proxy_or_chain name="(316)83.231.34.133: 3128-https"/>
+      <proxy_or_chain name="(317)182.52.104.63: 8080-https"/>
+      <proxy_or_chain name="(318)202.29.233.110: 3128-http"/>
+      <proxy_or_chain name="(319)212.15.182.143: 80-https"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 41" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(320)150.187.5.100: 8080-https"/>
+      <proxy_or_chain name="(321)180.250.74.210: 8080-http"/>
+      <proxy_or_chain name="(322)80.96.203.117: 9999-https"/>
+      <proxy_or_chain name="(323)202.100.167.180: 80-http"/>
+      <proxy_or_chain name="(324)190.11.225.222: 1080-socks4"/>
+      <proxy_or_chain name="(325)82.193.126.109: 1080-socks4"/>
+      <proxy_or_chain name="(326)202.78.206.83: 8080-http"/>
+      <proxy_or_chain name="(327)139.59.224.164: 8080-https"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 42" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(328)5.189.176.106: 80-http"/>
+      <proxy_or_chain name="(329)52.37.81.76: 80-https"/>
+      <proxy_or_chain name="(330)200.82.142.2: 80-https"/>
+      <proxy_or_chain name="(331)110.232.80.174: 80-http"/>
+      <proxy_or_chain name="(332)185.72.246.41: 3128-https"/>
+      <proxy_or_chain name="(333)195.244.36.177: 8080-http"/>
+      <proxy_or_chain name="(334)131.108.164.124: 8080-http"/>
+      <proxy_or_chain name="(335)81.21.114.52: 9050-socks5"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 43" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(336)58.247.125.205: 10229-https"/>
+      <proxy_or_chain name="(337)37.32.44.1: 1080-socks4"/>
+      <proxy_or_chain name="(338)62.37.237.68: 8080-https"/>
+      <proxy_or_chain name="(339)108.59.10.129: 55555-https"/>
+      <proxy_or_chain name="(340)210.129.22.168: 3128-https"/>
+      <proxy_or_chain name="(341)207.91.10.234: 8080-https"/>
+      <proxy_or_chain name="(342)175.100.97.41: 8080-https"/>
+      <proxy_or_chain name="(343)115.29.193.119: 1080-socks4"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 44" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(344)188.166.190.229: 8080-https"/>
+      <proxy_or_chain name="(345)181.48.229.106: 8080-https"/>
+      <proxy_or_chain name="(346)58.247.125.205: 10252-https"/>
+      <proxy_or_chain name="(347)5.105.112.144: 8080-https"/>
+      <proxy_or_chain name="(348)221.141.2.52: 8080-http"/>
+      <proxy_or_chain name="(349)59.37.163.176: 1080-socks4"/>
+      <proxy_or_chain name="(350)63.150.152.151: 8080-https"/>
+      <proxy_or_chain name="(351)128.199.78.87: 60000-https"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 45" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(352)124.93.222.95: 8080-socks4"/>
+      <proxy_or_chain name="(353)139.162.36.131: 8080-https"/>
+      <proxy_or_chain name="(354)203.81.71.102: 8080-https"/>
+      <proxy_or_chain name="(355)131.221.187.250: 1080-socks4"/>
+      <proxy_or_chain name="(356)62.84.66.39: 120-https"/>
+      <proxy_or_chain name="(357)118.70.81.79: 8080-http"/>
+      <proxy_or_chain name="(358)109.230.196.90: 8888-https"/>
+      <proxy_or_chain name="(359)103.16.112.213: 1080-socks4"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 46" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(360)138.97.236.17: 1080-socks4"/>
+      <proxy_or_chain name="(361)177.189.240.163: 3128-http"/>
+      <proxy_or_chain name="(362)177.99.167.151: 1080-socks4"/>
+      <proxy_or_chain name="(363)81.181.81.27: 3128-https"/>
+      <proxy_or_chain name="(364)58.247.125.205: 10241-https"/>
+      <proxy_or_chain name="(365)94.28.107.246: 41820-socks4"/>
+      <proxy_or_chain name="(366)125.209.91.190: 8080-https"/>
+      <proxy_or_chain name="(367)137.135.166.225: 8146-https"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 47" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(368)200.239.9.97: 49550-socks4"/>
+      <proxy_or_chain name="(369)103.15.60.21: 8080-http"/>
+      <proxy_or_chain name="(370)175.100.97.41: 8080-http"/>
+      <proxy_or_chain name="(371)41.205.231.202: 8080-http"/>
+      <proxy_or_chain name="(372)31.7.227.78: 3128-https"/>
+      <proxy_or_chain name="(373)117.102.100.6: 8080-https"/>
+      <proxy_or_chain name="(374)181.112.156.149: 8080-http"/>
+      <proxy_or_chain name="(375)1.9.170.114: 8080-https"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 48" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(376)181.143.48.243: 8080-https"/>
+      <proxy_or_chain name="(377)88.157.149.250: 8080-http"/>
+      <proxy_or_chain name="(378)221.4.140.85: 1080-socks4"/>
+      <proxy_or_chain name="(379)109.251.146.164: 8080-https"/>
+      <proxy_or_chain name="(380)58.247.125.205: 80-https"/>
+      <proxy_or_chain name="(381)51.254.106.78: 80-https"/>
+      <proxy_or_chain name="(382)119.18.234.60: 80-https"/>
+      <proxy_or_chain name="(383)202.173.214.23: 8080-http"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 49" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(384)61.168.11.25: 8080-https"/>
+      <proxy_or_chain name="(385)58.247.125.205: 10080-https"/>
+      <proxy_or_chain name="(386)189.90.254.239: 3128-https"/>
+      <proxy_or_chain name="(387)180.250.91.234: 8080-http"/>
+      <proxy_or_chain name="(388)185.58.226.40: 3128-https"/>
+      <proxy_or_chain name="(389)62.176.68.1: 1080-socks4"/>
+      <proxy_or_chain name="(390)181.211.145.19: 8080-https"/>
+      <proxy_or_chain name="(391)220.248.230.217: 3128-https"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 50" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(392)115.29.192.194: 1080-socks4"/>
+      <proxy_or_chain name="(393)218.90.174.167: 3128-http"/>
+      <proxy_or_chain name="(394)83.231.34.193: 3128-https"/>
+      <proxy_or_chain name="(395)190.119.255.182: 1080-socks4"/>
+      <proxy_or_chain name="(396)176.123.129.14: 8080-http"/>
+      <proxy_or_chain name="(397)91.235.91.62: 3128-http"/>
+      <proxy_or_chain name="(398)202.100.167.144: 80-http"/>
+      <proxy_or_chain name="(399)176.123.129.14: 8080-https"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 51" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(400)83.241.46.175: 8080-http"/>
+      <proxy_or_chain name="(401)203.160.172.163: 8090-http"/>
+      <proxy_or_chain name="(402)106.75.197.184: 3128-https"/>
+      <proxy_or_chain name="(403)202.100.167.145: 80-https"/>
+      <proxy_or_chain name="(404)45.64.166.149: 1080-socks4"/>
+      <proxy_or_chain name="(405)177.87.79.101: 8081-http"/>
+      <proxy_or_chain name="(406)108.166.220.18: 8080-http"/>
+      <proxy_or_chain name="(407)203.91.121.74: 3128-http"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 52" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(408)1.179.183.27: 3128-https"/>
+      <proxy_or_chain name="(409)220.101.93.3: 3128-https"/>
+      <proxy_or_chain name="(410)5.135.176.41: 3123-https"/>
+      <proxy_or_chain name="(411)219.255.197.90: 3128-http"/>
+      <proxy_or_chain name="(412)114.57.31.210: 8080-https"/>
+      <proxy_or_chain name="(413)202.100.167.160: 80-https"/>
+      <proxy_or_chain name="(414)113.53.255.242: 3128-https"/>
+      <proxy_or_chain name="(415)117.169.17.242: 80-https"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 53" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(416)165.138.66.247: 8080-http"/>
+      <proxy_or_chain name="(417)202.100.167.145: 80-http"/>
+      <proxy_or_chain name="(418)58.59.68.91: 1080-socks4"/>
+      <proxy_or_chain name="(419)24.196.69.180: 1080-socks4"/>
+      <proxy_or_chain name="(420)45.64.166.173: 1080-socks4"/>
+      <proxy_or_chain name="(421)87.249.205.103: 8080-https"/>
+      <proxy_or_chain name="(422)110.168.108.197: 3128-https"/>
+      <proxy_or_chain name="(423)86.62.71.41: 3128-http"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 54" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(424)220.225.245.109: 8000-https"/>
+      <proxy_or_chain name="(425)202.166.195.113: 8080-http"/>
+      <proxy_or_chain name="(426)202.29.233.110: 3128-https"/>
+      <proxy_or_chain name="(427)64.26.95.14: 8081-https"/>
+      <proxy_or_chain name="(428)85.187.115.179: 8080-https"/>
+      <proxy_or_chain name="(429)125.209.91.190: 8080-http"/>
+      <proxy_or_chain name="(430)220.248.229.45: 3128-https"/>
+      <proxy_or_chain name="(431)177.55.158.18: 3128-https"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 55" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(432)193.232.184.141: 8080-http"/>
+      <proxy_or_chain name="(433)132.255.22.82: 8080-https"/>
+      <proxy_or_chain name="(434)144.76.232.58: 3128-http"/>
+      <proxy_or_chain name="(435)173.199.124.140: 80-https"/>
+      <proxy_or_chain name="(436)62.37.237.90: 8080-https"/>
+      <proxy_or_chain name="(437)46.97.103.50: 3128-https"/>
+      <proxy_or_chain name="(438)41.74.78.202: 3128-http"/>
+      <proxy_or_chain name="(439)202.21.116.13: 3128-https"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 56" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(440)118.69.202.160: 3128-https"/>
+      <proxy_or_chain name="(441)68.38.88.142: 8080-http"/>
+      <proxy_or_chain name="(442)219.65.81.124: 80-https"/>
+      <proxy_or_chain name="(443)180.153.87.22: 10080-socks4"/>
+      <proxy_or_chain name="(444)61.19.177.42: 8080-http"/>
+      <proxy_or_chain name="(445)103.23.100.135: 80-http"/>
+      <proxy_or_chain name="(446)109.185.180.87: 8080-http"/>
+      <proxy_or_chain name="(447)168.1.47.248: 8080-https"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 57" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(448)202.159.16.165: 8080-https"/>
+      <proxy_or_chain name="(449)84.38.2.52: 3128-http"/>
+      <proxy_or_chain name="(450)41.87.81.138: 8080-https"/>
+      <proxy_or_chain name="(451)176.31.96.198: 3128-https"/>
+      <proxy_or_chain name="(452)62.37.237.18: 8080-https"/>
+      <proxy_or_chain name="(453)159.203.2.1: 8888-https"/>
+      <proxy_or_chain name="(454)187.19.2.26: 8080-http"/>
+      <proxy_or_chain name="(455)218.249.198.30: 3128-https"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 58" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(456)79.141.70.78: 3128-https"/>
+      <proxy_or_chain name="(457)202.100.167.182: 80-https"/>
+      <proxy_or_chain name="(458)113.200.29.10: 9999-http"/>
+      <proxy_or_chain name="(459)166.62.97.244: 18628-socks4"/>
+      <proxy_or_chain name="(460)200.150.68.126: 3128-http"/>
+      <proxy_or_chain name="(461)180.250.174.250: 8080-http"/>
+      <proxy_or_chain name="(462)118.70.81.79: 8080-https"/>
+      <proxy_or_chain name="(463)125.16.240.197: 8080-https"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 59" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(464)146.120.87.126: 8080-https"/>
+      <proxy_or_chain name="(465)59.34.2.92: 3128-https"/>
+      <proxy_or_chain name="(466)46.16.226.10: 8080-http"/>
+      <proxy_or_chain name="(467)108.35.236.62: 32797-socks4"/>
+      <proxy_or_chain name="(468)49.1.244.139: 3128-http"/>
+      <proxy_or_chain name="(469)183.60.200.171: 8888-https"/>
+      <proxy_or_chain name="(470)190.144.241.197: 3128-https"/>
+      <proxy_or_chain name="(471)182.253.201.78: 10000-https"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 60" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(472)143.208.29.2: 8080-http"/>
+      <proxy_or_chain name="(473)218.29.111.106: 9797-http"/>
+      <proxy_or_chain name="(474)128.199.100.118: 8080-https"/>
+      <proxy_or_chain name="(475)138.94.155.201: 8080-http"/>
+      <proxy_or_chain name="(476)183.57.27.163: 1080-socks4"/>
+      <proxy_or_chain name="(477)109.197.188.20: 8080-https"/>
+      <proxy_or_chain name="(478)78.187.73.210: 8080-https"/>
+      <proxy_or_chain name="(479)197.211.45.4: 8080-http"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 61" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(480)213.159.214.193: 80-http"/>
+      <proxy_or_chain name="(481)103.4.250.18: 8080-http"/>
+      <proxy_or_chain name="(482)104.131.209.138: 3128-https"/>
+      <proxy_or_chain name="(483)88.157.149.250: 8080-https"/>
+      <proxy_or_chain name="(484)188.166.231.182: 8080-https"/>
+      <proxy_or_chain name="(485)72.252.11.84: 8080-https"/>
+      <proxy_or_chain name="(486)85.207.68.67: 8080-https"/>
+      <proxy_or_chain name="(487)190.109.164.81: 1080-socks4"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 62" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(488)62.37.237.88: 8080-https"/>
+      <proxy_or_chain name="(489)46.232.207.166: 1080-socks4"/>
+      <proxy_or_chain name="(490)62.37.237.36: 8080-https"/>
+      <proxy_or_chain name="(491)221.1.215.138: 1080-socks4"/>
+      <proxy_or_chain name="(492)164.64.199.3: 80-http"/>
+      <proxy_or_chain name="(493)186.10.5.142: 8080-http"/>
+      <proxy_or_chain name="(494)118.97.252.154: 8080-https"/>
+      <proxy_or_chain name="(495)202.100.167.159: 80-http"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 63" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(496)213.228.165.18: 3129-http"/>
+      <proxy_or_chain name="(497)202.100.167.144: 80-https"/>
+      <proxy_or_chain name="(498)91.121.132.52: 8080-https"/>
+      <proxy_or_chain name="(499)177.39.186.59: 8008-http"/>
+      <proxy_or_chain name="(500)64.137.252.46: 3128-https"/>
+      <proxy_or_chain name="(501)200.155.186.122: 8080-http"/>
+      <proxy_or_chain name="(502)103.16.115.18: 1080-socks4"/>
+      <proxy_or_chain name="(503)101.255.17.244: 1080-socks4"/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+    <routing_rule disabled="false" name="Rule 64" transports="true" action="proxy" remote_dns="false">
+      <proxy_or_chain name="(504)123.139.59.85: 9999-https"/>
+      <proxy_or_chain name="(505)84.242.196.13: 8080-http"/>
+      <proxy_or_chain name="(506)62.37.237.72: 8080-https"/>
+      <proxy_or_chain name="(507)69.36.65.214: 1080-socks4"/>
+      <proxy_or_chain name=""/>
+      <proxy_or_chain name=""/>
+      <proxy_or_chain name=""/>
+      <proxy_or_chain name=""/>
+      <programs>
+        <program path="C:\none.exe" dir_included="true"/>
+      </programs>
+    </routing_rule>
+  </routing_rules>
+  <remote_dns_exceptions/>
+</proxycap_ruleset>

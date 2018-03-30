@@ -1,0 +1,44 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{969888d8-9cfb-4110-979c-60cb068af92a}</ProjectGuid>
+  </PropertyGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Projects Include="MVCPkg.dproj" />
+    <Projects Include="MVCPkg_Design.dproj" />
+  </ItemGroup>
+  <ProjectExtensions>
+    <Borland.Personality>Default.Personality</Borland.Personality>
+    <Borland.ProjectType />
+    <BorlandProject>
+  <BorlandProject xmlns=""> <Default.Personality> </Default.Personality> </BorlandProject></BorlandProject>
+  </ProjectExtensions>
+  <Target Name="MVCPkg">
+    <MSBuild Projects="MVCPkg.dproj" Targets="" />
+  </Target>
+  <Target Name="MVCPkg:Clean">
+    <MSBuild Projects="MVCPkg.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="MVCPkg:Make">
+    <MSBuild Projects="MVCPkg.dproj" Targets="Make" />
+  </Target>
+  <Target Name="MVCPkg_Design">
+    <MSBuild Projects="MVCPkg_Design.dproj" Targets="" />
+  </Target>
+  <Target Name="MVCPkg_Design:Clean">
+    <MSBuild Projects="MVCPkg_Design.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="MVCPkg_Design:Make">
+    <MSBuild Projects="MVCPkg_Design.dproj" Targets="Make" />
+  </Target>
+  <Target Name="Build">
+    <CallTarget Targets="MVCPkg;MVCPkg_Design" />
+  </Target>
+  <Target Name="Clean">
+    <CallTarget Targets="MVCPkg:Clean;MVCPkg_Design:Clean" />
+  </Target>
+  <Target Name="Make">
+    <CallTarget Targets="MVCPkg:Make;MVCPkg_Design:Make" />
+  </Target>
+  <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
+</Project>

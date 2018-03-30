@@ -1,0 +1,2 @@
+inherited CadControle: TCadControle
+end

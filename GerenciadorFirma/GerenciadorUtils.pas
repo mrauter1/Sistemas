@@ -2,12 +2,22 @@ unit GerenciadorUtils;
 
 interface
 
-uses System.SysUtils, System.Variants, System.Classes, Data.DB, Datasnap.DBClient;
+uses System.SysUtils, System.Variants, System.Classes, Data.DB, Datasnap.DBClient, Forms;
 
 function SortClientDataSet(ClientDataSet: TClientDataSet;
   const FieldName: String): Boolean;
 
+procedure WriteLog(Par_Texto: String);
+
 implementation
+
+uses
+  Utils, uFrmShowMemo;
+
+procedure WriteLog(Par_Texto: String);
+begin
+  Utils.WriteLog('Log.txt', Par_Texto);
+end;
 
 function SortClientDataSet(ClientDataSet: TClientDataSet;
   const FieldName: String): Boolean;

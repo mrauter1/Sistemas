@@ -90,6 +90,7 @@ object DmEstoqProdutos: TDmEstoqProdutos
     Left = 76
     Top = 72
     object CdsEstoqProdutosRANK: TIntegerField
+      DisplayLabel = 'Rank'
       FieldName = 'RANK'
     end
     object CODPRODUTO: TStringField
@@ -104,31 +105,35 @@ object DmEstoqProdutos: TDmEstoqProdutos
       Size = 200
     end
     object PROBFALTAHOJE: TFloatField
+      DisplayLabel = 'Prob. Falta Hoje'
       FieldName = 'PROBFALTAHOJE'
       DisplayFormat = '#0.00'
     end
     object PROBSAI2DIAS: TFloatField
+      DisplayLabel = 'Prob. Sai 2 Dias'
       FieldName = 'PROBSAI2DIAS'
+      Visible = False
       DisplayFormat = '#0.00'
     end
     object PROBFALTA: TFloatField
+      DisplayLabel = 'Prob. Falta'
       FieldName = 'PROBFALTA'
       DisplayFormat = '#0.00'
     end
     object PERCENTDIAS: TFloatField
+      DisplayLabel = '% Dias com Sa'#237'da'
       FieldName = 'PERCENTDIAS'
       DisplayFormat = '#0.00'
     end
     object MEDIASAIDA: TFloatField
+      DisplayLabel = 'M'#233'dia Sa'#237'da'
       FieldName = 'MEDIASAIDA'
       DisplayFormat = '#0.00'
     end
     object STDDEV: TFloatField
+      DisplayLabel = 'Desvio Padr'#227'o'
       FieldName = 'STDDEV'
-      DisplayFormat = '#0.00'
-    end
-    object ESTOQMAX: TFloatField
-      FieldName = 'ESTOQMAX'
+      Visible = False
       DisplayFormat = '#0.00'
     end
     object ESTOQUEATUAL: TFloatField
@@ -136,8 +141,27 @@ object DmEstoqProdutos: TDmEstoqProdutos
       FieldName = 'ESTOQUEATUAL'
       DisplayFormat = '#0.00'
     end
+    object ESTOQMAX: TFloatField
+      DisplayLabel = 'Estoq. Max C'#225'lculado'
+      FieldName = 'ESTOQMAX'
+      DisplayFormat = '#0.00'
+    end
+    object ESPACOESTOQUE: TFloatField
+      DisplayLabel = 'Espa'#231'o Estoque'
+      FieldName = 'ESPACOESTOQUE'
+    end
+    object PRODUCAOMINIMA: TIntegerField
+      DisplayLabel = 'Produ'#231#227'o Minima'
+      FieldName = 'PRODUCAOMINIMA'
+    end
     object DEMANDAC1: TFloatField
+      DisplayLabel = 'Demanda Cliente1'
       FieldName = 'DEMANDAC1'
+      DisplayFormat = '#0.00'
+    end
+    object DEMANDADIARIA: TFloatField
+      DisplayLabel = 'Demanda Di'#225'ria'
+      FieldName = 'DEMANDADIARIA'
       DisplayFormat = '#0.00'
     end
     object DEMANDA: TFloatField
@@ -146,26 +170,17 @@ object DmEstoqProdutos: TDmEstoqProdutos
       DisplayFormat = '#0.00'
     end
     object DIASESTOQUE: TFloatField
+      DisplayLabel = 'Dias Estoque'
       FieldName = 'DIASESTOQUE'
       DisplayFormat = '#0.00'
-    end
-    object ESPACOESTOQUE: TFloatField
-      DisplayLabel = 'Espa'#231'o Estoque'
-      FieldName = 'ESPACOESTOQUE'
     end
     object ROTACAO: TIntegerField
       DisplayLabel = 'Rota'#231#227'o'
       FieldName = 'ROTACAO'
     end
-    object DEMANDADIARIA: TFloatField
-      FieldName = 'DEMANDADIARIA'
-      DisplayFormat = '#0.00'
-    end
     object UNIDADEESTOQUE: TIntegerField
+      DisplayLabel = 'Unidade Estoque'
       FieldName = 'UNIDADEESTOQUE'
-    end
-    object PRODUCAOMINIMA: TIntegerField
-      FieldName = 'PRODUCAOMINIMA'
     end
   end
   object CdsPedidos: TClientDataSet

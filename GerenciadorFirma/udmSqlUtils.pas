@@ -20,6 +20,9 @@ type
     function RetornaValor(Sql: String; ValDefault: Variant): Variant;
   end;
 
+
+procedure CopiaDadosDataSet(pSource, pDest: TDataSet);
+
 var
   DmSqlUtils: TDmSqlUtils;
 
@@ -30,6 +33,36 @@ implementation
 {$R *.dfm}
 
 { TDmSqlUtils }
+
+procedure CopiaDadosDataSet(pSource, pDest: TDataSet);
+var
+  I: Integer;
+  FSourceField: TField;
+
+  procedure CopiarRecord(pSource, pDest: TDataSet);
+  var
+    I: Integer;
+  begin
+    for I := 0 to pDest.Fields.Count - 1 do
+    begin
+      FSourceField:= pSource.FindField(pDest.Fields[I].FieldName);
+      if Assigned(FSourceField) then
+        pDest.Fields[I].Value:= FSourceField.Value;
+
+    end;
+  end;
+
+begin
+  pSource.First;
+  while not pSource.Eof do
+  begin
+    pDest.Insert;
+    CopiarRecord(pSource, pDest);
+    pDest.Post;
+
+    pSource.Next;
+  end;
+end;
 
 function TDmSqlUtils.CriaSqlQuery(sql: String = ''): TSqlQuery;
 begin

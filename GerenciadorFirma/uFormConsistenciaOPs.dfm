@@ -1,7 +1,7 @@
-object Form2: TForm2
+object FormConsistenciaOPs: TFormConsistenciaOPs
   Left = 0
   Top = 0
-  Caption = 'Form2'
+  Caption = 'FormConsistenciaOPs'
   ClientHeight = 277
   ClientWidth = 529
   Color = clBtnFace

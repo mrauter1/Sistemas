@@ -4,7 +4,7 @@ interface
 
 uses
   System.SysUtils, System.Classes, Data.DB, Datasnap.DBClient, uDmSqlUtils, uFuncProbabilidades,
-  Data.SqlExpr, System.Math, uFormProInfo, Forms;
+  Data.SqlExpr, System.Math, uFormProInfo, uFrmShowMemo, uPedidos;
 
 type
   TDmEstoqProdutos = class(TDataModule)
@@ -61,6 +61,9 @@ var
   DataSistema: TDateTime;
 
 implementation
+
+uses
+  GerenciadorUtils, Utils;
 
 {%CLASSGROUP 'System.Classes.TPersistent'}
 
@@ -322,6 +325,7 @@ var
   fSoma, fVariancia: Double;
 
 begin
+  FormShowMemo.SetText('Calculando probabilidade de falta para o produto '+CODPRODUTO.AsString);
   if RefreshDemanda then
   begin
     fNumItens:= 0; fSoma:= 0; fVariancia:= 0;
@@ -399,6 +403,7 @@ var
   fDemandaTotal: Double;
   fDataIni, fDataBase: TDate;
 begin
+  FormShowMemo.SetText('Calculando demanda do produto '+CODPRODUTO.AsString);
   fDemandaTotal:= 0;
   fDataBase:= DataSistema;
   fDataIni:= fDataBase - (Rotacao.AsInteger * 7);
@@ -503,41 +508,45 @@ var
   fFalta, fSomaQuant: Double;
   fUltimoProduto: String;
 begin
-  CdsPedidos.First;
-  while not CdsPedidos.Eof do begin
-    CdsPedidos.Delete;
-  end;
+  CdsPedidos.DisableControls;
+  try
+    CdsPedidos.First;
+    while CdsPedidos.RecordCount > 0 do
+      CdsPedidos.Delete;
 
-  fUltimoProduto:= '';
-  fSomaQuant:= 0;
-  fDataSet.First;
-  while not fDataSet.Eof do
-  begin
-    CdsPedidos.Append;
-    CdsPedidos.FieldByName('CODPRODUTO').AsString:= fDataSet.FieldByName('CODPRODUTO').AsString;
-    CdsPedidos.FieldByName('NOMEPRODUTO').AsString:= fDataSet.FieldByName('NOMEPRODUTO').AsString;
-    CdsPedidos.FieldByName('QUANTIDADE').AsFloat:= fDataSet.FieldByName('QUANTIDADE').AsFloat;
-    CdsPedidos.FieldByName('DIASPARAENTREGA').AsInteger:= fDataSet.FieldByName('DIASPARAENTREGA').AsInteger;
-    CdsPedidos.FieldByName('SIT').AsString:= fDataSet.FieldByName('SIT').AsString;
-    CdsPedidos.FieldByName('NUMPEDIDOS').AsInteger:= fDataSet.FieldByName('NUMPEDIDOS').AsInteger;
-
-    if fUltimoProduto <> CdsPedidos.FieldByName('CODPRODUTO').AsString then begin
-      fUltimoProduto:= CdsPedidos.FieldByName('CODPRODUTO').AsString;
-      fSomaQuant:= 0;
-    end;
-    fSomaQuant:= fSomaQuant + CdsPedidos.FieldByName('QUANTIDADE').AsFloat;
-
-    if CdsEstoqProdutos.Locate('CODPRODUTO', CdsPedidos.FieldByName('CODPRODUTO').AsString, []) then begin
-      fFalta:= fSomaQuant - ESTOQUEATUAL.AsFloat;
-      if fFalta < 0 then fFalta:= 0;
-      CdsPedidos.FieldByName('FALTA').AsFloat:= fFalta;
-    end
-   else
+    fUltimoProduto:= '';
+    fSomaQuant:= 0;
+    fDataSet.First;
+    while not fDataSet.Eof do
     begin
-      CdsPedidos.FieldByName('FALTA').AsFloat:= 0;
+      CdsPedidos.Append;
+      CdsPedidos.FieldByName('CODPRODUTO').AsString:= fDataSet.FieldByName('CODPRODUTO').AsString;
+      CdsPedidos.FieldByName('NOMEPRODUTO').AsString:= fDataSet.FieldByName('NOMEPRODUTO').AsString;
+      CdsPedidos.FieldByName('QUANTIDADE').AsFloat:= fDataSet.FieldByName('QUANTIDADE').AsFloat;
+      CdsPedidos.FieldByName('DIASPARAENTREGA').AsInteger:= fDataSet.FieldByName('DIASPARAENTREGA').AsInteger;
+      CdsPedidos.FieldByName('SIT').AsString:= fDataSet.FieldByName('SIT').AsString;
+      CdsPedidos.FieldByName('NUMPEDIDOS').AsInteger:= fDataSet.FieldByName('NUMPEDIDOS').AsInteger;
+
+      if fUltimoProduto <> CdsPedidos.FieldByName('CODPRODUTO').AsString then begin
+        fUltimoProduto:= CdsPedidos.FieldByName('CODPRODUTO').AsString;
+        fSomaQuant:= 0;
+      end;
+      fSomaQuant:= fSomaQuant + CdsPedidos.FieldByName('QUANTIDADE').AsFloat;
+
+      if CdsEstoqProdutos.Locate('CODPRODUTO', CdsPedidos.FieldByName('CODPRODUTO').AsString, []) then begin
+        fFalta:= fSomaQuant - ESTOQUEATUAL.AsFloat;
+        if fFalta < 0 then fFalta:= 0;
+        CdsPedidos.FieldByName('FALTA').AsFloat:= fFalta;
+      end
+     else
+      begin
+        CdsPedidos.FieldByName('FALTA').AsFloat:= 0;
+      end;
+      CdsPedidos.Post;
+      fDataSet.Next;
     end;
-    CdsPedidos.Post;
-    fDataSet.Next;
+  finally
+    CdsPedidos.EnableControls;
   end;
 end;
 
@@ -619,63 +628,71 @@ var
 begin
   CdsEstoqProdutos.IndexName:= '';
 
-//  CarregaProInfo;
-  fDataSet:= DmSqlUtils.RetornaDataSet(cSql);
+  CdsEstoqProdutos.DisableControls;
   try
-    fDataSet.First;
-    while not fDataSet.Eof do
-    begin
 
-      if FormProInfo.CdsProInfo.Locate('CODPRODUTO', fDataSet.FieldByName('CODPRODUTO').AsString, []) then
+  //  CarregaProInfo;
+    FormShowMemo.SetText('Buscando informações dos produtos do banco de dados...');
+    fDataSet:= DmSqlUtils.RetornaDataSet(cSql);
+    FormShowMemo.SetText('Copiando informações do banco de dados para a memória...');
+    try
+      fDataSet.First;
+      while not fDataSet.Eof do
       begin
-        // Se este produto está marcado como não faz estoque, ele deve ser ignorado
-        if FormProInfo.CdsProInfoNAOFAZESTOQUE.AsBoolean then begin
-            fDataSet.Next;
-            Continue;
-          end
-      end
-     else
-      begin
-        SetInfoDefault(fDataSet.FieldByName('CODPRODUTO').AsString);
+
+        if FormProInfo.CdsProInfo.Locate('CODPRODUTO', fDataSet.FieldByName('CODPRODUTO').AsString, []) then
+        begin
+          // Se este produto está marcado como não faz estoque, ele deve ser ignorado
+          if FormProInfo.CdsProInfoNAOFAZESTOQUE.AsBoolean then begin
+              fDataSet.Next;
+              Continue;
+            end
+        end
+       else
+        begin
+          SetInfoDefault(fDataSet.FieldByName('CODPRODUTO').AsString);
+        end;
+
+        if CdsEstoqProdutos.Locate('CODPRODUTO', fDataSet.FieldByName('CODPRODUTO').AsString, []) then
+          CdsEstoqProdutos.Edit
+        else
+          CdsEstoqProdutos.Append;
+
+        CodProduto.AsString:= fDataSet.FieldByName('CODPRODUTO').AsString;
+        Apresentacao.AsString:= fDataSet.FieldByName('APRESENTACAO').AsString;
+        EstoqueAtual.AsFloat:= fDataSet.FieldByName('ESTOQUEATUAL').AsFloat;
+        DiasEstoque.AsFloat:= fDataSet.FieldByName('DIASESTOQUE').AsFloat;
+  //      FaltaUrgente.AsFloat:= fDataSet.FieldByName('FALTAURGENTE').AsFloat;
+  //      Falta.AsFloat:= fDataSet.FieldByName('FALTA').AsFloat;
+  //      Demanda.AsFloat:= fDataSet.FieldByName('DEMANDA').AsFloat;
+        Rotacao.AsInteger:= fDataSet.FieldByName('ROTACAO').AsInteger;
+
+        UnidadeEstoque.AsInteger:= fDataSet.FieldByName('UNIDADEESTOQUE').AsInteger;
+
+  //      PedidosPendentes.AsFloat:= GetPedidosPendentes(CodProduto.AsFloat, 2);
+        EspacoEstoque.AsInteger:= 30;
+        CdsEstoqProdutosRANK.AsInteger:= 0;
+
+        PRODUCAOMINIMA.AsInteger:= FormProInfo.CdsProInfoPRODUCAOMINIMA.AsInteger;
+
+        if AtualizarDemanda then
+          CalculaDemanda;
+
+        CalculaProbabilidades(AtualizarDemanda);
+  //      CalculaProbabFaltaEmXDias(1);
+
+        CdsEstoqProdutos.Post;
+        fDataSet.Next;
       end;
 
-      if CdsEstoqProdutos.Locate('CODPRODUTO', fDataSet.FieldByName('CODPRODUTO').AsString, []) then
-        CdsEstoqProdutos.Edit
-      else
-        CdsEstoqProdutos.Append;
-
-      CodProduto.AsString:= fDataSet.FieldByName('CODPRODUTO').AsString;
-      Apresentacao.AsString:= fDataSet.FieldByName('APRESENTACAO').AsString;
-      EstoqueAtual.AsFloat:= fDataSet.FieldByName('ESTOQUEATUAL').AsFloat;
-      DiasEstoque.AsFloat:= fDataSet.FieldByName('DIASESTOQUE').AsFloat;
-//      FaltaUrgente.AsFloat:= fDataSet.FieldByName('FALTAURGENTE').AsFloat;
-//      Falta.AsFloat:= fDataSet.FieldByName('FALTA').AsFloat;
-//      Demanda.AsFloat:= fDataSet.FieldByName('DEMANDA').AsFloat;
-      Rotacao.AsInteger:= fDataSet.FieldByName('ROTACAO').AsInteger;
-
-      UnidadeEstoque.AsInteger:= fDataSet.FieldByName('UNIDADEESTOQUE').AsInteger;
-
-//      PedidosPendentes.AsFloat:= GetPedidosPendentes(CodProduto.AsFloat, 2);
-      EspacoEstoque.AsInteger:= 30;
-      CdsEstoqProdutosRANK.AsInteger:= 0;
-
-      PRODUCAOMINIMA.AsInteger:= FormProInfo.CdsProInfoPRODUCAOMINIMA.AsInteger;
-
-      if AtualizarDemanda then
-        CalculaDemanda;
-
-      CalculaProbabilidades(AtualizarDemanda);
-//      CalculaProbabFaltaEmXDias(1);
-
-      CdsEstoqProdutos.Post;
-      fDataSet.Next;
+    finally
+      fDataSet.Free;
     end;
 
+    RankeiaProdutos;
   finally
-    fDataSet.Free;
+    CdsEstoqProdutos.EnableControls;
   end;
-
-  RankeiaProdutos;
 end;
 
 procedure TDmEstoqProdutos.RankeiaProdutos;
@@ -776,8 +793,10 @@ procedure TDmEstoqProdutos.DataModuleCreate(Sender: TObject);
 begin
   DataSistema:= now;//StrToDateTime('20.09.2013');
   fDataSetDiasUteis:= nil;
-  CdsEstoqProdutos.CreateDataSet;
-  CdsPedidos.CreateDataSet;
+
+  CreateDataSetIfNotActive(CdsEstoqProdutos);
+
+  CreateDataSetIfNotActive(CdsPedidos);
 //  AtualizaEstoque(True);
 end;
 

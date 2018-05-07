@@ -6,12 +6,10 @@ object DmSqlUtils: TDmSqlUtils
   object SQLConnection: TSQLConnection
     ConnectionName = 'FBConnection'
     DriverName = 'Firebird'
-    GetDriverFunc = 'getSQLDriverINTERBASE'
-    LibraryName = 'dbxfb.dll'
     LoginPrompt = False
     Params.Strings = (
       'DriverName=Firebird'
-      'Database=C:\Sidicom.new\DADOS\BANCO.FDB'
+      'Database=127.0.0.1:F:\DADOS\BANCO_447.FDB'
       'RoleName=RoleName'
       'User_Name=sysdba'
       'Password=masterkey'
@@ -24,7 +22,6 @@ object DmSqlUtils: TDmSqlUtils
       'WaitOnLocks=True'
       'IsolationLevel=ReadCommitted'
       'Trim Char=False')
-    VendorLib = 'fbclient.dll'
     Left = 112
     Top = 48
   end

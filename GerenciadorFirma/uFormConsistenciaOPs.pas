@@ -4,10 +4,10 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Grids, Vcl.DBGrids;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Grids, Vcl.DBGrids, Data.DB;
 
 type
-  TForm2 = class(TForm)
+  TFormConsistenciaOPs = class(TForm)
     DBGrid1: TDBGrid;
   private
     { Private declarations }
@@ -16,7 +16,7 @@ type
   end;
 
 var
-  Form2: TForm2;
+  FormConsistenciaOPs: TFormConsistenciaOPs;
 
 implementation
 

@@ -1,8 +1,8 @@
 object Form1: TForm1
   Left = 0
   Top = 0
-  Caption = 'Form1'
-  ClientHeight = 367
+  Caption = 'Informa'#231#245'es de estoque e demanda'
+  ClientHeight = 402
   ClientWidth = 768
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -14,26 +14,53 @@ object Form1: TForm1
   OldCreateOrder = False
   PixelsPerInch = 96
   TextHeight = 13
-  object DBGrid1: TDBGrid
+  object cxGrid: TcxGrid
     Left = 0
     Top = 0
     Width = 768
-    Height = 367
+    Height = 361
     Align = alClient
-    DataSource = DataSource1
     TabOrder = 0
-    TitleFont.Charset = DEFAULT_CHARSET
-    TitleFont.Color = clWindowText
-    TitleFont.Height = -11
-    TitleFont.Name = 'Tahoma'
-    TitleFont.Style = []
-    OnDblClick = DBGrid1DblClick
-    OnTitleClick = DBGrid1TitleClick
+    object cxGridDBTableView: TcxGridDBTableView
+      Navigator.Buttons.CustomButtons = <>
+      OnCellDblClick = cxGridDBTableViewCellDblClick
+      DataController.DataSource = DataSource1
+      DataController.Summary.DefaultGroupSummaryItems = <>
+      DataController.Summary.FooterSummaryItems = <>
+      DataController.Summary.SummaryGroups = <>
+      FilterRow.Visible = True
+    end
+    object cxGridLevel: TcxGridLevel
+      GridView = cxGridDBTableView
+    end
+  end
+  object Panel1: TPanel
+    Left = 0
+    Top = 361
+    Width = 768
+    Height = 41
+    Align = alBottom
+    Anchors = [akBottom]
+    Caption = 'Panel1'
+    TabOrder = 1
+    DesignSize = (
+      768
+      41)
+    object BtnAtualiza: TButton
+      Left = 352
+      Top = 14
+      Width = 88
+      Height = 25
+      Anchors = [akBottom]
+      Caption = 'Atualiza'
+      TabOrder = 0
+      OnClick = BtnAtualizaClick
+    end
   end
   object DataSource1: TDataSource
     AutoEdit = False
     DataSet = DmEstoqProdutos.CdsEstoqProdutos
-    Left = 160
+    Left = 144
     Top = 56
   end
   object MainMenu: TMainMenu

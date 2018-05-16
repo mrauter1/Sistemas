@@ -21,6 +21,7 @@ object FormDetalheProdutos: TFormDetalheProdutos
     Align = alClient
     TabOrder = 0
     object cxGridDBTableView: TcxGridDBTableView
+      PopupMenu = PopupMenu1
       Navigator.Buttons.CustomButtons = <>
       OnCellDblClick = cxGridDBTableViewCellDblClick
       DataController.DataSource = DataSource1
@@ -35,6 +36,7 @@ object FormDetalheProdutos: TFormDetalheProdutos
       OptionsData.Inserting = False
       OptionsSelection.CellSelect = False
       OptionsView.GroupByBox = False
+      OptionsView.HeaderAutoHeight = True
       Styles.StyleSheet = FormGlobal.cxGridTableViewStyleSheet1
       object cxGridDBTableViewRANK: TcxGridDBColumn
         DataBinding.FieldName = 'RANK'
@@ -47,16 +49,20 @@ object FormDetalheProdutos: TFormDetalheProdutos
       end
       object cxGridDBTableViewPROBFALTAHOJE: TcxGridDBColumn
         DataBinding.FieldName = 'PROBFALTAHOJE'
+        OnGetDataText = cxColumnProbabilidadeGetDataText
       end
       object cxGridDBTableViewPROBSAI2DIAS: TcxGridDBColumn
         DataBinding.FieldName = 'PROBSAI2DIAS'
         Visible = False
+        OnGetDataText = cxColumnProbabilidadeGetDataText
       end
       object cxGridDBTableViewPROBFALTA: TcxGridDBColumn
         DataBinding.FieldName = 'PROBFALTA'
+        OnGetDataText = cxColumnProbabilidadeGetDataText
       end
       object cxGridDBTableViewPERCENTDIAS: TcxGridDBColumn
         DataBinding.FieldName = 'PERCENTDIAS'
+        OnGetDataText = cxColumnProbabilidadeGetDataText
       end
       object cxGridDBTableViewMEDIASAIDA: TcxGridDBColumn
         DataBinding.FieldName = 'MEDIASAIDA'
@@ -105,5 +111,25 @@ object FormDetalheProdutos: TFormDetalheProdutos
     DataSet = DmEstoqProdutos.CdsEstoqProdutos
     Left = 144
     Top = 56
+  end
+  object PopupMenu1: TPopupMenu
+    Left = 368
+    Top = 88
+    object AbrirConfigPro: TMenuItem
+      Caption = 'Configura'#231#227'o do Produto'
+      OnClick = AbrirConfigProClick
+    end
+    object AbrirDetalhePro: TMenuItem
+      Caption = 'Detalhamento do Produto'
+      OnClick = AbrirDetalheProClick
+    end
+    object VerSimilares1: TMenuItem
+      Caption = 'Produtos Equivalentes'
+      OnClick = VerSimilares1Click
+    end
+    object VerInsumos1: TMenuItem
+      Caption = 'Ver Insumos'
+      OnClick = VerInsumos1Click
+    end
   end
 end

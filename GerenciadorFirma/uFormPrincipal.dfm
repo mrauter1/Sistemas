@@ -61,4 +61,10 @@ object FormPrincipal: TFormPrincipal
       end
     end
   end
+  object Timer1: TTimer
+    Interval = 210000
+    OnTimer = Timer1Timer
+    Left = 472
+    Top = 56
+  end
 end

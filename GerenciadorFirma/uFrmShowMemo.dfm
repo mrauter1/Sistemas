@@ -11,13 +11,13 @@ object FormShowMemo: TFormShowMemo
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  FormStyle = fsStayOnTop
   GlassFrame.Left = 2
   GlassFrame.Top = 2
   GlassFrame.Right = 2
   GlassFrame.Bottom = 2
   OldCreateOrder = False
   Position = poMainFormCenter
+  ScreenSnap = True
   PixelsPerInch = 96
   TextHeight = 13
   object LblText: TLabel

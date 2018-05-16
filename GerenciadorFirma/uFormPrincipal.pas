@@ -26,6 +26,7 @@ type
     Utilidades1: TMenuItem;
     Extras1: TMenuItem;
     Pedidos21: TMenuItem;
+    Timer1: TTimer;
     procedure Pedidos1Click(Sender: TObject);
     procedure Fila1Click(Sender: TObject);
     procedure Densidade1Click(Sender: TObject);
@@ -35,6 +36,7 @@ type
     procedure FormShow(Sender: TObject);
     procedure DetalhedosProdutos1Click(Sender: TObject);
     procedure Pedidos21Click(Sender: TObject);
+    procedure Timer1Timer(Sender: TObject);
   private
     { Private declarations }
   public
@@ -94,6 +96,11 @@ end;
 procedure TFormPrincipal.Pedidos21Click(Sender: TObject);
 begin
   FormPedidos2.Show;
+end;
+
+procedure TFormPrincipal.Timer1Timer(Sender: TObject);
+begin
+  DMFilaProducao.AtualizaFilaProducao;
 end;
 
 end.

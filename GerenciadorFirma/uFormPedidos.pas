@@ -28,23 +28,33 @@ type
     cxGridDBTableViewNOMETRANSPORTE: TcxGridDBColumn;
     cxGridDBTableViewCODPEDIDO: TcxGridDBColumn;
     cxGridDBTableViewQUANTPENDENTE: TcxGridDBColumn;
-    PopupMenuOpcoes: TPopupMenu;
-    Expandir1: TMenuItem;
-    Contrair1: TMenuItem;
     cxStyleRepository1: TcxStyleRepository;
     cxStyleVermelho: TcxStyle;
     Panel1: TPanel;
     BtnAtualiza: TButton;
     BtnOpcoes: TBitBtn;
+    cxGridDBTableViewESTOQUEATUAL: TcxGridDBColumn;
+    cxGridDBTableViewEMFALTA: TcxGridDBColumn;
+    cxStyleAmarelo: TcxStyle;
+    PopupMenu1: TPopupMenu;
+    AbrirConfigPro: TMenuItem;
+    AbrirDetalhePro: TMenuItem;
+    VerSimilares1: TMenuItem;
+    VerInsumos1: TMenuItem;
     procedure BtnOpcoesClick(Sender: TObject);
     procedure cxGridDBTableViewStylesGetContentStyle(
       Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;
       AItem: TcxCustomGridTableItem; var AStyle: TcxStyle);
     procedure BtnAtualizaClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure AbrirConfigProClick(Sender: TObject);
+    procedure AbrirDetalheProClick(Sender: TObject);
+    procedure VerSimilares1Click(Sender: TObject);
+    procedure VerInsumos1Click(Sender: TObject);
   private
     { Private declarations }
     FExpanded: Boolean;
+    function GetCodProSelecionado: String;
   public
     { Public declarations }
   end;
@@ -55,6 +65,40 @@ var
 implementation
 
 {$R *.dfm}
+
+uses uFormProInfo, uFormDetalheProdutos, uFormSelecionaModelos, uFormAdicionarSimilaridade, uFormInsumos;
+
+function TFormPedidos.GetCodProSelecionado: String;
+begin
+  Result:= VarToStrDef(cxGridDBTableView.DataController.Values[cxGridDBTableView.DataController.FocusedRecordIndex,
+                                                                cxGridDBTableViewCODPRODUTO.Index], '');
+end;
+
+procedure TFormPedidos.VerInsumos1Click(Sender: TObject);
+begin
+  TFormInsumos.AbrirInsumos(GetCodProSelecionado, Pedidos.DadosNOMEPRODUTO.AsString);
+end;
+
+procedure TFormPedidos.VerSimilares1Click(Sender: TObject);
+begin
+  TFormAdicionarSimilaridade.AbrirSimilares(GetCodProSelecionado, Pedidos.DadosNOMEPRODUTO.AsString);
+end;
+
+procedure TFormPedidos.AbrirConfigProClick(Sender: TObject);
+var
+  FCodPro: String;
+begin
+  FCodPro:= GetCodProSelecionado;
+
+  if FormProInfo.CdsProInfo.Locate('CODPRODUTO', FCodPro, []) then
+    FormProInfo.Show;
+end;
+
+procedure TFormPedidos.AbrirDetalheProClick(Sender: TObject);
+begin
+  FormDetalheProdutos.AbreEFocaProduto(VarToStrDef(cxGridDBTableView.DataController.Values[cxGridDBTableView.DataController.FocusedRecordIndex,
+                                                                cxGridDBTableViewCODPRODUTO.Index], ''));
+end;
 
 procedure TFormPedidos.BtnAtualizaClick(Sender: TObject);
 begin
@@ -82,13 +126,12 @@ end;
 procedure TFormPedidos.cxGridDBTableViewStylesGetContentStyle(
   Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;
   AItem: TcxCustomGridTableItem; var AStyle: TcxStyle);
-var
-  FColumn: TcxGridDBColumn;
 begin
-  FColumn:= cxGridDBTableViewQUANTPENDENTE;
+  if Sender.DataController.Values[ARecord.RecordIndex, cxGridDBTableViewQUANTPENDENTE.Index] > 0 then
+    AStyle := cxStyleVermelho
+  else if Sender.DataController.Values[ARecord.RecordIndex, cxGridDBTableViewEMFALTA.Index] = True then
+    AStyle := cxStyleAmarelo;
 
-  if Sender.DataController.Values[ARecord.RecordIndex, FColumn.Index] > 0 then
-    AStyle := cxStyleVermelho;
 end;
 
 procedure TFormPedidos.FormCreate(Sender: TObject);

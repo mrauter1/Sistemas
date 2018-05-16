@@ -14,13 +14,14 @@ type
     { Private declarations }
   public
     function CriaSqlQuery(sql: String = ''): TSqlQuery;
-    function RetornaDataSet(sql: String): TDataSet;
+    function RetornaDataSet(sql: String; pAbrirDataSet: Boolean = True): TDataSet;
+    procedure ExecutaComando(pSql: String);
     function OrdenaClientDataSet(parCds: TClientDataSet;
       const FieldName: String; PIndexOptions: TIndexOptions = []): Boolean;
     function RetornaValor(Sql: String; ValDefault: Variant): Variant;
   end;
 
-
+procedure CopiarRecord(pSource, pDest: TDataSet);
 procedure CopiaDadosDataSet(pSource, pDest: TDataSet);
 
 var
@@ -34,24 +35,21 @@ implementation
 
 { TDmSqlUtils }
 
-procedure CopiaDadosDataSet(pSource, pDest: TDataSet);
+procedure CopiarRecord(pSource, pDest: TDataSet);
 var
   I: Integer;
   FSourceField: TField;
-
-  procedure CopiarRecord(pSource, pDest: TDataSet);
-  var
-    I: Integer;
+begin
+  for I := 0 to pDest.Fields.Count - 1 do
   begin
-    for I := 0 to pDest.Fields.Count - 1 do
-    begin
-      FSourceField:= pSource.FindField(pDest.Fields[I].FieldName);
-      if Assigned(FSourceField) then
-        pDest.Fields[I].Value:= FSourceField.Value;
+    FSourceField:= pSource.FindField(pDest.Fields[I].FieldName);
+    if Assigned(FSourceField) then
+      pDest.Fields[I].Value:= FSourceField.Value;
 
-    end;
   end;
+end;
 
+procedure CopiaDadosDataSet(pSource, pDest: TDataSet);
 begin
   pSource.First;
   while not pSource.Eof do
@@ -76,13 +74,14 @@ begin
   end;
 end;
 
-function TDmSqlUtils.RetornaDataSet(sql: String): TDataSet;
+function TDmSqlUtils.RetornaDataSet(Sql: String; pAbrirDataSet: Boolean = True): TDataSet;
 var
   fSqlQuery: TSqlQuery;
 begin
-  fSqlQuery:= CriaSqlQuery(sql);
+  fSqlQuery:= CriaSqlQuery(Sql);
   try
-    fSqlQuery.Open;
+    if pAbrirDataSet then
+      fSqlQuery.Open;
   except
     fSqlQuery.Free;
     raise;
@@ -101,6 +100,18 @@ begin
      Result:= FDataSet.Fields[0].AsVariant;
   finally
     FDataSet.Free;
+  end;
+end;
+
+procedure TDmSqlUtils.ExecutaComando(pSql: String);
+var
+  FQry: TSqlQuery;
+begin
+  FQry:= CriaSqlQuery(pSql);
+  try
+    FQry.ExecSQL(True);
+  finally
+    FQry.Free;
   end;
 end;
 

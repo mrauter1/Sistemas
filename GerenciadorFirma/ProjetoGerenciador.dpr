@@ -22,7 +22,10 @@ uses
   uFormGlobal in 'uFormGlobal.pas' {FormGlobal},
   uFormDetalheProdutos in 'Fontes\uFormDetalheProdutos.pas' {FormDetalheProdutos},
   Utils in '..\utils\Utils.pas',
-  uFormPedidos2 in 'Fontes\uFormPedidos2.pas' {FormPedidos2};
+  uFormPedidos2 in 'Fontes\uFormPedidos2.pas' {FormPedidos2},
+  uFormAdicionarSimilaridade in 'Fontes\uFormAdicionarSimilaridade.pas' {FormAdicionarSimilaridade},
+  uFormInsumos in 'Fontes\uFormInsumos.pas' {FormInsumos},
+  uFormSelecionaModelos in 'Fontes\uFormSelecionaModelos.pas' {FormSelecionaModelo};
 
 {$R *.res}
 

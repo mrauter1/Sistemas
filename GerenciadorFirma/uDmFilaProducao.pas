@@ -3,9 +3,8 @@ unit uDmFilaProducao;
 interface
 
 uses
-  System.SysUtils, System.Classes, Data.DB, Datasnap.DBClient, uDmSqlUtils, uDmEstoqProdutos, uFrmShowMemo,
+  System.SysUtils, System.Classes, Vcl.ExtCtrls, Data.DB, Datasnap.DBClient, uDmSqlUtils, uDmEstoqProdutos, uFrmShowMemo,
   uPedidos;
-
 type
   TDMFilaProducao = class(TDataModule)
     CdsFilaProducao: TClientDataSet;
@@ -19,13 +18,15 @@ type
     CdsFilaProducaoESTOQMAX: TFloatField;
     CdsFilaProducaoPROBFALTAHOJE: TFloatField;
     CdsFilaProducaoESPACOESTOQUE: TFloatField;
+    CdsFilaProducaoDEMANDADIARIA: TFloatField;
+    CdsFilaProducaoDIASESTOQUE: TFloatField;
     procedure DataModuleCreate(Sender: TObject);
 //    procedure CdsFilaProducaoPROBFALTAHOJEGetText(Sender: TField;
 //      var Text: string; DisplayText: Boolean);
   private  
     function ProdutoGranel(CodProduto: String): Boolean;
-    procedure AdicionaNaFila(const CodProduto, NomeProduto: String; Falta: Double; Quant: Double; ProducaoSugerida: Double;
-                             NumPedidos: Integer);
+    procedure AdicionaNaFila(const pCodProduto, pNomeProduto: String; pFalta: Double; pQuant: Double; pProducaoSugerida: Double;
+                             pNumPedidos: Integer);
     { Private declarations }
   public   
     procedure AtualizaFilaProducao;
@@ -49,26 +50,28 @@ begin
             +CodProduto+''' ', 0) = 1);
 end;
 
-procedure TDMFilaProducao.AdicionaNaFila(const CodProduto, NomeProduto: String; Falta: Double; Quant: Double; ProducaoSugerida: Double; NumPedidos: Integer);
+procedure TDMFilaProducao.AdicionaNaFila(const pCodProduto, pNomeProduto: String; pFalta: Double; pQuant: Double; pProducaoSugerida: Double; pNumPedidos: Integer);
 begin
-  if not CdsFilaProducao.Locate('CODPRODUTO', CodProduto, []) then
+  if not CdsFilaProducao.Locate('CODPRODUTO', pCodProduto, []) then
   begin
     CdsFilaProducao.Append;
-    CdsFilaProducaoCODPRODUTO.AsString:= CodProduto;
-    CdsFilaProducaoNOMEPRODUTO.AsString:= NomeProduto;
-    CdsFilaProducaoFALTA.AsFloat:= Falta;
-    CdsFilaProducaoQUANTIDADE.AsFloat:= Quant;
-    CdsFilaProducaoNUMPEDIDOS.AsInteger:= NumPedidos;
-    CdsFilaProducaoPRODUCAOSUGERIDA.AsFloat:= ProducaoSugerida;
+    CdsFilaProducaoCODPRODUTO.AsString:= pCodProduto;
+    CdsFilaProducaoNOMEPRODUTO.AsString:= pNomeProduto;
+    CdsFilaProducaoFALTA.AsFloat:= pFalta;
+    CdsFilaProducaoQUANTIDADE.AsFloat:= pQuant;
+    CdsFilaProducaoNUMPEDIDOS.AsInteger:= pNumPedidos;
+    CdsFilaProducaoPRODUCAOSUGERIDA.AsFloat:= pProducaoSugerida;
 
     with DmEstoqProdutos do
     begin
-      if CdsEstoqProdutos.Locate('CODPRODUTO', CodProduto.AsString, []) then
+      if CdsEstoqProdutos.Locate('CODPRODUTO', pCodProduto, []) then
       begin
         CdsFilaProducaoPROBFALTAHOJE.AsFloat:= PROBFALTAHOJE.AsFloat * 100;
         CdsFilaProducaoESTOQUEATUAL.AsFloat:= ESTOQUEATUAL.AsFloat;
         CdsFilaProducaoESTOQMAX.AsFloat:= ESTOQMAX.AsFloat;
         CdsFilaProducaoPROBFALTAHOJE.AsFloat:= PROBFALTAHOJE.AsFloat;
+        CdsFilaProducaoDEMANDADIARIA.AsFloat:= DEMANDADIARIA.AsFloat;
+        CdsFilaProducaoDIASESTOQUE.AsFloat:= DIASESTOQUE.AsFloat;
       end;
     end;
 
@@ -146,22 +149,25 @@ procedure TDMFilaProducao.AtualizaFilaProducao;
   end;
 
 begin
-  CdsFilaProducao.DisableControls;
 
   if Assigned(FormFilaProducao) then
-    FormShowMemo.Parent:= FormFilaProducao;
+    if FormFilaProducao.Visible then
+      FormShowMemo.Parent:= FormFilaProducao
+    else
+      FormShowMemo.Parent:= nil;
 
   FormShowMemo.Show;
+  CdsFilaProducao.DisableControls;
   try
     FormShowMemo.SetText('Iniciando atualização das informações dos produtos...');
 
+    FormShowMemo.SetText('Atualizando pedidos...');
     Pedidos.LoadPedidos(Now - 30, Now + 1);
-    
+
     DmEstoqProdutos.AtualizaEstoque(False);
 
     FormShowMemo.SetText('Apagando Fila de produção atual...');
     ApagaFilaAtual;
-    FormShowMemo.SetText('Atualizando pedidos...');
 
     FormShowMemo.SetText('Adicionando itens em falta na fila de produção...');
 
@@ -213,7 +219,7 @@ begin
   finally
     FormShowMemo.Hide;
     CdsFilaProducao.EnableControls;
-  end;  
+  end;
 end;
 
 {procedure TDMFilaProducao.CdsFilaProducaoPROBFALTAHOJEGetText(Sender: TField;

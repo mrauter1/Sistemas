@@ -4,7 +4,7 @@ interface
 
 uses
   System.SysUtils, System.Classes, Data.DB, Datasnap.DBClient, uDmSqlUtils, uFuncProbabilidades,
-  Data.SqlExpr, System.Math, uFormProInfo, uFrmShowMemo, uPedidos;
+  Data.SqlExpr, System.Math, uFormProInfo, uFrmShowMemo, uPedidos, Vcl.ExtCtrls;
 
 type
   TDmEstoqProdutos = class(TDataModule)
@@ -59,6 +59,9 @@ type
 var
   DmEstoqProdutos: TDmEstoqProdutos;
   DataSistema: TDateTime;
+
+const
+  cArquivoCdsEstoqProdutos = 'CdsEstoqProdutos.xml';
 
 implementation
 
@@ -545,6 +548,8 @@ begin
       CdsPedidos.Post;
       fDataSet.Next;
     end;
+
+    CdsPedidos.SaveToFile('CdsPedidos.xml');
   finally
     CdsPedidos.EnableControls;
   end;
@@ -586,15 +591,49 @@ procedure TDmEstoqProdutos.CarregaProInfo;
 begin
   FormProInfo.CdsProInfo.First;
   while not FormProInfo.CdsProInfo.Eof do begin
-    CdsEstoqProdutos.Locate('CODPRODUTO', FormProInfo.CdsProInfoCODPRODUTO.AsString, []);
-    CdsEstoqProdutos.Edit;
-    PRODUCAOMINIMA.AsInteger:= FormProInfo.CdsProInfoPRODUCAOMINIMA.AsInteger;
-    CdsEstoqProdutos.Post;
+    if CdsEstoqProdutos.Locate('CODPRODUTO', FormProInfo.CdsProInfoCODPRODUTO.AsString, []) then
+    begin
+      CdsEstoqProdutos.Edit;
+      PRODUCAOMINIMA.AsInteger:= FormProInfo.CdsProInfoPRODUCAOMINIMA.AsInteger;
+      ESPACOESTOQUE.AsFloat:= FormProInfo.CdsProInfoESPACOESTOQUE.AsFloat;
+      CdsEstoqProdutos.Post;
+    end;
     FormProInfo.CdsProInfo.Next;
   end;
 end;
 
 procedure TDmEstoqProdutos.AtualizaEstoque(RefreshDemanda: Boolean);
+
+var
+  fDataSet: TDataSet;
+  fStdDeviation, fEstoque: Double;
+  I: Integer;
+
+  function AlterouDataSet: Boolean;
+  var
+    I: Integer;
+    FField: TField;
+  begin
+    Result:= True;
+
+    if ESTOQUEATUAL.Value <> fDataSet.FieldByName('ESTOQUEATUAL').Value then
+      Exit;
+
+    if EspacoEstoque.Value <> FormProInfo.CdsProInfoESPACOESTOQUE.Value then
+      Exit;
+
+    if PRODUCAOMINIMA.AsInteger <> FormProInfo.CdsProInfoPRODUCAOMINIMA.AsInteger then
+      Exit;
+
+    Result:= False;
+  end;
+
+  procedure ObterConfigProdutos;
+  begin
+    if not FormProInfo.CdsProInfo.Locate('CODPRODUTO', fDataSet.FieldByName('CODPRODUTO').AsString, []) then
+      SetInfoDefault(fDataSet.FieldByName('CODPRODUTO').AsString);
+
+  end;
 
   function AtualizarDemanda: Boolean;
   begin
@@ -622,9 +661,6 @@ const
         +' and (select count(ie.codproduto) from insumos_acabado ie where ie.codproduto = p.codproduto) > 0 '
         +' order by faltaurgente desc, e.dm_diasdeestoque, FALTA DESC';
 
-var
-  fDataSet: TDataSet;
-  fStdDeviation, fEstoque: Double;
 begin
   CdsEstoqProdutos.IndexName:= '';
 
@@ -639,42 +675,47 @@ begin
       fDataSet.First;
       while not fDataSet.Eof do
       begin
+        FormShowMemo.SetText('Atualizando informações do produto '+fDataSet.FieldByName('CODPRODUTO').AsString);
+        // Se não houver alterações, produto não deve ser atualizado
+        if AlterouDataSet = False then
+        begin
+          fDataSet.Next;
+          Continue;
+        end;
 
-        if FormProInfo.CdsProInfo.Locate('CODPRODUTO', fDataSet.FieldByName('CODPRODUTO').AsString, []) then
+        ObterConfigProdutos;
+
+        // Se este produto está marcado como não faz estoque, ele deve ser ignorado
+        if FormProInfo.CdsProInfoNAOFAZESTOQUE.AsBoolean then
         begin
-          // Se este produto está marcado como não faz estoque, ele deve ser ignorado
-          if FormProInfo.CdsProInfoNAOFAZESTOQUE.AsBoolean then begin
-              fDataSet.Next;
-              Continue;
-            end
-        end
-       else
-        begin
-          SetInfoDefault(fDataSet.FieldByName('CODPRODUTO').AsString);
+          fDataSet.Next;
+          Continue;
         end;
 
         if CdsEstoqProdutos.Locate('CODPRODUTO', fDataSet.FieldByName('CODPRODUTO').AsString, []) then
+        begin
+          // Se não alterou nenhum dado, vai para o próximo registro
+          if AlterouDataSet = False then
+          begin
+            fDataSet.Next;
+            Continue;
+          end;
+
           CdsEstoqProdutos.Edit
-        else
+        end
+       else
+        begin
           CdsEstoqProdutos.Append;
+        end;
 
-        CodProduto.AsString:= fDataSet.FieldByName('CODPRODUTO').AsString;
-        Apresentacao.AsString:= fDataSet.FieldByName('APRESENTACAO').AsString;
-        EstoqueAtual.AsFloat:= fDataSet.FieldByName('ESTOQUEATUAL').AsFloat;
-        DiasEstoque.AsFloat:= fDataSet.FieldByName('DIASESTOQUE').AsFloat;
-  //      FaltaUrgente.AsFloat:= fDataSet.FieldByName('FALTAURGENTE').AsFloat;
-  //      Falta.AsFloat:= fDataSet.FieldByName('FALTA').AsFloat;
-  //      Demanda.AsFloat:= fDataSet.FieldByName('DEMANDA').AsFloat;
-        Rotacao.AsInteger:= fDataSet.FieldByName('ROTACAO').AsInteger;
+        CopiarRecord(fDataSet, CdsEstoqProdutos);
 
-        UnidadeEstoque.AsInteger:= fDataSet.FieldByName('UNIDADEESTOQUE').AsInteger;
-
-  //      PedidosPendentes.AsFloat:= GetPedidosPendentes(CodProduto.AsFloat, 2);
-        EspacoEstoque.AsInteger:= 30;
-        CdsEstoqProdutosRANK.AsInteger:= 0;
-
+        EspacoEstoque.AsInteger:= FormProInfo.CdsProInfoESPACOESTOQUE.AsInteger;
         PRODUCAOMINIMA.AsInteger:= FormProInfo.CdsProInfoPRODUCAOMINIMA.AsInteger;
 
+        CdsEstoqProdutosRANK.AsInteger:= 0;
+
+      // Verifica se houve alguma mudança nos fields
         if AtualizarDemanda then
           CalculaDemanda;
 
@@ -689,7 +730,11 @@ begin
       fDataSet.Free;
     end;
 
+    FormShowMemo.SetText('Ordenando produtos por prioridade de produção');
     RankeiaProdutos;
+
+    FormShowMemo.SetText('Salvando informação dos produtos');
+    CdsEstoqProdutos.SaveToFile(cArquivoCdsEstoqProdutos);
   finally
     CdsEstoqProdutos.EnableControls;
   end;
@@ -724,6 +769,15 @@ var
   end;
 
 begin
+  CdsEstoqProdutos.First;
+  while not CdsEstoqProdutos.Eof do
+  begin
+    CdsEstoqProdutos.Edit;
+    CdsEstoqProdutosRANK.AsInteger:= 0;
+    CdsEstoqProdutos.Post;
+    CdsEstoqProdutos.Next;
+  end;
+
   FCurRank:= 1;
 
   AtualizaPedidos;
@@ -790,7 +844,17 @@ begin
 end;
 
 procedure TDmEstoqProdutos.DataModuleCreate(Sender: TObject);
+var
+  FDataArquivo: TDateTime;
 begin
+  if FileExists(cArquivoCdsEstoqProdutos) then
+  try
+    if FileAge(cArquivoCdsEstoqProdutos, FDataArquivo) then
+      if Trunc(FDataArquivo) = Trunc(Now) then    
+        CdsEstoqProdutos.LoadFromFile(cArquivoCdsEstoqProdutos);
+  except
+  end;
+
   DataSistema:= now;//StrToDateTime('20.09.2013');
   fDataSetDiasUteis:= nil;
 

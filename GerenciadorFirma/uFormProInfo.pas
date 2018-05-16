@@ -5,17 +5,27 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, Datasnap.DBClient, Vcl.Grids,
-  Vcl.DBGrids;
+  Vcl.DBGrids, cxGraphics, cxControls, cxLookAndFeels, cxLookAndFeelPainters,
+  cxStyles, dxSkinsCore, dxSkinscxPCPainter, cxCustomData, cxFilter, cxData,
+  cxDataStorage, cxEdit, cxNavigator, cxDBData, cxGridCustomTableView,
+  cxGridTableView, cxGridDBTableView, cxGridLevel, cxClasses, cxGridCustomView,
+  cxGrid;
 
 type
   TFormProInfo = class(TForm)
-    DBGrid1: TDBGrid;
     DataSource1: TDataSource;
     CdsProInfo: TClientDataSet;
     CdsProInfoCODPRODUTO: TStringField;
     CdsProInfoNAOFAZESTOQUE: TBooleanField;
     CdsProInfoESPACOESTOQUE: TIntegerField;
     CdsProInfoPRODUCAOMINIMA: TIntegerField;
+    cxGrid: TcxGrid;
+    cxGridDBTableView: TcxGridDBTableView;
+    cxGridLevel: TcxGridLevel;
+    cxGridDBTableViewCODPRODUTO: TcxGridDBColumn;
+    cxGridDBTableViewNAOFAZESTOQUE: TcxGridDBColumn;
+    cxGridDBTableViewESPACOESTOQUE: TcxGridDBColumn;
+    cxGridDBTableViewPRODUCAOMINIMA: TcxGridDBColumn;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
   private

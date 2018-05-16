@@ -3,7 +3,7 @@ object FormPedidos: TFormPedidos
   Top = 0
   Caption = 'Pedidos'
   ClientHeight = 408
-  ClientWidth = 875
+  ClientWidth = 882
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,11 +18,13 @@ object FormPedidos: TFormPedidos
   object cxGrid: TcxGrid
     Left = 0
     Top = 0
-    Width = 875
+    Width = 882
     Height = 377
     Align = alClient
     TabOrder = 0
+    ExplicitTop = -3
     object cxGridDBTableView: TcxGridDBTableView
+      PopupMenu = PopupMenu1
       Navigator.Buttons.CustomButtons = <>
       DataController.DataSource = DataSource1
       DataController.Summary.DefaultGroupSummaryItems = <>
@@ -72,6 +74,9 @@ object FormPedidos: TFormPedidos
       object cxGridDBTableViewQUANTPENDENTE: TcxGridDBColumn
         DataBinding.FieldName = 'QUANTPENDENTE'
       end
+      object cxGridDBTableViewESTOQUEATUAL: TcxGridDBColumn
+        DataBinding.FieldName = 'ESTOQUEATUAL'
+      end
       object cxGridDBTableViewDIASPARAENTREGA: TcxGridDBColumn
         DataBinding.FieldName = 'DIASPARAENTREGA'
         Width = 70
@@ -90,6 +95,10 @@ object FormPedidos: TFormPedidos
         GroupIndex = 0
         Width = 182
       end
+      object cxGridDBTableViewEMFALTA: TcxGridDBColumn
+        DataBinding.FieldName = 'EMFALTA'
+        Width = 47
+      end
     end
     object cxGridLevel: TcxGridLevel
       GridView = cxGridDBTableView
@@ -98,16 +107,16 @@ object FormPedidos: TFormPedidos
   object Panel1: TPanel
     Left = 0
     Top = 377
-    Width = 875
+    Width = 882
     Height = 31
     Align = alBottom
     Caption = 'Panel1'
     TabOrder = 1
     DesignSize = (
-      875
+      882
       31)
     object BtnAtualiza: TButton
-      Left = 408
+      Left = 412
       Top = 3
       Width = 88
       Height = 25
@@ -138,16 +147,6 @@ object FormPedidos: TFormPedidos
     Left = 304
     Top = 128
   end
-  object PopupMenuOpcoes: TPopupMenu
-    Left = 832
-    Top = 48
-    object Expandir1: TMenuItem
-      Caption = 'Expandir'
-    end
-    object Contrair1: TMenuItem
-      Caption = 'Contrair'
-    end
-  end
   object cxStyleRepository1: TcxStyleRepository
     Left = 496
     Top = 128
@@ -161,6 +160,30 @@ object FormPedidos: TFormPedidos
       Font.Name = 'Arial'
       Font.Style = [fsBold]
       TextColor = clWhite
+    end
+    object cxStyleAmarelo: TcxStyle
+      AssignedValues = [svColor]
+      Color = clYellow
+    end
+  end
+  object PopupMenu1: TPopupMenu
+    Left = 680
+    Top = 192
+    object AbrirConfigPro: TMenuItem
+      Caption = 'Configura'#231#227'o do Produto'
+      OnClick = AbrirConfigProClick
+    end
+    object AbrirDetalhePro: TMenuItem
+      Caption = 'Detalhamento do Produto'
+      OnClick = AbrirDetalheProClick
+    end
+    object VerSimilares1: TMenuItem
+      Caption = 'Produtos Equivalentes'
+      OnClick = VerSimilares1Click
+    end
+    object VerInsumos1: TMenuItem
+      Caption = 'Ver Insumos'
+      OnClick = VerInsumos1Click
     end
   end
 end

@@ -6,6 +6,7 @@ object DmSqlUtils: TDmSqlUtils
   object SQLConnection: TSQLConnection
     ConnectionName = 'FBConnection'
     DriverName = 'Firebird'
+    KeepConnection = False
     LoginPrompt = False
     Params.Strings = (
       'DriverName=Firebird'

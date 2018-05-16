@@ -20,9 +20,9 @@ object FormFilaProducao: TFormFilaProducao
     Height = 500
     Align = alClient
     TabOrder = 0
-    ExplicitWidth = 679
-    ExplicitHeight = 326
     object cxGridDBTableView: TcxGridDBTableView
+      PopupMenu = PopupMenuOpcoes
+      OnDblClick = cxGridDBTableViewDblClick
       Navigator.Buttons.CustomButtons = <>
       DataController.DataSource = DataSourceFila
       DataController.Summary.DefaultGroupSummaryItems = <>
@@ -40,15 +40,15 @@ object FormFilaProducao: TFormFilaProducao
       Styles.StyleSheet = FormGlobal.cxGridTableViewStyleSheet1
       object cxGridDBTableViewCODPRODUTO: TcxGridDBColumn
         DataBinding.FieldName = 'CODPRODUTO'
-        Width = 74
+        Width = 55
       end
       object cxGridDBTableViewNOMEPRODUTO: TcxGridDBColumn
         DataBinding.FieldName = 'NOMEPRODUTO'
-        Width = 205
+        Width = 198
       end
       object cxGridDBTableViewQUANTIDADE: TcxGridDBColumn
         DataBinding.FieldName = 'QUANTIDADE'
-        Width = 73
+        Width = 71
       end
       object cxGridDBTableViewFALTA: TcxGridDBColumn
         DataBinding.FieldName = 'FALTA'
@@ -58,17 +58,23 @@ object FormFilaProducao: TFormFilaProducao
         DataBinding.FieldName = 'NUMPEDIDOS'
         Width = 66
       end
-      object cxGridDBTableViewPRODUCAOSUGERIDA: TcxGridDBColumn
-        DataBinding.FieldName = 'PRODUCAOSUGERIDA'
-        Width = 71
+      object cxGridDBTableViewDEMANDADIARIA: TcxGridDBColumn
+        DataBinding.FieldName = 'DEMANDADIARIA'
+      end
+      object cxGridDBTableViewDIASESTOQUE: TcxGridDBColumn
+        DataBinding.FieldName = 'DIASESTOQUE'
+      end
+      object cxGridDBTableViewESTOQUEATUAL: TcxGridDBColumn
+        DataBinding.FieldName = 'ESTOQUEATUAL'
       end
       object cxGridDBTableViewPROBFALTAHOJE: TcxGridDBColumn
         DataBinding.FieldName = 'PROBFALTAHOJE'
         OnGetDataText = cxGridDBTableViewPROBFALTAHOJEGetDataText
         Width = 76
       end
-      object cxGridDBTableViewESTOQUEATUAL: TcxGridDBColumn
-        DataBinding.FieldName = 'ESTOQUEATUAL'
+      object cxGridDBTableViewPRODUCAOSUGERIDA: TcxGridDBColumn
+        DataBinding.FieldName = 'PRODUCAOSUGERIDA'
+        Width = 71
       end
       object cxGridDBTableViewESTOQMAX: TcxGridDBColumn
         DataBinding.FieldName = 'ESTOQMAX'
@@ -132,8 +138,6 @@ object FormFilaProducao: TFormFilaProducao
     Align = alBottom
     Caption = 'Panel1'
     TabOrder = 1
-    ExplicitTop = 326
-    ExplicitWidth = 679
     DesignSize = (
       965
       42)
@@ -146,7 +150,21 @@ object FormFilaProducao: TFormFilaProducao
       Caption = 'Atualiza'
       TabOrder = 0
       OnClick = BtnAtualizaClick
-      ExplicitWidth = 128
+    end
+    object BtnOpcoes: TBitBtn
+      Left = 5
+      Top = 6
+      Width = 26
+      Height = 27
+      Caption = '+'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -19
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 1
+      OnClick = BtnOpcoesClick
     end
   end
   object DataSourceFila: TDataSource
@@ -160,5 +178,25 @@ object FormFilaProducao: TFormFilaProducao
     DataSet = Pedidos.Dados
     Left = 320
     Top = 160
+  end
+  object PopupMenuOpcoes: TPopupMenu
+    Left = 528
+    Top = 104
+    object AbrirConfigPro: TMenuItem
+      Caption = 'Configura'#231#227'o do Produto'
+      OnClick = AbrirConfigProClick
+    end
+    object AbrirDetalhePro: TMenuItem
+      Caption = 'Detalhamento do Produto'
+      OnClick = AbrirDetalheProClick
+    end
+    object VerSimilares1: TMenuItem
+      Caption = 'Produtos Equivalentes'
+      OnClick = VerSimilares1Click
+    end
+    object VerInsumos1: TMenuItem
+      Caption = 'Ver Insumos'
+      OnClick = VerInsumos1Click
+    end
   end
 end

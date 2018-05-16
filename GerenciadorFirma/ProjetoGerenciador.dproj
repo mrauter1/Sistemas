@@ -156,6 +156,18 @@
             <Form>FormPedidos2</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="Fontes\uFormAdicionarSimilaridade.pas">
+            <Form>FormAdicionarSimilaridade</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Fontes\uFormInsumos.pas">
+            <Form>FormInsumos</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Fontes\uFormSelecionaModelos.pas">
+            <Form>FormSelecionaModelo</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

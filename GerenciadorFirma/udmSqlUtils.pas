@@ -21,6 +21,8 @@ type
     function RetornaValor(Sql: String; ValDefault: Variant): Variant;
   end;
 
+// Retorna um array com o nome dos campos que são diferentes entre um e outro dataset
+function ComparaRecord(pDataSet1, pDataSet2: TDataSet; pCamposParaIgnorar: String = ''): TArray<String>;
 procedure CopiarRecord(pSource, pDest: TDataSet);
 procedure CopiaDadosDataSet(pSource, pDest: TDataSet);
 
@@ -34,6 +36,43 @@ implementation
 {$R *.dfm}
 
 { TDmSqlUtils }
+
+function ComparaRecord(pDataSet1, pDataSet2: TDataSet; pCamposParaIgnorar: String = ''): TArray<String>;
+var
+  I: Integer;
+  FField1, FField2: TField;
+
+  function CampoIgnorado(pCampo: String): Boolean;
+  var
+    I: Integer;
+    fStr: String;
+  begin
+    Result:= True;
+
+    for fStr in pCamposParaIgnorar.Split(';') do
+      if Trim(fStr).ToUpper = pCampo.ToUpper then
+        Exit;
+
+    Result:= False;
+  end;
+
+begin
+  SetLength(Result, 0);
+  for FField1 in pDataSet1.Fields do
+  begin
+    if CampoIgnorado(FField1.FieldName) then
+      Continue;
+
+    FField2:= pDataSet2.FindField(FField1.FieldName);
+    if Assigned(FField2) then
+      if FField2.Value <> FField1.Value then
+      begin
+        SetLength(Result, Length(Result)+1);
+        Result[High(Result)]:= FField1.FieldName;
+      end;
+
+  end;
+end;
 
 procedure CopiarRecord(pSource, pDest: TDataSet);
 var

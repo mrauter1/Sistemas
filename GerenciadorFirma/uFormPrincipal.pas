@@ -11,7 +11,7 @@ uses
   dxSkinscxPCPainter, cxCustomData, cxFilter, cxData, cxDataStorage, cxEdit,
   cxNavigator, cxDBData, cxGridLevel, cxClasses, cxGridCustomView,
   cxGridCustomTableView, cxGridTableView, cxGridDBTableView, cxGrid,
-  Vcl.StdCtrls, Vcl.ExtCtrls, uFormGlobal;
+  Vcl.StdCtrls, Vcl.ExtCtrls, uFormGlobal, uSendMail;
 
 type
   TFormPrincipal = class(TForm)
@@ -45,6 +45,7 @@ type
 
 var
   FormPrincipal: TFormPrincipal;
+  FMailSender: TMailSender;
 
 implementation
 
@@ -102,5 +103,12 @@ procedure TFormPrincipal.Timer1Timer(Sender: TObject);
 begin
   DMFilaProducao.AtualizaFilaProducao;
 end;
+
+initialization
+try
+  FMailSender:= TMailSender.Create(Application, 'smtp.rauter.com.br', 587, 'marcelo@rauter.com.br', 'rtq1825', True, 'marcelo@rauter.com.br');
+except
+end;
+
 
 end.

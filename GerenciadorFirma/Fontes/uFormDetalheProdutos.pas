@@ -81,13 +81,8 @@ begin
 end;
 
 procedure TFormDetalheProdutos.AbrirConfigProClick(Sender: TObject);
-var
-  FCodPro: String;
 begin
-  FCodPro:= GetCodProSelecionado;
-
-  if FormProInfo.CdsProInfo.Locate('CODPRODUTO', FCodPro, []) then
-    FormProInfo.Show;
+  FormProInfo.Abrir(GetCodProSelecionado);
 end;
 
 procedure TFormDetalheProdutos.AbrirDetalheProClick(Sender: TObject);

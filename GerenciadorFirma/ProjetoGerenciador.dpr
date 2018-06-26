@@ -27,8 +27,7 @@ uses
   uFormInsumos in 'Fontes\uFormInsumos.pas' {FormInsumos},
   uFormSelecionaModelos in 'Fontes\uFormSelecionaModelos.pas' {FormSelecionaModelo},
   uSendMail in 'Fontes\uSendMail.pas',
-  uEnviaEmailPedidos in 'uEnviaEmailPedidos.pas',
-  uDMEnviaPedidos in 'uDMEnviaPedidos.pas' {DMEnviaPedidos: TDataModule};
+  uFormValidaModelos in 'uFormValidaModelos.pas' {FormValidaModelos};
 
 {$R *.res}
 
@@ -51,6 +50,5 @@ begin
   Application.CreateForm(TFormGlobal, FormGlobal);
   Application.CreateForm(TFormDetalheProdutos, FormDetalheProdutos);
   Application.CreateForm(TFormPedidos2, FormPedidos2);
-  Application.CreateForm(TDMEnviaPedidos, DMEnviaPedidos);
   Application.Run;
 end.

@@ -11,7 +11,6 @@ type
     FFrom: String;
     FIdSmtp: TIdSmtp;
     FIdMessage: TIdMessage;
-    FIdSSLIOHandlerSocket: TIdSSLIOHandlerSocketOpenSSL;
     procedure InitializeISO88591(var VHeaderEncoding: Char;
       var VCharSet: string);
   public
@@ -95,6 +94,8 @@ begin
   finally
     FIdMessage.Free;
   end;
+
+  Result:= True;
 end;
 
 end.

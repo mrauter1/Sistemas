@@ -1,7 +1,7 @@
 object DMEnviaPedidos: TDMEnviaPedidos
   OldCreateOrder = False
   OnCreate = DataModuleCreate
-  Height = 229
+  Height = 234
   Width = 378
   object SQLQuery: TSQLQuery
     MaxBlobSize = -1
@@ -23,6 +23,9 @@ object DMEnviaPedidos: TDMEnviaPedidos
       '           ELSE '#39'SEM BLOQUEIO'#39
       '      END AS SITBLOQUEIO,'
       ''
+      '      P.DATAENTREGA,'
+      '      C.CIDADE,'
+      ''
       
         '     (SELECT FIRST 1 CONDPGTO.CODCONDICAO ||'#39' - '#39'|| CONDPGTO.NOM' +
         'ECONDICAO FROM CONDPGTO'
@@ -41,13 +44,21 @@ object DMEnviaPedidos: TDMEnviaPedidos
       'INNER JOIN CLIENTE C ON C.CODCLIENTE = P.CODCLIENTE'
       'LEFT JOIN TRANSP T ON T.CODTRANSPORTE = P.CODTRANSPORTE'
       'WHERE P.situacao IN ('#39'0'#39', '#39'1'#39', '#39'2'#39') AND'
-      '             P.dataentrega BETWEEN CAST('#39'Now'#39' as date) - 30'
-      '                               and CAST('#39'Now'#39' as date)'
-      '      AND P.PEDIDOEMUSO <> '#39'S'#39)
+      '      P.TOTITENS > 0 AND'
+      '      P.dataentrega BETWEEN CAST('#39'Now'#39' as date) - 30'
+      '                       and CAST('#39'Now'#39' as date) +'
+      
+        '                         ( CASE WHEN Extract(Weekday from cast('#39 +
+        'NOW'#39' AS DATE)) = 5 THEN 3'
+      
+        '                           WHEN Extract(Weekday from cast('#39'NOW'#39' ' +
+        'AS DATE)) = 6 THEN 2'
+      '                           ELSE 1 END )')
     SQLConnection = DmSqlUtils.SQLConnection
     Left = 176
     Top = 88
     object SQLQueryCODPEDIDO: TStringField
+      DisplayLabel = 'Nro. Pedido:'
       FieldName = 'CODPEDIDO'
       Required = True
       FixedChar = True
@@ -58,10 +69,21 @@ object DMEnviaPedidos: TDMEnviaPedidos
       FieldName = 'NOMECLI'
       Size = 89
     end
+    object SQLQueryDATAENTREGA: TDateField
+      DisplayLabel = 'Data Entrega'
+      FieldName = 'DATAENTREGA'
+      DisplayFormat = 'dd/mm/yyyy'
+    end
     object SQLQueryNOMETRANSP: TStringField
       DisplayLabel = 'Transportadora'
       FieldName = 'NOMETRANSP'
       Size = 39
+    end
+    object SQLQueryCIDADE: TStringField
+      DisplayLabel = 'Cidade'
+      FieldName = 'CIDADE'
+      FixedChar = True
+      Size = 35
     end
     object SQLQuerySITUACAO: TStringField
       DisplayLabel = 'Situa'#231#227'o'
@@ -174,7 +196,7 @@ object DMEnviaPedidos: TDMEnviaPedidos
   object Timer1: TTimer
     Interval = 120000
     OnTimer = Timer1Timer
-    Left = 88
+    Left = 96
     Top = 48
   end
 end

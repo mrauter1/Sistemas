@@ -60,6 +60,10 @@ object FormProInfo: TFormProInfo
         DataBinding.FieldName = 'PRODUCAOMINIMA'
         Width = 157
       end
+      object cxGridDBTableViewNAOSOMANOPESOLIQ: TcxGridDBColumn
+        DataBinding.FieldName = 'NAOSOMANOPESOLIQ'
+        Width = 86
+      end
     end
     object cxGridLevel: TcxGridLevel
       GridView = cxGridDBTableView
@@ -89,6 +93,10 @@ object FormProInfo: TFormProInfo
       item
         Name = 'PRODUCAOMINIMA'
         DataType = ftInteger
+      end
+      item
+        Name = 'NAOSOMANOPESOLIQ'
+        DataType = ftBoolean
       end>
     IndexDefs = <>
     Params = <>
@@ -111,6 +119,10 @@ object FormProInfo: TFormProInfo
     object CdsProInfoPRODUCAOMINIMA: TIntegerField
       DisplayLabel = 'Produ'#231#227'o Minima'
       FieldName = 'PRODUCAOMINIMA'
+    end
+    object CdsProInfoNAOSOMANOPESOLIQ: TBooleanField
+      DisplayLabel = 'N'#227'o Soma No Peso L'#237'quido'
+      FieldName = 'NAOSOMANOPESOLIQ'
     end
   end
 end

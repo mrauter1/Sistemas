@@ -48,8 +48,6 @@ type
     function EDiaUtil(pDia: TDate): Boolean;
     procedure PopulaCdsPedidos(fDataSet: TDataSet);
     procedure RankeiaProdutos;
-    procedure SetInfoDefault(const pCodProduto: String);
-    function GetAplicacao(const pCodProduto: String): String;
     procedure CarregaProInfo;
   public
     procedure AtualizaEstoque(RefreshDemanda: Boolean);
@@ -73,61 +71,6 @@ uses
 {$R *.dfm}
 
 { TDmEstoqProdutos }
-
-function TDmEstoqProdutos.GetAplicacao(const pCodProduto: String): String;
-var
-  fDataSet: TDataSet;
-
-begin
-  fDataSet:= DmSqlUtils.RetornaDataSet('SELECT CODAPLICACAO FROM PRODUTO WHERE CODPRODUTO = '''+pCodProduto+''' ');
-  try
-    Result:= fDataSet.FieldByName('CODAPLICACAO').AsString;
-  finally
-    fDataSet.Free;
-  end;
-end;
-
-procedure TDmEstoqProdutos.SetInfoDefault(const pCodProduto: String);
-var
-  pAplicacao: String;
-const
-  cLata18 = '0002';
-  cLata5 = '0003';
-  cLata900 = '0004';
-  cTambor = '0000';
-  cTamborete = '0001';
-begin
-  with FormProInfo do
-  begin
-    pAplicacao:= GetAplicacao(pCodProduto);
-
-    CdsProInfo.Append;
-    CdsProInfoCODPRODUTO.AsString:= pCodProduto;
-    CdsProInfoNAOFAZESTOQUE.AsBoolean:= False;
-    if (pAplicacao = cLata18) or (pAplicacao = cLata900) then begin
-      CdsProInfoESPACOESTOQUE.AsInteger:= 22;
-      CdsProInfoPRODUCAOMINIMA.AsInteger:= 11;
-    end
-   else
-    if (pAplicacao = cLata5) then begin
-        CdsProInfoESPACOESTOQUE.AsInteger:= 12;
-        CdsProInfoPRODUCAOMINIMA.AsInteger:= 6;
-    end
-   else
-    if (pAplicacao = cTambor) then
-    begin
-      CdsProInfoESPACOESTOQUE.AsInteger:= 22;
-      CdsProInfoPRODUCAOMINIMA.AsInteger:= 8;
-    end
-    else if (pAplicacao = cTamborete) then
-    begin
-      CdsProInfoESPACOESTOQUE.AsInteger:= 5;
-      CdsProInfoPRODUCAOMINIMA.AsInteger:= 1;
-    end;
-
-    CdsProInfo.Post;
-  end;
-end;
 
 function TDmEstoqProdutos.EDiaUtil(pDia: TDate): Boolean;
 begin
@@ -425,14 +368,15 @@ begin
 
     // Se o maior cliente parar de comprar o produto dias estoque não deve ser maior que a data de validade
     EstoqMax.AsFloat:= cDiasValidade * (DemandaDiaria.AsFloat - (DemandaC1.AsFloat / Rotacao.AsInteger ));
-    if FormProInfo.CdsProInfo.Locate('CODPRODUTO', CODPRODUTO.AsString, []) then
+
+    FormProInfo.LocateProInfo(CODPRODUTO.AsString);
+
+    if (FormProInfo.CdsProInfoESPACOESTOQUE.AsInteger <> 0) and
+      (FormProInfo.CdsProInfoESPACOESTOQUE.AsInteger < ESTOQMAX.AsFloat) then
     begin
-      if (FormProInfo.CdsProInfoESPACOESTOQUE.AsInteger <> 0) and
-        (FormProInfo.CdsProInfoESPACOESTOQUE.AsInteger < ESTOQMAX.AsFloat) then
-      begin
-        ESTOQMAX.AsFloat:= FormProInfo.CdsProInfoESPACOESTOQUE.AsInteger;
-      end;
+      ESTOQMAX.AsFloat:= FormProInfo.CdsProInfoESPACOESTOQUE.AsInteger;
     end;
+
   finally
     fDataSet.Free;
   end;
@@ -630,8 +574,7 @@ var
 
   procedure ObterConfigProdutos;
   begin
-    if not FormProInfo.CdsProInfo.Locate('CODPRODUTO', fDataSet.FieldByName('CODPRODUTO').AsString, []) then
-      SetInfoDefault(fDataSet.FieldByName('CODPRODUTO').AsString);
+    FormProInfo.LocateProInfo(fDataSet.FieldByName('CODPRODUTO').AsString);
 
   end;
 
@@ -678,6 +621,7 @@ begin
         FormShowMemo.SetText('Atualizando informações do produto '+fDataSet.FieldByName('CODPRODUTO').AsString);
         // Se não houver alterações, produto não deve ser atualizado
         if AlterouDataSet = False then
+
         begin
           fDataSet.Next;
           Continue;
@@ -812,17 +756,16 @@ begin
   CdsEstoqProdutos.Filtered:= True;
   DmSqlUtils.OrdenaClientDataSet(CdsEstoqProdutos, 'PROBFALTAHOJE', [ixDescending]);
   CdsEstoqProdutos.First;
-  while not CdsEstoqProdutos.Eof do begin
-    if FormProInfo.CdsProInfo.Locate('CODPRODUTO', CODPRODUTO.AsString, []) then
-    begin
+  while not CdsEstoqProdutos.Eof do
+  begin
+    FormProInfo.LocateProInfo(CODPRODUTO.AsString);
 
-      // Se com a produção minima o estoque do produto passar de estoque max. não deve ser feito mais estoque do produto.
-      if (Trunc(ESTOQUEATUAL.AsFloat) + FormProInfo.CdsProInfoPRODUCAOMINIMA.AsInteger) >= ESTOQMAX.AsFloat then
-      begin
-        CdsEstoqProdutos.Edit;
-        CdsEstoqProdutosRANK.AsInteger:= 8888;
-        CdsEstoqProdutos.Post;
-      end;
+    // Se com a produção minima o estoque do produto passar de estoque max. não deve ser feito mais estoque do produto.
+    if (Trunc(ESTOQUEATUAL.AsFloat) + FormProInfo.CdsProInfoPRODUCAOMINIMA.AsInteger) >= ESTOQMAX.AsFloat then
+    begin
+      CdsEstoqProdutos.Edit;
+      CdsEstoqProdutosRANK.AsInteger:= 8888;
+      CdsEstoqProdutos.Post;
     end;
 
     DoRank;

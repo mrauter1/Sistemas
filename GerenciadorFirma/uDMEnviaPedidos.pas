@@ -7,7 +7,8 @@ uses
   FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
   FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
   FireDAC.Comp.DataSet, FireDAC.Comp.Client, System.Generics.Collections,
-  Variants, FireDAC.Stan.StorageJSON, FireDAC.Stan.StorageXML, Vcl.ExtCtrls;
+  Variants, FireDAC.Stan.StorageJSON, FireDAC.Stan.StorageXML, Vcl.ExtCtrls,
+  uSendMail, IniFiles;
 
 type
   TDMEnviaPedidos = class(TDataModule)
@@ -30,119 +31,66 @@ type
     SQLQueryNOMECONDICAO: TStringField;
     SQLQueryTOTITENS: TIntegerField;
     SQLQuerySITBLOQUEIO: TStringField;
+    SQLQueryDATAENTREGA: TDateField;
+    SQLQueryCIDADE: TStringField;
     procedure DataModuleCreate(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
   private
     { Private declarations }
+    FMailSender: TMailSender;
+    FEmails: String;
     function VerificaAlteracaoPedido: Boolean;
     function VerificaAlteracoesPedidos: Boolean;
     procedure CopiaDataSet;
     function LocateByKey(KeyField: String; KeyValue: Variant): Boolean;
     procedure EnviaEmailNovoPedido;
-    function GetHtmlProdutosPed(pCodPedido: String): String;
-    procedure EnviaEmailPedidoAlterado(pDict: TDictionary<string, string>);
+    procedure EnviaEmailPedidoAlterado;
+    procedure CarregarEmails;
   public
     { Public declarations }
 
   end;
 
+function ObterCabecalhoHtml(pDataSet: TDataSet): String;
+function ObterValoresRecordHtml(pDataSet: TDataSet): String;
+function RecordToHtml(pDataSet: TDataSet): String;
+function RecordToHtmlTable(pDataSet: TDataSet): String;
+function RecordCompareToHtml(pDataSetOld: TDataSet; pDataSetNew: TDataSet): String;
+function WrapHtml(pConteudo: String): String;
+
 var
   DMEnviaPedidos: TDMEnviaPedidos;
 
 const
-  cHtmlPedido = ''+
-     '<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"></head>' +
-      '<style> '+
-      'h1 { color: blue; } </style> '+
-      '<h1>%numPed%</h1> '+
-      '<h2>%cliente%</h2> '+
-      '<h2>%transp%</h2> '+
-      '<h2>%valortotal%</h2> '+
-      '<table border="1"> '+
-      '  <tr> '+
-      '    <td colspan="2"></td> '+
-      '    <td colspan="2" align="Center"><b>Atendido</b></td> '+
-      '    <td colspan="2" align="Center"><b>Não Atendido</b></td> '+
-      '    <td colspan="2"></td> '+
-      '  </tr> '+
-      '  <tr> '+
-      '    <td>Produto</td> '+
-      '    <td>Unidade</td> '+
-      '    <td>Quant.</td> '+
-      '    <td>Solto</td> '+
-      '    <td>Quant.</td> '+
-      '    <td>Solto</td> '+
-      '    <td>Preço</td> '+
-      '    <td>Total</td> '+
-      '  </tr> '+
-      '  %Produtos% '+
-      ' </table> '+
-      '</html> ';
+  sProdutoTable = ' bgcolor=”#ffffff”; font-color:"white"; font-weight: "bold"; ';
 
 implementation
 
-{%CLASSGROUP 'Vcl.Controls.TControl'}
-
 uses
-  uFormPrincipal;
+  Forms, Utils;
+
+{%CLASSGROUP 'Vcl.Controls.TControl'}
 
 {$R *.dfm}
 
 { TDMEnviaPedidos }
 
-function TDMEnviaPedidos.GetHtmlProdutosPed(pCodPedido: String): String;
-var
-  fFlags: TReplaceFlags;
-  sProduto: String;
-
-const
-  cHtmlProdutos = ''+
-      ' <tr> '+
-      '    <td>%Produto%</td> '+
-      '    <td>%Unidade%</td> '+
-      '    <td>%Quant%</td> '+
-      '    <td>%Solto%</td> '+
-      '    <td>%QuantPendente%</td> '+
-      '    <td>%SoltoPendente%</td> '+
-      '    <td>%Preço%</td> '+
-      '    <td>%Total%</td> '+
-      '  </tr> ';
-
+procedure WriteLog(pTexto: String);
 begin
-  Result:= '';
-
-  fFlags:= [rfReplaceAll, rfIgnoreCase];
-
-  while not QryProdutosPed.Eof do
-  begin
-    sProduto:= cHtmlProdutos;
-
-    sProduto:= sProduto.Replace('%Produto%', Trim(QryProdutosPedPRODUTO.AsString), fFlags).
-                  Replace('%Unidade%', Trim(QryProdutosPedUNIDADE.DisplayText), fFlags).
-                  Replace('%Quant%', Trim(QryProdutosPedQUANTATENDIDA.DisplayText), fFlags).
-                  Replace('%Solto%', Trim(QryProdutosPedSOLTOATENDIDO.DisplayText), fFlags).
-                  Replace('%QuantPendente%', Trim(QryProdutosPedQUANTPENDENTE.DisplayText), fFlags).
-                  Replace('%SoltoPendente%', Trim(QryProdutosPedSOLTOPENDENTE.DisplayText), fFlags).
-                  Replace('%Preço%', Trim(QryProdutosPedPRECO.DisplayText), fFlags).
-                  Replace('%Total%', Trim(QryProdutosPedVALTOTAL.DisplayText), fFlags);
-
-    Result:= Result+sProduto;
-    QryProdutosPed.Next;
-  end;
+  Utils.WriteLog('Monitor.log', pTexto);
 end;
 
 function WrapHtml(pConteudo: String): String;
 begin
   Result:= '<html>'
-          +'<head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"></head>' +
-          +' <style> h1 { color: blue; } </style> '
+          +'<head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"></head>'
+//          +' <style> h1 { color: blue; } </style> '
           +pConteudo
           +'</html>';
 end;
 
 function RecordToHtml(pDataSet: TDataSet): String;
 var
-  I: Integer;
   FField: TField;
 begin
   Result:= '';
@@ -152,69 +100,114 @@ begin
 
 end;
 
-function DataSetToHtml(pDataSet: TDataSet): String;
-
-  function Cabecalho: String;
-  var
-    FField: TField;
-  begin
-    for FField in pDataSet.Fields do
-      if FField.Visible then
-        Result:= Result+' <tr>'+FField.DisplayLabel+'</tr> ';
-  end;
-
-  function Valores: String;
-  var
-    FField: TField;
-  begin
-    for FField in pDataSet.Fields do
-      if FField.Visible then
-        Result:= Result+' <tr>'+FField.DisplayText+'</tr> ';
-  end;
-
+function GetCssStyle(pStyle: String): String;
 begin
-  Result:= Cabecalho;
+  Result:= ' <style>'+pStyle+'</style>';
+end;
+
+function RecordToHtmlTable(pDataSet: TDataSet): String;
+begin
+  Result:= ' <table border="1"> ';
+  Result:= Result+ObterCabecalhoHtml(pDataSet);
+  Result:= Result+ObterValoresRecordHtml(pDataSet);
+  Result:= Result+'</table>';
+end;
+
+function RecordCompareToHtml(pDataSetOld: TDataSet; pDataSetNew: TDataSet): String;
+var
+  FFieldNew, FFieldOld: TField;
+begin
+  Result:= '';
+  for FFIeldNew in pDataSetNew.Fields do
+  begin
+    if not FFIeldNew.Visible then
+      Continue;
+
+    FFieldOld:= pDataSetOld.FindField(FFieldNew.FieldName);
+    if not Assigned(FFieldOld) then
+      Continue;
+
+    if FFieldOld.Value <> FFieldNew.Value then
+      Result:= Result+' <h2>'+FFieldNew.DisplayLabel+'(ALTERADO)=> Valor anterior: '+FFieldOld.DisplayText+'; Novo Valor: '+FFieldNew.DisplayText+'</h2> ';
+  end;
+
+end;
+
+function ObterCabecalhoHtml(pDataSet: TDataSet): String;
+var
+  FField: TField;
+begin
+  Result:= '<tr>';
+  for FField in pDataSet.Fields do
+    if FField.Visible then
+      Result:= Result+' <th>'+FField.DisplayLabel+'</th> ';
+  Result:= Result+'</tr>';
+end;
+
+function FieldToTD(pField: TField): String;
+var
+  sAlign: String;
+begin
+  case pField.Alignment of
+    taLeftJustify: sAlign:= '"left"';
+    taRightJustify: sAlign:= '"right"';
+    taCenter: sAlign:= '"center"';
+  end;
+  Result:= ' <td align='+sAlign+' >'+pField.DisplayText+'</td> ';
+end;
+
+function ObterValoresRecordHtml(pDataSet: TDataSet): String;
+var
+  FField: TField;
+begin
+  Result:= '<tr>';
+  for FField in pDataSet.Fields do
+    if FField.Visible then
+      Result:= Result+FieldToTD(FField);
+
+  Result:= Result+'</tr>';
+end;
+
+function DataSetToHtml(pDataSet: TDataSet): String;
+begin
+  Result:= '<table> ';
+  Result:= Result+ObterCabecalhoHtml(pDataSet);
 
   pDataSet.First;
   while not pDataSet.Eof do
   begin
-    Result:= Result+Valores;
+    Result:= Result+ObterValoresRecordHtml(pDataSet);
     pDataSet.Next;
   end;
+  Result:= Result+'</table>';
 end;
 
-procedure TDMEnviaPedidos.EnviaEmailPedidoAlterado(pDict: TDictionary<string, string>);
+procedure TDMEnviaPedidos.EnviaEmailPedidoAlterado;
 
   function GetHtmlPedidoAlterado: String;
-  var
-    fFlags: TReplaceFlags;
-
-    function ObterTextoCampo(pNomeCampo: String): String;
-    begin
-      if pDict.ContainsKey(pNomeCampo) then
-        Result:= pDict[pNomeCampo]
-      else
-        Result:= SqlQuery.FieldByName(pNomeCampo).DisplayLabel+': '+SqlQuery.FieldByName(pNomeCampo).DisplayText;
-
-    end;
-
   begin
-    fFlags:= [rfReplaceAll, rfIgnoreCase];
-    Result:= cHtmlPedido;
-    Result:= Result.Replace('%numPed%', 'Alterado Pedido Nro.: '+SqlQueryCODPEDIDO.AsString, fFlags).
-                    Replace('%cliente%', ObterTextoCampo('NOMECLI'), fFlags).
-                    Replace('%transp%', ObterTextoCampo('NOMETRANSP'), fFlags).
-                    Replace('%valortotal%', ObterTextoCampo('TOTNOTA'), fFlags).
-                    Replace('%produtos%', GetHtmlProdutosPed(SqlQueryCodPedido.AsString), fFlags);
+    QryProdutosPed.Close;
+    QryProdutosPed.ParamByName('CODPEDIDO').AsString:= SqlQueryCODPEDIDO.AsString;
+    QryProdutosPed.Open;
 
+    Result:=  WrapHtml('<h1>Pedido Alterado</h1>'+
+                        RecordCompareToHtml(FDMemTable, SQLQuery)+
+                        RecordToHtmlTable(SqlQuery)+
+                        '<br>'+
+                        DataSetToHtml(QryProdutosPed));
   end;
 
 begin
-  FMailSender.EnviarEmail('Pedido alterado: '+SqlQueryCODPEDIDO.AsString+', '+SqlQueryNOMECLI.AsString, GetHtmlPedidoAlterado, 'marcelorauter@gmail.com', 'marcelo@rauter.com.br');
+  WriteLog('Enviando email de pedido alterado nro.: '+SqlQueryCodPedido.AsString+', para os emails: '+FEmails);
+  FMailSender.EnviarEmail('Pedido alterado: '+SqlQueryCODPEDIDO.AsString+', '+SqlQueryNOMECLI.AsString, GetHtmlPedidoAlterado,
+    FEmails, 'marcelo@rauter.com.br');
 end;
 
 procedure TDMEnviaPedidos.DataModuleCreate(Sender: TObject);
 begin
+  CarregarEmails;
+
+  FMailSender:= TMailSender.Create(Self, 'smtp.rauter.com.br', 587, 'marcelo@rauter.com.br', 'rtq1825', True, 'marcelo@rauter.com.br');
   try
     FDMemTable.LoadFromFile('Pedidos.xml', sfXml);
   except
@@ -234,11 +227,29 @@ procedure TDMEnviaPedidos.EnviaEmailNovoPedido;
     QryProdutosPed.ParamByName('CODPEDIDO').AsString:= SqlQueryCODPEDIDO.AsString;
     QryProdutosPed.Open;
 
-    Result:=  WrapHtml('<h1>Novo Pedido!</h1>'+RecordToHtml(SqlQuery)+DataSetToHtml(QryProdutosPed));
+    Result:=  WrapHtml('<h1>Novo Pedido</h1>'+RecordToHtmlTable(SqlQuery)+'<br>'+DataSetToHtml(QryProdutosPed));
   end;
 
 begin
-  FMailSender.EnviarEmail('Novo Pedido: '+SqlQueryCODPEDIDO.AsString+', '+SqlQueryNOMECLI.AsString, GetHtmlNovoPedido, 'marcelorauter@gmail.com', 'marcelo@rauter.com.br');
+  WriteLog('Enviando email de novo pedido nro.: '+SqlQueryCodPedido.AsString+', para os emails: '+FEmails);
+  FMailSender.EnviarEmail('Novo Pedido: '+SqlQueryCODPEDIDO.AsString+', '+SqlQueryNOMECLI.AsString, GetHtmlNovoPedido,
+      FEmails, 'marcelo@rauter.com.br');
+end;
+
+procedure TDMEnviaPedidos.CarregarEmails;
+var
+  ArqIni: TIniFile;
+begin
+  if FileExists(ExtractFilePath(Application.ExeName) + 'Monitor.Ini') = True then
+  begin
+    ArqIni:= TIniFile.Create(ExtractFilePath(Application.ExeName) + 'Monitor.Ini');
+    try
+      FEmails :=
+        ArqIni.ReadString('Emails', 'NovoPedido', 'marcelo@rauter.com.br');
+    finally
+      ArqIni.Free;
+    end;
+  end;
 end;
 
 procedure TDMEnviaPedidos.CopiaDataSet;
@@ -247,35 +258,12 @@ begin
 end;
 
 function TDMEnviaPedidos.VerificaAlteracaoPedido: Boolean;
-var
-  FFieldsAlterados: TArray<String>;
-  FDictCampoAlterado: TDictionary<String, String>;
-  FCamposAlterados: String;
-  I: Integer;
-
-  procedure AdicionarValorAlterado(pCampo: TField; pOldValue: Variant; pNewValue: Variant);
-  var
-    FTexto: String;
-  begin
-    FTexto:= 'Campo '+pCampo.DisplayLabel+' alterado. Valor Anterior: '+VarToStrDef(pOldValue, '')+' Novo Valor: '+VarToStrDef(pNewValue, '');
-    FDictCampoAlterado.AddOrSetValue(pCampo.FieldName.ToUpper, FTexto);
-  end;
-
 begin
-  FDictCampoAlterado:= TDictionary<String, String>.Create;
-  try
-    FFieldsAlterados:= ComparaRecord(SqlQuery, FDMemTable, 'SITUACAO');
 
-    Result:= Length(FFieldsAlterados) > 0;
 
-    for I:= 0 to Length(FFieldsAlterados)-1 do
-      AdicionarValorAlterado(SqlQuery.FieldByName(FFieldsAlterados[I]), FDMemTable.FieldByName(FFieldsAlterados[I]).DisplayText, SqlQuery.FieldByName(FFieldsAlterados[I]).DisplayText);
-
-    if Result then
-      EnviaEmailPedidoAlterado(FDictCampoAlterado);
-  finally
-    FDictCampoAlterado.Free;
-  end;
+  Result:= Length(ComparaRecord(SqlQuery, FDMemTable, 'SITUACAO;PEDIDOEMUSO;NOMETRANSP')) > 0;
+  if Result then  
+    EnviaEmailPedidoAlterado;
 end;
 
 function TDMEnviaPedidos.LocateByKey(KeyField: String; KeyValue: Variant): Boolean;
@@ -288,28 +276,35 @@ end;
 
 procedure TDMEnviaPedidos.Timer1Timer(Sender: TObject);
 begin
+  CarregarEmails;
   VerificaAlteracoesPedidos;
 end;
 
 function TDMEnviaPedidos.VerificaAlteracoesPedidos: Boolean;
 begin
   Result:= False;
+  WriteLog('Verificando alterações nos pedidos');
+  try
+    SqlQuery.SQLConnection.Connected:= True;
+    SqlQuery.Close;
+    SqlQuery.Open;
 
-  SqlQuery.Close;
-  SqlQuery.Open;
+    SqlQuery.First;
+    while not SqlQuery.Eof do
+    begin
+      if LocateByKey('CODPEDIDO', SQLQueryCODPEDIDO.AsString) then
+        Result:= VerificaAlteracaoPedido
+      else
+        EnviaEmailNovoPedido;
 
-  SqlQuery.First;
-  while not SqlQuery.Eof do
-  begin
-    if LocateByKey('CODPEDIDO', SQLQueryCODPEDIDO.AsString) then
-      Result:= VerificaAlteracaoPedido
-    else
-      EnviaEmailNovoPedido;
+      SqlQuery.Next;
+    end;
 
-    SqlQuery.Next;
+    CopiaDataSet;
+  finally
+    SqlQuery.SQLConnection.Connected:= False;
   end;
 
-  CopiaDataSet;
   FDMemTable.SaveToFile('Pedidos.xml', sfXml);
 end;
 

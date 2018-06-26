@@ -19,6 +19,7 @@ type
     function OrdenaClientDataSet(parCds: TClientDataSet;
       const FieldName: String; PIndexOptions: TIndexOptions = []): Boolean;
     function RetornaValor(Sql: String; ValDefault: Variant): Variant;
+    procedure PopulaClientDataSet(pCds: TClientDataSet; pSql: String; pEmptyDataSet: Boolean = True);
   end;
 
 // Retorna um array com o nome dos campos que são diferentes entre um e outro dataset
@@ -39,17 +40,15 @@ implementation
 
 function ComparaRecord(pDataSet1, pDataSet2: TDataSet; pCamposParaIgnorar: String = ''): TArray<String>;
 var
-  I: Integer;
   FField1, FField2: TField;
 
   function CampoIgnorado(pCampo: String): Boolean;
   var
-    I: Integer;
     fStr: String;
   begin
     Result:= True;
 
-    for fStr in pCamposParaIgnorar.Split(';') do
+    for fStr in pCamposParaIgnorar.Split([';']) do
       if Trim(fStr).ToUpper = pCampo.ToUpper then
         Exit;
 
@@ -201,6 +200,25 @@ begin
   parCds.IndexName := cIdx;
   Result:= True;
   parCds.IndexDefs.Update;
+end;
+
+procedure TDmSqlUtils.PopulaClientDataSet(pCds: TClientDataSet; pSql: String;
+  pEmptyDataSet: Boolean = True);
+var
+  FQry: TDataSet;
+begin
+  if not pCds.Active then
+    pCds.CreateDataSet;
+
+  if pEmptyDataSet then
+    pCds.EmptyDataSet;
+
+  FQry:= DmSqlUtils.RetornaDataSet(pSql);
+  try
+    CopiaDadosDataSet(FQry, pCds);
+  finally
+    FQry.Free;
+  end;
 end;
 
 end.

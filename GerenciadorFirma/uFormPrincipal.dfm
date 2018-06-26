@@ -59,6 +59,10 @@ object FormPrincipal: TFormPrincipal
         Caption = 'Conversor'
         OnClick = Conversor1Click
       end
+      object ValidaModelos1: TMenuItem
+        Caption = 'Valida Modelos'
+        OnClick = ValidaModelos1Click
+      end
     end
   end
   object Timer1: TTimer

@@ -2,8 +2,8 @@ object FormInsumos: TFormInsumos
   Left = 0
   Top = 0
   Caption = 'Insumos do Produto'
-  ClientHeight = 399
-  ClientWidth = 747
+  ClientHeight = 400
+  ClientWidth = 855
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,14 +16,11 @@ object FormInsumos: TFormInsumos
   TextHeight = 13
   object cxGrid: TcxGrid
     Left = 0
-    Top = 0
-    Width = 747
-    Height = 399
+    Top = 81
+    Width = 855
+    Height = 319
     Align = alClient
     TabOrder = 0
-    ExplicitLeft = 24
-    ExplicitTop = 8
-    ExplicitWidth = 735
     object cxGridDBTableView: TcxGridDBTableView
       PopupMenu = PopupMenuOpcoes
       OnDblClick = cxGridDBTableViewDblClick
@@ -42,6 +39,26 @@ object FormInsumos: TFormInsumos
           FieldName = 'LITROS'
           Column = cxGridDBTableViewLITROS
           DisplayText = 'Quant. Em Litros'
+        end
+        item
+          Kind = skSum
+          FieldName = 'PESO'
+          Column = cxGridDBTableViewPESO
+          DisplayText = 'Peso'
+        end
+        item
+          Kind = skSum
+          OnGetText = cxGridDBTableViewTcxGridDBDataControllerTcxDataSummaryFooterSummaryItems3GetText
+          FieldName = 'PERCLITROS'
+          Column = cxGridDBTableViewPERCLITROS
+          DisplayText = '% Litros Total'
+        end
+        item
+          Kind = skSum
+          OnGetText = cxGridDBTableViewTcxGridDBDataControllerTcxDataSummaryFooterSummaryItems3GetText
+          FieldName = 'PERCPESO'
+          Column = cxGridDBTableViewPERCPESO
+          DisplayText = '% Peso Total'
         end>
       DataController.Summary.SummaryGroups = <>
       FilterRow.Visible = True
@@ -57,8 +74,7 @@ object FormInsumos: TFormInsumos
       Styles.StyleSheet = FormGlobal.cxGridTableViewStyleSheet1
       object cxGridDBTableViewCODPRODUTO: TcxGridDBColumn
         DataBinding.FieldName = 'CODPRODUTO'
-        Visible = False
-        Width = 67
+        Width = 49
       end
       object cxGridDBTableViewAPRESENTACAO: TcxGridDBColumn
         Caption = 'Produto'
@@ -68,7 +84,7 @@ object FormInsumos: TFormInsumos
       end
       object cxGridDBTableViewINSUMO: TcxGridDBColumn
         DataBinding.FieldName = 'INSUMO'
-        Width = 222
+        Width = 167
       end
       object cxGridDBTableViewQUANTINSUMO: TcxGridDBColumn
         DataBinding.FieldName = 'QUANTINSUMO'
@@ -76,6 +92,21 @@ object FormInsumos: TFormInsumos
       end
       object cxGridDBTableViewLITROS: TcxGridDBColumn
         DataBinding.FieldName = 'LITROS'
+        Width = 68
+      end
+      object cxGridDBTableViewPERCLITROS: TcxGridDBColumn
+        DataBinding.FieldName = 'PERCLITROS'
+        OnGetDataText = cxGridDBTableViewPERCLITROSGetDataText
+        Width = 59
+      end
+      object cxGridDBTableViewPESO: TcxGridDBColumn
+        DataBinding.FieldName = 'PESO'
+        Width = 55
+      end
+      object cxGridDBTableViewPERCPESO: TcxGridDBColumn
+        DataBinding.FieldName = 'PERCPESO'
+        OnGetDataText = cxGridDBTableViewPERCLITROSGetDataText
+        Width = 73
       end
       object cxGridDBTableViewDENSIDADECALCULADA: TcxGridDBColumn
         DataBinding.FieldName = 'DENSIDADECALCULADA'
@@ -179,6 +210,119 @@ object FormInsumos: TFormInsumos
       end
     end
   end
+  object Panel1: TPanel
+    Left = 0
+    Top = 0
+    Width = 855
+    Height = 81
+    Align = alTop
+    TabOrder = 1
+    object GroupPeso: TGroupBox
+      Left = 24
+      Top = 10
+      Width = 225
+      Height = 55
+      Caption = 'Peso'
+      Color = clBtnFace
+      ParentBackground = False
+      ParentColor = False
+      TabOrder = 0
+      object Label1: TLabel
+        Left = 16
+        Top = 15
+        Width = 75
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Prod. Acabado:'
+        Color = clBtnFace
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentColor = False
+        ParentFont = False
+      end
+      object Label2: TLabel
+        Left = 41
+        Top = 35
+        Width = 50
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Calculado:'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+      end
+      object LblPesoPAcabado: TLabel
+        Left = 97
+        Top = 15
+        Width = 38
+        Height = 13
+        Caption = '0.00 KG'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+      end
+      object LblPesoCalculado: TLabel
+        Left = 97
+        Top = 35
+        Width = 38
+        Height = 13
+        Caption = '0.00 KG'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+      end
+    end
+    object GroupLitros: TGroupBox
+      Left = 288
+      Top = 10
+      Width = 225
+      Height = 55
+      Caption = 'Em Litros'
+      TabOrder = 1
+      object Label3: TLabel
+        Left = 15
+        Top = 15
+        Width = 75
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Prod. Acabado:'
+      end
+      object Label4: TLabel
+        Left = 40
+        Top = 34
+        Width = 50
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Calculado:'
+      end
+      object LblLitrosCalculado: TLabel
+        Left = 96
+        Top = 34
+        Width = 51
+        Height = 13
+        Caption = '0.00 Litros'
+      end
+      object LblLitrosPAcabado: TLabel
+        Left = 96
+        Top = 15
+        Width = 51
+        Height = 13
+        Caption = '0.00 Litros'
+      end
+    end
+  end
   object DsInsumos: TDataSource
     DataSet = CdsInsumos
     Left = 352
@@ -229,15 +373,36 @@ object FormInsumos: TFormInsumos
       FieldName = 'LITROS'
       DisplayFormat = '#0.00'
     end
+    object CdsInsumosPESO: TFloatField
+      DisplayLabel = 'Quant. Em Kg'
+      FieldName = 'PESO'
+      DisplayFormat = '#0.00'
+    end
     object CdsInsumosDENSIDADECALCULADA: TFloatField
       DisplayLabel = 'Densidade Calculada'
       FieldName = 'DENSIDADECALCULADA'
       DisplayFormat = '#0.000'
     end
+    object CdsInsumosPERCPESO: TFloatField
+      DisplayLabel = '% Peso'
+      FieldName = 'PERCPESO'
+    end
+    object CdsInsumosPERCLITROS: TFloatField
+      DisplayLabel = '% Litros'
+      FieldName = 'PERCLITROS'
+    end
   end
   object PopupMenuOpcoes: TPopupMenu
     Left = 528
     Top = 88
+    object ConfiguraodoProduto1: TMenuItem
+      Caption = 'Configura'#231#227'o do Produto'
+      OnClick = ConfiguraodoProduto1Click
+    end
+    object DetalhamentodoProduto1: TMenuItem
+      Caption = 'Detalhamento do Produto'
+      OnClick = DetalhamentodoProduto1Click
+    end
     object VerSimilares1: TMenuItem
       Caption = 'Produtos Equivalentes'
       OnClick = VerSimilares1Click
@@ -287,5 +452,31 @@ object FormInsumos: TFormInsumos
     DataSet = CdsInsumosDetalhe
     Left = 248
     Top = 200
+  end
+  object CdsProdutoAcabado: TClientDataSet
+    Aggregates = <>
+    Params = <>
+    Left = 472
+    Top = 152
+    object CdsProdutoAcabadoCodProduto: TStringField
+      DisplayLabel = 'Cod. Produto'
+      FieldName = 'CODPRODUTO'
+      Size = 10
+    end
+    object CdsProdutoAcabadoApresentacao: TStringField
+      DisplayLabel = 'Apresenta'#231#227'o'
+      FieldName = 'APRESENTACAO'
+      Size = 80
+    end
+    object CdsProdutoAcabadoPESO: TFloatField
+      DisplayLabel = 'Peso'
+      FieldName = 'PESO'
+      DisplayFormat = '#0.00'
+    end
+    object CdsProdutoAcabadoLITROS: TFloatField
+      DisplayLabel = 'Litros'
+      FieldName = 'LITROS'
+      DisplayFormat = '#0.00'
+    end
   end
 end

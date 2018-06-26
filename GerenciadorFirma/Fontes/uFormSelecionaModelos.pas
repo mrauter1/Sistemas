@@ -12,7 +12,7 @@ type
     BtnOK: TBitBtn;
     procedure BtnOKClick(Sender: TObject);
   private
-    function CarregaModelos(pCodProduto: String): Integer;
+    procedure CarregaModelos(pCodProduto: String);
     { Private declarations }
   public
     class function SelecionaModelo(pCodProduto: String): Integer;
@@ -54,7 +54,7 @@ begin
   Close;
 end;
 
-function TFormSelecionaModelo.CarregaModelos(pCodProduto: String): Integer;
+procedure TFormSelecionaModelo.CarregaModelos(pCodProduto: String);
 const
   cSql = 'SELECT M.CODMODELO, M.DESCRICAOMODELO FROM INSUMOS_MODELO M INNER JOIN INSUMOS_ACABADO A ON A.CODMODELO = M.CODMODELO AND A.CODPRODUTO = ''%s'' ';
 var

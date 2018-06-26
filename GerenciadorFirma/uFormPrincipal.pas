@@ -27,6 +27,7 @@ type
     Extras1: TMenuItem;
     Pedidos21: TMenuItem;
     Timer1: TTimer;
+    ValidaModelos1: TMenuItem;
     procedure Pedidos1Click(Sender: TObject);
     procedure Fila1Click(Sender: TObject);
     procedure Densidade1Click(Sender: TObject);
@@ -37,6 +38,7 @@ type
     procedure DetalhedosProdutos1Click(Sender: TObject);
     procedure Pedidos21Click(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
+    procedure ValidaModelos1Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -52,7 +54,7 @@ implementation
 {$R *.dfm}
 
 uses
-  uDmFilaProducao, Utils, uFormDetalheProdutos, uFormPedidos2;
+  uDmFilaProducao, Utils, uFormDetalheProdutos, uFormPedidos2, uFormValidaModelos;
 
 procedure TFormPrincipal.BtnAtualizaClick(Sender: TObject);
 begin
@@ -102,6 +104,18 @@ end;
 procedure TFormPrincipal.Timer1Timer(Sender: TObject);
 begin
   DMFilaProducao.AtualizaFilaProducao;
+end;
+
+procedure TFormPrincipal.ValidaModelos1Click(Sender: TObject);
+var
+  vFrm: TFormValidaModelos;
+begin
+  vFrm:= TFormValidaModelos.Create(Self);
+  try
+    vFrm.ShowModal;
+  finally
+    vFrm.Free;
+  end;
 end;
 
 initialization

@@ -169,11 +169,9 @@
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="Fontes\uSendMail.pas"/>
-        <DCCReference Include="uEnviaEmailPedidos.pas"/>
-        <DCCReference Include="uDMEnviaPedidos.pas">
-            <Form>DMEnviaPedidos</Form>
+        <DCCReference Include="uFormValidaModelos.pas">
+            <Form>FormValidaModelos</Form>
             <FormType>dfm</FormType>
-            <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

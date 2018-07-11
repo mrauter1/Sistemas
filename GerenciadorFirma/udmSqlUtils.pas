@@ -1,10 +1,17 @@
+
 unit udmSqlUtils;
 
 interface
 
 uses
   System.SysUtils, System.Classes, Data.DB, Data.SqlExpr, Data.DBXFirebird,
-  Data.FMTBcd, Datasnap.DBClient, Datasnap.Provider, Inifiles, Forms;
+  Data.FMTBcd, Datasnap.DBClient, Datasnap.Provider, Inifiles, Forms, TypInfo;
+
+type
+ cfMapField = record
+   SourceType: TFieldType;
+   DestType: TFieldType;
+ end;
 
 type
   TDmSqlUtils = class(TDataModule)
@@ -20,6 +27,9 @@ type
       const FieldName: String; PIndexOptions: TIndexOptions = []): Boolean;
     function RetornaValor(Sql: String; ValDefault: Variant): Variant;
     procedure PopulaClientDataSet(pCds: TClientDataSet; pSql: String; pEmptyDataSet: Boolean = True);
+
+    class procedure CopyFieldDefs(Dest, Source: TDataSet; pMapedFields: array of cfMapField); overload;
+    class procedure CopyFieldDefs(Dest, Source: TDataSet); overload;
   end;
 
 // Retorna um array com o nome dos campos que são diferentes entre um e outro dataset
@@ -37,6 +47,62 @@ implementation
 {$R *.dfm}
 
 { TDmSqlUtils }
+
+class procedure TDmSqlUtils.CopyFieldDefs(Dest, Source: TDataSet; pMapedFields: array of cfMapField);
+var
+  FFieldType: TFieldType;
+  Field, NewField: TField;
+  FieldDef: TFieldDef;
+  I: Integer;
+
+  function GetFieldType: TFieldType;
+  var
+    I: Integer;
+  begin
+    for I := Low(pMapedFields) to High(pMapedFields) do
+    begin
+      if Field.DataType = pMapedFields[I].SourceType then
+      begin
+        Result:= pMapedFields[I].DestType;
+        Exit;
+      end;
+    end;
+
+    Result:= Field.DataType;
+  end;
+
+begin
+  for Field in Source.Fields do
+  begin
+    FFieldType:= GetFieldType;
+
+   // Skip unknown fields
+    if FFieldType = ftUnknown then
+      Continue;
+
+    FieldDef := Dest.FieldDefs.AddFieldDef;
+
+    FieldDef.DataType:= FFieldType;
+
+    FieldDef.Size := Field.Size;
+    FieldDef.Name := Field.FieldName;
+
+    NewField := FieldDef.CreateField(Dest);
+    NewField.Visible := Field.Visible;
+    NewField.DisplayLabel := Field.DisplayLabel;
+    NewField.DisplayWidth := Field.DisplayWidth;
+    NewField.EditMask := Field.EditMask;
+
+   if IsPublishedProp(Field, 'currency') then
+     SetPropValue(NewField, 'currency', GetPropValue(Field, 'currency'));
+
+  end;
+end;
+
+class procedure TDmSqlUtils.CopyFieldDefs(Dest, Source: TDataSet);
+begin
+  TDmSqlUtils.CopyFieldDefs(Dest, Source, []);
+end;
 
 function ComparaRecord(pDataSet1, pDataSet2: TDataSet; pCamposParaIgnorar: String = ''): TArray<String>;
 var
@@ -157,6 +223,7 @@ procedure TDmSqlUtils.DataModuleCreate(Sender: TObject);
 var
   ArqIni: TIniFile;
 begin
+  SqlConnection.Close;
   if FileExists(ExtractFilePath(Application.ExeName) + 'Banco.Ini') then
     begin
       ArqIni:= TIniFile.Create(ExtractFilePath(Application.ExeName) +  'Banco.Ini');

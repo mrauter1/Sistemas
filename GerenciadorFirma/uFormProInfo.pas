@@ -9,7 +9,9 @@ uses
   cxStyles, dxSkinsCore, dxSkinscxPCPainter, cxCustomData, cxFilter, cxData,
   cxDataStorage, cxEdit, cxNavigator, cxDBData, cxGridCustomTableView,
   cxGridTableView, cxGridDBTableView, cxGridLevel, cxClasses, cxGridCustomView,
-  cxGrid;
+  cxGrid, uDmCon, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
+  FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
+  FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet, FireDAC.Comp.Client;
 
 type
   TFormProInfo = class(TForm)
@@ -27,12 +29,21 @@ type
     cxGridDBTableViewESPACOESTOQUE: TcxGridDBColumn;
     cxGridDBTableViewPRODUCAOMINIMA: TcxGridDBColumn;
     CdsProInfoNAOSOMANOPESOLIQ: TBooleanField;
-    cxGridDBTableViewNAOSOMANOPESOLIQ: TcxGridDBColumn;
+    QryProInfo: TFDQuery;
+    QryProInfoNAOFAZESTOQUE: TBooleanField;
+    QryProInfoESPACOESTOQUE: TIntegerField;
+    QryProInfoPRODUCAOMINIMA: TIntegerField;
+    QryProInfoSOMANOPESOLIQ: TBooleanField;
+    QryProInfoAPRESENTACAO: TStringField;
+    cxGridDBTableViewSOMANOPESOLIQ: TcxGridDBColumn;
+    cxGridDBTableViewAPRESENTACAO: TcxGridDBColumn;
+    QryProInfoCODPRODUTO: TStringField;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
   private
     procedure CarregaTabelaProInfo;
     function GetAplicacao(const pCodProduto: String): String;
+    procedure ImportaDadosXml;
     { Private declarations }
   public
     procedure AddProInfoDefault(pCodProduto: String);
@@ -169,9 +180,28 @@ begin
   CdsProInfo.SaveToFile(ExtractFilePath(Application.ExeName)+'ProInfo.xml', dfXml);
 end;
 
-procedure TFormProInfo.FormCreate(Sender: TObject);
+procedure TFormProInfo.ImportaDadosXml;
 begin
   CarregaTabelaProInfo;
+  CopiaDadosDataSet(CdsProInfo, QryProInfo);
+  QryProInfo.First;
+  while not QryProInfo.Eof do
+  begin
+    QryProInfo.Edit;
+    if CdsProInfo.Locate('CODPRODUTO', QryProInfoCodProduto.AsString, []) then
+      QryProInfoSomaNoPesoLiq.AsBoolean:= (CdsProInfoNaoSomaNoPesoLiq.IsNull) or (CdsProInfoNaoSomaNoPesoLiq.AsBoolean <> False);
+
+    QryProInfo.Post;
+
+    QryProInfo.Next;
+  end;
+end;
+
+procedure TFormProInfo.FormCreate(Sender: TObject);
+begin
+  DmCon.TransformaEmLookup(QryProInfoAPRESENTACAO, 'SELECT CODPRODUTO, APRESENTACAO FROM PRODUTO');
+
+  ReopenDataSet(QryProInfo);
 end;
 
 procedure TFormProInfo.Abrir(pCodProduto: String);

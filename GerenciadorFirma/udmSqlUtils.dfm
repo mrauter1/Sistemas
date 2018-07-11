@@ -23,6 +23,7 @@ object DmSqlUtils: TDmSqlUtils
       'WaitOnLocks=True'
       'IsolationLevel=ReadCommitted'
       'Trim Char=False')
+    Connected = True
     Left = 112
     Top = 48
   end

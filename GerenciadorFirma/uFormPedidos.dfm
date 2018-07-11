@@ -22,7 +22,6 @@ object FormPedidos: TFormPedidos
     Height = 377
     Align = alClient
     TabOrder = 0
-    ExplicitTop = -3
     object cxGridDBTableView: TcxGridDBTableView
       PopupMenu = PopupMenu1
       Navigator.Buttons.CustomButtons = <>

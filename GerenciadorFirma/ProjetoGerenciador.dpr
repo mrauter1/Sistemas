@@ -27,7 +27,8 @@ uses
   uFormInsumos in 'Fontes\uFormInsumos.pas' {FormInsumos},
   uFormSelecionaModelos in 'Fontes\uFormSelecionaModelos.pas' {FormSelecionaModelo},
   uSendMail in 'Fontes\uSendMail.pas',
-  uFormValidaModelos in 'uFormValidaModelos.pas' {FormValidaModelos};
+  uFormValidaModelos in 'uFormValidaModelos.pas' {FormValidaModelos},
+  uDmCon in 'Fontes\uDmCon.pas' {DmCon: TDataModule};
 
 {$R *.res}
 
@@ -35,6 +36,7 @@ begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TDmSqlUtils, DmSqlUtils);
+  Application.CreateForm(TDmCon, DmCon);
   Application.CreateForm(TFormPrincipal, FormPrincipal);
   Application.CreateForm(TFormProInfo, FormProInfo);
   Application.CreateForm(TPedidos, Pedidos);

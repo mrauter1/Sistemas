@@ -5,37 +5,49 @@ interface
 uses
   System.SysUtils, System.Classes, Data.DB, Datasnap.DBClient,
   cxLookAndFeelPainters, cxGraphics, dxSkinsCore, cxClasses, dxAlertWindow,
-  Vcl.ExtCtrls;
+  Vcl.ExtCtrls, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
+  FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
+  FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet, FireDAC.Comp.Client;
 
 type
   TPedidos = class(TDataModule)
-    Dados: TClientDataSet;
-    DadosCODPRODUTO: TStringField;
-    DadosNOMEPRODUTO: TStringField;
-    DadosQUANTIDADE: TFloatField;
-    DadosDIASPARAENTREGA: TIntegerField;
-    DadosSIT: TStringField;
-    DadosCODCLIENTE: TStringField;
-    DadosNOMECLIENTE: TStringField;
-    DadosCODTRANSPORTE: TStringField;
-    DadosNOMETRANSPORTE: TStringField;
-    DadosCODPEDIDO: TStringField;
-    DadosQUANTPENDENTE: TFloatField;
     dxAlert: TdxAlertWindowManager;
-    DadosUPDATEID: TIntegerField;
-    DadosESTOQUEATUAL: TFloatField;
     dxAlertFalta: TdxAlertWindowManager;
-    DadosEMFALTA: TBooleanField;
-    Timer1: TTimer;
+    QryPedidos: TFDQuery;
+    QryPedidosCODPEDIDO: TStringField;
+    QryPedidosCODPRODUTO: TStringField;
+    QryPedidosNOMEPRODUTO: TStringField;
+    QryPedidosDIASPARAENTREGA: TIntegerField;
+    QryPedidosSIT: TStringField;
+    QryPedidosCODCLIENTE: TStringField;
+    QryPedidosNOMECLIENTE: TStringField;
+    QryPedidosCODTRANSPORTE: TStringField;
+    QryPedidosNOMETRANSPORTE: TStringField;
+    QryPedidosEMFALTA: TBooleanField;
+    QryPedidosFALTAAMANHA: TFMTBCDField;
+    QryPedidosQUANTIDADE: TBCDField;
+    QryPedidosFALTAHOJE: TFMTBCDField;
+    QryPedidosEstoqueAtual: TBCDField;
+    QryPedidosQUANTPENDENTE: TBCDField;
+    QryPedidosSITUACAO: TStringField;
+    TblPedidosCache: TFDMemTable;
+    TblPedidosCacheCODPEDIDO: TStringField;
+    TblPedidosCacheCODPRODUTO: TStringField;
+    TblPedidosCacheEMFALTA: TBooleanField;
     procedure DataModuleCreate(Sender: TObject);
-    procedure Timer1Timer(Sender: TObject);
   private
-    function GetSql(pDataInicial, pDataFinal: TDateTime): String;
-    function ProdutoEmFalta(pCodProduto: String): Boolean;
+    procedure VerificaNovosPedidos;
+    procedure ShowAlertPedidoEmFalta;
+    function GetTextoPedidoAlert: String;
+    procedure ShowAlertNovoPedido;
+//    function GetSql(pDataInicial, pDataFinal: TDateTime): String;
+//    function ProdutoEmFalta(pCodProduto: String): Boolean;
+
     { Private declarations }
   public
-    procedure LoadPedidos(pDataInicial, pDataFinal: TDateTime);
-    procedure Filtra(const pFiltro: String);
+//    procedure LoadPedidos(pDataInicial, pDataFinal: TDateTime);
+//    procedure Filtra(const pFiltro: String);
+    procedure LoadPedidosNew;
     procedure Refresh;
   end;
 
@@ -55,11 +67,13 @@ uses
 
 procedure TPedidos.DataModuleCreate(Sender: TObject);
 begin
-  Randomize;
-  Self.LoadPedidos(Now - 30, Now + 1);
+//  Self.LoadPedidos(Now - 30, Now + 1);
+  TblPedidosCache.CreateDataSet;
+
+  Self.LoadPedidosNew;
 end;
 
-procedure TPedidos.Filtra(const pFiltro: String);
+{procedure TPedidos.Filtra(const pFiltro: String);
 begin
   if pFiltro = '' then
   begin
@@ -72,8 +86,8 @@ begin
     Dados.Filtered:= True;
     Dados.First;
   end;
-end;
-
+end;}
+     {
 function TPedidos.GetSql(pDataInicial, pDataFinal: TDateTime): String;
 // Busca os pedidos pendentes no período
 var
@@ -122,9 +136,80 @@ begin
        ' where P.situacao IN (''0'', ''1'', ''2'') AND '+
        ' P.dataentrega BETWEEN CAST('+sDataInicial+' as DATE) AND CAST('+ sDataFinal +'  AS DATE) ';
   Result:= DmSqlUtils.RetornaValor(fSql, 0) < 0;
+end;}
+
+function TPedidos.GetTextoPedidoAlert: String;
+begin
+  Result:=  'Pedido: '+ QryPedidos.FieldByName('CODPEDIDO').AsString
+            + ' - ' + QryPedidos.FieldByName('NOMECLIENTE').AsString
+            + sLineBreak
+            +'Produto: '+QryPedidos.FieldByName('CODPRODUTO').AsString
+            +' - '+QryPedidos.FieldByName('NOMEPRODUTO').AsString
+            + sLineBreak
+            +'Quantidade: '+QryPedidosQUANTIDADE.DisplayText
+            + sLineBreak
+            +'Estoque atual: '+QryPedidosEstoqueAtual.DisplayText
+            +sLineBreak
+            +'Transportadora: '+ QryPedidos.FieldByName('NOMETRANSPORTE').AsString;
+
 end;
 
-procedure TPedidos.LoadPedidos(pDataInicial, pDataFinal: TDateTime);
+procedure TPedidos.ShowAlertPedidoEmFalta;
+begin
+  dxAlertFalta.Show('Pedido com falta!',
+                GetTextoPedidoAlert);
+end;
+
+procedure TPedidos.ShowAlertNovoPedido;
+begin
+  dxAlert.Show('Entrou novo Pedido',
+                GetTextoPedidoAlert);
+end;
+
+procedure TPedidos.VerificaNovosPedidos;
+begin
+  QryPedidos.DisableControls;
+  try
+    QryPedidos.First;
+
+    while not QryPedidos.Eof do
+    begin
+      if TblPedidosCache.Locate('CODPEDIDO;CODPRODUTO',
+                                VarArrayOf([QryPedidosCODPEDIDO.AsString,QryPedidosCODPRODUTO.AsString]),
+                                []) then
+      begin
+        if (QryPedidosEMFALTA.AsBoolean) and (TblPedidosCacheEMFALTA.AsBoolean = False) then
+           ShowAlertPedidoEmFalta;
+
+      end
+     else
+      begin
+        if (QryPedidosEMFALTA.AsBoolean) then
+          ShowAlertPedidoEmFalta
+        else
+          ShowAlertNovoPedido;
+      end;
+
+      QryPedidos.Next;
+    end;
+
+    TblPedidosCache.CopyDataSet(QryPedidos, [coRestart, coAppend]);
+  finally
+    QryPedidos.EnableControls;
+  end;
+end;
+
+procedure TPedidos.LoadPedidosNew;
+begin
+  if QryPedidos.Active then
+    QryPedidos.Close;
+
+  QryPedidos.Open;
+
+  VerificaNovosPedidos;
+end;
+
+(*procedure TPedidos.LoadPedidos(pDataInicial, pDataFinal: TDateTime);
 var
   fSqlQuery: TDataSet;
   fUpdateID: Integer;
@@ -198,16 +283,12 @@ begin
   finally
     fSqlQuery.Free;
   end;
-end;
+end;     *)
 
 procedure TPedidos.Refresh;
 begin
-  Pedidos.LoadPedidos(Now-30, Now+1);
-end;
-
-procedure TPedidos.Timer1Timer(Sender: TObject);
-begin
-  Refresh;
+//  LoadPedidos(Now-30, Now+1);
+  Self.LoadPedidosNew;
 end;
 
 end.

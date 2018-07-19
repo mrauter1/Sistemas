@@ -22,7 +22,7 @@ type
     cxGridDBTableViewNOMEPRODUTO: TcxGridDBColumn;
     cxGridDBTableViewQUANTIDADE: TcxGridDBColumn;
     cxGridDBTableViewDIASPARAENTREGA: TcxGridDBColumn;
-    cxGridDBTableViewSIT: TcxGridDBColumn;
+    cxGridDBTableViewSITUACAO: TcxGridDBColumn;
     cxGridDBTableViewCODCLIENTE: TcxGridDBColumn;
     cxGridDBTableViewNOMECLIENTE: TcxGridDBColumn;
     cxGridDBTableViewNOMETRANSPORTE: TcxGridDBColumn;
@@ -41,6 +41,9 @@ type
     AbrirDetalhePro: TMenuItem;
     VerSimilares1: TMenuItem;
     VerInsumos1: TMenuItem;
+    cxGridDBTableViewFALTAHOJE: TcxGridDBColumn;
+    cxGridDBTableViewFALTAAMANHA: TcxGridDBColumn;
+    Timer1: TTimer;
     procedure BtnOpcoesClick(Sender: TObject);
     procedure cxGridDBTableViewStylesGetContentStyle(
       Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;
@@ -51,6 +54,12 @@ type
     procedure AbrirDetalheProClick(Sender: TObject);
     procedure VerSimilares1Click(Sender: TObject);
     procedure VerInsumos1Click(Sender: TObject);
+    procedure cxGridDBTableViewSITUACAOGetDisplayText(
+      Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord;
+      var AText: string);
+    procedure Timer1Timer(Sender: TObject);
+    procedure cxGridDBTableViewDIASPARAENTREGAGetDataText(
+      Sender: TcxCustomGridTableItem; ARecordIndex: Integer; var AText: string);
   private
     { Private declarations }
     FExpanded: Boolean;
@@ -74,14 +83,19 @@ begin
                                                                 cxGridDBTableViewCODPRODUTO.Index], '');
 end;
 
+procedure TFormPedidos.Timer1Timer(Sender: TObject);
+begin
+  BtnAtualiza.Click;
+end;
+
 procedure TFormPedidos.VerInsumos1Click(Sender: TObject);
 begin
-  TFormInsumos.AbrirInsumos(GetCodProSelecionado, Pedidos.DadosNOMEPRODUTO.AsString);
+  TFormInsumos.AbrirInsumos(GetCodProSelecionado, Pedidos.QryPedidosNOMEPRODUTO.AsString);
 end;
 
 procedure TFormPedidos.VerSimilares1Click(Sender: TObject);
 begin
-  TFormAdicionarSimilaridade.AbrirSimilares(GetCodProSelecionado, Pedidos.DadosNOMEPRODUTO.AsString);
+  TFormAdicionarSimilaridade.AbrirSimilares(GetCodProSelecionado, Pedidos.QryPedidosNOMEPRODUTO.AsString);
 end;
 
 procedure TFormPedidos.AbrirConfigProClick(Sender: TObject);
@@ -90,8 +104,7 @@ var
 begin
   FCodPro:= GetCodProSelecionado;
 
-  if FormProInfo.CdsProInfo.Locate('CODPRODUTO', FCodPro, []) then
-    FormProInfo.Show;
+  FormProInfo.Abrir(FCodPro);
 end;
 
 procedure TFormPedidos.AbrirDetalheProClick(Sender: TObject);
@@ -121,6 +134,30 @@ begin
     BtnOpcoes.Caption:= '+';
   end;
 
+end;
+
+procedure TFormPedidos.cxGridDBTableViewDIASPARAENTREGAGetDataText(
+  Sender: TcxCustomGridTableItem; ARecordIndex: Integer; var AText: string);
+begin
+  if AText = '0' then
+    AText:= '  Hoje'
+  else if AText = '1' then
+    AText:= ' Amanhã'
+  else
+    AText:= AText+' dia(s)';
+
+end;
+
+procedure TFormPedidos.cxGridDBTableViewSITUACAOGetDisplayText(
+  Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord;
+  var AText: string);
+begin
+  if AText = '0' then
+    AText:= 'Pendente'
+  else if AText = '1' then
+    AText:= 'Reserva'
+  else if AText = '2' then
+    AText:= 'Separação';
 end;
 
 procedure TFormPedidos.cxGridDBTableViewStylesGetContentStyle(

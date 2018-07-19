@@ -7,26 +7,12 @@ uses
   uPedidos;
 type
   TDMFilaProducao = class(TDataModule)
-    CdsFilaProducao: TClientDataSet;
-    CdsFilaProducaoCODPRODUTO: TStringField;
-    CdsFilaProducaoNOMEPRODUTO: TStringField;
-    CdsFilaProducaoNUMPEDIDOS: TIntegerField;
-    CdsFilaProducaoPRODUCAOSUGERIDA: TFloatField;
-    CdsFilaProducaoFALTA: TFloatField;
-    CdsFilaProducaoQUANTIDADE: TFloatField;
-    CdsFilaProducaoESTOQUEATUAL: TFloatField;
-    CdsFilaProducaoESTOQMAX: TFloatField;
-    CdsFilaProducaoPROBFALTAHOJE: TFloatField;
-    CdsFilaProducaoESPACOESTOQUE: TFloatField;
-    CdsFilaProducaoDEMANDADIARIA: TFloatField;
-    CdsFilaProducaoDIASESTOQUE: TFloatField;
-    procedure DataModuleCreate(Sender: TObject);
 //    procedure CdsFilaProducaoPROBFALTAHOJEGetText(Sender: TField;
 //      var Text: string; DisplayText: Boolean);
   private  
     function ProdutoGranel(CodProduto: String): Boolean;
-    procedure AdicionaNaFila(const pCodProduto, pNomeProduto: String; pFalta: Double; pQuant: Double; pProducaoSugerida: Double;
-                             pNumPedidos: Integer);
+{    procedure AdicionaNaFila(const pCodProduto, pNomeProduto: String; pFalta: Double; pQuant: Double; pProducaoSugerida: Double;
+                             pNumPedidos: Integer);}
     { Private declarations }
   public   
     procedure AtualizaFilaProducao;
@@ -49,7 +35,7 @@ begin
   Result:= (DmSqlUtils.RetornaValor('SELECT CODTAMANHO FROM PRODUTO WHERE CODPRODUTO = '''
             +CodProduto+''' ', 0) = 1);
 end;
-
+ {
 procedure TDMFilaProducao.AdicionaNaFila(const pCodProduto, pNomeProduto: String; pFalta: Double; pQuant: Double; pProducaoSugerida: Double; pNumPedidos: Integer);
 begin
   if not CdsFilaProducao.Locate('CODPRODUTO', pCodProduto, []) then
@@ -78,10 +64,10 @@ begin
     CdsFilaProducao.Post;
   end;
 end;
-                                             
+}
 procedure TDMFilaProducao.AtualizaFilaProducao;
 
-  procedure ApagaFilaAtual;
+{  procedure ApagaFilaAtual;
   begin
     while not CdsFilaProducao.IsEmpty do
       CdsFilaProducao.Delete;
@@ -146,7 +132,7 @@ procedure TDMFilaProducao.AtualizaFilaProducao;
     end;
 
     AdicionaNaFila(pCodProduto, pApresentacao, FFalta, FQuant, 0, FNum);
-  end;
+  end;            }
 
 begin
 
@@ -157,22 +143,24 @@ begin
       FormShowMemo.Parent:= nil;
 
   FormShowMemo.Show;
-  CdsFilaProducao.DisableControls;
   try
     FormShowMemo.SetText('Iniciando atualização das informações dos produtos...');
-
+{
     FormShowMemo.SetText('Atualizando pedidos...');
-    Pedidos.LoadPedidos(Now - 30, Now + 1);
-
-    DmEstoqProdutos.AtualizaEstoque(False);
-
+//    Pedidos.LoadPedidos(Now - 30, Now + 1);
+    Pedidos.LoadPedidosNew;
+ }
+//    DmEstoqProdutos.AtualizaEstoque(False);
+    FormShowMemo.SetText('Atualizando fila de produção...');
+    DmEstoqProdutos.AtualizaEstoqueNew;
+                      {
     FormShowMemo.SetText('Apagando Fila de produção atual...');
-    ApagaFilaAtual;
+//    ApagaFilaAtual;
 
     FormShowMemo.SetText('Adicionando itens em falta na fila de produção...');
 
     //Primeiro pega todos os pedidos em granel confirmados para hoje
-    AdicionaPedidosGranelNaFila('DIASPARAENTREGA = 0 AND SIT = ''C'' ');
+   AdicionaPedidosGranelNaFila('DIASPARAENTREGA = 0 AND SIT = ''C'' ');
 
     // Segundo: Pega os produtos em falta confirmados para hoje
     AdicionaPedidosNaFila('FALTA > 0 AND DIASPARAENTREGA = 0 AND SIT = ''C'' ');
@@ -194,8 +182,8 @@ begin
 
     //OITAVO: Verificar se tem algum produto com falta pendente amanhã
     AdicionaPedidosNaFila('FALTA > 0 AND DIASPARAENTREGA = 1 AND SIT = ''P'' ');
-
-    FormShowMemo.SetText('Adicionando itens que não estão em falta na fila de produção...');
+  }
+{    FormShowMemo.SetText('Adicionando itens que não estão em falta na fila de produção...');
     with DmEstoqProdutos do
     begin
       CdsPedidos.Filtered:= False;
@@ -215,10 +203,9 @@ begin
 
     FormShowMemo.SetText('Finalizada atualização dos itens!');
 
-    FiltraPedidos('');
+    FiltraPedidos(''); }
   finally
     FormShowMemo.Hide;
-    CdsFilaProducao.EnableControls;
   end;
 end;
 
@@ -230,10 +217,5 @@ begin
   if TryStrToFloat(Text,Val) then
     Text:= FormatFloat('#,## %',(Val * 100));
 end;                                              }
-
-procedure TDMFilaProducao.DataModuleCreate(Sender: TObject);
-begin  
-  CreateDataSetIfNotActive(CdsFilaProducao);
-end;
 
 end.

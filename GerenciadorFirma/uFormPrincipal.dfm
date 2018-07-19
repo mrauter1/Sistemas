@@ -3,7 +3,7 @@ object FormPrincipal: TFormPrincipal
   Top = 0
   Caption = 'Informa'#231#245'es de estoque e demanda'
   ClientHeight = 454
-  ClientWidth = 899
+  ClientWidth = 971
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,10 +18,11 @@ object FormPrincipal: TFormPrincipal
   object PanelMain: TPanel
     Left = 0
     Top = 0
-    Width = 899
+    Width = 971
     Height = 454
     Align = alClient
     TabOrder = 0
+    ExplicitWidth = 899
   end
   object MainMenu: TMainMenu
     Left = 328

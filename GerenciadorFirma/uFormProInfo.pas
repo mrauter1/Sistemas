@@ -16,11 +16,6 @@ uses
 type
   TFormProInfo = class(TForm)
     DataSource1: TDataSource;
-    CdsProInfo: TClientDataSet;
-    CdsProInfoCODPRODUTO: TStringField;
-    CdsProInfoNAOFAZESTOQUE: TBooleanField;
-    CdsProInfoESPACOESTOQUE: TIntegerField;
-    CdsProInfoPRODUCAOMINIMA: TIntegerField;
     cxGrid: TcxGrid;
     cxGridDBTableView: TcxGridDBTableView;
     cxGridLevel: TcxGridLevel;
@@ -28,7 +23,6 @@ type
     cxGridDBTableViewNAOFAZESTOQUE: TcxGridDBColumn;
     cxGridDBTableViewESPACOESTOQUE: TcxGridDBColumn;
     cxGridDBTableViewPRODUCAOMINIMA: TcxGridDBColumn;
-    CdsProInfoNAOSOMANOPESOLIQ: TBooleanField;
     QryProInfo: TFDQuery;
     QryProInfoNAOFAZESTOQUE: TBooleanField;
     QryProInfoESPACOESTOQUE: TIntegerField;
@@ -41,9 +35,7 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
   private
-    procedure CarregaTabelaProInfo;
     function GetAplicacao(const pCodProduto: String): String;
-    procedure ImportaDadosXml;
     { Private declarations }
   public
     procedure AddProInfoDefault(pCodProduto: String);
@@ -129,58 +121,47 @@ begin
   begin
     pAplicacao:= GetAplicacao(pCodProduto);
 
-    CdsProInfo.Append;
-    CdsProInfoCODPRODUTO.AsString:= pCodProduto;
-    CdsProInfoNAOFAZESTOQUE.AsBoolean:= False;
-    CdsProInfoNAOSOMANOPESOLIQ.AsBoolean:= False;
+    QryProInfo.Append;
+    QryProInfoCODPRODUTO.AsString:= pCodProduto;
+    QryProInfoNAOFAZESTOQUE.AsBoolean:= False;
+    QryProInfoSOMANOPESOLIQ.AsBoolean:= True;
     if (pAplicacao = cLata18) or (pAplicacao = cLata900) then begin
-      CdsProInfoESPACOESTOQUE.AsInteger:= 22;
-      CdsProInfoPRODUCAOMINIMA.AsInteger:= 11;
+      QryProInfoESPACOESTOQUE.AsInteger:= 22;
+      QryProInfoPRODUCAOMINIMA.AsInteger:= 11;
     end
    else
     if (pAplicacao = cLata5) then begin
-        CdsProInfoESPACOESTOQUE.AsInteger:= 12;
-        CdsProInfoPRODUCAOMINIMA.AsInteger:= 6;
+        QryProInfoESPACOESTOQUE.AsInteger:= 12;
+        QryProInfoPRODUCAOMINIMA.AsInteger:= 6;
     end
    else
     if (pAplicacao = cTambor) then
     begin
-      CdsProInfoESPACOESTOQUE.AsInteger:= 22;
-      CdsProInfoPRODUCAOMINIMA.AsInteger:= 8;
+      QryProInfoESPACOESTOQUE.AsInteger:= 22;
+      QryProInfoPRODUCAOMINIMA.AsInteger:= 8;
     end
     else if (pAplicacao = cTamborete) then
     begin
-      CdsProInfoESPACOESTOQUE.AsInteger:= 5;
-      CdsProInfoPRODUCAOMINIMA.AsInteger:= 1;
+      QryProInfoESPACOESTOQUE.AsInteger:= 5;
+      QryProInfoPRODUCAOMINIMA.AsInteger:= 1;
     end
    else
     begin
-      CdsProInfoESPACOESTOQUE.AsInteger:= 0;
-      CdsProInfoPRODUCAOMINIMA.AsInteger:= 0;
-      CdsProInfoNAOFAZESTOQUE.AsBoolean:= False;
+      QryProInfoESPACOESTOQUE.AsInteger:= 0;
+      QryProInfoPRODUCAOMINIMA.AsInteger:= 0;
+      QryProInfoNAOFAZESTOQUE.AsBoolean:= True;
     end;
 
-    CdsProInfo.Post;
-  end;
-end;
-
-procedure TFormProInfo.CarregaTabelaProInfo;
-begin
-  if not CdsProInfo.Active then begin
-
-    CdsProInfo.CreateDataSet;
-    if FileExists(ExtractFilePath(Application.ExeName)+'ProInfo.xml') then
-      CarregaArquivo(CdsProInfo, ExtractFilePath(Application.ExeName)+'ProInfo.xml');
+    QryProInfo.Post;
   end;
 end;
 
 procedure TFormProInfo.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-  CdsProInfo.MergeChangeLog;
-  CdsProInfo.SaveToFile(ExtractFilePath(Application.ExeName)+'ProInfo.xml', dfXml);
+
 end;
 
-procedure TFormProInfo.ImportaDadosXml;
+{procedure TFormProInfo.ImportaDadosXml;
 begin
   CarregaTabelaProInfo;
   CopiaDadosDataSet(CdsProInfo, QryProInfo);
@@ -195,7 +176,7 @@ begin
 
     QryProInfo.Next;
   end;
-end;
+end;}
 
 procedure TFormProInfo.FormCreate(Sender: TObject);
 begin
@@ -215,15 +196,12 @@ begin
   Result:= False;
   LocateProInfo(pCodPro);
 
-  if CdsProInfoNAOSOMANOPESOLIQ.IsNull then
-    Exit;
-
-  Result:= CdsProInfoNAOSOMANOPESOLIQ.AsBoolean
+  Result:= not QryProInfoSOMANOPESOLIQ.AsBoolean;
 end;
 
 procedure TFormProInfo.LocateProInfo(pCodPro: String);
 begin
-  if not CdsProInfo.Locate('CODPRODUTO', pCodPro, []) then
+  if not QryProInfo.Locate('CODPRODUTO', pCodPro, []) then
     AddProInfoDefault(pCodPro);
 end;
 

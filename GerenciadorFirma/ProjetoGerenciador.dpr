@@ -40,8 +40,8 @@ begin
   Application.CreateForm(TFormPrincipal, FormPrincipal);
   Application.CreateForm(TFormProInfo, FormProInfo);
   Application.CreateForm(TPedidos, Pedidos);
-  Application.CreateForm(TDMFilaProducao, DMFilaProducao);
   Application.CreateForm(TDmEstoqProdutos, DmEstoqProdutos);
+  Application.CreateForm(TDMFilaProducao, DMFilaProducao);
   Application.CreateForm(TDMConsistenciaOPs, DMConsistenciaOPs);
   Application.CreateForm(TFormPedidos, FormPedidos);
   Application.CreateForm(TFormFilaProducao, FormFilaProducao);

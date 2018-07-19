@@ -81,57 +81,6 @@ object FormProInfo: TFormProInfo
     Left = 176
     Top = 80
   end
-  object CdsProInfo: TClientDataSet
-    Aggregates = <>
-    FieldDefs = <
-      item
-        Name = 'CODPRODUTO'
-        DataType = ftString
-        Size = 10
-      end
-      item
-        Name = 'NAOFAZESTOQUE'
-        DataType = ftBoolean
-      end
-      item
-        Name = 'ESPACOESTOQUE'
-        DataType = ftInteger
-      end
-      item
-        Name = 'PRODUCAOMINIMA'
-        DataType = ftInteger
-      end
-      item
-        Name = 'NAOSOMANOPESOLIQ'
-        DataType = ftBoolean
-      end>
-    IndexDefs = <>
-    Params = <>
-    StoreDefs = True
-    Left = 320
-    Top = 80
-    object CdsProInfoCODPRODUTO: TStringField
-      DisplayLabel = 'Cod. Produto'
-      FieldName = 'CODPRODUTO'
-      Size = 10
-    end
-    object CdsProInfoNAOFAZESTOQUE: TBooleanField
-      DisplayLabel = 'N'#227'o Faz Estoque'
-      FieldName = 'NAOFAZESTOQUE'
-    end
-    object CdsProInfoESPACOESTOQUE: TIntegerField
-      DisplayLabel = 'Espa'#231'o Estoque'
-      FieldName = 'ESPACOESTOQUE'
-    end
-    object CdsProInfoPRODUCAOMINIMA: TIntegerField
-      DisplayLabel = 'Produ'#231#227'o Minima'
-      FieldName = 'PRODUCAOMINIMA'
-    end
-    object CdsProInfoNAOSOMANOPESOLIQ: TBooleanField
-      DisplayLabel = 'N'#227'o Soma No Peso L'#237'quido'
-      FieldName = 'NAOSOMANOPESOLIQ'
-    end
-  end
   object QryProInfo: TFDQuery
     Connection = DmCon.FDConSqlServer
     SQL.Strings = (

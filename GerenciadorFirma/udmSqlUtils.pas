@@ -36,6 +36,7 @@ type
 function ComparaRecord(pDataSet1, pDataSet2: TDataSet; pCamposParaIgnorar: String = ''): TArray<String>;
 procedure CopiarRecord(pSource, pDest: TDataSet);
 procedure CopiaDadosDataSet(pSource, pDest: TDataSet);
+procedure CopyFieldDefs(pSource, pDest: TDataSet);
 
 var
   DmSqlUtils: TDmSqlUtils;
@@ -47,6 +48,30 @@ implementation
 {$R *.dfm}
 
 { TDmSqlUtils }
+
+procedure CopyFieldDefs(pSource, pDest: TDataSet);
+var
+  Field, NewField: TField;
+  FieldDef: TFieldDef;
+begin
+  for Field in pSource.Fields do
+  begin
+    FieldDef := pDest.FieldDefs.AddFieldDef;
+    FieldDef.DataType := Field.DataType;
+    FieldDef.Size := Field.Size;
+    FieldDef.Name := Field.FieldName;
+
+    NewField := FieldDef.CreateField(pDest);
+    NewField.Visible := Field.Visible;
+    NewField.DisplayLabel := Field.DisplayLabel;
+    NewField.DisplayWidth := Field.DisplayWidth;
+    NewField.EditMask := Field.EditMask;
+
+   if IsPublishedProp(Field, 'currency')  then
+     SetPropValue(NewField, 'currency', GetPropValue(Field, 'currency'));
+
+  end;
+end;
 
 class procedure TDmSqlUtils.CopyFieldDefs(Dest, Source: TDataSet; pMapedFields: array of cfMapField);
 var

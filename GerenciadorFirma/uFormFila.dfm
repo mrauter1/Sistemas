@@ -3,7 +3,7 @@ object FormFilaProducao: TFormFilaProducao
   Top = 0
   Caption = 'Fila'
   ClientHeight = 542
-  ClientWidth = 965
+  ClientWidth = 990
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,7 +16,7 @@ object FormFilaProducao: TFormFilaProducao
   object cxGrid: TcxGrid
     Left = 0
     Top = 0
-    Width = 965
+    Width = 990
     Height = 500
     Align = alClient
     TabOrder = 0
@@ -38,49 +38,66 @@ object FormFilaProducao: TFormFilaProducao
       OptionsView.GroupByBox = False
       OptionsView.HeaderAutoHeight = True
       Styles.StyleSheet = FormGlobal.cxGridTableViewStyleSheet1
+      object cxGridDBTableViewRank: TcxGridDBColumn
+        DataBinding.FieldName = 'Rank'
+        Width = 29
+      end
       object cxGridDBTableViewCODPRODUTO: TcxGridDBColumn
         DataBinding.FieldName = 'CODPRODUTO'
-        Width = 55
+        Width = 48
       end
       object cxGridDBTableViewNOMEPRODUTO: TcxGridDBColumn
-        DataBinding.FieldName = 'NOMEPRODUTO'
-        Width = 198
+        DataBinding.FieldName = 'APRESENTACAO'
+        Width = 193
       end
-      object cxGridDBTableViewQUANTIDADE: TcxGridDBColumn
-        DataBinding.FieldName = 'QUANTIDADE'
-        Width = 71
+      object cxGridDBTableViewFALTAHOJE: TcxGridDBColumn
+        DataBinding.FieldName = 'FaltaHoje'
+        Width = 51
       end
-      object cxGridDBTableViewFALTA: TcxGridDBColumn
-        DataBinding.FieldName = 'FALTA'
-        Width = 66
+      object cxGridDBTableViewFALTACONFIRMADA: TcxGridDBColumn
+        DataBinding.FieldName = 'FaltaConfirmada'
+        Width = 61
       end
-      object cxGridDBTableViewNUMPEDIDOS: TcxGridDBColumn
-        DataBinding.FieldName = 'NUMPEDIDOS'
-        Width = 66
-      end
-      object cxGridDBTableViewDEMANDADIARIA: TcxGridDBColumn
-        DataBinding.FieldName = 'DEMANDADIARIA'
-      end
-      object cxGridDBTableViewDIASESTOQUE: TcxGridDBColumn
-        DataBinding.FieldName = 'DIASESTOQUE'
-      end
-      object cxGridDBTableViewESTOQUEATUAL: TcxGridDBColumn
-        DataBinding.FieldName = 'ESTOQUEATUAL'
+      object cxGridDBTableViewFaltaTotal: TcxGridDBColumn
+        DataBinding.FieldName = 'FaltaTotal'
+        Width = 50
       end
       object cxGridDBTableViewPROBFALTAHOJE: TcxGridDBColumn
         DataBinding.FieldName = 'PROBFALTAHOJE'
-        OnGetDataText = cxGridDBTableViewPROBFALTAHOJEGetDataText
-        Width = 76
+        OnGetDisplayText = cxGridDBTableViewPROBFALTAHOJEGetDisplayText
+        Width = 65
+      end
+      object cxGridDBTableViewNUMPEDIDOS: TcxGridDBColumn
+        DataBinding.FieldName = 'NUMPEDIDOS'
+        Width = 61
+      end
+      object cxGridDBTableViewDEMANDADIARIA: TcxGridDBColumn
+        DataBinding.FieldName = 'DEMANDADIARIA'
+        Width = 71
+      end
+      object cxGridDBTableViewDIASESTOQUE: TcxGridDBColumn
+        DataBinding.FieldName = 'DIASESTOQUE'
+        Width = 63
+      end
+      object cxGridDBTableViewESTOQUEATUAL: TcxGridDBColumn
+        DataBinding.FieldName = 'ESTOQUEATUAL'
+        Width = 59
       end
       object cxGridDBTableViewPRODUCAOSUGERIDA: TcxGridDBColumn
         DataBinding.FieldName = 'PRODUCAOSUGERIDA'
-        Width = 71
+        Visible = False
+        Width = 69
       end
-      object cxGridDBTableViewESTOQMAX: TcxGridDBColumn
-        DataBinding.FieldName = 'ESTOQMAX'
+      object cxGridDBTableViewEstoqMaxCalculado: TcxGridDBColumn
+        DataBinding.FieldName = 'EstoqMaxCalculado'
+        Width = 60
       end
       object cxGridDBTableViewESPACOESTOQUE: TcxGridDBColumn
         DataBinding.FieldName = 'ESPACOESTOQUE'
+      end
+      object cxGridDBTableViewNOMEAPLICACAO: TcxGridDBColumn
+        DataBinding.FieldName = 'NOMEAPLICACAO'
+        Width = 101
       end
     end
     object cxGridDBTableView1: TcxGridDBTableView
@@ -99,28 +116,33 @@ object FormFilaProducao: TFormFilaProducao
         DataBinding.FieldName = 'CODPEDIDO'
         Width = 60
       end
-      object cxGridDBTableView1QUANTIDADE: TcxGridDBColumn
-        DataBinding.FieldName = 'QUANTIDADE'
-        Width = 60
+      object cxGridDBTableView1SITUACAO: TcxGridDBColumn
+        DataBinding.FieldName = 'SITUACAO'
+        OnGetDisplayText = cxGridDBTableView1SITUACAOGetDisplayText
+        Width = 54
+      end
+      object cxGridDBTableView1DATAENTREGA: TcxGridDBColumn
+        DataBinding.FieldName = 'DATAENTREGA'
       end
       object cxGridDBTableView1DIASPARAENTREGA: TcxGridDBColumn
         DataBinding.FieldName = 'DIASPARAENTREGA'
-        Width = 50
-      end
-      object cxGridDBTableView1SIT: TcxGridDBColumn
-        DataBinding.FieldName = 'SIT'
-        Width = 40
-      end
-      object cxGridDBTableView1NOMECLIENTE: TcxGridDBColumn
-        DataBinding.FieldName = 'NOMECLIENTE'
-        Width = 200
+        Width = 72
       end
       object cxGridDBTableView1NOMETRANSPORTE: TcxGridDBColumn
         DataBinding.FieldName = 'NOMETRANSPORTE'
-        Width = 200
+        Width = 190
+      end
+      object cxGridDBTableView1NOMECLIENTE: TcxGridDBColumn
+        DataBinding.FieldName = 'NOMECLIENTE'
+        Width = 212
+      end
+      object cxGridDBTableView1QUANTIDADE: TcxGridDBColumn
+        DataBinding.FieldName = 'QUANTIDADE'
+        Width = 67
       end
       object cxGridDBTableView1QUANTPENDENTE: TcxGridDBColumn
         DataBinding.FieldName = 'QUANTPENDENTE'
+        Width = 87
       end
     end
     object cxGridLevel: TcxGridLevel
@@ -133,18 +155,18 @@ object FormFilaProducao: TFormFilaProducao
   object Panel1: TPanel
     Left = 0
     Top = 500
-    Width = 965
+    Width = 990
     Height = 42
     Align = alBottom
     Caption = 'Panel1'
     TabOrder = 1
     DesignSize = (
-      965
+      990
       42)
     object BtnAtualiza: TButton
       Left = 272
       Top = 9
-      Width = 414
+      Width = 439
       Height = 25
       Anchors = [akLeft, akRight, akBottom]
       Caption = 'Atualiza'
@@ -169,13 +191,13 @@ object FormFilaProducao: TFormFilaProducao
   end
   object DataSourceFila: TDataSource
     AutoEdit = False
-    DataSet = DMFilaProducao.CdsFilaProducao
+    DataSet = DmEstoqProdutos.QryEstoq
     Left = 320
     Top = 72
   end
   object DataSourcePedidos: TDataSource
     AutoEdit = False
-    DataSet = Pedidos.Dados
+    DataSet = DmEstoqProdutos.QryPedPro
     Left = 320
     Top = 160
   end

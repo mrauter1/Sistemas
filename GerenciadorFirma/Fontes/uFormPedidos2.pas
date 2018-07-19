@@ -23,7 +23,6 @@ type
     cxGridDBTableViewSIT: TcxGridDBColumn;
     cxGridDBTableViewNUMPEDIDOS: TcxGridDBColumn;
     cxGridDBTableViewFALTA: TcxGridDBColumn;
-    procedure FormShow(Sender: TObject);
   private
     { Private declarations }
   public
@@ -36,10 +35,5 @@ var
 implementation
 
 {$R *.dfm}
-
-procedure TFormPedidos2.FormShow(Sender: TObject);
-begin
-  DmEstoqProdutos.AtualizaPedidos;
-end;
 
 end.

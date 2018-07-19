@@ -83,6 +83,7 @@ end;
 
 procedure TFormPrincipal.FormShow(Sender: TObject);
 begin
+  DMFilaProducao.AtualizaFilaProducao;
   EmbedForm(PanelMain, FormPedidos);
 end;
 

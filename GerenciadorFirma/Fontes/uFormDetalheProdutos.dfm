@@ -108,7 +108,6 @@ object FormDetalheProdutos: TFormDetalheProdutos
   end
   object DataSource1: TDataSource
     AutoEdit = False
-    DataSet = DmEstoqProdutos.CdsEstoqProdutos
     Left = 144
     Top = 56
   end

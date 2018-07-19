@@ -69,7 +69,7 @@ uses
 
 procedure TFormDetalheProdutos.AbreEFocaProduto(pCodPro: String);
 begin
-  DmEstoqProdutos.CdsEstoqProdutos.Locate('CODPRODUTO', pCodPro, []);
+  DmEstoqProdutos.QryEstoq.Locate('CODPRODUTO', pCodPro, []);
   Show;
 end;
 
@@ -77,7 +77,7 @@ procedure TFormDetalheProdutos.cxGridDBTableViewCellDblClick(
   Sender: TcxCustomGridTableView; ACellViewInfo: TcxGridTableDataCellViewInfo;
   AButton: TMouseButton; AShift: TShiftState; var AHandled: Boolean);
 begin
-  TFormInsumos.AbrirInsumos(GetCodProSelecionado, DmEstoqProdutos.APRESENTACAO.AsString);
+  TFormInsumos.AbrirInsumos(GetCodProSelecionado, DmEstoqProdutos.QryEstoqAPRESENTACAO.AsString);
 end;
 
 procedure TFormDetalheProdutos.AbrirConfigProClick(Sender: TObject);
@@ -98,12 +98,12 @@ end;
 
 procedure TFormDetalheProdutos.VerInsumos1Click(Sender: TObject);
 begin
-  TFormInsumos.AbrirInsumos(GetCodProSelecionado, DmEstoqProdutos.APRESENTACAO.AsString);
+  TFormInsumos.AbrirInsumos(GetCodProSelecionado, DmEstoqProdutos.QryEstoqAPRESENTACAO.AsString);
 end;
 
 procedure TFormDetalheProdutos.VerSimilares1Click(Sender: TObject);
 begin
-  TFormAdicionarSimilaridade.AbrirSimilares(GetCodProSelecionado, DmEstoqProdutos.APRESENTACAO.AsString);
+  TFormAdicionarSimilaridade.AbrirSimilares(GetCodProSelecionado, DmEstoqProdutos.QryEstoqAPRESENTACAO.AsString);
 end;
 
 procedure TFormDetalheProdutos.cxColumnProbabilidadeGetDataText(

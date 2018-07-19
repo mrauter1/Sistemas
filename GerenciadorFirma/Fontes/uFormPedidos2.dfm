@@ -11,7 +11,6 @@ object FormPedidos2: TFormPedidos2
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
-  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object cxGrid: TcxGrid
@@ -21,9 +20,6 @@ object FormPedidos2: TFormPedidos2
     Height = 398
     Align = alClient
     TabOrder = 0
-    ExplicitLeft = -245
-    ExplicitWidth = 875
-    ExplicitHeight = 377
     object cxGridDBTableView: TcxGridDBTableView
       Navigator.Buttons.CustomButtons = <>
       DataController.DataSource = DataSource1
@@ -80,7 +76,6 @@ object FormPedidos2: TFormPedidos2
   end
   object DataSource1: TDataSource
     AutoEdit = False
-    DataSet = DmEstoqProdutos.CdsPedidos
     Left = 344
     Top = 168
   end

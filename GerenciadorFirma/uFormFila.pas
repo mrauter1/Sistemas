@@ -10,7 +10,7 @@ uses
   cxCustomData, cxFilter, cxData, cxDataStorage, cxEdit, cxNavigator, cxDBData,
   Vcl.ExtCtrls, cxGridLevel, cxClasses, cxGridCustomView, cxGridCustomTableView,
   cxGridTableView, cxGridDBTableView, cxGrid, uFormGlobal, uPedidos, cxTextEdit,
-  Vcl.Buttons, Vcl.Menus;
+  Vcl.Buttons, Vcl.Menus, uDmEstoqProdutos;
 
 type
   TFormFilaProducao = class(TForm)
@@ -22,23 +22,22 @@ type
     BtnAtualiza: TButton;
     cxGridDBTableViewCODPRODUTO: TcxGridDBColumn;
     cxGridDBTableViewNOMEPRODUTO: TcxGridDBColumn;
-    cxGridDBTableViewFALTA: TcxGridDBColumn;
+    cxGridDBTableViewFALTACONFIRMADA: TcxGridDBColumn;
     cxGridDBTableViewNUMPEDIDOS: TcxGridDBColumn;
     cxGridDBTableViewPRODUCAOSUGERIDA: TcxGridDBColumn;
-    cxGridDBTableViewQUANTIDADE: TcxGridDBColumn;
+    cxGridDBTableViewFALTAHOJE: TcxGridDBColumn;
     cxGridLevel1: TcxGridLevel;
     cxGridDBTableView1: TcxGridDBTableView;
     DataSourcePedidos: TDataSource;
     cxGridDBTableView1CODPEDIDO: TcxGridDBColumn;
     cxGridDBTableView1QUANTIDADE: TcxGridDBColumn;
     cxGridDBTableView1DIASPARAENTREGA: TcxGridDBColumn;
-    cxGridDBTableView1SIT: TcxGridDBColumn;
     cxGridDBTableView1NOMECLIENTE: TcxGridDBColumn;
     cxGridDBTableView1NOMETRANSPORTE: TcxGridDBColumn;
     cxGridDBTableView1QUANTPENDENTE: TcxGridDBColumn;
     cxGridDBTableViewPROBFALTAHOJE: TcxGridDBColumn;
     cxGridDBTableViewESTOQUEATUAL: TcxGridDBColumn;
-    cxGridDBTableViewESTOQMAX: TcxGridDBColumn;
+    cxGridDBTableViewEstoqMaxCalculado: TcxGridDBColumn;
     cxGridDBTableViewESPACOESTOQUE: TcxGridDBColumn;
     PopupMenuOpcoes: TPopupMenu;
     AbrirConfigPro: TMenuItem;
@@ -48,15 +47,24 @@ type
     VerInsumos1: TMenuItem;
     cxGridDBTableViewDEMANDADIARIA: TcxGridDBColumn;
     cxGridDBTableViewDIASESTOQUE: TcxGridDBColumn;
+    cxGridDBTableViewFaltaTotal: TcxGridDBColumn;
+    cxGridDBTableView1DATAENTREGA: TcxGridDBColumn;
+    cxGridDBTableView1SITUACAO: TcxGridDBColumn;
+    cxGridDBTableViewNOMEAPLICACAO: TcxGridDBColumn;
+    cxGridDBTableViewRank: TcxGridDBColumn;
     procedure BtnAtualizaClick(Sender: TObject);
-    procedure cxGridDBTableViewPROBFALTAHOJEGetDataText(
-      Sender: TcxCustomGridTableItem; ARecordIndex: Integer; var AText: string);
     procedure BtnOpcoesClick(Sender: TObject);
     procedure AbrirConfigProClick(Sender: TObject);
     procedure AbrirDetalheProClick(Sender: TObject);
     procedure VerSimilares1Click(Sender: TObject);
     procedure VerInsumos1Click(Sender: TObject);
     procedure cxGridDBTableViewDblClick(Sender: TObject);
+    procedure cxGridDBTableViewPROBFALTAHOJEGetDisplayText(
+      Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord;
+      var AText: string);
+    procedure cxGridDBTableView1SITUACAOGetDisplayText(
+      Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord;
+      var AText: string);
   private
     procedure AtualizaGrid;
     function GetCodProSelecionado: String;
@@ -107,13 +115,26 @@ begin
 
 end;
 
-procedure TFormFilaProducao.cxGridDBTableViewDblClick(Sender: TObject);
+procedure TFormFilaProducao.cxGridDBTableView1SITUACAOGetDisplayText(
+  Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord;
+  var AText: string);
 begin
-  TFormInsumos.AbrirInsumos(GetCodProSelecionado, DMFilaProducao.CdsFilaProducaoNOMEPRODUTO.AsString);
+  if AText = '0' then
+    AText:= 'Pendente'
+  else if AText = '1' then
+    AText:= 'Reserva'
+  else if AText = '2' then
+    AText:= 'Separação';
 end;
 
-procedure TFormFilaProducao.cxGridDBTableViewPROBFALTAHOJEGetDataText(
-  Sender: TcxCustomGridTableItem; ARecordIndex: Integer; var AText: string);
+procedure TFormFilaProducao.cxGridDBTableViewDblClick(Sender: TObject);
+begin
+  TFormInsumos.AbrirInsumos(GetCodProSelecionado, DmEstoqProdutos.QryEstoqAPRESENTACAO.AsString);
+end;
+
+procedure TFormFilaProducao.cxGridDBTableViewPROBFALTAHOJEGetDisplayText(
+  Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord;
+  var AText: string);
 var
   Val: Double;
 begin
@@ -123,12 +144,12 @@ end;
 
 procedure TFormFilaProducao.VerInsumos1Click(Sender: TObject);
 begin
-  TFormInsumos.AbrirInsumos(GetCodProSelecionado, DMFilaProducao.CdsFilaProducaoNOMEPRODUTO.AsString);
+  TFormInsumos.AbrirInsumos(GetCodProSelecionado, DmEstoqProdutos.QryEstoqAPRESENTACAO.AsString);
 end;
 
 procedure TFormFilaProducao.VerSimilares1Click(Sender: TObject);
 begin
-  TFormAdicionarSimilaridade.AbrirSimilares(GetCodProSelecionado, DMFilaProducao.CdsFilaProducaoNOMEPRODUTO.AsString);
+  TFormAdicionarSimilaridade.AbrirSimilares(GetCodProSelecionado, DmEstoqProdutos.QryEstoqAPRESENTACAO.AsString);
 end;
 
 function TFormFilaProducao.GetCodProSelecionado: String;

@@ -3,7 +3,7 @@ object FormPedidos: TFormPedidos
   Top = 0
   Caption = 'Pedidos'
   ClientHeight = 408
-  ClientWidth = 882
+  ClientWidth = 1037
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,10 +18,11 @@ object FormPedidos: TFormPedidos
   object cxGrid: TcxGrid
     Left = 0
     Top = 0
-    Width = 882
+    Width = 1037
     Height = 377
     Align = alClient
     TabOrder = 0
+    ExplicitTop = -3
     object cxGridDBTableView: TcxGridDBTableView
       PopupMenu = PopupMenu1
       Navigator.Buttons.CustomButtons = <>
@@ -48,6 +49,7 @@ object FormPedidos: TFormPedidos
       OptionsData.Editing = False
       OptionsData.Inserting = False
       OptionsSelection.CellSelect = False
+      OptionsView.CellAutoHeight = True
       OptionsView.HeaderAutoHeight = True
       Styles.OnGetContentStyle = cxGridDBTableViewStylesGetContentStyle
       Styles.StyleSheet = FormGlobal.cxGridTableViewStyleSheet1
@@ -55,38 +57,18 @@ object FormPedidos: TFormPedidos
         DataBinding.FieldName = 'CODPEDIDO'
         Width = 52
       end
-      object cxGridDBTableViewNOMECLIENTE: TcxGridDBColumn
-        DataBinding.FieldName = 'NOMECLIENTE'
-        Width = 173
-      end
-      object cxGridDBTableViewCODPRODUTO: TcxGridDBColumn
-        DataBinding.FieldName = 'CODPRODUTO'
-        Width = 68
-      end
-      object cxGridDBTableViewNOMEPRODUTO: TcxGridDBColumn
-        DataBinding.FieldName = 'NOMEPRODUTO'
-        Width = 172
-      end
-      object cxGridDBTableViewQUANTIDADE: TcxGridDBColumn
-        DataBinding.FieldName = 'QUANTIDADE'
-      end
-      object cxGridDBTableViewQUANTPENDENTE: TcxGridDBColumn
-        DataBinding.FieldName = 'QUANTPENDENTE'
-      end
-      object cxGridDBTableViewESTOQUEATUAL: TcxGridDBColumn
-        DataBinding.FieldName = 'ESTOQUEATUAL'
-      end
       object cxGridDBTableViewDIASPARAENTREGA: TcxGridDBColumn
+        Caption = 'Dia entrega'
         DataBinding.FieldName = 'DIASPARAENTREGA'
-        Width = 70
+        Visible = False
+        OnGetDataText = cxGridDBTableViewDIASPARAENTREGAGetDataText
+        GroupIndex = 1
+        Width = 51
       end
-      object cxGridDBTableViewSIT: TcxGridDBColumn
-        DataBinding.FieldName = 'SIT'
-        Width = 34
-      end
-      object cxGridDBTableViewCODCLIENTE: TcxGridDBColumn
-        DataBinding.FieldName = 'CODCLIENTE'
-        Width = 47
+      object cxGridDBTableViewSITUACAO: TcxGridDBColumn
+        DataBinding.FieldName = 'SITUACAO'
+        OnGetDisplayText = cxGridDBTableViewSITUACAOGetDisplayText
+        Width = 53
       end
       object cxGridDBTableViewNOMETRANSPORTE: TcxGridDBColumn
         DataBinding.FieldName = 'NOMETRANSPORTE'
@@ -94,9 +76,45 @@ object FormPedidos: TFormPedidos
         GroupIndex = 0
         Width = 182
       end
+      object cxGridDBTableViewCODCLIENTE: TcxGridDBColumn
+        DataBinding.FieldName = 'CODCLIENTE'
+        Width = 47
+      end
+      object cxGridDBTableViewNOMECLIENTE: TcxGridDBColumn
+        DataBinding.FieldName = 'NOMECLIENTE'
+        Width = 122
+      end
+      object cxGridDBTableViewCODPRODUTO: TcxGridDBColumn
+        DataBinding.FieldName = 'CODPRODUTO'
+        Width = 51
+      end
+      object cxGridDBTableViewNOMEPRODUTO: TcxGridDBColumn
+        DataBinding.FieldName = 'NOMEPRODUTO'
+        Width = 175
+      end
+      object cxGridDBTableViewQUANTIDADE: TcxGridDBColumn
+        DataBinding.FieldName = 'QUANTIDADE'
+        Width = 56
+      end
+      object cxGridDBTableViewQUANTPENDENTE: TcxGridDBColumn
+        DataBinding.FieldName = 'QUANTPENDENTE'
+        Width = 59
+      end
+      object cxGridDBTableViewESTOQUEATUAL: TcxGridDBColumn
+        DataBinding.FieldName = 'ESTOQUEATUAL'
+        Width = 63
+      end
       object cxGridDBTableViewEMFALTA: TcxGridDBColumn
         DataBinding.FieldName = 'EMFALTA'
-        Width = 47
+        Width = 39
+      end
+      object cxGridDBTableViewFALTAHOJE: TcxGridDBColumn
+        DataBinding.FieldName = 'FALTAHOJE'
+        Width = 71
+      end
+      object cxGridDBTableViewFALTAAMANHA: TcxGridDBColumn
+        DataBinding.FieldName = 'FALTAAMANHA'
+        Width = 76
       end
     end
     object cxGridLevel: TcxGridLevel
@@ -106,16 +124,17 @@ object FormPedidos: TFormPedidos
   object Panel1: TPanel
     Left = 0
     Top = 377
-    Width = 882
+    Width = 1037
     Height = 31
     Align = alBottom
     Caption = 'Panel1'
     TabOrder = 1
+    ExplicitWidth = 882
     DesignSize = (
-      882
+      1037
       31)
     object BtnAtualiza: TButton
-      Left = 412
+      Left = 492
       Top = 3
       Width = 88
       Height = 25
@@ -123,6 +142,7 @@ object FormPedidos: TFormPedidos
       Caption = 'Atualiza'
       TabOrder = 0
       OnClick = BtnAtualizaClick
+      ExplicitLeft = 412
     end
     object BtnOpcoes: TBitBtn
       Left = 5
@@ -142,13 +162,13 @@ object FormPedidos: TFormPedidos
   end
   object DataSource1: TDataSource
     AutoEdit = False
-    DataSet = Pedidos.Dados
+    DataSet = Pedidos.QryPedidos
     Left = 304
     Top = 128
   end
   object cxStyleRepository1: TcxStyleRepository
-    Left = 496
-    Top = 128
+    Left = 472
+    Top = 80
     PixelsPerInch = 96
     object cxStyleVermelho: TcxStyle
       AssignedValues = [svColor, svFont, svTextColor]
@@ -184,5 +204,11 @@ object FormPedidos: TFormPedidos
       Caption = 'Ver Insumos'
       OnClick = VerInsumos1Click
     end
+  end
+  object Timer1: TTimer
+    Interval = 120000
+    OnTimer = Timer1Timer
+    Left = 130
+    Top = 112
   end
 end

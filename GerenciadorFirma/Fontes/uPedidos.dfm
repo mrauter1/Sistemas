@@ -3,159 +3,6 @@ object Pedidos: TPedidos
   OnCreate = DataModuleCreate
   Height = 205
   Width = 354
-  object Dados: TClientDataSet
-    PersistDataPacket.Data = {
-      8A0100009619E0BD01000000180000000E0000000000030000008A0109434F44
-      50454449444F0100490000000100055749445448020002000A000A434F445052
-      4F4455544F01004900000001000557494454480200020014000B4E4F4D455052
-      4F4455544F01004900000001000557494454480200020064000A5155414E5449
-      4441444508000400000000000C4553544F515545415455414C08000400000000
-      000F4449415350415241454E5452454741040001000000000003534954010049
-      00000001000557494454480200020001000A434F44434C49454E544501004900
-      00000100055749445448020002000A000B4E4F4D45434C49454E544501004900
-      000001000557494454480200020050000D434F445452414E53504F5254450100
-      490000000100055749445448020002000A000E4E4F4D455452414E53504F5254
-      4501004900000001000557494454480200020064000D5155414E5450454E4445
-      4E54450800040000000000085550444154454944040001000000000007454D46
-      414C544102000300000000000000}
-    Active = True
-    Aggregates = <>
-    FieldDefs = <
-      item
-        Name = 'CODPEDIDO'
-        DataType = ftString
-        Size = 10
-      end
-      item
-        Name = 'CODPRODUTO'
-        DataType = ftString
-        Size = 20
-      end
-      item
-        Name = 'NOMEPRODUTO'
-        DataType = ftString
-        Size = 100
-      end
-      item
-        Name = 'QUANTIDADE'
-        DataType = ftFloat
-      end
-      item
-        Name = 'ESTOQUEATUAL'
-        DataType = ftFloat
-      end
-      item
-        Name = 'DIASPARAENTREGA'
-        DataType = ftInteger
-      end
-      item
-        Name = 'SIT'
-        DataType = ftString
-        Size = 1
-      end
-      item
-        Name = 'CODCLIENTE'
-        DataType = ftString
-        Size = 10
-      end
-      item
-        Name = 'NOMECLIENTE'
-        DataType = ftString
-        Size = 80
-      end
-      item
-        Name = 'CODTRANSPORTE'
-        DataType = ftString
-        Size = 10
-      end
-      item
-        Name = 'NOMETRANSPORTE'
-        DataType = ftString
-        Size = 100
-      end
-      item
-        Name = 'QUANTPENDENTE'
-        DataType = ftFloat
-      end
-      item
-        Name = 'UPDATEID'
-        DataType = ftInteger
-      end
-      item
-        Name = 'EMFALTA'
-        DataType = ftBoolean
-      end>
-    IndexDefs = <>
-    Params = <>
-    StoreDefs = True
-    Left = 168
-    Top = 80
-    object DadosCODPEDIDO: TStringField
-      DisplayLabel = 'Cod. Pedido'
-      FieldName = 'CODPEDIDO'
-      Size = 10
-    end
-    object DadosCODPRODUTO: TStringField
-      DisplayLabel = 'Cod. Prod'
-      FieldName = 'CODPRODUTO'
-    end
-    object DadosNOMEPRODUTO: TStringField
-      DisplayLabel = 'Produto'
-      FieldName = 'NOMEPRODUTO'
-      Size = 100
-    end
-    object DadosQUANTIDADE: TFloatField
-      DisplayLabel = 'Qtd.'
-      FieldName = 'QUANTIDADE'
-    end
-    object DadosESTOQUEATUAL: TFloatField
-      DisplayLabel = 'Estoq. Atual'
-      FieldName = 'ESTOQUEATUAL'
-      DisplayFormat = '#0.00'
-    end
-    object DadosDIASPARAENTREGA: TIntegerField
-      DisplayLabel = 'Dias para entrega'
-      FieldName = 'DIASPARAENTREGA'
-    end
-    object DadosSIT: TStringField
-      DisplayLabel = 'Situa'#231#227'o'
-      FieldName = 'SIT'
-      Size = 1
-    end
-    object DadosCODCLIENTE: TStringField
-      DisplayLabel = 'Cod. Cliente'
-      FieldName = 'CODCLIENTE'
-      Size = 10
-    end
-    object DadosNOMECLIENTE: TStringField
-      DisplayLabel = 'Cliente'
-      FieldName = 'NOMECLIENTE'
-      Size = 80
-    end
-    object DadosCODTRANSPORTE: TStringField
-      DisplayLabel = 'Cod. Transp'
-      FieldName = 'CODTRANSPORTE'
-      Size = 10
-    end
-    object DadosNOMETRANSPORTE: TStringField
-      DisplayLabel = 'Transportadora'
-      DisplayWidth = 40
-      FieldName = 'NOMETRANSPORTE'
-      Size = 100
-    end
-    object DadosQUANTPENDENTE: TFloatField
-      DisplayLabel = 'N'#227'o Atendido'
-      FieldName = 'QUANTPENDENTE'
-    end
-    object DadosUPDATEID: TIntegerField
-      FieldName = 'UPDATEID'
-      Visible = False
-    end
-    object DadosEMFALTA: TBooleanField
-      DisplayLabel = 'Em Falta'
-      FieldName = 'EMFALTA'
-    end
-  end
   object dxAlert: TdxAlertWindowManager
     OptionsButtons.Buttons = <>
     OptionsMessage.Caption.Font.Charset = DEFAULT_CHARSET
@@ -201,10 +48,157 @@ object Pedidos: TPedidos
     Top = 80
     PixelsPerInch = 96
   end
-  object Timer1: TTimer
-    Interval = 120000
-    OnTimer = Timer1Timer
-    Left = 162
-    Top = 16
+  object QryPedidos: TFDQuery
+    Connection = DmCon.FDConSqlServer
+    SQL.Strings = (
+      'SELECT     PED.CodPedido,'
+      '           PED.SITUACAO,'
+      #9'   PED.SIT,'
+      #9'   PED.DIASPARAENTREGA,'
+      #9'   PED.CODCLIENTE,'
+      #9'   PED.NOMECLIENTE,'
+      #9'   PED.CODTRANSPORTE,'
+      #9'   PED.NOMETRANSPORTE,'
+      '           PED.CODPRODUTO, '
+      #9'   PED.NOMEPRODUTO, '
+      #9'   PED.QUANTIDADE,'
+      #9'   PED.QUANTPENDENTE,'
+      #9'   E.EstoqueAtual,'
+      #9'   E.FALTAHOJE,'
+      #9'   E.FALTATOTAL - E.FALTAHOJE AS FALTAAMANHA,'
+      
+        '           CONVERT(BIT, CASE WHEN E.FALTATOTAL > 0 THEN 1 ELSE 0' +
+        ' END) AS EmFalta'
+      ''
+      'FROM PEDIDOS PED'
+      
+        'LEFT JOIN PrevisaoProdutoEmFalta E on E.CodProduto = Ped.CodProd' +
+        'uto'
+      
+        'order by PED.CodTransporte, ped.CODCLIENTE, SIT, DIASPARAENTREGA' +
+        ', PED.CODPRODUTO')
+    Left = 160
+    Top = 24
+    object QryPedidosCODPEDIDO: TStringField
+      DisplayLabel = 'Cod. Pedido'
+      FieldName = 'CODPEDIDO'
+      Size = 6
+    end
+    object QryPedidosDIASPARAENTREGA: TIntegerField
+      DisplayLabel = 'Dias para entrega'
+      FieldName = 'DIASPARAENTREGA'
+    end
+    object QryPedidosSITUACAO: TStringField
+      DisplayLabel = 'Situa'#231#227'o'
+      FieldName = 'SITUACAO'
+      Origin = 'SITUACAO'
+      Required = True
+      FixedChar = True
+      Size = 1
+    end
+    object QryPedidosSIT: TStringField
+      DisplayLabel = 'Situa'#231#227'o'
+      FieldName = 'SIT'
+      Size = 1
+    end
+    object QryPedidosCODCLIENTE: TStringField
+      DisplayLabel = 'Cod. Cliente'
+      FieldName = 'CODCLIENTE'
+      Size = 6
+    end
+    object QryPedidosNOMECLIENTE: TStringField
+      DisplayLabel = 'Cliente'
+      FieldName = 'NOMECLIENTE'
+      Size = 80
+    end
+    object QryPedidosCODPRODUTO: TStringField
+      DisplayLabel = 'Cod. Prod'
+      FieldName = 'CODPRODUTO'
+      Size = 6
+    end
+    object QryPedidosNOMEPRODUTO: TStringField
+      DisplayLabel = 'Produto'
+      FieldName = 'NOMEPRODUTO'
+      Size = 80
+    end
+    object QryPedidosQUANTIDADE: TBCDField
+      DisplayLabel = 'Qtd. Total'
+      FieldName = 'QUANTIDADE'
+      Origin = 'QUANTIDADE'
+      DisplayFormat = '#0.00'
+      Precision = 18
+    end
+    object QryPedidosQUANTPENDENTE: TBCDField
+      DisplayLabel = 'Qnt. N'#227'o Atendida'
+      FieldName = 'QUANTPENDENTE'
+      Origin = 'QUANTPENDENTE'
+      DisplayFormat = '#0.00'
+      Precision = 18
+    end
+    object QryPedidosEstoqueAtual: TBCDField
+      DisplayLabel = 'Estoq. Atual'
+      FieldName = 'EstoqueAtual'
+      Origin = 'EstoqueAtual'
+      DisplayFormat = '#0.00'
+      Precision = 18
+    end
+    object QryPedidosFALTAHOJE: TFMTBCDField
+      DisplayLabel = 'Falta Hoje'
+      FieldName = 'FALTAHOJE'
+      Origin = 'FALTAHOJE'
+      ReadOnly = True
+      DisplayFormat = '#0.00'
+      Precision = 38
+      Size = 4
+    end
+    object QryPedidosFALTAAMANHA: TFMTBCDField
+      DisplayLabel = 'Falta Amanh'#227
+      FieldName = 'FALTAAMANHA'
+      Origin = 'FALTAAMANHA'
+      ReadOnly = True
+      DisplayFormat = '#0.00'
+      Precision = 38
+      Size = 4
+    end
+    object QryPedidosCODTRANSPORTE: TStringField
+      DisplayLabel = 'Cod. Transp'
+      FieldName = 'CODTRANSPORTE'
+      Size = 6
+    end
+    object QryPedidosNOMETRANSPORTE: TStringField
+      DisplayLabel = 'Transportadora'
+      DisplayWidth = 40
+      FieldName = 'NOMETRANSPORTE'
+      Size = 39
+    end
+    object QryPedidosEMFALTA: TBooleanField
+      DisplayLabel = 'Em Falta'
+      FieldName = 'EMFALTA'
+    end
+  end
+  object TblPedidosCache: TFDMemTable
+    FetchOptions.AssignedValues = [evMode]
+    FetchOptions.Mode = fmAll
+    ResourceOptions.AssignedValues = [rvSilentMode]
+    ResourceOptions.SilentMode = True
+    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
+    UpdateOptions.CheckRequired = False
+    UpdateOptions.AutoCommitUpdates = True
+    Left = 160
+    Top = 144
+    object TblPedidosCacheCODPEDIDO: TStringField
+      DisplayLabel = 'Cod. Pedido'
+      FieldName = 'CODPEDIDO'
+      Size = 6
+    end
+    object TblPedidosCacheCODPRODUTO: TStringField
+      DisplayLabel = 'Cod. Prod'
+      FieldName = 'CODPRODUTO'
+      Size = 6
+    end
+    object TblPedidosCacheEMFALTA: TBooleanField
+      DisplayLabel = 'Em Falta'
+      FieldName = 'EMFALTA'
+    end
   end
 end

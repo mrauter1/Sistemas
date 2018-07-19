@@ -1,249 +1,280 @@
 object DmEstoqProdutos: TDmEstoqProdutos
   OldCreateOrder = False
   OnCreate = DataModuleCreate
-  Height = 182
-  Width = 334
-  object CdsEstoqProdutos: TClientDataSet
-    Aggregates = <>
-    FieldDefs = <
-      item
-        Name = 'RANK'
-        DataType = ftInteger
-      end
-      item
-        Name = 'CODPRODUTO'
-        DataType = ftString
-        Size = 20
-      end
-      item
-        Name = 'ESTOQUEATUAL'
-        DataType = ftFloat
-      end
-      item
-        Name = 'PROBFALTAHOJE'
-        DataType = ftFloat
-      end
-      item
-        Name = 'PROBFALTA'
-        DataType = ftFloat
-      end
-      item
-        Name = 'PROBSAI2DIAS'
-        DataType = ftFloat
-      end
-      item
-        Name = 'PERCENTDIAS'
-        DataType = ftFloat
-      end
-      item
-        Name = 'MEDIASAIDA'
-        DataType = ftFloat
-      end
-      item
-        Name = 'STDDEV'
-        DataType = ftFloat
-      end
-      item
-        Name = 'ESPACOESTOQUE'
-        DataType = ftFloat
-      end
-      item
-        Name = 'ROTACAO'
-        DataType = ftInteger
-      end
-      item
-        Name = 'DEMANDA'
-        DataType = ftFloat
-      end
-      item
-        Name = 'APRESENTACAO'
-        DataType = ftString
-        Size = 200
-      end
-      item
-        Name = 'DEMANDADIARIA'
-        DataType = ftFloat
-      end
-      item
-        Name = 'DEMANDAC1'
-        DataType = ftFloat
-      end
-      item
-        Name = 'DIASESTOQUE'
-        DataType = ftFloat
-      end
-      item
-        Name = 'UNIDADEESTOQUE'
-        DataType = ftInteger
-      end
-      item
-        Name = 'ESTOQMAX'
-        DataType = ftFloat
-      end
-      item
-        Name = 'PRODUCAOMINIMA'
-        DataType = ftInteger
-      end>
-    IndexDefs = <>
-    Params = <>
-    StoreDefs = True
-    Left = 76
-    Top = 72
-    object CdsEstoqProdutosRANK: TIntegerField
-      DisplayLabel = 'Rank'
-      FieldName = 'RANK'
+  Height = 270
+  Width = 397
+  object QryEstoq: TFDQuery
+    Connection = DmCon.FDConSqlServer
+    SQL.Strings = (
+      'Select '
+      
+        '   ROW_NUMBER() OVER (ORDER BY FALTAHOJE, FALTACONFIRMADA, FALTA' +
+        'TOTAL, ProbFaltaHoje DESC, DiasEstoque) AS Rank,'
+      '   *, '
+      '   A.NomeAplicacao'
+      'FROM PrevisaoProdutoEmFalta E'
+      'left join APLICA A ON A.CodAplicacao = E.CodAplicacao'
+      
+        'where (NaoFazEstoque <> 1 and E.EspacoEstoque > 0) or (E.FaltaTo' +
+        'tal > 0)'
+      
+        'ORDER BY FALTAHOJE, FALTACONFIRMADA, FALTATOTAL, ProbFaltaHoje D' +
+        'ESC, DiasEstoque')
+    Left = 104
+    Top = 96
+    object QryEstoqRank: TLargeintField
+      FieldName = 'Rank'
+      Origin = 'Rank'
+      ReadOnly = True
     end
-    object CODPRODUTO: TStringField
+    object QryEstoqCODPRODUTO: TStringField
       DisplayLabel = 'Cod.'
       FieldName = 'CODPRODUTO'
+      Required = True
+      FixedChar = True
       Size = 6
     end
-    object APRESENTACAO: TStringField
+    object QryEstoqAPRESENTACAO: TStringField
       DisplayLabel = 'Nome'
-      DisplayWidth = 20
       FieldName = 'APRESENTACAO'
-      Size = 200
+      Size = 80
     end
-    object PROBFALTAHOJE: TFloatField
-      DisplayLabel = 'Prob. Falta Hoje'
-      FieldName = 'PROBFALTAHOJE'
-      DisplayFormat = '#0.00'
+    object QryEstoqCodAplicacao: TStringField
+      DisplayLabel = 'Cod. Aplica'#231#227'o'
+      FieldName = 'CodAplicacao'
+      Origin = 'CodAplicacao'
+      FixedChar = True
+      Size = 4
     end
-    object PROBSAI2DIAS: TFloatField
-      DisplayLabel = 'Prob. Sai 2 Dias'
-      FieldName = 'PROBSAI2DIAS'
-      Visible = False
-      DisplayFormat = '#0.00'
+    object QryEstoqNOMEAPLICACAO: TStringField
+      DisplayLabel = 'Aplicaca'#231#227'o'
+      FieldName = 'NOMEAPLICACAO'
+      Origin = 'NOMEAPLICACAO'
+      FixedChar = True
+      Size = 30
     end
-    object PROBFALTA: TFloatField
-      DisplayLabel = 'Prob. Falta'
-      FieldName = 'PROBFALTA'
-      DisplayFormat = '#0.00'
-    end
-    object PERCENTDIAS: TFloatField
-      DisplayLabel = '% Dias com Sa'#237'da'
-      FieldName = 'PERCENTDIAS'
-      DisplayFormat = '#0.00'
-    end
-    object MEDIASAIDA: TFloatField
-      DisplayLabel = 'M'#233'dia Sa'#237'da'
-      FieldName = 'MEDIASAIDA'
-      DisplayFormat = '#0.00'
-    end
-    object STDDEV: TFloatField
-      DisplayLabel = 'Desvio Padr'#227'o'
-      FieldName = 'STDDEV'
-      Visible = False
-      DisplayFormat = '#0.00'
-    end
-    object ESTOQUEATUAL: TFloatField
+    object QryEstoqESTOQUEATUAL: TBCDField
       DisplayLabel = 'Estoque'
       FieldName = 'ESTOQUEATUAL'
       DisplayFormat = '#0.00'
+      Precision = 18
     end
-    object ESTOQMAX: TFloatField
-      DisplayLabel = 'Estoq. Max C'#225'lculado'
-      FieldName = 'ESTOQMAX'
-      DisplayFormat = '#0.00'
-    end
-    object ESPACOESTOQUE: TFloatField
+    object QryEstoqESPACOESTOQUE: TIntegerField
       DisplayLabel = 'Espa'#231'o Estoque'
       FieldName = 'ESPACOESTOQUE'
+      Origin = 'ESPACOESTOQUE'
     end
-    object PRODUCAOMINIMA: TIntegerField
-      DisplayLabel = 'Produ'#231#227'o Minima'
-      FieldName = 'PRODUCAOMINIMA'
-    end
-    object DEMANDAC1: TFloatField
+    object QryEstoqDEMANDAC1: TFMTBCDField
       DisplayLabel = 'Demanda Cliente1'
       FieldName = 'DEMANDAC1'
+      Origin = 'DEMANDAC1'
       DisplayFormat = '#0.00'
+      Precision = 38
+      Size = 5
     end
-    object DEMANDADIARIA: TFloatField
-      DisplayLabel = 'Demanda Di'#225'ria'
-      FieldName = 'DEMANDADIARIA'
-      DisplayFormat = '#0.00'
-    end
-    object DEMANDA: TFloatField
-      DisplayLabel = 'Demanda'
-      FieldName = 'DEMANDA'
-      DisplayFormat = '#0.00'
-    end
-    object DIASESTOQUE: TFloatField
-      DisplayLabel = 'Dias Estoque'
-      FieldName = 'DIASESTOQUE'
-      DisplayFormat = '#0.00'
-    end
-    object ROTACAO: TIntegerField
-      DisplayLabel = 'Rota'#231#227'o'
+    object QryEstoqROTACAO: TIntegerField
+      DisplayLabel = 'Rota'#231'ao'
       FieldName = 'ROTACAO'
     end
-    object UNIDADEESTOQUE: TIntegerField
-      DisplayLabel = 'Unidade Estoque'
-      FieldName = 'UNIDADEESTOQUE'
+    object QryEstoqMediaSaida: TFMTBCDField
+      DisplayLabel = 'M'#233'dia Sa'#237'da'
+      FieldName = 'MediaSaida'
+      Origin = 'MediaSaida'
+      DisplayFormat = '#0.00'
+      Precision = 38
+      Size = 6
+    end
+    object QryEstoqStdDev: TFloatField
+      DisplayLabel = 'Desvio Padr'#227'o'
+      FieldName = 'StdDev'
+      Origin = 'StdDev'
+      DisplayFormat = '#0.00'
+    end
+    object QryEstoqFaltaConfirmada: TFMTBCDField
+      DisplayLabel = 'Falta Confirmada'
+      FieldName = 'FaltaConfirmada'
+      Origin = 'FaltaConfirmada'
+      ReadOnly = True
+      Precision = 38
+      Size = 4
+    end
+    object QryEstoqFaltaHoje: TFMTBCDField
+      DisplayLabel = 'Falta Hoje'
+      FieldName = 'FaltaHoje'
+      Origin = 'FaltaHoje'
+      ReadOnly = True
+      Precision = 38
+      Size = 4
+    end
+    object QryEstoqFaltaTotal: TFMTBCDField
+      DisplayLabel = 'Falta Total'
+      FieldName = 'FaltaTotal'
+      Origin = 'FaltaTotal'
+      ReadOnly = True
+      Precision = 38
+      Size = 4
+    end
+    object QryEstoqProbFaltaHoje: TFloatField
+      DisplayLabel = 'Prob. Falta Hoje'
+      FieldName = 'ProbFaltaHoje'
+      Origin = 'ProbFaltaHoje'
+      ReadOnly = True
+      DisplayFormat = '#0.00'
+    end
+    object QryEstoqDIASESTOQUE: TBCDField
+      DisplayLabel = 'Dias Estoq'
+      FieldName = 'DIASESTOQUE'
+      Origin = 'DIASESTOQUE'
+      DisplayFormat = '#0.00'
+      Precision = 14
+      Size = 2
+    end
+    object QryEstoqDemandaDiaria: TBCDField
+      DisplayLabel = 'Demanda Diaria'
+      FieldName = 'DemandaDiaria'
+      Origin = 'DemandaDiaria'
+      DisplayFormat = '#0.00'
+      Precision = 14
+    end
+    object QryEstoqDemanda: TFMTBCDField
+      FieldName = 'Demanda'
+      Origin = 'Demanda'
+      Precision = 38
+      Size = 5
+    end
+    object QryEstoqNUMPEDIDOS: TIntegerField
+      DisplayLabel = 'Num. Pedidos'
+      FieldName = 'NUMPEDIDOS'
+      Origin = 'NUMPEDIDOS'
+    end
+    object QryEstoqPercentDias: TFloatField
+      DisplayLabel = '% Dias com Sa'#237'da'
+      FieldName = 'PercentDias'
+      Origin = 'PercentDias'
+      ReadOnly = True
+      DisplayFormat = '#0.00'
+    end
+    object QryEstoqProbFalta: TBCDField
+      DisplayLabel = 'Prob. Falta Se Sair'
+      FieldName = 'ProbFalta'
+      Origin = 'ProbFalta'
+      DisplayFormat = '#0.00'
+      Precision = 7
+      Size = 3
+    end
+    object QryEstoqEstoqMaxCalculado: TFMTBCDField
+      DisplayLabel = 'Estoq Max Calc.'
+      FieldName = 'EstoqMaxCalculado'
+      Origin = 'EstoqMaxCalculado'
+      ReadOnly = True
+      DisplayFormat = '#0.00'
+      Precision = 38
+      Size = 6
+    end
+    object QryEstoqNAOFAZESTOQUE: TBooleanField
+      DisplayLabel = 'N'#227'o Faz Estoq'
+      FieldName = 'NAOFAZESTOQUE'
+      Origin = 'NAOFAZESTOQUE'
+    end
+    object QryEstoqPRODUCAOMINIMA: TIntegerField
+      DisplayLabel = 'Produ'#231#227'o Min.'
+      FieldName = 'PRODUCAOMINIMA'
+      Origin = 'PRODUCAOMINIMA'
+      DisplayFormat = '#0.00'
+    end
+    object QryEstoqSOMANOPESOLIQ: TBooleanField
+      DisplayLabel = 'Soma no Peso Liq.'
+      FieldName = 'SOMANOPESOLIQ'
+      Origin = 'SOMANOPESOLIQ'
     end
   end
-  object CdsPedidos: TClientDataSet
-    Aggregates = <>
-    FieldDefs = <
-      item
-        Name = 'CODPRODUTO'
-        DataType = ftString
-        Size = 20
-      end
-      item
-        Name = 'NOMEPRODUTO'
-        DataType = ftString
-        Size = 100
-      end
-      item
-        Name = 'QUANTIDADE'
-        DataType = ftFloat
-      end
-      item
-        Name = 'DIASPARAENTREGA'
-        DataType = ftInteger
-      end
-      item
-        Name = 'SIT'
-        DataType = ftString
-        Size = 1
-      end
-      item
-        Name = 'NUMPEDIDOS'
-        DataType = ftInteger
-      end
-      item
-        Name = 'FALTA'
-        DataType = ftInteger
-      end>
-    IndexDefs = <>
-    Params = <>
-    StoreDefs = True
-    Left = 232
-    Top = 72
-    object CdsPedidosCODPRODUTO: TStringField
+  object QryPedPro: TFDQuery
+    Connection = DmCon.FDConSqlServer
+    SQL.Strings = (
+      'Select *'
+      'FROM PEDIDOS'
+      'ORDER BY CODPRODUTO, DiasParaEntrega, CodCliente')
+    Left = 272
+    Top = 96
+    object QryPedProCODPRODUTO: TStringField
+      DisplayLabel = 'Cod. Produto'
       FieldName = 'CODPRODUTO'
+      Origin = 'CODPRODUTO'
+      Required = True
+      FixedChar = True
+      Size = 6
     end
-    object CdsPedidosNOMEPRODUTO: TStringField
-      FieldName = 'NOMEPRODUTO'
-      Size = 100
+    object QryPedProCODPEDIDO: TStringField
+      DisplayLabel = 'Cod. Pedido'
+      FieldName = 'CODPEDIDO'
+      Origin = 'CODPEDIDO'
+      Required = True
+      FixedChar = True
+      Size = 6
     end
-    object CdsPedidosQUANTIDADE: TFloatField
-      FieldName = 'QUANTIDADE'
+    object QryPedProCODCLIENTE: TStringField
+      DisplayLabel = 'Cod. Cliente'
+      FieldName = 'CODCLIENTE'
+      Origin = 'CODCLIENTE'
+      Required = True
+      FixedChar = True
+      Size = 6
     end
-    object CdsPedidosDIASPARAENTREGA: TIntegerField
+    object QryPedProNOMECLIENTE: TStringField
+      DisplayLabel = 'Nome Cliente'
+      FieldName = 'NOMECLIENTE'
+      Origin = 'NOMECLIENTE'
+      Size = 80
+    end
+    object QryPedProDATAENTREGA: TDateField
+      DisplayLabel = 'Data Entrega'
+      FieldName = 'DATAENTREGA'
+      Origin = 'DATAENTREGA'
+    end
+    object QryPedProDIASPARAENTREGA: TIntegerField
+      DisplayLabel = 'Dias Para Entrega'
       FieldName = 'DIASPARAENTREGA'
+      Origin = 'DIASPARAENTREGA'
     end
-    object CdsPedidosSIT: TStringField
-      FieldName = 'SIT'
+    object QryPedProSITUACAO: TStringField
+      DisplayLabel = 'Situa'#231#227'o'
+      FieldName = 'SITUACAO'
+      Origin = 'SITUACAO'
+      Required = True
+      FixedChar = True
       Size = 1
     end
-    object CdsPedidosNUMPEDIDOS: TIntegerField
-      FieldName = 'NUMPEDIDOS'
+    object QryPedProNOMEPRODUTO: TStringField
+      DisplayLabel = 'Produto'
+      FieldName = 'NOMEPRODUTO'
+      Origin = 'NOMEPRODUTO'
+      Size = 80
     end
-    object CdsPedidosFALTA: TIntegerField
-      FieldName = 'FALTA'
+    object QryPedProQUANTIDADE: TBCDField
+      DisplayLabel = 'Quantidade'
+      FieldName = 'QUANTIDADE'
+      Origin = 'QUANTIDADE'
+      Precision = 18
+    end
+    object QryPedProQUANTPENDENTE: TBCDField
+      DisplayLabel = 'Quant. N'#227'o Atendida'
+      FieldName = 'QUANTPENDENTE'
+      Origin = 'QUANTPENDENTE'
+      Precision = 18
+    end
+    object QryPedProCODTRANSPORTE: TStringField
+      DisplayLabel = 'Cod. Transporte'
+      FieldName = 'CODTRANSPORTE'
+      Origin = 'CODTRANSPORTE'
+      Required = True
+      FixedChar = True
+      Size = 6
+    end
+    object QryPedProNOMETRANSPORTE: TStringField
+      DisplayLabel = 'Nome Transporte'
+      FieldName = 'NOMETRANSPORTE'
+      Origin = 'NOMETRANSPORTE'
+      Size = 39
     end
   end
 end

@@ -49,7 +49,7 @@ object Pedidos: TPedidos
     PixelsPerInch = 96
   end
   object QryPedidos: TFDQuery
-    Connection = DmCon.FDConSqlServer
+    Connection = ConSqlServer.FDConnection
     SQL.Strings = (
       'SELECT     PED.CodPedido,'
       '           PED.SITUACAO,'
@@ -63,6 +63,7 @@ object Pedidos: TPedidos
       #9'   PED.NOMEPRODUTO, '
       #9'   PED.QUANTIDADE,'
       #9'   PED.QUANTPENDENTE,'
+      '                   PED.DataEntrega,'
       #9'   E.EstoqueAtual,'
       #9'   E.FALTAHOJE,'
       #9'   E.FALTATOTAL - E.FALTAHOJE AS FALTAAMANHA,'
@@ -174,6 +175,11 @@ object Pedidos: TPedidos
     object QryPedidosEMFALTA: TBooleanField
       DisplayLabel = 'Em Falta'
       FieldName = 'EMFALTA'
+    end
+    object QryPedidosDataEntrega: TDateField
+      DisplayLabel = 'Data Entrega'
+      FieldName = 'DataEntrega'
+      Origin = 'DataEntrega'
     end
   end
   object TblPedidosCache: TFDMemTable

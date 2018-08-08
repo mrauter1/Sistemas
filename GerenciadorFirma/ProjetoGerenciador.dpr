@@ -6,7 +6,6 @@ uses
   uFormPrincipal in 'uFormPrincipal.pas' {FormPrincipal},
   uDmFilaProducao in 'uDmFilaProducao.pas' {DMFilaProducao: TDataModule},
   uDmEstoqProdutos in 'uDmEstoqProdutos.pas' {DmEstoqProdutos: TDataModule},
-  udmSqlUtils in 'udmSqlUtils.pas' {DmSqlUtils: TDataModule},
   uFuncProbabilidades in 'uFuncProbabilidades.pas',
   uFormPedidos in 'uFormPedidos.pas' {FormPedidos},
   GerenciadorUtils in 'GerenciadorUtils.pas',
@@ -28,15 +27,20 @@ uses
   uFormSelecionaModelos in 'Fontes\uFormSelecionaModelos.pas' {FormSelecionaModelo},
   uSendMail in 'Fontes\uSendMail.pas',
   uFormValidaModelos in 'uFormValidaModelos.pas' {FormValidaModelos},
-  uDmCon in 'Fontes\uDmCon.pas' {DmCon: TDataModule};
+  uConSqlServer in 'Fontes\uConSqlServer.pas' {ConSqlServer: TDataModule},
+  uDmConnection in '..\utils\uDmConnection.pas' {DmConnection: TDataModule},
+  uConFirebird in 'uConFirebird.pas' {ConFirebird: TDataModule},
+  uFrmConsulta in 'Fontes\uFrmConsulta.pas' {FrmConsulta},
+  uFormExecSql in 'Fontes\uFormExecSql.pas' {FormExecSql},
+  uFormRelatoriosPersonalizados in 'Fontes\uFormRelatoriosPersonalizados.pas' {FormRelatoriosPersonalizados};
 
 {$R *.res}
 
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  Application.CreateForm(TDmSqlUtils, DmSqlUtils);
-  Application.CreateForm(TDmCon, DmCon);
+  Application.CreateForm(TConSqlServer, ConSqlServer);
+  Application.CreateForm(TConFirebird, ConFirebird);
   Application.CreateForm(TFormPrincipal, FormPrincipal);
   Application.CreateForm(TFormProInfo, FormProInfo);
   Application.CreateForm(TPedidos, Pedidos);
@@ -52,5 +56,6 @@ begin
   Application.CreateForm(TFormGlobal, FormGlobal);
   Application.CreateForm(TFormDetalheProdutos, FormDetalheProdutos);
   Application.CreateForm(TFormPedidos2, FormPedidos2);
+  Application.CreateForm(TFormRelatoriosPersonalizados, FormRelatoriosPersonalizados);
   Application.Run;
 end.

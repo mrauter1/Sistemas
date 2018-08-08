@@ -7,7 +7,8 @@ uses
   cxLookAndFeelPainters, cxGraphics, dxSkinsCore, cxClasses, dxAlertWindow,
   Vcl.ExtCtrls, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
   FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
-  FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet, FireDAC.Comp.Client;
+  FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet, FireDAC.Comp.Client,
+  uConSqlServer;
 
 type
   TPedidos = class(TDataModule)
@@ -34,12 +35,14 @@ type
     TblPedidosCacheCODPEDIDO: TStringField;
     TblPedidosCacheCODPRODUTO: TStringField;
     TblPedidosCacheEMFALTA: TBooleanField;
+    QryPedidosDataEntrega: TDateField;
     procedure DataModuleCreate(Sender: TObject);
   private
     procedure VerificaNovosPedidos;
     procedure ShowAlertPedidoEmFalta;
     function GetTextoPedidoAlert: String;
     procedure ShowAlertNovoPedido;
+    function GetStringDia: String;
 //    function GetSql(pDataInicial, pDataFinal: TDateTime): String;
 //    function ProdutoEmFalta(pCodProduto: String): Boolean;
 
@@ -57,7 +60,7 @@ var
 implementation
 
 uses
-  uDmSqlUtils, Variants;
+  uConFirebird, Variants;
 
 {%CLASSGROUP 'Vcl.Controls.TControl'}
 
@@ -135,7 +138,7 @@ begin
        ' INNER JOIN estoque E ON E.CODPRODUTO = PRO.CODPRODUTO AND E.CODFILIAL = ''01'' '+
        ' where P.situacao IN (''0'', ''1'', ''2'') AND '+
        ' P.dataentrega BETWEEN CAST('+sDataInicial+' as DATE) AND CAST('+ sDataFinal +'  AS DATE) ';
-  Result:= DmSqlUtils.RetornaValor(fSql, 0) < 0;
+  Result:= ConFirebird.RetornaValor(fSql, 0) < 0;
 end;}
 
 function TPedidos.GetTextoPedidoAlert: String;
@@ -154,15 +157,25 @@ begin
 
 end;
 
+function TPedidos.GetStringDia: String;
+begin
+  if QryPedidosDIASPARAENTREGA.AsInteger <= 0 then
+    Result:= 'hoje!'
+  else if QryPedidosDIASPARAENTREGA.AsInteger = 1 then
+    Result:= 'Amanhã'
+  else
+    Result:= FormatDateTime('dd/mm', QryPedidosDataEntrega.AsDateTime);
+end;
+
 procedure TPedidos.ShowAlertPedidoEmFalta;
 begin
-  dxAlertFalta.Show('Pedido com falta!',
+  dxAlertFalta.Show('Falta '+GetStringDia+'!',
                 GetTextoPedidoAlert);
 end;
 
 procedure TPedidos.ShowAlertNovoPedido;
 begin
-  dxAlert.Show('Entrou novo Pedido',
+  dxAlert.Show('Novo Ped. '+GetStringDia,
                 GetTextoPedidoAlert);
 end;
 
@@ -193,6 +206,7 @@ begin
       QryPedidos.Next;
     end;
 
+    TblPedidosCache.EmptyDataSet;
     TblPedidosCache.CopyDataSet(QryPedidos, [coRestart, coAppend]);
   finally
     QryPedidos.EnableControls;
@@ -222,7 +236,7 @@ begin
 {  while not Dados.IsEmpty do
     Dados.Delete;       }
 
-  fSqlQuery:= DmSqlUtils.RetornaDataSet(GetSql(Now-30, Now));
+  fSqlQuery:= ConFirebird.RetornaDataSet(GetSql(Now-30, Now));
   try
     fSqlQuery.First;
     while not fSqlQuery.Eof do

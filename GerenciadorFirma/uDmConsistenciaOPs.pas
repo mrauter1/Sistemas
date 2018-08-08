@@ -3,7 +3,7 @@ unit uDmConsistenciaOPs;
 interface
 
 uses
-  System.SysUtils, System.Classes, Data.DB, Datasnap.DBClient, uDmSqlUtils,
+  System.SysUtils, System.Classes, Data.DB, Datasnap.DBClient, uConFirebird,
   Data.FMTBcd, Datasnap.Provider, Data.SqlExpr, uFormConversorLKG, dialogs;
 
 type
@@ -113,7 +113,7 @@ var
   fSqlQuery: TDataSet;
 begin
   CdsModeloInsumo.EmptyDataSet;
-  fSqlQuery:= DmSqlUtils.RetornaDataSet(
+  fSqlQuery:= ConFirebird.RetornaDataSet(
     'SELECT II.*, P.CODGRUPOSUB, P.PESO, P.UNIDADEESTOQUE, P.UNIDADE '
    + ' FROM INSUMOS_INSUMO II '
    + ' INNER JOIN PRODUTO P ON P.CODPRODUTO = II.CODPRODUTO '

@@ -44,6 +44,7 @@ type
     cxGridDBTableViewFALTAHOJE: TcxGridDBColumn;
     cxGridDBTableViewFALTAAMANHA: TcxGridDBColumn;
     Timer1: TTimer;
+    cxGridDBTableViewDataEntrega: TcxGridDBColumn;
     procedure BtnOpcoesClick(Sender: TObject);
     procedure cxGridDBTableViewStylesGetContentStyle(
       Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;

@@ -2,8 +2,8 @@ object FormPrincipal: TFormPrincipal
   Left = 0
   Top = 0
   Caption = 'Informa'#231#245'es de estoque e demanda'
-  ClientHeight = 454
-  ClientWidth = 971
+  ClientHeight = 397
+  ClientWidth = 977
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -12,20 +12,20 @@ object FormPrincipal: TFormPrincipal
   Font.Style = []
   Menu = MainMenu
   OldCreateOrder = False
+  OnCreate = FormCreate
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object PanelMain: TPanel
     Left = 0
     Top = 0
-    Width = 971
-    Height = 454
+    Width = 977
+    Height = 397
     Align = alClient
     TabOrder = 0
-    ExplicitWidth = 899
   end
   object MainMenu: TMainMenu
-    Left = 328
+    Left = 50
     Top = 56
     object Utilidades1: TMenuItem
       Caption = 'Utilit'#225'rios'
@@ -64,6 +64,17 @@ object FormPrincipal: TFormPrincipal
         Caption = 'Valida Modelos'
         OnClick = ValidaModelos1Click
       end
+      object ExecutarSql1: TMenuItem
+        Caption = 'Executar Sql'
+        OnClick = ExecutarSql1Click
+      end
+      object CriarConsulta1: TMenuItem
+        Caption = 'Gerenciar Relat'#243'rios'
+        OnClick = CriarConsulta1Click
+      end
+    end
+    object Consultas1: TMenuItem
+      Caption = 'Consultas'
     end
   end
   object Timer1: TTimer
@@ -71,5 +82,20 @@ object FormPrincipal: TFormPrincipal
     OnTimer = Timer1Timer
     Left = 472
     Top = 56
+  end
+  object QryConsultas: TFDQuery
+    Connection = ConSqlServer.FDConnection
+    SQL.Strings = (
+      'SELECT v.* FROM '
+      'sys.views v'
+      'where v.schema_id = schema_id('#39'cons'#39')')
+    Left = 144
+    Top = 56
+    object QryConsultasname: TWideStringField
+      FieldName = 'name'
+      Origin = 'name'
+      Required = True
+      Size = 128
+    end
   end
 end

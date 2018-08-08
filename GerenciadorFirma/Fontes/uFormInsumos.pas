@@ -135,7 +135,8 @@ type
 implementation
 
 uses
-  uDmSqlUtils, uFormSelecionaModelos, uFormAdicionarSimilaridade, uFormProInfo, uFormDetalheProdutos;
+  uConFirebird, uFormSelecionaModelos, uFormAdicionarSimilaridade, uFormProInfo, uFormDetalheProdutos,
+  uDmConnection;
 
 {$R *.dfm}
 
@@ -285,7 +286,7 @@ var
   FQry: TDataSet;
 begin
   CdsProdutoAcabado.EmptyDataSet;
-  FQry:= DmSqlUtils.RetornaDataSet(Format(cSql, [pCodModelo]));
+  FQry:= ConFirebird.RetornaDataSet(Format(cSql, [pCodModelo]));
   try
     CopiaDadosDataSet(FQry, CdsProdutoAcabado);
   finally
@@ -324,7 +325,7 @@ var
 
 begin
   CdsInsumosDetalhe.EmptyDataSet;
-  FQry:= DmSqlUtils.RetornaDataSet(GetSql(pCodModelo));
+  FQry:= ConFirebird.RetornaDataSet(GetSql(pCodModelo));
   try
     CopiaDadosDataSet(FQry, CdsInsumosDetalhe);
   finally
@@ -353,7 +354,7 @@ var
   end;
 begin
   CdsInsumos.EmptyDataSet;
-  FQry:= DmSqlUtils.RetornaDataSet(GetSql(pCodModelo));
+  FQry:= ConFirebird.RetornaDataSet(GetSql(pCodModelo));
   try
     CopiaDadosDataSet(FQry, CdsInsumos);
   finally

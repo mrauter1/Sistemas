@@ -61,7 +61,7 @@ implementation
 {$R *.dfm}
 
 uses
-  uDmSqlUtils, uFormProInfo, uFormDetalheProdutos, uFormAdicionarSimilaridade;
+  uConFirebird, uFormProInfo, uFormDetalheProdutos, uFormAdicionarSimilaridade;
 
 procedure TFormValidaModelos.VerificaDivergencias;
 const
@@ -71,7 +71,7 @@ const
          ' INNER JOIN PRODUTO P ON P.CODPRODUTO = IA.CODPRODUTO '+
          ' WHERE MODELOATIVO_SN <> ''N'' AND (SELECT COUNT(II.CODPRODUTO) FROM INSUMOS_INSUMO II WHERE II.CODMODELO = IM.CODMODELO) > 0 ';
 begin
-  DmSqlUtils.PopulaClientDataSet(CdsModelosComDivergencia, cSql);
+  ConFirebird.PopulaClientDataSet(CdsModelosComDivergencia, cSql);
 
   CdsModelosComDivergencia.First;
   while not CdsModelosComDivergencia.Eof do

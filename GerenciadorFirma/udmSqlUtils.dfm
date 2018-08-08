@@ -1,30 +1,21 @@
 object DmSqlUtils: TDmSqlUtils
   OldCreateOrder = False
-  OnCreate = DataModuleCreate
-  Height = 226
+  Height = 175
   Width = 305
-  object SQLConnection: TSQLConnection
-    ConnectionName = 'FBConnection'
-    DriverName = 'Firebird'
-    KeepConnection = False
-    LoginPrompt = False
+  object FDConnection: TFDConnection
     Params.Strings = (
-      'DriverName=Firebird'
-      'Database=127.0.0.1:F:\DADOS\BANCO_447.FDB'
-      'RoleName=RoleName'
-      'User_Name=sysdba'
+      'DriverID=FB'
       'Password=masterkey'
-      'ServerCharSet='
-      'SQLDialect=3'
-      'ErrorResourceFile='
-      'LocaleCode=0000'
-      'BlobSize=-1'
-      'CommitRetain=False'
-      'WaitOnLocks=True'
-      'IsolationLevel=ReadCommitted'
-      'Trim Char=False')
-    Connected = True
-    Left = 112
-    Top = 48
+      'Server=10.0.0.201'
+      'Protocol=TCPIP'
+      'Port=3051'
+      'User_Name=SYSDBA'
+      'Database=E:\Dados\BANCO.FDB')
+    ResourceOptions.AssignedValues = [rvAutoConnect, rvAutoReconnect]
+    ResourceOptions.AutoReconnect = True
+    LoginPrompt = False
+    AfterCommit = FDConnectionAfterCommit
+    Left = 137
+    Top = 64
   end
 end

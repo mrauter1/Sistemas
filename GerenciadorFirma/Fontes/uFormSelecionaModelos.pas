@@ -22,7 +22,7 @@ type
 implementation
 
 uses
-  uDmSqlUtils;
+  uConFirebird;
 
 {$R *.dfm}
 
@@ -62,7 +62,7 @@ var
   FCnt: Integer;
 begin
   FCnt:= 0;
-  FDataSet:= DmSqlUtils.RetornaDataSet(Format(cSql, [pCodProduto]));
+  FDataSet:= ConFirebird.RetornaDataSet(Format(cSql, [pCodProduto]));
   try
     FDataSet.First;
 

@@ -4,8 +4,8 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, udmSqlUtils, Data.DB, Datasnap.DBClient,
-  Vcl.Grids, Vcl.DBGrids, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, uFormDensidades;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, Datasnap.DBClient,
+  Vcl.Grids, Vcl.DBGrids, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, uFormDensidades, uConFirebird;
 
 type
   TFormConversorLKG = class(TForm)
@@ -151,7 +151,7 @@ begin
   fSoma:= 0;
   fTotalKg:= 0;
 // Verifica se a soma das quantidades fecha 100% e se a unidade é válida
-  fDataSet:= DmSqlUtils.RetornaDataSet(Format(cSql, [pCodModelo]));
+  fDataSet:= ConFirebird.RetornaDataSet(Format(cSql, [pCodModelo]));
   try
     fDataSet.First;
     while not fDataSet.Eof do
@@ -193,7 +193,7 @@ procedure TFormConversorLKG.CarregaModelo;
 var
   fDataSet: TDataSet;
 begin
-  fDataSet:= DmSqlUtils.RetornaDataSet('SELECT M.DESCRICAOMODELO, P.UNIDADEESTOQUE, P.NOMESUBUNIDADE FROM INSUMOS_MODELO M '
+  fDataSet:= ConFirebird.RetornaDataSet('SELECT M.DESCRICAOMODELO, P.UNIDADEESTOQUE, P.NOMESUBUNIDADE FROM INSUMOS_MODELO M '
             +' INNER JOIN INSUMOS_ACABADO A ON A.CODMODELO = M.CODMODELO '
             +' INNER JOIN PRODUTO P ON P.CODPRODUTO = A.CODPRODUTO '
             +'WHERE M.CODMODELO = '''+Trim(EditModelo.Text)+''' ' );

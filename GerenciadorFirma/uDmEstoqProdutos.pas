@@ -3,11 +3,12 @@ unit uDmEstoqProdutos;
 interface
 
 uses
-  System.SysUtils, System.Classes, Data.DB, Datasnap.DBClient, uDmSqlUtils, uFuncProbabilidades,
-  Data.SqlExpr, System.Math, uFormProInfo, uFrmShowMemo, uPedidos, Vcl.ExtCtrls, uDMCon,
+  System.SysUtils, System.Classes, Data.DB, Datasnap.DBClient, uFuncProbabilidades,
+  Data.SqlExpr, System.Math, uFormProInfo, uFrmShowMemo, uPedidos, Vcl.ExtCtrls,
   FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
   FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
-  FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.Client, FireDAC.Comp.DataSet;
+  FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.Client, FireDAC.Comp.DataSet,
+  uConSqlServer;
 
 type
   TDmEstoqProdutos = class(TDataModule)
@@ -52,11 +53,11 @@ type
     QryEstoqRank: TLargeintField;
     procedure DataModuleCreate(Sender: TObject);
   private
-    fDataSetDiasUteis: TDataSet;
-    fUltimoDiasUteis, fUltimoPeriodo: Integer;
+{    fDataSetDiasUteis: TDataSet;
+    fUltimoDiasUteis, fUltimoPeriodo: Integer;}
 
-    function GetDiasUteisPeriodo(pDataIni, pDataFim: TDate): Integer;
-    function EDiaUtil(pDia: TDate): Boolean;
+{    function GetDiasUteisPeriodo(pDataIni, pDataFim: TDate): Integer;
+    function EDiaUtil(pDia: TDate): Boolean; }
   public
     procedure AtualizaEstoqueNew;
   end;
@@ -79,7 +80,7 @@ uses
 
 { TDmEstoqProdutos }
 
-function TDmEstoqProdutos.EDiaUtil(pDia: TDate): Boolean;
+{function TDmEstoqProdutos.EDiaUtil(pDia: TDate): Boolean;
 begin
   if not Assigned(fDataSetDiasUteis) then
     GetDiasUteisPeriodo(pDia, pDia);
@@ -96,8 +97,8 @@ begin
   end;
 
   Result:= False;
-end;
-
+end;}
+{
 function TDmEstoqProdutos.GetDiasUteisPeriodo(pDataIni, pDataFim: TDate): Integer;
 const
   cSql = 'select distinct(mcli.datacomprovante) as DiaUtil'
@@ -115,7 +116,7 @@ begin
 
     fUltimoPeriodo:= Trunc((pDataFim - pDataIni));
 
-    fDataSetDiasUteis:= DmSqlUtils.RetornaDataSet(Format(cSql,
+    fDataSetDiasUteis:= ConFirebird.RetornaDataSet(Format(cSql,
                 [FormatDateTime('dd.mm.yyyy', pDataIni), FormatDateTime('dd.mm.yyyy', pDataFim)]));
     try
       Result:= 0;
@@ -131,7 +132,7 @@ begin
     end;
   end;
 end;
-
+ }
 procedure TDmEstoqProdutos.AtualizaEstoqueNew;
 begin
   QryEstoq.DisableControls;
@@ -169,7 +170,7 @@ var
   begin
     CdsPedidos.Filter:= ParFilter;
     CdsPedidos.Filtered:= True;
-    DmSqlUtils.OrdenaClientDataSet(CdsPedidos, 'NUMPEDIDOS', [ixDescending]);
+    ConFirebird.OrdenaClientDataSet(CdsPedidos, 'NUMPEDIDOS', [ixDescending]);
     CdsPedidos.First;
     while not CdsPedidos.Eof do
     begin
@@ -210,7 +211,7 @@ begin
   CdsEstoqProdutos.Filtered:= False;
   CdsEstoqProdutos.Filter:= '(ESTOQUEATUAL + PRODUCAOMINIMA >= ESTOQMAX) OR ESTOQMAX < 1';
   CdsEstoqProdutos.Filtered:= True;
-//  DmSqlUtils.OrdenaClientDataSet(CdsEstoqProdutos, 'PROBFALTAHOJE', [ixDescending]);
+//  ConFirebird.OrdenaClientDataSet(CdsEstoqProdutos, 'PROBFALTAHOJE', [ixDescending]);
   CdsEstoqProdutos.First;
   while not CdsEstoqProdutos.Eof do begin
     CdsEstoqProdutos.Edit;
@@ -222,7 +223,7 @@ begin
   // Rankeia pelos produtos com maior probabilidade de falta hoje
   CdsEstoqProdutos.Filter:= 'PROBFALTAHOJE > 0 AND RANK = 0';
   CdsEstoqProdutos.Filtered:= True;
-  DmSqlUtils.OrdenaClientDataSet(CdsEstoqProdutos, 'PROBFALTAHOJE', [ixDescending]);
+  ConFirebird.OrdenaClientDataSet(CdsEstoqProdutos, 'PROBFALTAHOJE', [ixDescending]);
   CdsEstoqProdutos.First;
   while not CdsEstoqProdutos.Eof do
   begin
@@ -242,7 +243,7 @@ begin
   //S Rankeia pelos dias estoque
   CdsEstoqProdutos.Filter:= 'RANK = 0';
   CdsEstoqProdutos.Filtered:= True;
-  DmSqlUtils.OrdenaClientDataSet(CdsEstoqProdutos, 'DIASESTOQUE', []);
+  ConFirebird.OrdenaClientDataSet(CdsEstoqProdutos, 'DIASESTOQUE', []);
   CdsEstoqProdutos.First;
   while not CdsEstoqProdutos.Eof do begin
     DoRank;
@@ -250,14 +251,14 @@ begin
 
   CdsEstoqProdutos.Filtered:= False;
 
-  DmSqlUtils.OrdenaClientDataSet(CdsEstoqProdutos, 'RANK', []);
+  ConFirebird.OrdenaClientDataSet(CdsEstoqProdutos, 'RANK', []);
   CdsEstoqProdutos.First;
 end;
      }
 procedure TDmEstoqProdutos.DataModuleCreate(Sender: TObject);
 begin
   DataSistema:= now;//StrToDateTime('20.09.2013');
-  fDataSetDiasUteis:= nil;
+  //fDataSetDiasUteis:= nil;
 end;
 
 

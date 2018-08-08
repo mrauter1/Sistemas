@@ -9,9 +9,10 @@ uses
   cxStyles, dxSkinsCore, dxSkinscxPCPainter, cxCustomData, cxFilter, cxData,
   cxDataStorage, cxEdit, cxNavigator, cxDBData, cxGridCustomTableView,
   cxGridTableView, cxGridDBTableView, cxGridLevel, cxClasses, cxGridCustomView,
-  cxGrid, uDmCon, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
+  cxGrid, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
   FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
-  FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet, FireDAC.Comp.Client;
+  FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet, FireDAC.Comp.Client,
+  uConSqlServer;
 
 type
   TFormProInfo = class(TForm)
@@ -53,7 +54,7 @@ implementation
 {$R *.dfm}
 
 uses
-  uDmSqlUtils;
+  uConFirebird, uDmConnection;
 
 procedure CopiaFields(pSource, pDest: TClientDataSet);
 var
@@ -95,16 +96,10 @@ begin
 end;
 
 function TFormProInfo.GetAplicacao(const pCodProduto: String): String;
-var
-  fDataSet: TDataSet;
-
 begin
-  fDataSet:= DmSqlUtils.RetornaDataSet('SELECT CODAPLICACAO FROM PRODUTO WHERE CODPRODUTO = '''+pCodProduto+''' ');
-  try
-    Result:= fDataSet.FieldByName('CODAPLICACAO').AsString;
-  finally
-    fDataSet.Free;
-  end;
+  Result:= VarToStrDef(ConSqlServer.FDConnection.ExecSQLScalar(
+              'SELECT CODAPLICACAO FROM PRODUTO WHERE CODPRODUTO = '''+pCodProduto+''' ')
+              , '');
 end;
 
 procedure TFormProInfo.AddProInfoDefault(pCodProduto: String);
@@ -180,7 +175,7 @@ end;}
 
 procedure TFormProInfo.FormCreate(Sender: TObject);
 begin
-  DmCon.TransformaEmLookup(QryProInfoAPRESENTACAO, 'SELECT CODPRODUTO, APRESENTACAO FROM PRODUTO');
+  ConSqlServer.TransformaEmLookup(QryProInfoAPRESENTACAO, 'SELECT CODPRODUTO, APRESENTACAO FROM PRODUTO');
 
   ReopenDataSet(QryProInfo);
 end;

@@ -5,7 +5,11 @@ interface
 
 uses
   System.SysUtils, System.Classes, Data.DB, Data.SqlExpr, Data.DBXFirebird,
-  Data.FMTBcd, Datasnap.DBClient, Datasnap.Provider, Inifiles, Forms, TypInfo;
+  Data.FMTBcd, Datasnap.DBClient, Datasnap.Provider, Inifiles, Forms, TypInfo,
+  FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf,
+  FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
+  FireDAC.Phys, FireDAC.Phys.FB, FireDAC.Phys.FBDef, FireDAC.ConsoleUI.Wait,
+  FireDAC.Comp.Client;
 
 type
  cfMapField = record
@@ -15,23 +19,39 @@ type
 
 type
   TDmSqlUtils = class(TDataModule)
-    SQLConnection: TSQLConnection;
-    procedure DataModuleCreate(Sender: TObject);
+    FDConnection: TFDConnection;
+    procedure FDConnectionAfterCommit(Sender: TObject);
   private
+    FModoDesconectado: Boolean;
+    procedure SetModoDesconectado(const Value: BOolean);
     { Private declarations }
   public
-    function CriaSqlQuery(sql: String = ''): TSqlQuery;
+    constructor Create(AOwner: TComponent); override;
+
+    function CriaFDQuery(sql: String = ''): TFDQuery;
     function RetornaDataSet(sql: String; pAbrirDataSet: Boolean = True): TDataSet;
+    function RetornaFDQuery(AOwner: TComponent; Sql: String; pAbrirDataSet: Boolean = True): TFDQuery;
+
     procedure ExecutaComando(pSql: String);
-    function OrdenaClientDataSet(parCds: TClientDataSet;
-      const FieldName: String; PIndexOptions: TIndexOptions = []): Boolean;
+
     function RetornaValor(Sql: String; ValDefault: Variant): Variant;
+
+    // transforma um field do tipo fkCalculated em fkLookup
+    procedure TransformaEmLookup(pField: TField; pSql: String);
+
     procedure PopulaClientDataSet(pCds: TClientDataSet; pSql: String; pEmptyDataSet: Boolean = True);
+
+    function OrdenaClientDataSet(parCds: TClientDataSet;
+        const FieldName: String; PIndexOptions: TIndexOptions = []): Boolean;
+    procedure CarregaConnectionInfo(pFile, pSection: String);
 
     class procedure CopyFieldDefs(Dest, Source: TDataSet; pMapedFields: array of cfMapField); overload;
     class procedure CopyFieldDefs(Dest, Source: TDataSet); overload;
+
+    property ModoDesconectado: BOolean read FModoDesconectado write SetModoDesconectado;
   end;
 
+procedure ReopenDataSet(pDataSet: TDataSet);
 // Retorna um array com o nome dos campos que são diferentes entre um e outro dataset
 function ComparaRecord(pDataSet1, pDataSet2: TDataSet; pCamposParaIgnorar: String = ''): TArray<String>;
 procedure CopiarRecord(pSource, pDest: TDataSet);
@@ -48,6 +68,14 @@ implementation
 {$R *.dfm}
 
 { TDmSqlUtils }
+
+procedure ReopenDataSet(pDataSet: TDataSet);
+begin
+  if pDataSet.Active then
+    pDataSet.Close;
+
+  pDataSet.Open;
+end;
 
 procedure CopyFieldDefs(pSource, pDest: TDataSet);
 var
@@ -78,7 +106,6 @@ var
   FFieldType: TFieldType;
   Field, NewField: TField;
   FieldDef: TFieldDef;
-  I: Integer;
 
   function GetFieldType: TFieldType;
   var
@@ -191,11 +218,18 @@ begin
   end;
 end;
 
-function TDmSqlUtils.CriaSqlQuery(sql: String = ''): TSqlQuery;
+constructor TDmSqlUtils.Create(AOwner: TComponent);
 begin
-  Result:= TSqlQuery.Create(Self);
+  inherited Create(AOwner);
+
+  ModoDesconectado:= False;
+end;
+
+function TDmSqlUtils.CriaFDQuery(sql: String = ''): TFDQuery;
+begin
+  Result:= TFDQuery.Create(Self);
   try
-    Result.SQLConnection:= SqlConnection;
+    Result.Connection:= FDConnection;
     Result.SQL.Text:= sql;
   except
     Result.Free;
@@ -205,18 +239,18 @@ end;
 
 function TDmSqlUtils.RetornaDataSet(Sql: String; pAbrirDataSet: Boolean = True): TDataSet;
 var
-  fSqlQuery: TSqlQuery;
+  fQuery: TFDQuery;
 begin
-  fSqlQuery:= CriaSqlQuery(Sql);
+  fQuery:= CriaFDQuery(Sql);
   try
     if pAbrirDataSet then
-      fSqlQuery.Open;
+      fQuery.Open;
   except
-    fSqlQuery.Free;
+    fQuery.Free;
     raise;
   end;
 
-  Result:= fSqlQuery;
+  Result:= fQuery;
 end;
 
 function TDmSqlUtils.RetornaValor(Sql: String; ValDefault: Variant): Variant;
@@ -232,11 +266,19 @@ begin
   end;
 end;
 
+procedure TDmSqlUtils.SetModoDesconectado(const Value: BOolean);
+begin
+  FModoDesconectado := Value;
+
+  if FModoDesconectado then
+    FDConnection.Offline;
+end;
+
 procedure TDmSqlUtils.ExecutaComando(pSql: String);
 var
-  FQry: TSqlQuery;
+  FQry: TFDQuery;
 begin
-  FQry:= CriaSqlQuery(pSql);
+  FQry:= CriaFDQuery(pSql);
   try
     FQry.ExecSQL(True);
   finally
@@ -244,22 +286,73 @@ begin
   end;
 end;
 
-procedure TDmSqlUtils.DataModuleCreate(Sender: TObject);
+function TDmSqlUtils.RetornaFDQuery(AOwner: TComponent; Sql: String; pAbrirDataSet: Boolean = True): TFDQuery;
+var
+  fQry: TFDQuery;
+begin
+  fQry:= TFDQuery.Create(AOwner);
+  try
+    fQry.Connection:= FDConnection;
+
+    fQry.SQL.Text:= Sql;
+
+    if pAbrirDataSet then
+      fQry.Open;
+  except
+    fQry.Free;
+    raise;
+  end;
+
+  Result:= fQry;
+end;
+
+procedure TDmSqlUtils.FDConnectionAfterCommit(Sender: TObject);
+begin
+  if ModoDesconectado then
+    FDConnection.Offline;
+end;
+
+procedure TDmSqlUtils.CarregaConnectionInfo(pFile, pSection: String);
 var
   ArqIni: TIniFile;
 begin
-  SqlConnection.Close;
-  if FileExists(ExtractFilePath(Application.ExeName) + 'Banco.Ini') then
+  FDConnection.Close;
+  if FileExists(pFile) then
     begin
-      ArqIni:= TIniFile.Create(ExtractFilePath(Application.ExeName) +  'Banco.Ini');
-      SqlConnection.Params.Values['Database'] :=
-          ArqIni.ReadString('Banco', 'Dir', 'C:\Sidicom.new\Dados\Banco.fdb');
-      ArqIni.Free;
-    end
-  else
-    SqlConnection.Params.Values['Database']:= 'C:\Sidicom.new\Dados\Banco.fdb';
+      ArqIni:= TIniFile.Create(pFile);
+      try
+        FDConnection.Params.Values['Server'] :=
+            ArqIni.ReadString(pSection, 'Server', FDConnection.Params.Values['Server']);
+        FDConnection.Params.Values['Database'] :=
+            ArqIni.ReadString(pSection, 'Database', FDConnection.Params.Values['Database']);
+      finally
+        ArqIni.Free;
+      end;
+    end;
 
-  SQLConnection.Open;
+  FDConnection.Open;
+end;
+
+procedure TDmSqlUtils.TransformaEmLookup(pField: TField; pSql: String);
+var
+  fQry: TFDQuery;
+begin
+  if pField.FieldKind <> fkCalculated then
+    raise Exception.Create('Erro TDmCon.TransformaLookup: Field deve ter a propriedade FieldKind = fkCalculated!');
+
+  fQry:= RetornaFDQuery(pField, pSql, True);
+  if fQry.Fields.Count < 2 then
+  begin
+    fQry.Free;
+    raise Exception.Create('Erro TDmCon.TransformaLookup: Query deve retornar dois campos! Qry: '+pSql);
+  end;
+
+  pField.FieldKind:= fkLookup;
+  pField.Lookup:= True;
+  pField.LookupDataSet:= fQry;
+  pField.LookupKeyFields:= fQry.Fields[0].FieldName;
+  pField.KeyFields:= fQry.Fields[0].FieldName;
+  pField.LookupResultField:= fQry.Fields[1].FieldName;
 end;
 
 function TDmSqlUtils.OrdenaClientDataSet(parCds: TClientDataSet;

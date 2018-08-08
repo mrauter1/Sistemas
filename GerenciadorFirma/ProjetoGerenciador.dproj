@@ -105,10 +105,6 @@
             <Form>DmEstoqProdutos</Form>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
-        <DCCReference Include="udmSqlUtils.pas">
-            <Form>DmSqlUtils</Form>
-            <DesignClass>TDataModule</DesignClass>
-        </DCCReference>
         <DCCReference Include="uFuncProbabilidades.pas"/>
         <DCCReference Include="uFormPedidos.pas">
             <Form>FormPedidos</Form>
@@ -173,10 +169,32 @@
             <Form>FormValidaModelos</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="Fontes\uDmCon.pas">
-            <Form>DmCon</Form>
+        <DCCReference Include="Fontes\uConSqlServer.pas">
+            <Form>ConSqlServer</Form>
             <FormType>dfm</FormType>
             <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="..\utils\uDmConnection.pas">
+            <Form>DmConnection</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="uConFirebird.pas">
+            <Form>ConFirebird</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="Fontes\uFrmConsulta.pas">
+            <Form>FrmConsulta</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Fontes\uFormExecSql.pas">
+            <Form>FormExecSql</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Fontes\uFormRelatoriosPersonalizados.pas">
+            <Form>FormRelatoriosPersonalizados</Form>
+            <FormType>dfm</FormType>
         </DCCReference>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

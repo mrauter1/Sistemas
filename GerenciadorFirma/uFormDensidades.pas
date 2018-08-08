@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, Datasnap.DBClient, Vcl.Grids,
-  Vcl.DBGrids, udmSqlUtils, JSonConverter, Vcl.StdCtrls, dwsJSon, Vcl.ExtCtrls;
+  Vcl.DBGrids, uConFirebird, JSonConverter, Vcl.StdCtrls, dwsJSon, Vcl.ExtCtrls;
 
 type
   TFormDensidades = class(TForm)
@@ -54,7 +54,7 @@ const
 var
   fDataSet: TDataSet;
 begin
-  fDataSet:= DmSqlUtils.RetornaDataSet(cSql);
+  fDataSet:= ConFirebird.RetornaDataSet(cSql);
   try
     fDataSet.First;
     while not fDataSet.Eof do

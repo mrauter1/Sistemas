@@ -9,7 +9,7 @@ uses
   cxCustomData, cxFilter, cxData, cxDataStorage, cxEdit, cxNavigator, Data.DB,
   cxDBData, cxGridLevel, cxGridCustomTableView, cxGridTableView,
   cxGridDBTableView, cxClasses, cxGridCustomView, cxGrid, Datasnap.DBClient,
-  uDmSqlUtils, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.Menus;
+  uConFirebird, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.Menus;
 
 type
   TFormAdicionarSimilaridade = class(TForm)
@@ -67,7 +67,7 @@ implementation
 {$R *.dfm}
 
 uses
-  uFormInsumos;
+  uFormInsumos, uDmConnection;
 
 { TFormAdicionarSimilaridade }
 
@@ -94,7 +94,7 @@ var
   FQry: TDataSet;
 begin
   FSql:= GetSqlEquivalentes(pCodPro1)+' WHERE X.COD = '''+pCodPro2+''' ';
-  FQry:= DmSqlUtils.RetornaDataSet(FSql);
+  FQry:= ConFirebird.RetornaDataSet(FSql);
   try
     Result:= FQry.FieldByName('COD').IsNull = False;
   finally
@@ -120,7 +120,7 @@ procedure TFormAdicionarSimilaridade.AdicionaSimilares(pCodPro1, pCodPro2: Strin
 const
   cSql = ' INSERT INTO PRODUTOSIMILAR (CODPRODUTO, CODPROSIMILAR) VALUES (''%s'', ''%s'') ';
 begin
-  DmSqlUtils.ExecutaComando(Format(cSql, [pCodPro1, pCodPro2]));
+  ConFirebird.ExecutaComando(Format(cSql, [pCodPro1, pCodPro2]));
 end;
 
 procedure TFormAdicionarSimilaridade.RemoveSimilares(pCodPro1, pCodPro2: String);
@@ -132,7 +132,7 @@ procedure TFormAdicionarSimilaridade.RemoveSimilares(pCodPro1, pCodPro2: String)
   end;
 
 begin
-  DmSqlUtils.ExecutaComando(Format(RetornaSql, [pCodPro1, pCodPro2]));
+  ConFirebird.ExecutaComando(Format(RetornaSql, [pCodPro1, pCodPro2]));
 end;
 
 procedure TFormAdicionarSimilaridade.VerInsumos1Click(Sender: TObject);
@@ -190,7 +190,7 @@ var
   FQry: TDataSet;
 begin
   FCodProduto:= pCodProduto;
-  FQry:= DmSqlUtils.RetornaDataSet(Format(cSql, [pCodProduto]));
+  FQry:= ConFirebird.RetornaDataSet(Format(cSql, [pCodProduto]));
   try
     CopiaDadosDataSet(FQry, CdsSimilares);
 

@@ -22,7 +22,6 @@ object FormPedidos: TFormPedidos
     Height = 377
     Align = alClient
     TabOrder = 0
-    ExplicitTop = -3
     object cxGridDBTableView: TcxGridDBTableView
       PopupMenu = PopupMenu1
       Navigator.Buttons.CustomButtons = <>
@@ -116,6 +115,10 @@ object FormPedidos: TFormPedidos
         DataBinding.FieldName = 'FALTAAMANHA'
         Width = 76
       end
+      object cxGridDBTableViewDataEntrega: TcxGridDBColumn
+        DataBinding.FieldName = 'DataEntrega'
+        Width = 75
+      end
     end
     object cxGridLevel: TcxGridLevel
       GridView = cxGridDBTableView
@@ -129,7 +132,6 @@ object FormPedidos: TFormPedidos
     Align = alBottom
     Caption = 'Panel1'
     TabOrder = 1
-    ExplicitWidth = 882
     DesignSize = (
       1037
       31)
@@ -142,7 +144,6 @@ object FormPedidos: TFormPedidos
       Caption = 'Atualiza'
       TabOrder = 0
       OnClick = BtnAtualizaClick
-      ExplicitLeft = 412
     end
     object BtnOpcoes: TBitBtn
       Left = 5

@@ -22,8 +22,6 @@ object FormProInfo: TFormProInfo
     Height = 272
     Align = alClient
     TabOrder = 0
-    ExplicitLeft = -8
-    ExplicitWidth = 578
     object cxGridDBTableView: TcxGridDBTableView
       Navigator.Buttons.CustomButtons = <>
       DataController.DataSource = DataSource1
@@ -82,13 +80,14 @@ object FormProInfo: TFormProInfo
     Top = 80
   end
   object QryProInfo: TFDQuery
-    Connection = DmCon.FDConSqlServer
+    Connection = ConSqlServer.FDConnection
     SQL.Strings = (
       'select * '
       'from PROINFO')
     Left = 408
     Top = 80
     object QryProInfoCODPRODUTO: TStringField
+      DisplayLabel = 'Cod. Produto'
       FieldName = 'CODPRODUTO'
       Origin = 'CODPRODUTO'
       ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]

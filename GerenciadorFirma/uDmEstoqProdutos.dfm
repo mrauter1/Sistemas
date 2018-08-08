@@ -4,22 +4,23 @@ object DmEstoqProdutos: TDmEstoqProdutos
   Height = 270
   Width = 397
   object QryEstoq: TFDQuery
-    Connection = DmCon.FDConSqlServer
+    Connection = ConSqlServer.FDConnection
     SQL.Strings = (
       'Select '
       
-        '   ROW_NUMBER() OVER (ORDER BY FALTAHOJE, FALTACONFIRMADA, FALTA' +
-        'TOTAL, ProbFaltaHoje DESC, DiasEstoque) AS Rank,'
+        '   ROW_NUMBER() OVER (ORDER BY FALTAHOJE desc, FALTACONFIRMADA d' +
+        'esc, FALTATOTAL desc, ProbFaltaHoje DESC, DiasEstoque) AS Rank,'
       '   *, '
       '   A.NomeAplicacao'
       'FROM PrevisaoProdutoEmFalta E'
       'left join APLICA A ON A.CodAplicacao = E.CodAplicacao'
       
-        'where (NaoFazEstoque <> 1 and E.EspacoEstoque > 0) or (E.FaltaTo' +
-        'tal > 0)'
+        'where (NaoFazEstoque <> 1 and E.EspacoEstoque > 0 and EstoqMaxCa' +
+        'lculado > 0) '
+      '     or (E.FaltaTotal > 0)'
       
-        'ORDER BY FALTAHOJE, FALTACONFIRMADA, FALTATOTAL, ProbFaltaHoje D' +
-        'ESC, DiasEstoque')
+        'ORDER BY FALTAHOJE desc, FALTACONFIRMADA desc, FALTATOTAL desc, ' +
+        'ProbFaltaHoje DESC, DiasEstoque')
     Left = 104
     Top = 96
     object QryEstoqRank: TLargeintField
@@ -189,7 +190,7 @@ object DmEstoqProdutos: TDmEstoqProdutos
     end
   end
   object QryPedPro: TFDQuery
-    Connection = DmCon.FDConSqlServer
+    Connection = ConSqlServer.FDConnection
     SQL.Strings = (
       'Select *'
       'FROM PEDIDOS'

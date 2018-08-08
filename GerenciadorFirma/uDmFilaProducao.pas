@@ -3,7 +3,7 @@ unit uDmFilaProducao;
 interface
 
 uses
-  System.SysUtils, System.Classes, Vcl.ExtCtrls, Data.DB, Datasnap.DBClient, uDmSqlUtils, uDmEstoqProdutos, uFrmShowMemo,
+  System.SysUtils, System.Classes, Vcl.ExtCtrls, Data.DB, Datasnap.DBClient, uDmEstoqProdutos, uFrmShowMemo,
   uPedidos;
 type
   TDMFilaProducao = class(TDataModule)
@@ -28,11 +28,11 @@ implementation
 {$R *.dfm}
 
 uses
-  Utils, uFormFila;
+  Utils, uFormFila, uConFirebird;
 
 function TDMFilaProducao.ProdutoGranel(CodProduto: String): Boolean;
 begin
-  Result:= (DmSqlUtils.RetornaValor('SELECT CODTAMANHO FROM PRODUTO WHERE CODPRODUTO = '''
+  Result:= (ConFirebird.RetornaValor('SELECT CODTAMANHO FROM PRODUTO WHERE CODPRODUTO = '''
             +CodProduto+''' ', 0) = 1);
 end;
  {
@@ -80,7 +80,7 @@ procedure TDMFilaProducao.AtualizaFilaProducao;
     begin
       CdsPedidos.Filter:= ParFilter;
       CdsPedidos.Filtered:= True;
-      DmSqlUtils.OrdenaClientDataSet(CdsPedidos, 'NUMPEDIDOS', [ixDescending]);
+      ConFirebird.OrdenaClientDataSet(CdsPedidos, 'NUMPEDIDOS', [ixDescending]);
       CdsPedidos.First;
     end;
   end;
@@ -188,7 +188,7 @@ begin
     begin
       CdsPedidos.Filtered:= False;
       CdsEstoqProdutos.Filtered:= False;
-      DmSqlUtils.OrdenaClientDataSet(CdsEstoqProdutos, 'RANK', []);
+      ConFirebird.OrdenaClientDataSet(CdsEstoqProdutos, 'RANK', []);
       CdsEstoqProdutos.First;
       while not CdsEstoqProdutos.Eof do
       begin

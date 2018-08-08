@@ -124,7 +124,6 @@ object DMConsistenciaOPs: TDMConsistenciaOPs
     SQL.Strings = (
       'SELECT * FROM PRODUCAO'
       'WHERE DATAOP BETWEEN :DATAINI AND :DATAFIM')
-    SQLConnection = DmSqlUtils.SQLConnection
     Left = 56
     Top = 136
   end
@@ -246,7 +245,6 @@ object DMConsistenciaOPs: TDMConsistenciaOPs
       'INNER JOIN MCLIPRO MP ON M.CHAVENF = MP.CHAVENF'
       'INNER JOIN PRODUTO P ON P.CODPRODUTO = MP.CODPRODUTO'
       'WHERE M.CODORDEMPRODUCAO = :CODOP AND M.CODCOMPROVANTE = '#39'101'#39)
-    SQLConnection = DmSqlUtils.SQLConnection
     Left = 144
     Top = 136
   end
@@ -355,7 +353,6 @@ object DMConsistenciaOPs: TDMConsistenciaOPs
       'INNER JOIN MCLIPRO MP ON M.CHAVENF = MP.CHAVENF'
       'INNER JOIN PRODUTO P ON P.CODPRODUTO = MP.CODPRODUTO'
       'WHERE M.CODORDEMPRODUCAO = :CODOP AND M.CODCOMPROVANTE = '#39'100'#39)
-    SQLConnection = DmSqlUtils.SQLConnection
     Left = 248
     Top = 136
   end

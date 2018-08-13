@@ -32,7 +32,9 @@ uses
   uConFirebird in 'uConFirebird.pas' {ConFirebird: TDataModule},
   uFrmConsulta in 'Fontes\uFrmConsulta.pas' {FrmConsulta},
   uFormExecSql in 'Fontes\uFormExecSql.pas' {FormExecSql},
-  uFormRelatoriosPersonalizados in 'Fontes\uFormRelatoriosPersonalizados.pas' {FormRelatoriosPersonalizados};
+  uFormRelatoriosPersonalizados in 'Fontes\uFormRelatoriosPersonalizados.pas' {FormRelatoriosPersonalizados},
+  uDmGeradorConsultas in 'Fontes\uDmGeradorConsultas.pas' {DmGeradorConsultas: TDataModule},
+  uConsultaPersonalizada in 'Fontes\uConsultaPersonalizada.pas' {FrmConsultaPersonalizada};
 
 {$R *.res}
 
@@ -55,7 +57,5 @@ begin
   Application.CreateForm(TFormShowMemo, FormShowMemo);
   Application.CreateForm(TFormGlobal, FormGlobal);
   Application.CreateForm(TFormDetalheProdutos, FormDetalheProdutos);
-  Application.CreateForm(TFormPedidos2, FormPedidos2);
-  Application.CreateForm(TFormRelatoriosPersonalizados, FormRelatoriosPersonalizados);
   Application.Run;
 end.

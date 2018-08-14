@@ -74,7 +74,6 @@ type
     LabelCount: TLabel;
     LbTime: TLabel;
     BtnExcelcxGridTarefa: TBitBtn;
-    DBEditConCodigo: TDBEdit;
     cxStyleRepository1: TcxStyleRepository;
     cxStyle2: TcxStyle;
     cxStyleFontes: TcxStyleRepository;
@@ -103,10 +102,10 @@ type
     QryVisualizacoes: TFDQuery;
     QryVisualizacoesID: TFDAutoIncField;
     QryVisualizacoesConsulta: TIntegerField;
-    QryVisualizacoesDescricao: TMemoField;
     QryVisualizacoesArquivo: TBlobField;
     QryVisualizacoesDataHora: TSQLTimeStampField;
     QryConsulta: TFDQuery;
+    QryVisualizacoesDescricao: TStringField;
     procedure BtnFecharClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure VOLTAR_PARAMETROSClick(Sender: TObject);
@@ -184,8 +183,9 @@ type
     { Public declarations }
     procedure PopulaComboBoxQry(pComboBox: TComboBox; pQry: TDataSet; ValorPadrao: variant);
     procedure PopulaCheckListBoxQry(pCheckListBox: TCheckListBox; pQry: TDataSet; ValorPadrao: variant);
-    procedure Proc_GetConsultaPersonalizada(Consulta :string);
-    class procedure Proc_AbreConsultaPersonalizadaByName(NomeConsulta: String; pWindowState: TWindowState = wsNormal); static;
+    procedure AbrirConsultaPersonalizada(Consulta :string);
+    class procedure AbreConsultaPersonalizadaByName(NomeConsulta: String; pWindowState: TWindowState = wsNormal); static;
+    class procedure AbreConsultaPersonalizada(pIDConsulta: Integer);
   end;
 
 var
@@ -223,7 +223,15 @@ begin
   end;
 end;
 
-class procedure TFrmConsultaPersonalizada.Proc_AbreConsultaPersonalizadaByName(NomeConsulta: String; pWindowState: TWindowState = wsNormal);
+class procedure TFrmConsultaPersonalizada.AbreConsultaPersonalizada(pIDConsulta: Integer);
+var
+  FFrmConsulta: TFrmConsultaPersonalizada;
+begin
+  FFrmConsulta:=TFrmConsultaPersonalizada.Create(Application);
+  FFrmConsulta.AbrirConsultaPersonalizada(IntToStr(pIDConsulta));
+end;
+
+class procedure TFrmConsultaPersonalizada.AbreConsultaPersonalizadaByName(NomeConsulta: String; pWindowState: TWindowState = wsNormal);
 var
   FFrmConsulta: TFrmConsultaPersonalizada;
   FCodRelatorio: Integer;
@@ -238,16 +246,15 @@ begin
     Exit;
   end;
 
-  FFrmConsulta:=TFrmConsultaPersonalizada.Create(Application);
-  FFrmConsulta.Proc_GetConsultaPersonalizada(IntToStr(FCodRelatorio));
+  TFrmConsultaPersonalizada.AbreConsultaPersonalizada(FCodRelatorio);
 end;
 
-procedure TFrmConsultaPersonalizada.Proc_GetConsultaPersonalizada(Consulta :string);
+procedure TFrmConsultaPersonalizada.AbrirConsultaPersonalizada(Consulta :string);
 begin
 {  if not FDm.UsuarioLogadoTemPermissao(StrToIntDef(Consulta,0)) then
     Close;      }
 
-  FDm.Proc_Get_Consulta(StrToIntDef(Consulta,0));
+  FDm.AbrirConsulta(StrToIntDef(Consulta,0));
 
   ConfiguraTipoFormulario;
 
@@ -377,7 +384,7 @@ begin
 
    PopulaParametrosDM;
 
-    if FDm.GeraSqlConsulta=0 then
+    if FDm.GeraSqlConsulta<>'' then
       begin
         MemoSqlGerado.Lines.Text:= FDm.SqlGerado;
         TIni:=Now();
@@ -423,7 +430,7 @@ begin
     else
       begin
         PageControlAtiva(0);
-        Application.MessageBox('Atenção: Não Foram Preenchidos Todos os Parâmetros Necessários para Executar o Cruzamento.','e-Audit',MB_ICONERROR);
+        Application.MessageBox('Atenção: Não Foram Preenchidos Todos os Parâmetros Necessários para Executar o Cruzamento.','Atenção',MB_ICONERROR);
       end
 
   except
@@ -469,7 +476,7 @@ var
     X: Integer;
   begin
     for X := 0 to pCheckListBox.items.Count-1 do
-      if Copy(pCheckListBox.Items[X],1002,length(pCheckListBox.Items[X])-1000) = Trim(pValor) then
+      if TValorChave.ObterValorPorIndex(pCheckListBox.items, X) = Trim(pValor) then
       begin
         pCheckListBox.Checked[X]:= True;
         Break;
@@ -734,7 +741,7 @@ begin
 
   except
     on E: Exception do
-      Application.MessageBox(PWideChar('Erro ao Criar os Parâmetros. Mensagem: '+E.Message),'e-Audit',MB_ICONERROR);
+      Application.MessageBox(PWideChar('Erro ao Criar os Parâmetros. Mensagem: '+E.Message),'Erro',MB_ICONERROR);
   end;
   Glo_Para:=0;
 end;
@@ -797,7 +804,7 @@ procedure TFrmConsultaPersonalizada.AtualizaCamposGrid;
     begin
       FNomeCampo:= TcxDBPivotGridFieldDataBinding(DBPivotGrid.Fields[i].DataBinding).FieldName;
 
-      if FDm.QryCampos.Locate('CpcNomeCampo', FNomeCampo, [loCaseInsensitive]) then
+      if FDm.QryCampos.Locate('NomeCampo', FNomeCampo, [loCaseInsensitive]) then
       begin
         case FDm.QryCamposAgrupamento.AsInteger of
           0: DBPivotGrid.Fields[i].SummaryType:= stSum; //Soma
@@ -944,7 +951,7 @@ begin
     QryVisualizacoesDataHora.AsDateTime := now();
   end;
 
-  QryVisualizacoesID.Value   := FDm.QryConsultasID.Value;
+  QryVisualizacoesConsulta.Value   := FDm.QryConsultasID.Value;
   QryVisualizacoesDescricao.Value:= FDescricao;
   QryVisualizacoesArquivo.LoadFromFile(FNomeIni);
   QryVisualizacoes.Post;
@@ -1047,7 +1054,7 @@ begin
   if QryVisualizacoesDescricao.AsString = '' then
     Exit;
 
-  if Application.MessageBox('Deseja excluir esta Configuração?', 'E-Project', MB_YESNO) = ID_NO then
+  if Application.MessageBox('Deseja excluir esta Configuração?', 'Atenção', MB_YESNO) = ID_NO then
     Exit;
 
   QryVisualizacoes.Delete;

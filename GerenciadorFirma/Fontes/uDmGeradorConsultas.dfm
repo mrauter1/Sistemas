@@ -95,10 +95,12 @@ object DmGeradorConsultas: TDmGeradorConsultas
       Origin = 'ID'
       ProviderFlags = [pfInWhere, pfInKey]
       ReadOnly = True
+      Visible = False
     end
     object QryParametrosConsulta: TIntegerField
       FieldName = 'Consulta'
       Origin = 'Consulta'
+      Visible = False
     end
     object QryParametrosNome: TStringField
       FieldName = 'Nome'
@@ -106,6 +108,7 @@ object DmGeradorConsultas: TDmGeradorConsultas
       Size = 255
     end
     object QryParametrosDescricao: TStringField
+      DisplayLabel = 'Descri'#231#227'o'
       FieldName = 'Descricao'
       Origin = 'Descricao'
       Size = 255
@@ -129,12 +132,14 @@ object DmGeradorConsultas: TDmGeradorConsultas
       Origin = 'Tamanho'
     end
     object QryParametrosObrigatorio: TBooleanField
+      DisplayLabel = 'Obrigat'#243'rio'
       FieldName = 'Obrigatorio'
-      Origin = 'Obrigatorio'
+      Origin = 'Obrigat'#243'rio'
     end
     object QryParametrosValorPadrao: TMemoField
+      DisplayLabel = 'Valor Padr'#227'o'
       FieldName = 'ValorPadrao'
-      Origin = 'ValorPadrao'
+      Origin = 'Valor Padr'#227'o'
       BlobType = ftMemo
       Size = 2147483647
     end

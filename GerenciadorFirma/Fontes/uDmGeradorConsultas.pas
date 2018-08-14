@@ -10,6 +10,7 @@ uses
 
 type
   TTipoParametro = (ptNada, ptComboBox, ptTexto, ptDateTime, ptCheckListBox);
+  TTipoConsulta = (tcNormal, tcEvolutivo, tcParametros);
 
   TParametroCon = class(TObject)
   public
@@ -67,7 +68,6 @@ type
     function FazEvolutivo(const FSql: String): String;
     function VarArrayToSql(pVar: variant): String;
     function GetCodConsulta(NomeConsulta: String): integer;
-    procedure CriarParametrosBanco(Refresh: Boolean);
   public
     SQLCampoTabList  : TStringList;
     CampoTelaList : TStringList;
@@ -77,12 +77,13 @@ type
 
     Params: TObjectList;
     SqlGerado: String;
-    procedure Proc_Get_Consulta(CodConsulta: Integer);
-    procedure Proc_Get_Consulta_Por_Nome(NomeConsulta: String);
+    procedure AbrirConsulta(CodConsulta: Integer);
+    procedure AbrirConsultaPorNome(NomeConsulta: String);
+    procedure CriarParametrosBanco(Refresh: Boolean = False);
 
 //    function UsuarioLogadoTemPermissao(pCodConsulta: Integer): Boolean;
 
-    function GeraSqlConsulta: Integer;
+    function GeraSqlConsulta: String;
     function ParamCount: Integer;
 //    procedure ProcSubstVarSistema(var pSql: String);
     function SetParam(const pNomeParam: String; pValor: Variant): Boolean;
@@ -90,6 +91,8 @@ type
     function GetParam(Index: Integer): TParametroCon; overload;
     function GetParam(const pNomeParam: String): TParametroCon; overload;
     procedure SetEstilosCamposQry(Qry: TDataSet);
+
+    procedure AdicionaNovoCampo(Field: TField; pRefresh: Boolean = False);
 
     procedure SalvarValoresParametros(RefreshParams: Boolean = false);
     procedure RefreshQryCampos;
@@ -238,7 +241,7 @@ begin
   TMensagem.Aviso('Usuário sem Permissão.', 'Atenção');
 end;}
 
-procedure TDmGeradorConsultas.Proc_Get_Consulta(CodConsulta: Integer);
+procedure TDmGeradorConsultas.AbrirConsulta(CodConsulta: Integer);
 begin
   QryConsultas.Active:= False;
   QryConsultas.Params.ParamByName('codConsulta').Value:= CodConsulta;
@@ -259,9 +262,31 @@ begin
   Result:= VarToIntDef(ConSqlServer.RetornaValor(Format(cSql, [NomeConsulta])),0);
 end;
 
-procedure TDmGeradorConsultas.Proc_Get_Consulta_Por_Nome(NomeConsulta: String);
+procedure TDmGeradorConsultas.AbrirConsultaPorNome(NomeConsulta: String);
 begin
-  Proc_Get_Consulta(GetCodConsulta(NomeConsulta));
+  AbrirConsulta(GetCodConsulta(NomeConsulta));
+end;
+
+procedure TDmGeradorConsultas.AdicionaNovoCampo(Field: TField;
+  pRefresh: Boolean = False);
+begin
+  if QryCampos.Locate('NomeCampo', Field.FieldName, [loCaseInsensitive]) then
+  begin
+    if not pRefresh then
+      Exit;
+
+    QryCampos.Edit;
+  end
+ else
+   QryCampos.Append;
+
+  QryCamposConsulta.AsInteger:= QryConsultasID.AsInteger;
+  QryCamposNomeCampo.AsString:= Field.FieldName;
+  QryCamposDescricao.AsString:= Field.DisplayLabel;
+  QryCamposTamanhoCampo.AsInteger:= Field.DisplayWidth;
+  QryCamposVisivel.AsBoolean:= Field.Visible;
+  QryCamposMonetario.AsBoolean:= IsCurrencyField(Field);
+  QryCampos.Post;
 end;
 
 (*procedure TDmGeradorConsultas.ProcSubstVarSistema(var pSql: String);
@@ -309,7 +334,7 @@ begin
     if FCodPai = 0 then
       FCodPai:= 108; {108 paramêtros padrão}
 
-    Proc_Get_Consulta_Por_Nome(pNomeInterno);
+    AbrirConsultaPorNome(pNomeInterno);
     if QryConsultas.IsEmpty then
     begin
       QryConsultas.Insert;
@@ -318,7 +343,7 @@ begin
       QryConsultasDescricao.AsString:= pDescricao;
       QryConsultasInfoExtendida.AsString:= pTexto;
       QryConsultasIDPai.AsInteger:= FCodPai;
-      QryConsultasTipo.AsInteger:= 2; // Parametrização
+      QryConsultasTipo.AsInteger:= Ord(tcParametros); // Parametrização
 
       QryConsultas.Post;
     end;
@@ -334,7 +359,7 @@ begin
   end;
 end;
 
-procedure TDmGeradorConsultas.CriarParametrosBanco(Refresh: Boolean);
+procedure TDmGeradorConsultas.CriarParametrosBanco(Refresh: Boolean = False);
 // Refresh: Se falso apenas inclui os parâmetros que não existirem no sistema,
 //                   se verdadeiro atualiza os dados de todos os parametros
 var
@@ -467,18 +492,16 @@ begin
   end;
 end;
 
-function TDmGeradorConsultas.GeraSqlConsulta():Integer;
-var
-  Ret : Integer;
+function TDmGeradorConsultas.GeraSqlConsulta():String;
 begin
-  Ret:=0;
+  Result:='';
 
-  if QryConsultasTipo.AsInteger = 0 then
+  if QryConsultasTipo.AsInteger = Ord(tcNormal) then
     SqlGerado:= SubstituiParametros(SqlOriginal)
-  else if QryConsultasTipo.AsInteger = 1 then
+  else if QryConsultasTipo.AsInteger = Ord(tcEvolutivo) then
     SqlGerado:= FazEvolutivo(SqlOriginal);
 
-  Result:=Ret;
+  Result:=SqlGerado;
 end;
 
 function TDmGeradorConsultas.FazEvolutivo(const FSql: String): String;
@@ -620,9 +643,9 @@ begin
       FField.DisplayWidth:= QryCamposTamanhoCampo.AsInteger;
       FField.Visible:= QryCamposVisivel.AsBoolean;
 
-      if QryCamposMonetario.AsInteger = 0 then
+      if QryCamposMonetario.AsBoolean then
         SetFieldDisplayFormat(FField, 'R$ #,##0.00');
-        
+
     end;
   end;
 end;

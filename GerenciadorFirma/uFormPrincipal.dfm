@@ -23,6 +23,28 @@ object FormPrincipal: TFormPrincipal
     Height = 397
     Align = alClient
     TabOrder = 0
+    object TreeViewMenu: TdxDBTreeView
+      Left = 1
+      Top = 1
+      Width = 152
+      Height = 395
+      ShowNodeHint = True
+      DataSource = DsMenu
+      KeyField = 'ID'
+      ListField = 'Descricao'
+      ParentField = 'IDPai'
+      RootValue = Null
+      SeparatedSt = ' - '
+      RaiseOnError = True
+      Indent = 19
+      Align = alLeft
+      ParentColor = False
+      Options = [trDBCanDelete, trDBConfirmDelete, trCanDBNavigate, trSmartRecordCopy, trCheckHasChildren]
+      SelectedIndex = -1
+      TabOrder = 0
+      OnDblClick = TreeViewMenuDblClick
+      PopupMenu = PopupMenuTreeView
+    end
   end
   object MainMenu: TMainMenu
     Left = 50
@@ -96,6 +118,65 @@ object FormPrincipal: TFormPrincipal
       Origin = 'name'
       Required = True
       Size = 128
+    end
+  end
+  object QryMenu: TFDQuery
+    Connection = ConSqlServer.FDConnection
+    SQL.Strings = (
+      'select * from cons.Menu')
+    Left = 144
+    Top = 128
+    object QryMenuID: TFDAutoIncField
+      FieldName = 'ID'
+      Origin = 'ID'
+      ProviderFlags = [pfInWhere, pfInKey]
+      ReadOnly = True
+    end
+    object QryMenuDescricao: TStringField
+      FieldName = 'Descricao'
+      Origin = 'Descricao'
+      Size = 255
+    end
+    object QryMenuIDPai: TIntegerField
+      FieldName = 'IDPai'
+      Origin = 'IDPai'
+    end
+    object QryMenuTipo: TIntegerField
+      FieldName = 'Tipo'
+      Origin = 'Tipo'
+    end
+    object QryMenuIDAcao: TIntegerField
+      FieldName = 'IDAcao'
+      Origin = 'IDAcao'
+    end
+  end
+  object DsMenu: TDataSource
+    DataSet = QryMenu
+    Left = 80
+    Top = 128
+  end
+  object PopupMenuTreeView: TPopupMenu
+    Left = 72
+    Top = 224
+    object AbrirConsulta1: TMenuItem
+      Caption = 'Abrir Consulta'
+      Default = True
+      OnClick = AbrirConsulta1Click
+    end
+    object N1: TMenuItem
+      Caption = '-'
+    end
+    object NovoGrupo1: TMenuItem
+      Caption = 'Novo Grupo'
+      OnClick = NovoGrupo1Click
+    end
+    object NovaConsulta1: TMenuItem
+      Caption = 'Nova Consulta'
+      OnClick = NovaConsulta1Click
+    end
+    object EditarConsulta1: TMenuItem
+      Caption = 'Editar Consulta'
+      OnClick = EditarConsulta1Click
     end
   end
 end

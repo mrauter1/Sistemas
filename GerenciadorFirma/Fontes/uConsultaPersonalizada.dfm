@@ -13,7 +13,6 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
   Font.Height = -11
   Font.Name = 'MS Sans Serif'
   Font.Style = []
-  FormStyle = fsMDIChild
   OldCreateOrder = False
   Position = poMainFormCenter
   Visible = True
@@ -31,7 +30,7 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
     Top = 0
     Width = 824
     Height = 566
-    ActivePage = TabSheetResultado
+    ActivePage = TabSheet2
     Align = alClient
     Style = tsFlatButtons
     TabOrder = 0
@@ -44,7 +43,8 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
         Width = 816
         Height = 21
         Align = alTop
-        DataField = 'ConDesc'
+        DataField = 'Descricao'
+        DataSource = DmGeradorConsultas.DsConsultas
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlue
         Font.Height = -11
@@ -253,7 +253,8 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
         Align = alTop
         BorderStyle = bsNone
         Color = clBtnFace
-        DataField = 'ConFAC'
+        DataField = 'InfoExtendida'
+        DataSource = DmGeradorConsultas.DsConsultas
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -13
@@ -686,8 +687,8 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
           Font.Height = -11
           Font.Name = 'Arial'
           Font.Style = []
-          KeyField = 'ConCodigo'
-          ListField = 'ConDescricao'
+          KeyField = 'ID'
+          ListField = 'Descricao'
           ListSource = DsVisualizacoes
           ParentFont = False
           TabOrder = 0
@@ -891,16 +892,6 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
           end
         end
       end
-      object DBEditConCodigo: TDBEdit
-        Left = 256
-        Top = 30
-        Width = 97
-        Height = 21
-        DataField = 'ConCodigo'
-        DataSource = DsVisualizacoes
-        TabOrder = 3
-        Visible = False
-      end
     end
   end
   object BtnFechar: TBitBtn
@@ -1019,11 +1010,10 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
       FieldName = 'Consulta'
       Origin = 'Consulta'
     end
-    object QryVisualizacoesDescricao: TMemoField
+    object QryVisualizacoesDescricao: TStringField
       FieldName = 'Descricao'
       Origin = 'Descricao'
-      BlobType = ftMemo
-      Size = 2147483647
+      Size = 1024
     end
     object QryVisualizacoesArquivo: TBlobField
       FieldName = 'Arquivo'

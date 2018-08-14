@@ -80,12 +80,11 @@ end;
 
 procedure TFrmConsulta.ExecutarSql(pSql: String);
 begin
-  Qry.Close;
-
   cxGridDBTableView.BeginUpdate();
   try
     cxGridDBTableView.ClearItems;
 
+    Qry.Close;
     Qry.Open(pSql);
 
     cxGridDBTableView.DataController.CreateAllItems;

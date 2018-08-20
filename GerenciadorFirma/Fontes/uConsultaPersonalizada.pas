@@ -107,7 +107,6 @@ type
     QryConsulta: TFDQuery;
     QryVisualizacoesDescricao: TStringField;
     procedure BtnFecharClick(Sender: TObject);
-    procedure FormShow(Sender: TObject);
     procedure VOLTAR_PARAMETROSClick(Sender: TObject);
     procedure IR_EXECUTANDOCONSULTAClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -152,6 +151,7 @@ type
     procedure BtItalicoClick(Sender: TObject);
     procedure BtnCancelarClick(Sender: TObject);
     procedure BtnGravarClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
 
   private
     { Private declarations }
@@ -159,6 +159,7 @@ type
     PosicaoPanelDinamico: TPosicaoPanelDinamico;
     FDm: TDmGeradorConsultas;
     FPrimeiraExecucao: Boolean;
+    FPrimeiroShow: Boolean;
     FUltimaConfig: Integer;
     procedure PageControlAtiva(Pagina:Integer);
     function PopulaParametrosDM: Boolean;
@@ -184,8 +185,8 @@ type
     procedure PopulaComboBoxQry(pComboBox: TComboBox; pQry: TDataSet; ValorPadrao: variant);
     procedure PopulaCheckListBoxQry(pCheckListBox: TCheckListBox; pQry: TDataSet; ValorPadrao: variant);
     procedure AbrirConsultaPersonalizada(Consulta :string);
-    class procedure AbreConsultaPersonalizadaByName(NomeConsulta: String; pWindowState: TWindowState = wsNormal); static;
-    class procedure AbreConsultaPersonalizada(pIDConsulta: Integer);
+    class function AbreConsultaPersonalizadaByName(NomeConsulta: String; pWindowState: TWindowState = wsNormal): TFrmConsultaPersonalizada; static;
+    class function AbreConsultaPersonalizada(pIDConsulta: Integer): TFrmConsultaPersonalizada;
   end;
 
 var
@@ -223,21 +224,23 @@ begin
   end;
 end;
 
-class procedure TFrmConsultaPersonalizada.AbreConsultaPersonalizada(pIDConsulta: Integer);
+class function TFrmConsultaPersonalizada.AbreConsultaPersonalizada(pIDConsulta: Integer): TFrmConsultaPersonalizada;
 var
   FFrmConsulta: TFrmConsultaPersonalizada;
 begin
-  FFrmConsulta:=TFrmConsultaPersonalizada.Create(Application);
+  FFrmConsulta:= TFrmConsultaPersonalizada.Create(Application);
   FFrmConsulta.AbrirConsultaPersonalizada(IntToStr(pIDConsulta));
+  Result:= FFrmConsulta;
 end;
 
-class procedure TFrmConsultaPersonalizada.AbreConsultaPersonalizadaByName(NomeConsulta: String; pWindowState: TWindowState = wsNormal);
+class function TFrmConsultaPersonalizada.AbreConsultaPersonalizadaByName(NomeConsulta: String; pWindowState: TWindowState = wsNormal): TFrmConsultaPersonalizada;
 var
-  FFrmConsulta: TFrmConsultaPersonalizada;
   FCodRelatorio: Integer;
 const
   cSql = 'SELECT ID FROM cons.Consultas WHERE Nome = %s';
 begin
+  Result:= nil;
+
   FCodRelatorio:= ConSqlServer.RetornaValor(Format(cSql, [QuotedStr(NomeConsulta)]));
 
   if FCodRelatorio = 0 then
@@ -246,7 +249,7 @@ begin
     Exit;
   end;
 
-  TFrmConsultaPersonalizada.AbreConsultaPersonalizada(FCodRelatorio);
+  Result:= TFrmConsultaPersonalizada.AbreConsultaPersonalizada(FCodRelatorio);
 end;
 
 procedure TFrmConsultaPersonalizada.AbrirConsultaPersonalizada(Consulta :string);
@@ -352,20 +355,6 @@ begin
   end;
 end;
 
-procedure TFrmConsultaPersonalizada.FormShow(Sender: TObject);
-begin
-  PageControlAtiva(0);
-
-  Glo_Para:=0;
-
-  vArSQLCampoTab  := TStringList.Create;
-  vArSQLCampoTela := TStringList.Create;
-  vArSQLObrigator := TStringList.Create;
-  vArExcel        := TStringList.Create;
-  vArResultado    := TStringList.Create;
-
-end;
-
 procedure TFrmConsultaPersonalizada.VOLTAR_PARAMETROSClick(Sender: TObject);
 begin
   PageControlAtiva(0);
@@ -444,8 +433,6 @@ begin
 end;
 
 procedure TFrmConsultaPersonalizada.PopulaComboBoxQry(pComboBox: TComboBox; pQry: TDataSet; ValorPadrao: variant);
-var
-  vParamPadrao: Variant;
 begin
   pComboBox.Clear;
 
@@ -458,8 +445,8 @@ begin
                                       pQry.Fields[0].Value,
                                       pQry.Fields[1].Value);
 
-    if not VarIsNull(vParamPadrao) then
-      if pQry.Fields[0].Value = vParamPadrao then
+    if not VarIsNull(ValorPadrao) then
+      if pQry.Fields[0].Value = ValorPadrao then
         pComboBox.ItemIndex:= pComboBox.Items.Count-1;
 
     pQry.next;
@@ -648,7 +635,7 @@ var
         if not (pComp is TComboBox) then
           Exit;
 
-        PopulaComboBoxQry(TComboBox(pComp), FQry, FDm.GetParamValue(FDm.QryParametrosNome.Value));
+        PopulaComboBoxQry(TComboBox(pComp), FQry, FDm.QryParametrosValorPadrao.Value);
       end
      else
       if FDm.QryParametrosTipo.Value=4 then
@@ -661,22 +648,6 @@ var
     finally
       FQry.Free;
     end;
-  end;
-
-  procedure FocaPrimeiroParametro;
-  var
-    X: Integer;
-  begin
-    if FDm.QryParametros.RecordCount>0 then
-      for X := 0 to ScrollBox.ControlCount-1 do
-       if (ScrollBox.Controls[x] is TComboBox) or
-          (ScrollBox.Controls[x] is TCheckListBox) or
-          (ScrollBox.Controls[x] is TMaskEdit) then
-          if TWinControl(ScrollBox.Controls[x]).CanFocus then
-          begin
-            TWinControl(ScrollBox.Controls[x]).SetFocus;
-            break;
-          end;
   end;
 
 begin
@@ -728,7 +699,7 @@ begin
       if (QryParametrosTipo.Value=3) then
         CriaDateTimePicker;
 
-      if Trim(QryParametrosSql.AsString).IsEmpty then
+      if not Trim(QryParametrosSql.AsString).IsEmpty then
         ParConfigComboSql;
 
       QryParametros.Next;
@@ -736,8 +707,8 @@ begin
 
     ScrollBox.VertScrollBar.Position := 0;
 
-    //Posiciona no Primeira Pârameto
-    FocaPrimeiroParametro;
+    // Posiciona no Primeira Pârameto
+    // FocaPrimeiroParametro;
 
   except
     on E: Exception do
@@ -1149,18 +1120,55 @@ end;
 procedure TFrmConsultaPersonalizada.FormCreate(Sender: TObject);
 begin
   UpdatingPage:= False;
+  FPrimeiroShow:= True;
 
   FUltimaConfig:= 0;
 
   FDm:= TDmGeradorConsultas.Create(Self);
 
   FPrimeiraExecucao:= True;
+
+  PageControlAtiva(0);
+
+  Glo_Para:=0;
+
+  vArSQLCampoTab  := TStringList.Create;
+  vArSQLCampoTela := TStringList.Create;
+  vArSQLObrigator := TStringList.Create;
+  vArExcel        := TStringList.Create;
+  vArResultado    := TStringList.Create;
 //  Self.BorderStyle:= bsSizeable;
 end;
 
 procedure TFrmConsultaPersonalizada.FormDestroy(Sender: TObject);
 begin
   FDm.Free;
+end;
+
+procedure TFrmConsultaPersonalizada.FormShow(Sender: TObject);
+
+  procedure FocaPrimeiroParametro;
+  var
+    X: Integer;
+  begin
+    if FDm.QryParametros.RecordCount>0 then
+      for X := 0 to ScrollBox.ControlCount-1 do
+       if (ScrollBox.Controls[x] is TComboBox) or
+          (ScrollBox.Controls[x] is TCheckListBox) or
+          (ScrollBox.Controls[x] is TMaskEdit) then
+          if TWinControl(ScrollBox.Controls[x]).CanFocus then
+          begin
+            TWinControl(ScrollBox.Controls[x]).SetFocus;
+            break;
+          end;
+  end;
+
+begin
+  if FPrimeiroShow then
+  begin
+    FocaPrimeiroParametro;
+    FPrimeiroShow:= False;
+  end;
 end;
 
 procedure TFrmConsultaPersonalizada.BitBtn1Click(Sender: TObject);

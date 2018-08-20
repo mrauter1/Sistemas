@@ -76,6 +76,7 @@ object DmGeradorConsultas: TDmGeradorConsultas
     end
   end
   object QryParametros: TFDQuery
+    AfterInsert = QryParametrosAfterInsert
     Connection = ConSqlServer.FDConnection
     SQL.Strings = (
       'SELECT * FROM'
@@ -134,12 +135,12 @@ object DmGeradorConsultas: TDmGeradorConsultas
     object QryParametrosObrigatorio: TBooleanField
       DisplayLabel = 'Obrigat'#243'rio'
       FieldName = 'Obrigatorio'
-      Origin = 'Obrigat'#243'rio'
+      Origin = 'Obrigatorio'
     end
     object QryParametrosValorPadrao: TMemoField
       DisplayLabel = 'Valor Padr'#227'o'
       FieldName = 'ValorPadrao'
-      Origin = 'Valor Padr'#227'o'
+      Origin = 'ValorPadrao'
       BlobType = ftMemo
       Size = 2147483647
     end

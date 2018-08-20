@@ -183,6 +183,7 @@ object FormRelatoriosPersonalizados: TFormRelatoriosPersonalizados
               DataController.Summary.DefaultGroupSummaryItems = <>
               DataController.Summary.FooterSummaryItems = <>
               DataController.Summary.SummaryGroups = <>
+              OptionsData.Appending = True
               OptionsView.GroupByBox = False
               OptionsView.HeaderAutoHeight = True
               object cxGridParamsDBTableView1Nome: TcxGridDBColumn

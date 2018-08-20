@@ -246,7 +246,6 @@ begin
   try
     cxGridConsultaView.ClearItems;
 
-
     QryExec.Open(FDm.GeraSqlConsulta);
     FDm.SetEstilosCamposQry(QryExec);
 

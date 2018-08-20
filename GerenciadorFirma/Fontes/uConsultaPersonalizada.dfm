@@ -14,8 +14,6 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
   Font.Name = 'MS Sans Serif'
   Font.Style = []
   OldCreateOrder = False
-  Position = poMainFormCenter
-  Visible = True
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy

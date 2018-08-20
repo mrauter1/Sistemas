@@ -60,6 +60,7 @@ type
     QryConsultasVisualizacaoPadrao: TIntegerField;
     QryConsultasIDPai: TIntegerField;
     procedure DataModuleCreate(Sender: TObject);
+    procedure QryParametrosAfterInsert(DataSet: TDataSet);
   private
     procedure CriaListaParams;
     procedure DeletaParams;
@@ -101,6 +102,8 @@ type
 
     class procedure VerificaECriaParametros(pNomeInterno, pDescricao,
           pTexto: String; pParams: array of TParametroCon; pPai: String = 'PARAMETROS'; RefreshParams: Boolean = false);
+
+    class function DeletaConsulta(pIDConsulta: Integer): Boolean;
 
     property SqlOriginal: String read GetSqlOriginal;
   end;
@@ -153,6 +156,13 @@ begin
   end
   else
    Result:= False;
+end;
+
+class function TDmGeradorConsultas.DeletaConsulta(pIDConsulta: Integer): Boolean;
+begin
+  Result:= True;
+
+  ConSqlServer.ExecutaComando(Format('DELETE FROM Cons.Consultas Where ID = %d', [pIDConsulta]));
 end;
 
 procedure TDmGeradorConsultas.DeletaParams;
@@ -480,7 +490,7 @@ begin
       else if QryParametrosTipo.AsInteger = 3 then
         Result:= StringReplace(Result,'{'+QryParametrosNome.AsString+'}', Func_DateTime_SqlServer(VarToFloatDef(GetParamValue(QryParametrosNome.AsString))), [rfIgnoreCase, rfReplaceAll])
       else
-        Result:= StringReplace(Result,'{'+QryParametrosNome.AsString+'}', VarToStrDef(GetParamValue(QryParametrosNome.AsString), ''), [rfIgnoreCase, rfReplaceAll]);
+        Result:= StringReplace(Result,'{'+QryParametrosNome.AsString+'}', VarToStrDef(GetParamValue(QryParametrosNome.AsString), QryParametrosValorPadrao.AsString), [rfIgnoreCase, rfReplaceAll]);
 
       QryParametros.Next;
     end;
@@ -613,6 +623,11 @@ end;
 function TDmGeradorConsultas.ParamCount: Integer;
 begin
   Result:= Params.Count;
+end;
+
+procedure TDmGeradorConsultas.QryParametrosAfterInsert(DataSet: TDataSet);
+begin
+  QryParametrosConsulta.AsInteger:= QryConsultasID.AsInteger;
 end;
 
 procedure TDmGeradorConsultas.RefreshQryPara;

@@ -3,7 +3,7 @@ object FormDensidades: TFormDensidades
   Top = 0
   Caption = 'Densidades'
   ClientHeight = 412
-  ClientWidth = 790
+  ClientWidth = 682
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,28 +18,11 @@ object FormDensidades: TFormDensidades
   object Memo1: TMemo
     Left = 496
     Top = 0
-    Width = 294
+    Width = 186
     Height = 412
-    Align = alRight
+    Align = alClient
     TabOrder = 0
-  end
-  object Button1: TButton
-    Left = 385
-    Top = 8
-    Width = 105
-    Height = 25
-    Caption = 'DataSet to JSon'
-    TabOrder = 1
-    OnClick = Button1Click
-  end
-  object Button2: TButton
-    Left = 384
-    Top = 39
-    Width = 106
-    Height = 25
-    Caption = 'Json to dataset'
-    TabOrder = 2
-    OnClick = Button2Click
+    ExplicitWidth = 287
   end
   object Panel1: TPanel
     Left = 0
@@ -47,7 +30,7 @@ object FormDensidades: TFormDensidades
     Width = 379
     Height = 412
     Align = alLeft
-    TabOrder = 3
+    TabOrder = 1
     object DBGrid1: TDBGrid
       Left = 1
       Top = 209
@@ -75,6 +58,36 @@ object FormDensidades: TFormDensidades
       TitleFont.Height = -11
       TitleFont.Name = 'Tahoma'
       TitleFont.Style = []
+    end
+  end
+  object Panel2: TPanel
+    Left = 379
+    Top = 0
+    Width = 117
+    Height = 412
+    Align = alLeft
+    TabOrder = 2
+    ExplicitLeft = 408
+    ExplicitTop = 104
+    ExplicitWidth = 185
+    ExplicitHeight = 41
+    object Button2: TButton
+      Left = 6
+      Top = 39
+      Width = 106
+      Height = 25
+      Caption = 'Json to dataset'
+      TabOrder = 0
+      OnClick = Button2Click
+    end
+    object Button1: TButton
+      Left = 7
+      Top = 8
+      Width = 105
+      Height = 25
+      Caption = 'DataSet to JSon'
+      TabOrder = 1
+      OnClick = Button1Click
     end
   end
   object DataSource1: TDataSource

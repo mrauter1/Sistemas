@@ -28,7 +28,7 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
     Top = 0
     Width = 824
     Height = 566
-    ActivePage = TabSheet2
+    ActivePage = TabSheetResultado
     Align = alClient
     Style = tsFlatButtons
     TabOrder = 0
@@ -291,7 +291,7 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
         Top = 28
         Width = 816
         Height = 478
-        ActivePage = TsTabela
+        ActivePage = TsGrafico
         Align = alClient
         Style = tsFlatButtons
         TabOrder = 0
@@ -368,6 +368,8 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
                 Height = 366
                 Align = alClient
                 TabOrder = 0
+                ExplicitLeft = 2
+                ExplicitTop = 14
                 object cxGridChartView: TcxGridChartView
                   Categories.OnGetValueDisplayText = cxGridChartViewCategoriesGetValueDisplayText
                   DiagramArea.OnCustomDrawLegendItem = cxChangeLegendColorCustomDrawLegendItem

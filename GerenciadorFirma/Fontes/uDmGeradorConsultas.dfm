@@ -146,6 +146,7 @@ object DmGeradorConsultas: TDmGeradorConsultas
     end
   end
   object QryConsultas: TFDQuery
+    Active = True
     Connection = ConSqlServer.FDConnection
     SQL.Strings = (
       'SELECT * FROM'
@@ -203,6 +204,10 @@ object DmGeradorConsultas: TDmGeradorConsultas
     object QryConsultasIDPai: TIntegerField
       FieldName = 'IDPai'
       Origin = 'IDPai'
+    end
+    object QryConsultasFonteDados: TIntegerField
+      FieldName = 'FonteDados'
+      Origin = 'FonteDados'
     end
   end
 end

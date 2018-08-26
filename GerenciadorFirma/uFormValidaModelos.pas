@@ -43,6 +43,7 @@ type
     procedure AbrirDetalheProClick(Sender: TObject);
     procedure VerInsumos1Click(Sender: TObject);
     procedure VerSimilares1Click(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     FFrmInsumos: TFormInsumos;
     procedure VerificaDivergencias;
@@ -119,6 +120,12 @@ function TFormValidaModelos.GetCodProSelecionado: String;
 begin
   Result:= VarToStrDef(cxGridDBTableView.DataController.Values[cxGridDBTableView.DataController.FocusedRecordIndex,
                                                                 cxGridDBTableViewCODPRODUTO.Index], '');
+end;
+
+procedure TFormValidaModelos.FormClose(Sender: TObject;
+  var Action: TCloseAction);
+begin
+  Action:= caFree;
 end;
 
 procedure TFormValidaModelos.FormCreate(Sender: TObject);

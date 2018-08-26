@@ -8,7 +8,7 @@ uses
   Vcl.ExtCtrls, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
   FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
   FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet, FireDAC.Comp.Client,
-  uConSqlServer;
+  uConSqlServer, uAppConfig;
 
 type
   TPedidos = class(TDataModule)
@@ -181,6 +181,9 @@ end;
 
 procedure TPedidos.VerificaNovosPedidos;
 begin
+  if not (puGerenteProducao in AppConfig.GruposUsuario) then
+    Exit;
+
   QryPedidos.DisableControls;
   try
     QryPedidos.First;
@@ -222,82 +225,6 @@ begin
 
   VerificaNovosPedidos;
 end;
-
-(*procedure TPedidos.LoadPedidos(pDataInicial, pDataFinal: TDateTime);
-var
-  fSqlQuery: TDataSet;
-  fUpdateID: Integer;
-begin
-  fUpdateID:= Random(999999);
-
-  if not Dados.Active then
-    Dados.CreateDataSet;
-
-{  while not Dados.IsEmpty do
-    Dados.Delete;       }
-
-  fSqlQuery:= ConFirebird.RetornaDataSet(GetSql(Now-30, Now));
-  try
-    fSqlQuery.First;
-    while not fSqlQuery.Eof do
-    begin
-      if Dados.Locate('CODPEDIDO;CODPRODUTO', VarArrayOf([fSqlQuery.FieldByName('CODPEDIDO').AsString,
-                                              fSqlQuery.FieldByName('CODPRODUTO').AsString]), []) then
-      begin
-        Dados.Edit;
-        DadosEMFALTA.AsBoolean:= ProdutoEmFalta(fSqlQuery.FieldByName('CODPRODUTO').AsString);
-
-      end
-     else
-      begin
-        Dados.Insert;
-
-        if ProdutoEmFalta(fSqlQuery.FieldByName('CODPRODUTO').AsString) then
-        begin
-          dxAlertFalta.Show('Produto em falta!',
-                        'Produto: '+fSqlQuery.FieldByName('NOMEPRODUTO').AsString
-                        + sLineBreak +
-                        'Cod. Produto: '+ fSqlQuery.FieldByName('CODPRODUTO').AsString
-                        + sLineBreak +
-                        'Cod. Pedido: '+ fSqlQuery.FieldByName('CODPEDIDO').AsString
-                        + sLineBreak +
-                        'Cliente: '+ fSqlQuery.FieldByName('NOMECLIENTE').AsString
-                        + sLineBreak +
-                        'Nome Transporte: '+ fSqlQuery.FieldByName('NOMETRANSPORTE').AsString);
-          DadosEMFALTA.AsBoolean:= True;
-
-        end
-       else
-        begin
-          dxAlert.Show('Entrou novo pedido',
-            'Número: '+fSqlQuery.FieldByName('CODPEDIDO').AsString);
-          DadosEMFALTA.AsBoolean:= False;
-        end;
-      end;
-
-      DadosUPDATEID.AsInteger:= fUpdateID;
-
-      CopiarRecord(fSqlQuery, Dados);
-      Dados.Post;
-
-      fSqlQuery.Next;
-    end;
-
-    // Deleta os pedidos que não estão mais na lista;
-    Dados.First;
-    while not Dados.Eof do
-    begin
-      if not DadosUPDATEID.AsInteger = fUpdateID then
-        Dados.Delete
-       else
-        Dados.Next;
-    end;
-
-
-  finally
-    fSqlQuery.Free;
-  end;
-end;     *)
 
 procedure TPedidos.Refresh;
 begin

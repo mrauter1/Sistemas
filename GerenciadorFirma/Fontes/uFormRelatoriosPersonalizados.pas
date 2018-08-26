@@ -14,7 +14,8 @@ uses
   dxSkinscxPCPainter, cxFilter, cxData, cxDataStorage, cxEdit, cxNavigator,
   cxDBData, cxGridLevel, cxClasses, cxGridCustomView, cxGridCustomTableView,
   cxGridTableView, cxGridDBTableView, cxGrid, cxImageComboBox, cxTextEdit,
-  cxColorComboBox, uDmGeradorConsultas;
+  cxColorComboBox, uDmGeradorConsultas, uAppConfig, cxContainer, cxMaskEdit,
+  cxDropDownEdit, cxDBEdit, uConFirebird;
 
 type
   TFormRelatoriosPersonalizados = class(TForm)
@@ -38,9 +39,6 @@ type
     Label1: TLabel;
     Label2: TLabel;
     EditNome: TDBEdit;
-    Panel1: TPanel;
-    Label4: TLabel;
-    DBMemoSql: TDBMemo;
     cxGridParamsDBTableView1: TcxGridDBTableView;
     cxGridParamsLevel1: TcxGridLevel;
     cxGridParams: TcxGrid;
@@ -70,11 +68,17 @@ type
     cxGridConsultaView: TcxGridDBTableView;
     cxGridLevel2: TcxGridLevel;
     BtnCancelar: TButton;
+    Label4: TLabel;
+    DBMemoSql: TDBMemo;
+    Label5: TLabel;
+    cxDBImageComboBox1: TcxDBImageComboBox;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure BtnSalvarClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure BtnCancelarClick(Sender: TObject);
     procedure PageControlChange(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
     FDm: TDmGeradorConsultas;
     function ConsultaExiste: Boolean;
@@ -88,10 +92,11 @@ type
       pTipo: TTipoParametro; pDescricao, pSql: String; pRefresh: Boolean = False);
     procedure VariantToField(pValue: Variant; pField: TField);
     procedure QryCamposAfterPost(DataSet: TDataSet);
+    procedure SetaConexao;
     { Private declarations }
   public
     LiberaAoFechar: Boolean;
-    class procedure AbreConsulta(pCodConsulta: Integer);
+    class function AbreConsulta(pCodConsulta: Integer): TFormRelatoriosPersonalizados;
     class function CadastrarNovaConsulta: Integer;
 
     property DM: TDmGeradorConsultas read FDM;
@@ -106,13 +111,11 @@ implementation
 
 { TFormRelatoriosPersonalizados }
 
-class procedure TFormRelatoriosPersonalizados.AbreConsulta(pCodConsulta: Integer);
-var
-  vFrm: TFormRelatoriosPersonalizados;
+class function TFormRelatoriosPersonalizados.AbreConsulta(pCodConsulta: Integer): TFormRelatoriosPersonalizados;
 begin
-  vFrm:= TFormRelatoriosPersonalizados.Create(Application);
-  vFrm.CarregaConsulta(pCodConsulta);
-  vFrm.Show;
+  Result:= TFormRelatoriosPersonalizados.Create(Application);
+  Result.CarregaConsulta(pCodConsulta);
+  Result.Show;
 end;
 
 class function TFormRelatoriosPersonalizados.CadastrarNovaConsulta: Integer;
@@ -225,7 +228,7 @@ begin
   AdicionaParametro('geDataIni', null, ptDateTime, 'Data Inicial', '');
   AdicionaParametro('geDataFim', null, ptDateTime, 'Data Final', '');
   AdicionaParametro('geTipoPeriodo', 0, ptComboBox, 'Tipo período',
-      'SELECT 0 as Cod, ''Diário'' as Desc union SELECT 1 as Cod, ''Mensal'' as Desc ');
+      'SELECT 0 as Cod, ''Diário'' as Nome union SELECT 1 as Cod, ''Mensal'' as Nome ');
   AdicionaParametro('gePeriodo', 7, ptTexto, 'Período', '');
 end;
 
@@ -239,9 +242,21 @@ begin
     FDm.AdicionaNovoCampo(Field, False);
 end;
 
+procedure TFormRelatoriosPersonalizados.SetaConexao;
+begin
+  if FDm.GetFonteDados = fdSqlServer then
+    QryExec.Connection:= ConSqlServer.FDConnection
+  else
+    QryExec.Connection:= ConFirebird.FDConnection;
+
+end;
+
 procedure TFormRelatoriosPersonalizados.RefreshConsulta;
 begin
   QryExec.Close;
+
+  SetaConexao;
+
   cxGridConsultaView.BeginUpdate();
   try
     cxGridConsultaView.ClearItems;
@@ -271,8 +286,24 @@ procedure TFormRelatoriosPersonalizados.FormCreate(Sender: TObject);
 begin
   LiberaAoFechar:= True;
   FDm:= TDmGeradorConsultas.Create(Self);
+
+  DsConsultas.DataSet:= FDM.QryConsultas;
+  DsPara.DataSet:= FDM.QryParametros;
+  DsCampos.DataSet:= FDM.QryCampos;
+
   FDm.QryCampos.AfterPost:= QryCamposAfterPost;
   PageControl.ActivePage:= TabCadastro;
+end;
+
+procedure TFormRelatoriosPersonalizados.FormDestroy(Sender: TObject);
+begin
+  FDm.Free;
+end;
+
+procedure TFormRelatoriosPersonalizados.FormShow(Sender: TObject);
+begin
+  if not (puDesenvolvedor in AppConfig.GruposUsuario) then
+    PostMessage(Self.Handle,wm_close,0,0);
 end;
 
 end.

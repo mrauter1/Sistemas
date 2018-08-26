@@ -11,6 +11,7 @@ object FormValidaModelos: TFormValidaModelos
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  OnClose = FormClose
   OnCreate = FormCreate
   OnShow = FormShow
   PixelsPerInch = 96
@@ -22,10 +23,6 @@ object FormValidaModelos: TFormValidaModelos
     Height = 363
     Align = alClient
     TabOrder = 0
-    ExplicitLeft = -414
-    ExplicitTop = -54
-    ExplicitWidth = 998
-    ExplicitHeight = 417
     object cxGridDBTableView: TcxGridDBTableView
       PopupMenu = PopupMenu1
       Navigator.Buttons.CustomButtons = <>

@@ -15,8 +15,6 @@ type
     CdsDensidadeNOMESUBGRUPO: TStringField;
     CdsDensidadeDENSIDADE: TFloatField;
     Memo1: TMemo;
-    Button1: TButton;
-    Button2: TButton;
     Panel1: TPanel;
     DBGrid1: TDBGrid;
     DBGrid2: TDBGrid;
@@ -25,6 +23,9 @@ type
     StringField2: TStringField;
     FloatField1: TFloatField;
     DataSource2: TDataSource;
+    Panel2: TPanel;
+    Button2: TButton;
+    Button1: TButton;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure Button1Click(Sender: TObject);

@@ -33,7 +33,7 @@ uses
   cxDropDownEdit, cxShellComboBox, FireDAC.Stan.Intf, FireDAC.Stan.Option,
   FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf,
   FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet,
-  FireDAC.Comp.Client;
+  FireDAC.Comp.Client, uConFirebird;
 
 type
   TPosicaoPanelDinamico = (cMinimizado, cMeio, cMaximizado);
@@ -202,7 +202,7 @@ var
   vArExcel    : TStringList;
   vArResultado: TStringList;
 
-procedure ExportarCxGridParaBmp(cxGrid: TCxGrid; pFileName: String);
+procedure ExportarCxGridParaBmp(cxGridView: TcxGridChartView; pFileName: String);
 
 implementation
 
@@ -210,18 +210,26 @@ uses Utils, System.UITypes;
 
 {$R *.dfm}
 
-procedure ExportarCxGridParaBmp(cxGrid: TCxGrid; pFileName: String);
+procedure ExportarCxGridParaBmp(cxGridView: TcxGridChartView; pFileName: String);
 var
- B: TBitmap;
+ ImageExport : TGraphic;
 begin
-  B := TBitmap.CREATE;
+   ImageExport := TGraphicClass.Create;
+   try
+     ImageExport := cxGridView.CreateImage(TBitmap);
+     ImageExport.SaveToFile(pFileName);
+   finally
+     ImageExport.free;
+   end;
+
+{  B := TBitmap.CREATE;
   try
     cxGrid.PaintTo(B.Canvas, 0, 0);
-    b.SaveToFile('C:\Test.bmp');
+    b.SaveToFile(pFileName);
     //PaintToCanvas(b.Canvas);
     FreeAndNil(b);
   finally
-  end;
+  end;}
 end;
 
 class function TFrmConsultaPersonalizada.AbreConsultaPersonalizada(pIDConsulta: Integer): TFrmConsultaPersonalizada;
@@ -378,6 +386,12 @@ begin
         MemoSqlGerado.Lines.Text:= FDm.SqlGerado;
         TIni:=Now();
         QryConsulta.Active:=False;
+
+        if FDm.GetFonteDados = fdSqlServer then
+          QryConsulta.Connection:= ConSqlServer.FDConnection
+        else
+          QryConsulta.Connection:= ConFirebird.FDConnection;
+
         QryConsulta.SQL.Clear;
         QryConsulta.SQL.Add(FDm.SqlGerado);
 //        QryCruzamento.ExecSQL;
@@ -587,7 +601,7 @@ var
       Parent    := ScrollBox;
       Text      := '';
 
-      Text      := fDm.GetParamValue(FDm.QryParametrosNome.AsString);
+      Text      := VarToStrDef(fDm.GetParamValue(FDm.QryParametrosNome.AsString), '');
 
       Loc_TOP:=Loc_TOP+32;
     end;
@@ -876,7 +890,7 @@ var
   FNomeIni, FDescricao: String;
 begin
 
-  FDescricao:= InputBox('Nova visão', 'Digite o nome da visão:', '');
+  FDescricao:= InputBox('Nova visão', 'Digite o nome da visão:', cbxConfiguracoes.Text);
   if FDescricao = '' then
     Exit;
 
@@ -926,6 +940,8 @@ begin
   QryVisualizacoesDescricao.Value:= FDescricao;
   QryVisualizacoesArquivo.LoadFromFile(FNomeIni);
   QryVisualizacoes.Post;
+
+  cbxConfiguracoes.KeyValue:= QryVisualizacoesID.AsInteger;
 
 end;
 
@@ -1238,7 +1254,7 @@ begin
     SaveDialog.FileName:= FDm.QryConsultasDescricao.AsString+'.bmp';
     if SaveDialog.Execute then
       begin
-        ExportarCxGridParaBmp(cxGrid, SaveDialog.FileName);
+        ExportarCxGridParaBmp(cxGridChartView, SaveDialog.FileName);
         showmessage('Arquivo Exportado com Sucesso.');
         ShellExecute(Handle, 'open', pchar(SaveDialog.FileName), nil, nil, SW_SHOW);
       end;

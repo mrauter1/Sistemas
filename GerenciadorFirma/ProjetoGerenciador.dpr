@@ -34,13 +34,23 @@ uses
   uFormExecSql in 'Fontes\uFormExecSql.pas' {FormExecSql},
   uFormRelatoriosPersonalizados in 'Fontes\uFormRelatoriosPersonalizados.pas' {FormRelatoriosPersonalizados},
   uDmGeradorConsultas in 'Fontes\uDmGeradorConsultas.pas' {DmGeradorConsultas: TDataModule},
-  uConsultaPersonalizada in 'Fontes\uConsultaPersonalizada.pas' {FrmConsultaPersonalizada};
+  uConsultaPersonalizada in 'Fontes\uConsultaPersonalizada.pas' {FrmConsultaPersonalizada},
+  UCopyFolder3Test in 'Fontes\UCopyFolder3Test.pas',
+  uAtualiza in 'Fontes\uAtualiza.pas',
+  uAppConfig in 'uAppConfig.pas';
 
 {$R *.res}
 
 begin
+  with TAtualiza.Create(AppConfig.PastaUpdate) do
+  try
+    VerificaEAtualiza;
+  finally
+    Free;
+  end;
+
   Application.Initialize;
-  Application.MainFormOnTaskbar := True;
+//  Application.MainFormOnTaskbar := True;
   Application.CreateForm(TConSqlServer, ConSqlServer);
   Application.CreateForm(TConFirebird, ConFirebird);
   Application.CreateForm(TFormPrincipal, FormPrincipal);

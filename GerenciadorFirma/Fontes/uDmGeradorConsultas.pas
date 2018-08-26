@@ -23,6 +23,8 @@ type
     constructor Create(pNome: String; pValor: Variant; pTipo: TTipoParametro; pDescricao, pSql: String); overload;
   end;
 
+  TFonteDados = (fdSqlServer, fdFirebird);
+
 type
   TDmGeradorConsultas = class(TDataModule)
     DsPara: TDataSource;
@@ -59,6 +61,7 @@ type
     QryConsultasConfigPadrao: TIntegerField;
     QryConsultasVisualizacaoPadrao: TIntegerField;
     QryConsultasIDPai: TIntegerField;
+    QryConsultasFonteDados: TIntegerField;
     procedure DataModuleCreate(Sender: TObject);
     procedure QryParametrosAfterInsert(DataSet: TDataSet);
   private
@@ -69,6 +72,8 @@ type
     function FazEvolutivo(const FSql: String): String;
     function VarArrayToSql(pVar: variant): String;
     function GetCodConsulta(NomeConsulta: String): integer;
+    function IntToFonteDados(pValor: Integer): TFonteDados;
+    function Func_DateTime_Sql(parData: TDateTime): String;
   public
     SQLCampoTabList  : TStringList;
     CampoTelaList : TStringList;
@@ -98,6 +103,7 @@ type
     procedure SalvarValoresParametros(RefreshParams: Boolean = false);
     procedure RefreshQryCampos;
     procedure RefreshQryPara;
+    function GetFonteDados: TFonteDados;
     function GeraSqlEvolutivo(const pSql: String; pDataIni, pDataFim: TDateTime; pEmMeses: Boolean; pPeriodo: Integer): String;
 
     class procedure VerificaECriaParametros(pNomeInterno, pDescricao,
@@ -272,6 +278,11 @@ begin
   Result:= VarToIntDef(ConSqlServer.RetornaValor(Format(cSql, [NomeConsulta])),0);
 end;
 
+function TDmGeradorConsultas.GetFonteDados: TFonteDados;
+begin
+  Result:= IntToFonteDados(QryConsultasFonteDados.AsInteger);
+end;
+
 procedure TDmGeradorConsultas.AbrirConsultaPorNome(NomeConsulta: String);
 begin
   AbrirConsulta(GetCodConsulta(NomeConsulta));
@@ -437,6 +448,24 @@ begin
   end;
 end;
 
+function TDmGeradorConsultas.IntToFonteDados(pValor: Integer): TFonteDados;
+begin
+  case pValor of
+    1: Result:= fdSqlServer;
+    2: Result:= fdFirebird;
+    else Result:= fdSqlServer;
+  end;
+end;
+
+function TDmGeradorConsultas.Func_DateTime_Sql(parData: TDateTime): String;
+begin
+  if GetFonteDados = fdFirebird then
+    Result:= Func_DataTime_Firebird(parData)
+  else
+    Result:= Func_DateTime_SqlServer(parData);
+
+end;
+
 function TDmGeradorConsultas.SubstituiParametros(const FSql: String): String;
 
   function FiltroCheckListBox(const pNomeCampo: String; pParam: variant): String;
@@ -488,7 +517,7 @@ begin
         Result:= StringReplace(Result, '{'+QryParametrosNome.AsString+'}',
                                  FiltroCheckListBox(QryParametrosNome.AsString, GetParamValue(QryParametrosNome.AsString)), [rfIgnoreCase, rfReplaceAll])
       else if QryParametrosTipo.AsInteger = 3 then
-        Result:= StringReplace(Result,'{'+QryParametrosNome.AsString+'}', Func_DateTime_SqlServer(VarToFloatDef(GetParamValue(QryParametrosNome.AsString))), [rfIgnoreCase, rfReplaceAll])
+        Result:= StringReplace(Result,'{'+QryParametrosNome.AsString+'}', Func_DateTime_Sql(VarToFloatDef(GetParamValue(QryParametrosNome.AsString))), [rfIgnoreCase, rfReplaceAll])
       else
         Result:= StringReplace(Result,'{'+QryParametrosNome.AsString+'}', VarToStrDef(GetParamValue(QryParametrosNome.AsString), QryParametrosValorPadrao.AsString), [rfIgnoreCase, rfReplaceAll]);
 
@@ -701,8 +730,8 @@ var
              + ' end ';
   begin
     Result:= StringReplace(FSql, '{tmpPeriodo}', cPeriodo, [rfReplaceAll, rfIgnoreCase]);
-    Result:= StringReplace(Result, '{tmpDataIni}', Func_DateTime_SqlServer(pTempDataIni), [rfReplaceAll, rfIgnoreCase]);
-    Result:= StringReplace(Result, '{tmpDataFim}', Func_DateTime_SqlServer(pTempDataFim), [rfReplaceAll, rfIgnoreCase]);
+    Result:= StringReplace(Result, '{tmpDataIni}', Func_DateTime_Sql(pTempDataIni), [rfReplaceAll, rfIgnoreCase]);
+    Result:= StringReplace(Result, '{tmpDataFim}', Func_DateTime_Sql(pTempDataFim), [rfReplaceAll, rfIgnoreCase]);
   end;
 
 begin

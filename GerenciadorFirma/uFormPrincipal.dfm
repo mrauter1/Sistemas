@@ -12,6 +12,7 @@ object FormPrincipal: TFormPrincipal
   Font.Style = []
   Menu = MainMenu
   OldCreateOrder = False
+  OnClose = FormClose
   OnCreate = FormCreate
   OnShow = FormShow
   PixelsPerInch = 96
@@ -33,6 +34,7 @@ object FormPrincipal: TFormPrincipal
       OnButtonAddClick = ChromeTabs1ButtonAddClick
       OnButtonCloseTabClick = ChromeTabs1ButtonCloseTabClick
       OnNeedDragImageControl = ChromeTabs1NeedDragImageControl
+      OnStateChange = ChromeTabs1StateChange
       OnTabDragStart = ChromeTabs1TabDragStart
       OnTabDragDrop = ChromeTabs1TabDragDrop
       ActiveTabIndex = -1
@@ -364,8 +366,6 @@ object FormPrincipal: TFormPrincipal
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 1
-      ExplicitLeft = -2
-      ExplicitTop = 38
     end
   end
   object TreeViewMenu: TdxDBTreeView
@@ -438,6 +438,7 @@ object FormPrincipal: TFormPrincipal
       end
       object ValidaModelos1: TMenuItem
         Caption = 'Valida Modelos'
+        Visible = False
         OnClick = ValidaModelos1Click
       end
       object ExecutarSql1: TMenuItem

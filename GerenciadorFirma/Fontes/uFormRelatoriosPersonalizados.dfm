@@ -2,8 +2,8 @@ object FormRelatoriosPersonalizados: TFormRelatoriosPersonalizados
   Left = 0
   Top = 110
   Caption = 'Relat'#243'rios Personalizados'
-  ClientHeight = 584
-  ClientWidth = 640
+  ClientHeight = 535
+  ClientWidth = 638
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -14,9 +14,11 @@ object FormRelatoriosPersonalizados: TFormRelatoriosPersonalizados
   Position = poDesigned
   OnClose = FormClose
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnShow = FormShow
   DesignSize = (
-    640
-    584)
+    638
+    535)
   PixelsPerInch = 96
   TextHeight = 13
   object Label1: TLabel
@@ -38,34 +40,38 @@ object FormRelatoriosPersonalizados: TFormRelatoriosPersonalizados
   object PanelConsulta: TPanel
     Left = 0
     Top = 0
-    Width = 640
-    Height = 584
+    Width = 638
+    Height = 535
     Align = alClient
     TabOrder = 0
+    ExplicitWidth = 640
     object PanelInfo: TPanel
       Left = 1
       Top = 1
-      Width = 638
-      Height = 539
+      Width = 636
+      Height = 490
       Align = alClient
       TabOrder = 0
+      ExplicitWidth = 638
       object PageControl: TPageControl
         Left = 1
         Top = 41
-        Width = 636
-        Height = 497
-        ActivePage = TabParametros
+        Width = 634
+        Height = 448
+        ActivePage = TabCampos
         Align = alClient
         MultiLine = True
         ParentShowHint = False
         ShowHint = False
         TabOrder = 0
         OnChange = PageControlChange
+        ExplicitWidth = 636
         object TabCadastro: TTabSheet
           Caption = 'Cadastro'
+          ExplicitWidth = 628
           DesignSize = (
-            628
-            469)
+            626
+            420)
           object LblDescricao: TLabel
             Left = 21
             Top = 6
@@ -82,30 +88,48 @@ object FormRelatoriosPersonalizados: TFormRelatoriosPersonalizados
             Alignment = taRightJustify
             Caption = 'Descri'#231#227'o'
           end
+          object Label4: TLabel
+            Left = 15
+            Top = 163
+            Width = 14
+            Height = 13
+            Caption = 'Sql'
+          end
+          object Label5: TLabel
+            Left = 374
+            Top = 131
+            Width = 76
+            Height = 13
+            Alignment = taRightJustify
+            Anchors = [akTop, akRight]
+            Caption = 'Fonte de Dados'
+          end
           object EdtDescricao: TDBEdit
             Left = 54
             Top = 3
-            Width = 541
+            Width = 539
             Height = 21
             Anchors = [akLeft, akTop, akRight]
             DataField = 'Descricao'
             DataSource = DsConsultas
             TabOrder = 0
+            ExplicitWidth = 541
           end
           object DBMemo1: TDBMemo
             Left = 54
             Top = 45
-            Width = 541
+            Width = 539
             Height = 61
             Anchors = [akLeft, akTop, akRight]
             DataField = 'InfoExtendida'
             DataSource = DsConsultas
             TabOrder = 1
+            ExplicitWidth = 541
           end
           object DBRadioGroup1: TDBRadioGroup
             Left = 54
             Top = 112
-            Width = 541
+            Width = 289
             Height = 41
             Anchors = [akLeft, akTop, akRight]
             Caption = 'Tipo'
@@ -121,47 +145,51 @@ object FormRelatoriosPersonalizados: TFormRelatoriosPersonalizados
               '0'
               '1'
               '2')
+            ExplicitWidth = 291
           end
-          object Panel1: TPanel
-            Left = 0
-            Top = 169
-            Width = 628
-            Height = 300
-            Align = alBottom
-            Caption = 'Panel1'
+          object DBMemoSql: TDBMemo
+            Left = 15
+            Top = 180
+            Width = 593
+            Height = 229
+            Anchors = [akLeft, akTop, akRight, akBottom]
+            DataField = 'Sql'
+            DataSource = DsConsultas
             TabOrder = 3
-            DesignSize = (
-              628
-              300)
-            object Label4: TLabel
-              Left = 15
-              Top = 0
-              Width = 14
-              Height = 13
-              Caption = 'Sql'
-            end
-            object DBMemoSql: TDBMemo
-              Left = 15
-              Top = 17
-              Width = 595
-              Height = 271
-              Anchors = [akLeft, akTop, akRight, akBottom]
-              DataField = 'Sql'
-              DataSource = DsConsultas
-              TabOrder = 0
-            end
+            ExplicitWidth = 595
+          end
+          object cxDBImageComboBox1: TcxDBImageComboBox
+            Left = 456
+            Top = 127
+            DataBinding.DataField = 'FonteDados'
+            DataBinding.DataSource = DsConsultas
+            Properties.ImageAlign = iaRight
+            Properties.Items = <
+              item
+                Description = 'Sql Server'
+                ImageIndex = 0
+                Value = 1
+              end
+              item
+                Description = 'Firebird'
+                Value = 2
+              end>
+            TabOrder = 4
+            Width = 137
           end
         end
         object TabParametros: TTabSheet
           Caption = 'Par'#226'metros'
           ImageIndex = 1
+          ExplicitWidth = 628
           object cxGridParams: TcxGrid
             Left = 0
             Top = 0
-            Width = 628
-            Height = 469
+            Width = 626
+            Height = 420
             Align = alClient
             TabOrder = 0
+            ExplicitWidth = 628
             object cxGridParamsDBTableView1: TcxGridDBTableView
               Navigator.Buttons.CustomButtons = <>
               Navigator.Buttons.First.Visible = False
@@ -241,13 +269,15 @@ object FormRelatoriosPersonalizados: TFormRelatoriosPersonalizados
         object TabCampos: TTabSheet
           Caption = 'Campos'
           ImageIndex = 2
+          ExplicitWidth = 628
           object cxGridCampos: TcxGrid
             Left = 0
             Top = 0
-            Width = 628
+            Width = 626
             Height = 225
             Align = alTop
             TabOrder = 0
+            ExplicitWidth = 628
             object cxGridDBTableView1: TcxGridDBTableView
               Navigator.Buttons.CustomButtons = <>
               Navigator.Buttons.First.Visible = False
@@ -336,10 +366,11 @@ object FormRelatoriosPersonalizados: TFormRelatoriosPersonalizados
           object cxGridConsulta: TcxGrid
             Left = 0
             Top = 225
-            Width = 628
-            Height = 244
+            Width = 626
+            Height = 195
             Align = alClient
             TabOrder = 1
+            ExplicitWidth = 628
             object cxGridConsultaView: TcxGridDBTableView
               Navigator.Buttons.CustomButtons = <>
               Navigator.Buttons.First.Visible = False
@@ -361,6 +392,11 @@ object FormRelatoriosPersonalizados: TFormRelatoriosPersonalizados
               DataController.Summary.DefaultGroupSummaryItems = <>
               DataController.Summary.FooterSummaryItems = <>
               DataController.Summary.SummaryGroups = <>
+              OptionsData.CancelOnExit = False
+              OptionsData.Deleting = False
+              OptionsData.DeletingConfirmation = False
+              OptionsData.Editing = False
+              OptionsData.Inserting = False
               OptionsView.GroupByBox = False
               OptionsView.HeaderAutoHeight = True
             end
@@ -373,19 +409,21 @@ object FormRelatoriosPersonalizados: TFormRelatoriosPersonalizados
       object Panel2: TPanel
         Left = 1
         Top = 1
-        Width = 636
+        Width = 634
         Height = 40
         Align = alTop
         TabOrder = 1
+        ExplicitWidth = 636
       end
     end
     object PanelControles: TPanel
       Left = 1
-      Top = 540
-      Width = 638
+      Top = 491
+      Width = 636
       Height = 43
       Align = alBottom
       TabOrder = 1
+      ExplicitWidth = 638
       object BtnSalvar: TButton
         Left = 20
         Top = 6
@@ -407,13 +445,14 @@ object FormRelatoriosPersonalizados: TFormRelatoriosPersonalizados
     end
   end
   object BtnDefineCampos: TButton
-    Left = 450
-    Top = 546
+    Left = 448
+    Top = 497
     Width = 98
     Height = 25
     Anchors = [akRight, akBottom]
     Caption = 'Definir Campos'
     TabOrder = 1
+    ExplicitLeft = 450
   end
   object EdtID: TDBEdit
     Left = 87

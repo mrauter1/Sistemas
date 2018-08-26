@@ -85,7 +85,8 @@ type
     function GetCodProSelecionado: String;
     { Private declarations }
   public
-    procedure AbreEFocaProduto(pCodPro: String);
+    procedure RefreshProduto(pCodProFoco: String = '');
+    procedure AbreEFocaProduto(pCodProFoco: String);
   end;
 
 var
@@ -98,12 +99,17 @@ implementation
 uses
   uFormProInfo, uFormInsumos, uFormAdicionarSimilaridade;
 
-procedure TFormDetalheProdutos.AbreEFocaProduto(pCodPro: String);
+procedure TFormDetalheProdutos.RefreshProduto(pCodProFoco: String = '');
 begin
   QryDetalhesPro.Close;
   QryDetalhesPro.Open;
 
-  QryDetalhesPro.Locate('CODPRODUTO', pCodPro, []);
+  QryDetalhesPro.Locate('CODPRODUTO', pCodProFoco, []);
+end;
+
+procedure TFormDetalheProdutos.AbreEFocaProduto(pCodProFoco: String);
+begin
+  RefreshProduto(pCodProFoco);
   Show;
 end;
 

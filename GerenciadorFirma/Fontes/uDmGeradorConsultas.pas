@@ -459,7 +459,9 @@ end;
 
 function TDmGeradorConsultas.Func_DateTime_Sql(parData: TDateTime): String;
 begin
-  if GetFonteDados = fdFirebird then
+  if parData = 0 then
+     Result:= 'null'
+  else if GetFonteDados = fdFirebird then
     Result:= Func_DataTime_Firebird(parData)
   else
     Result:= Func_DateTime_SqlServer(parData);

@@ -72,6 +72,16 @@ type
     DBMemoSql: TDBMemo;
     Label5: TLabel;
     cxDBImageComboBox1: TcxDBImageComboBox;
+    Label6: TLabel;
+    cbxConfiguracoes: TDBLookupComboBox;
+    QryVisualizacoes: TFDQuery;
+    QryVisualizacoesID: TFDAutoIncField;
+    QryVisualizacoesConsulta: TIntegerField;
+    QryVisualizacoesDescricao: TStringField;
+    QryVisualizacoesArquivo: TBlobField;
+    QryVisualizacoesDataHora: TSQLTimeStampField;
+    DsVisualizacoes: TDataSource;
+    DBRadioPaginaPadrao: TDBRadioGroup;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure BtnSalvarClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -141,6 +151,9 @@ begin
   CarregaConsulta(0);
   FDm.QryConsultas.Insert;
   FDm.QryConsultasTipo.AsInteger:= 0;
+
+  FDM.QryConsultasVisualizacaoPadrao.AsInteger:= 0;
+  FDM.QryConsultasFonteDados.AsInteger:= 1;
 end;
 
 procedure TFormRelatoriosPersonalizados.PageControlChange(Sender: TObject);
@@ -161,6 +174,14 @@ procedure TFormRelatoriosPersonalizados.CarregaConsulta(
   pCodConsulta: Integer);
 begin
   FDm.AbrirConsulta(pCodConsulta);
+  if FDM.QryConsultasID.AsInteger > 0 then
+  begin
+    FDM.QryConsultas.Edit;
+
+    QryVisualizacoes.Close;
+    QryVisualizacoes.Params[0].Value:= FDM.QryConsultasID.AsInteger;
+    QryVisualizacoes.Active := True;
+  end;
 end;
 
 procedure TFormRelatoriosPersonalizados.BtnCancelarClick(Sender: TObject);

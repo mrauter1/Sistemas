@@ -59,7 +59,6 @@ type
     IR_EXECUTANDOCONSULTA: TBitBtn;
     Panel1: TPanel;
     MemoSQL: TMemo;
-    MemoSqlGerado: TMemo;
     SaveDialog: TSaveDialog;
     StatusBar1: TStatusBar;
     Timer1: TTimer;
@@ -106,6 +105,8 @@ type
     QryVisualizacoesDataHora: TSQLTimeStampField;
     QryConsulta: TFDQuery;
     QryVisualizacoesDescricao: TStringField;
+    TabSheetSql: TTabSheet;
+    MemoSqlGerado: TMemo;
     procedure BtnFecharClick(Sender: TObject);
     procedure VOLTAR_PARAMETROSClick(Sender: TObject);
     procedure IR_EXECUTANDOCONSULTAClick(Sender: TObject);

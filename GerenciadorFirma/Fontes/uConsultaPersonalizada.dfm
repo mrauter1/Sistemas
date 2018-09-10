@@ -220,27 +220,17 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
         Caption = 'PanelSqls'
         TabOrder = 1
         Visible = False
-        object MemoSqlGerado: TMemo
-          Left = 440
-          Top = 1
-          Width = 375
-          Height = 32
-          Align = alRight
-          Lines.Strings = (
-            '')
-          TabOrder = 1
-          Visible = False
-        end
         object MemoSQL: TMemo
           Left = 1
           Top = 1
-          Width = 439
+          Width = 814
           Height = 32
           Align = alClient
           Lines.Strings = (
             '')
           TabOrder = 0
           Visible = False
+          ExplicitWidth = 439
         end
       end
       object DBMemoDescricao: TDBMemo
@@ -291,7 +281,7 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
         Top = 28
         Width = 816
         Height = 478
-        ActivePage = TsGrafico
+        ActivePage = TsTabela
         Align = alClient
         Style = tsFlatButtons
         TabOrder = 0
@@ -368,8 +358,6 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
                 Height = 366
                 Align = alClient
                 TabOrder = 0
-                ExplicitLeft = 2
-                ExplicitTop = 14
                 object cxGridChartView: TcxGridChartView
                   Categories.OnGetValueDisplayText = cxGridChartViewCategoriesGetValueDisplayText
                   DiagramArea.OnCustomDrawLegendItem = cxChangeLegendColorCustomDrawLegendItem
@@ -556,6 +544,24 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
                 Control = PanelTabelaDinamica
               end
             end
+          end
+        end
+        object TabSheetSql: TTabSheet
+          Caption = 'Sql'
+          ImageIndex = 3
+          object MemoSqlGerado: TMemo
+            Left = 0
+            Top = 0
+            Width = 808
+            Height = 447
+            Align = alClient
+            Lines.Strings = (
+              '')
+            TabOrder = 0
+            ExplicitLeft = 440
+            ExplicitTop = 1
+            ExplicitWidth = 375
+            ExplicitHeight = 32
           end
         end
       end

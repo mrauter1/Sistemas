@@ -306,7 +306,7 @@ end;
 procedure TFormRelatoriosPersonalizados.FormCreate(Sender: TObject);
 begin
   LiberaAoFechar:= True;
-  FDm:= TDmGeradorConsultas.Create(Self);
+  FDm:= TDmGeradorConsultas.Create(Self, ConSqlServer);
 
   DsConsultas.DataSet:= FDM.QryConsultas;
   DsPara.DataSet:= FDM.QryParametros;

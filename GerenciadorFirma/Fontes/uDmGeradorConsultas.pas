@@ -3,7 +3,7 @@ unit uDmGeradorConsultas;
 interface
 
 uses
-  SysUtils, Classes, DB, ADODB, DBClient, Provider, Contnrs, variants, Windows, Utils, uConSqlServer,
+  SysUtils, Classes, DB, ADODB, DBClient, Provider, Contnrs, variants, Windows, Utils, uDmConnection,
   FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
   FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
   FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet, FireDAC.Comp.Client;
@@ -65,6 +65,7 @@ type
     procedure DataModuleCreate(Sender: TObject);
     procedure QryParametrosAfterInsert(DataSet: TDataSet);
   private
+    FDmConnection: TDmConnection;
     procedure CriaListaParams;
     procedure DeletaParams;
     function GetSqlOriginal: String;
@@ -74,15 +75,19 @@ type
     function GetCodConsulta(NomeConsulta: String): integer;
     function IntToFonteDados(pValor: Integer): TFonteDados;
     function Func_DateTime_Sql(parData: TDateTime): String;
+    procedure SetDmConnection(const Value: TDmConnection);
   public
-    SQLCampoTabList  : TStringList;
+(*    SQLCampoTabList  : TStringList;
     CampoTelaList : TStringList;
     ObrigatorList : TStringList;
     ExcelList        : TStringList;
-    ResultadoList    : TStringList;
+    ResultadoList    : TStringList;       *)
 
     Params: TObjectList;
     SqlGerado: String;
+
+    constructor Create(AOwner: TComponent; pDmConnection: TDmConnection); virtual;
+
     procedure AbrirConsulta(CodConsulta: Integer);
     procedure AbrirConsultaPorNome(NomeConsulta: String);
     procedure CriarParametrosBanco(Refresh: Boolean = False);
@@ -106,12 +111,14 @@ type
     function GetFonteDados: TFonteDados;
     function GeraSqlEvolutivo(const pSql: String; pDataIni, pDataFim: TDateTime; pEmMeses: Boolean; pPeriodo: Integer): String;
 
-    class procedure VerificaECriaParametros(pNomeInterno, pDescricao,
+    procedure VerificaECriaParametros(pNomeInterno, pDescricao,
           pTexto: String; pParams: array of TParametroCon; pPai: String = 'PARAMETROS'; RefreshParams: Boolean = false);
 
-    class function DeletaConsulta(pIDConsulta: Integer): Boolean;
+    function DeletaConsulta(pIDConsulta: Integer): Boolean;
 
     property SqlOriginal: String read GetSqlOriginal;
+
+    property DmConnection: TDmConnection read FDmConnection write SetDmConnection;
   end;
 
 function FieldIsNumerico(pField: TField): Boolean;
@@ -164,17 +171,24 @@ begin
    Result:= False;
 end;
 
-class function TDmGeradorConsultas.DeletaConsulta(pIDConsulta: Integer): Boolean;
+function TDmGeradorConsultas.DeletaConsulta(pIDConsulta: Integer): Boolean;
 begin
   Result:= True;
 
-  ConSqlServer.ExecutaComando(Format('DELETE FROM Cons.Consultas Where ID = %d', [pIDConsulta]));
+  FDmConnection.ExecutaComando(Format('DELETE FROM Cons.Consultas Where ID = %d', [pIDConsulta]));
 end;
 
 procedure TDmGeradorConsultas.DeletaParams;
 begin
   while Params.Count > 0 do
     Params.Delete(0);
+end;
+
+constructor TDmGeradorConsultas.Create(AOwner: TComponent;
+  pDmConnection: TDmConnection);
+begin
+  inherited Create(AOwner);
+  SetDmConnection(pDmConnection);
 end;
 
 procedure TDmGeradorConsultas.CriaListaParams;
@@ -275,7 +289,7 @@ function TDmGeradorConsultas.GetCodConsulta(NomeConsulta: String): integer;
 const
   cSql = 'SELECT ID FROM cons.Consultas WHERE Upper(Nome) = Upper(''%s'') ';
 begin
-  Result:= VarToIntDef(ConSqlServer.RetornaValor(Format(cSql, [NomeConsulta])),0);
+  Result:= VarToIntDef(FDmConnection.RetornaValor(Format(cSql, [NomeConsulta])),0);
 end;
 
 function TDmGeradorConsultas.GetFonteDados: TFonteDados;
@@ -338,46 +352,39 @@ begin
   end;
 end;
 
-class procedure TDmGeradorConsultas.VerificaECriaParametros(pNomeInterno, pDescricao,
+procedure TDmGeradorConsultas.VerificaECriaParametros(pNomeInterno, pDescricao,
   pTexto: String; pParams: array of TParametroCon; pPai: String = 'PARAMETROS'; RefreshParams: Boolean = false);
 // pParams: Lista de Parâmetros
 // pPai: Nome do menu pai em que esta parametrização se encontra
 // RefreshParams: Se falso apenas inclui os parâmetros que não existirem no sistema, se verdadeiro atualiza os dados de todos os parametros
 var
   I: Integer;
-  FDmGerador: TDmGeradorConsultas;
   FCodPai: Integer;
 begin
-  FDmGerador:= TDmGeradorConsultas.Create(nil);
-  with FDmGerador do
-  try
-    FCodPai:= GetCodConsulta(pPai);
-    if FCodPai = 0 then
-      FCodPai:= 108; {108 paramêtros padrão}
+  FCodPai:= GetCodConsulta(pPai);
+  if FCodPai = 0 then
+    FCodPai:= 108; {108 paramêtros padrão}
 
-    AbrirConsultaPorNome(pNomeInterno);
-    if QryConsultas.IsEmpty then
-    begin
-      QryConsultas.Insert;
+  AbrirConsultaPorNome(pNomeInterno);
+  if QryConsultas.IsEmpty then
+  begin
+    QryConsultas.Insert;
 
-      QryConsultasNome.AsString:= pNomeInterno;
-      QryConsultasDescricao.AsString:= pDescricao;
-      QryConsultasInfoExtendida.AsString:= pTexto;
-      QryConsultasIDPai.AsInteger:= FCodPai;
-      QryConsultasTipo.AsInteger:= Ord(tcParametros); // Parametrização
+    QryConsultasNome.AsString:= pNomeInterno;
+    QryConsultasDescricao.AsString:= pDescricao;
+    QryConsultasInfoExtendida.AsString:= pTexto;
+    QryConsultasIDPai.AsInteger:= FCodPai;
+    QryConsultasTipo.AsInteger:= Ord(tcParametros); // Parametrização
 
-      QryConsultas.Post;
-    end;
-
-    DeletaParams;
-
-    for I:= 0 to Length(pParams)-1 do
-      Params.Add(pParams[I]);
-
-    CriarParametrosBanco(RefreshParams);
-  finally
-    FDmGerador.Free;
+    QryConsultas.Post;
   end;
+
+  DeletaParams;
+
+  for I:= 0 to Length(pParams)-1 do
+    Params.Add(pParams[I]);
+
+  CriarParametrosBanco(RefreshParams);
 end;
 
 procedure TDmGeradorConsultas.CriarParametrosBanco(Refresh: Boolean = False);
@@ -673,6 +680,14 @@ begin
   QryCampos.Active:= False;
   QryCampos.Params.ParamByName('codConsulta').Value:= QryConsultasID.AsInteger;
   QryCampos.Active:= True;
+end;
+
+procedure TDmGeradorConsultas.SetDmConnection(const Value: TDmConnection);
+begin
+  FDmConnection := Value;
+  QryCampos.Connection:= FDmConnection.FDConnection;
+  QryParametros.Connection:= FDmConnection.FDConnection;
+  QryConsultas.Connection:= FDmConnection.FDConnection;
 end;
 
 procedure TDmGeradorConsultas.SetEstilosCamposQry(Qry: TDataSet);

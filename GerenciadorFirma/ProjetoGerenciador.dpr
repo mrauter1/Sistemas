@@ -25,7 +25,6 @@ uses
   uFormAdicionarSimilaridade in 'Fontes\uFormAdicionarSimilaridade.pas' {FormAdicionarSimilaridade},
   uFormInsumos in 'Fontes\uFormInsumos.pas' {FormInsumos},
   uFormSelecionaModelos in 'Fontes\uFormSelecionaModelos.pas' {FormSelecionaModelo},
-  uSendMail in 'Fontes\uSendMail.pas',
   uFormValidaModelos in 'uFormValidaModelos.pas' {FormValidaModelos},
   uConSqlServer in 'Fontes\uConSqlServer.pas' {ConSqlServer: TDataModule},
   uDmConnection in '..\utils\uDmConnection.pas' {DmConnection: TDataModule},
@@ -37,7 +36,8 @@ uses
   uConsultaPersonalizada in 'Fontes\uConsultaPersonalizada.pas' {FrmConsultaPersonalizada},
   UCopyFolder3Test in 'Fontes\UCopyFolder3Test.pas',
   uAtualiza in 'Fontes\uAtualiza.pas',
-  uAppConfig in 'uAppConfig.pas';
+  uAppConfig in 'uAppConfig.pas',
+  uSendMail in '..\utils\uSendMail.pas';
 
 {$R *.res}
 

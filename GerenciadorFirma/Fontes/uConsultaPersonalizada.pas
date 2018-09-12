@@ -1141,7 +1141,7 @@ begin
 
   FUltimaConfig:= 0;
 
-  FDm:= TDmGeradorConsultas.Create(Self);
+  FDm:= TDmGeradorConsultas.Create(Self, ConSqlServer);
 
   FPrimeiraExecucao:= True;
 

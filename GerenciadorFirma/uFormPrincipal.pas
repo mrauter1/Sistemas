@@ -16,7 +16,7 @@ uses
   FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
   FireDAC.Comp.DataSet, FireDAC.Comp.Client, uFrmConsulta, Vcl.ComCtrls, dxtree,
   dxdbtree, uConSqlServer, uConsultaPersonalizada, cxSplitter, ChromeTabs,
-  ChromeTabsClasses, ChromeTabsTypes, uAppConfig;
+  ChromeTabsClasses, ChromeTabsTypes, uAppConfig, uDmGeradorConsultas;
 
 type
   TTabPanel = class(TPanel)
@@ -115,6 +115,7 @@ type
     procedure ChromeTabs1StateChange(Sender: TObject; PreviousState,
       CurrentState: TChromeTabStates);
   private
+    FDmGeradorConsultas: TDmGeradorConsultas;
     FPopupActive: Boolean;
     FIDNodeSelecionado: Integer;
     procedure CarregaConsultas;
@@ -146,7 +147,7 @@ implementation
 
 uses
   uDmFilaProducao, Utils, uFormDetalheProdutos, uFormPedidos2, uFormValidaModelos, uFormExecSql,
-  uFormRelatoriosPersonalizados, uDMGeradorConsultas;
+  uFormRelatoriosPersonalizados;
 
 procedure TFormPrincipal.RemoveTab(pTab: TChromeTab);
 begin
@@ -269,6 +270,8 @@ end;
 
 procedure TFormPrincipal.FormCreate(Sender: TObject);
 begin
+  FDmGeradorConsultas:= TDmGeradorConsultas.Create(Self, ConSqlServer);
+
   FIDNodeSelecionado:= 0;
 
   if Application.MainForm = Self then
@@ -376,7 +379,7 @@ begin
     FIDConsulta:= QryMenuIDAcao.AsInteger;
 
     if (FIDConsulta > 0) and (QryMenuTipo.AsInteger = 1) then
-      TDmGeradorConsultas.DeletaConsulta(FIDConsulta);
+      FDmGeradorConsultas.DeletaConsulta(FIDConsulta);
 
     QryMenu.Delete;
   end;

@@ -2,8 +2,8 @@ object FormProInfo: TFormProInfo
   Left = 0
   Top = 0
   Caption = 'Configura'#231#227'o dos Produtos'
-  ClientHeight = 272
-  ClientWidth = 679
+  ClientHeight = 378
+  ClientWidth = 770
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,10 +18,12 @@ object FormProInfo: TFormProInfo
   object cxGrid: TcxGrid
     Left = 0
     Top = 0
-    Width = 679
-    Height = 272
+    Width = 770
+    Height = 378
     Align = alClient
     TabOrder = 0
+    ExplicitWidth = 679
+    ExplicitHeight = 272
     object cxGridDBTableView: TcxGridDBTableView
       Navigator.Buttons.CustomButtons = <>
       DataController.DataSource = DataSource1
@@ -68,6 +70,18 @@ object FormProInfo: TFormProInfo
       object cxGridDBTableViewSOMANOPESOLIQ: TcxGridDBColumn
         DataBinding.FieldName = 'SOMANOPESOLIQ'
         Width = 55
+      end
+      object cxGridDBTableViewSomaNoCustoLiq: TcxGridDBColumn
+        DataBinding.FieldName = 'SomaNoCustoLiq'
+        Width = 65
+      end
+      object cxGridDBTableViewSomaNoCustoBruto: TcxGridDBColumn
+        DataBinding.FieldName = 'SomaNoCustoBruto'
+        Width = 68
+      end
+      object cxGridDBTableViewCustoInformado: TcxGridDBColumn
+        DataBinding.FieldName = 'CustoInformado'
+        Width = 92
       end
     end
     object cxGridLevel: TcxGridLevel
@@ -120,6 +134,22 @@ object FormProInfo: TFormProInfo
       ReadOnly = True
       Size = 80
       Calculated = True
+    end
+    object QryProInfoSomaNoCustoLiq: TBooleanField
+      DisplayLabel = 'Soma no Custo liq.'
+      FieldName = 'SomaNoCustoLiq'
+      Origin = 'SomaNoCustoLiq'
+    end
+    object QryProInfoSomaNoCustoBruto: TBooleanField
+      DisplayLabel = 'Soma No Custo Bruto'
+      FieldName = 'SomaNoCustoBruto'
+      Origin = 'SomaNoCustoBruto'
+    end
+    object QryProInfoCustoInformado: TBCDField
+      DisplayLabel = 'Custo Informado'
+      FieldName = 'CustoInformado'
+      Origin = 'CustoInformado'
+      Precision = 16
     end
   end
 end

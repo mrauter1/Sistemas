@@ -366,6 +366,8 @@ object FormPrincipal: TFormPrincipal
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 1
+      ExplicitLeft = 6
+      ExplicitTop = 38
     end
   end
   object TreeViewMenu: TdxDBTreeView
@@ -479,7 +481,7 @@ object FormPrincipal: TFormPrincipal
     Connection = ConSqlServer.FDConnection
     SQL.Strings = (
       'select * from cons.Menu')
-    Left = 232
+    Left = 248
     Top = 136
     object QryMenuID: TFDAutoIncField
       FieldName = 'ID'

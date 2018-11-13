@@ -32,12 +32,12 @@ uses
   uFrmConsulta in 'Fontes\uFrmConsulta.pas' {FrmConsulta},
   uFormExecSql in 'Fontes\uFormExecSql.pas' {FormExecSql},
   uFormRelatoriosPersonalizados in 'Fontes\uFormRelatoriosPersonalizados.pas' {FormRelatoriosPersonalizados},
-  uDmGeradorConsultas in 'Fontes\uDmGeradorConsultas.pas' {DmGeradorConsultas: TDataModule},
-  uConsultaPersonalizada in 'Fontes\uConsultaPersonalizada.pas' {FrmConsultaPersonalizada},
+  uConsultaPersonalizada in '..\utils\uConsultaPersonalizada.pas' {FrmConsultaPersonalizada},
   UCopyFolder3Test in 'Fontes\UCopyFolder3Test.pas',
   uAtualiza in 'Fontes\uAtualiza.pas',
   uAppConfig in 'uAppConfig.pas',
-  uSendMail in '..\utils\uSendMail.pas';
+  uSendMail in '..\utils\uSendMail.pas',
+  uDmGeradorConsultas in '..\utils\uDmGeradorConsultas.pas' {DmGeradorConsultas: TDataModule};
 
 {$R *.res}
 

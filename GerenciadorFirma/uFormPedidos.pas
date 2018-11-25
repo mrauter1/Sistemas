@@ -76,7 +76,8 @@ implementation
 
 {$R *.dfm}
 
-uses uFormProInfo, uFormDetalheProdutos, uFormSelecionaModelos, uFormAdicionarSimilaridade, uFormInsumos;
+uses uFormProInfo, uFormDetalheProdutos, uFormSelecionaModelos, uFormAdicionarSimilaridade,
+    uFormInsumos;
 
 function TFormPedidos.GetCodProSelecionado: String;
 begin

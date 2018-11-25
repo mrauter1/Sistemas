@@ -24,6 +24,8 @@ type
     class function ObterValoresSelecionados(pCheckListBox: TCheckListBox; pSeparador: String=','): String;
   end;
 
+function GetMesString(pDate: TDateTime): String;
+
 procedure WriteLog(Par_Arquivo: String; Par_Texto: String);
 
 procedure CreateDataSetIfNotActive(pCds: TClientDataSet);
@@ -46,7 +48,25 @@ function BlendColors(Color1, Color2: TColor; A: Byte): TColor;
 implementation
 
 uses
-  SysUtils, System.TypInfo;
+  SysUtils, System.TypInfo, DateUtils;
+
+function GetMesString(pDate: TDateTime): String;
+begin
+  case MonthOfTheYear(pDate) of
+    1: Result:= 'janeiro';
+    2: Result:= 'fevereiro';
+    3: Result:= 'Março';
+    4: Result:= 'Abril';
+    5: Result:= 'Maio';
+    6: Result:= 'Junho';
+    7: Result:= 'Julho';
+    8: Result:= 'Agosto';
+    9: Result:= 'Setembro';
+    10: Result:= 'Outubro';
+    11: Result:= 'Novembro';
+    12: Result:= 'Dezembro';
+  end;
+end;
 
 function IsCurrencyField(pField: TField): Boolean;
 begin
@@ -158,12 +178,12 @@ end;
 
 function Func_DateTime_SqlServer(parData: TDateTime): String;
 begin
-  Result:= QuotedStr(FormatDateTime('yyyy/mm/dd hh:nn:ss:zzz', parData));
+  Result:= QuotedStr(FormatDateTime('yyyy/mm/dd hh:nn:ss', parData));
 end;
 
 function Func_DataTime_Firebird(parData: TDateTime): String;
 begin
-  Result:= 'CAST('+QuotedStr(FormatDateTime('yyyy/mm/dd hh:nn:ss:zzz', parData))+' as Timestamp)';
+  Result:= 'CAST('+QuotedStr(FormatDateTime('yyyy/mm/dd hh:nn:ss', parData))+' as Timestamp)';
 end;
 
 { TValorChave }

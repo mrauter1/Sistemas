@@ -1,30 +1,62 @@
+
 unit udmSqlUtils;
 
 interface
 
 uses
-  {JSONConverter, dwsJson  }
   System.SysUtils, System.Classes, Data.DB, Data.SqlExpr, Data.DBXFirebird,
-  Data.FMTBcd, Datasnap.DBClient, Datasnap.Provider, Dialogs;
+  Data.FMTBcd, Datasnap.DBClient, Datasnap.Provider, Inifiles, Forms, TypInfo,
+  FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf,
+  FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
+  FireDAC.Phys, FireDAC.Phys.FB, FireDAC.Phys.FBDef, FireDAC.ConsoleUI.Wait,
+  FireDAC.Comp.Client;
+
+type
+ cfMapField = record
+   SourceType: TFieldType;
+   DestType: TFieldType;
+ end;
 
 type
   TDmSqlUtils = class(TDataModule)
+    FDConnection: TFDConnection;
+    procedure FDConnectionAfterCommit(Sender: TObject);
   private
+    FModoDesconectado: Boolean;
+    procedure SetModoDesconectado(const Value: BOolean);
     { Private declarations }
-  protected
-    FSqlConnection: TSQLConnection;
   public
-    property SqlConnection: TSqlConnection read FSqlConnection write FSqlConnection;
+    constructor Create(AOwner: TComponent); override;
 
-    function CriaSqlQuery(sql: String = ''): TSqlQuery;
-    function RetornaDataSet(sql: String): TDataSet;
-    function OrdenaClientDataSet(parCds: TClientDataSet;
-      const FieldName: String; PIndexOptions: TIndexOptions = []): Boolean;
+    function CriaFDQuery(sql: String = ''): TFDQuery;
+    function RetornaDataSet(sql: String; pAbrirDataSet: Boolean = True): TDataSet;
+    function RetornaFDQuery(AOwner: TComponent; Sql: String; pAbrirDataSet: Boolean = True): TFDQuery;
+
+    procedure ExecutaComando(pSql: String);
+
     function RetornaValor(Sql: String; ValDefault: Variant): Variant;
 
-//    procedure populateJSON(pJSon: TDwsJSONObject; const pSql: String);
-//    function createJSON(const pSql: String): TDwsJSONArray;
+    // transforma um field do tipo fkCalculated em fkLookup
+    procedure TransformaEmLookup(pField: TField; pSql: String);
+
+    procedure PopulaClientDataSet(pCds: TClientDataSet; pSql: String; pEmptyDataSet: Boolean = True);
+
+    function OrdenaClientDataSet(parCds: TClientDataSet;
+        const FieldName: String; PIndexOptions: TIndexOptions = []): Boolean;
+    procedure CarregaConnectionInfo(pFile, pSection: String);
+
+    class procedure CopyFieldDefs(Dest, Source: TDataSet; pMapedFields: array of cfMapField); overload;
+    class procedure CopyFieldDefs(Dest, Source: TDataSet); overload;
+
+    property ModoDesconectado: BOolean read FModoDesconectado write SetModoDesconectado;
   end;
+
+procedure ReopenDataSet(pDataSet: TDataSet);
+// Retorna um array com o nome dos campos que são diferentes entre um e outro dataset
+function ComparaRecord(pDataSet1, pDataSet2: TDataSet; pCamposParaIgnorar: String = ''): TArray<String>;
+procedure CopiarRecord(pSource, pDest: TDataSet);
+procedure CopiaDadosDataSet(pSource, pDest: TDataSet);
+procedure CopyFieldDefs(pSource, pDest: TDataSet);
 
 var
   DmSqlUtils: TDmSqlUtils;
@@ -36,39 +68,168 @@ implementation
 {$R *.dfm}
 
 { TDmSqlUtils }
-                                  {
-procedure TDmSqlUtils.populateJSON(out pJSon: TDwsJSONObject; const pSql: String);
-var
-  FSql: TDataSet;
-begin
-  FSql:= RetornaDataSet(pSql);
-  try
-    TDataSetJSONConverter.UnMarshalToJSON(FSql, pJson);
-  finally
-    FSql.Free;
-  end;
-end;                                   }
-                                    {
-function TDmSqlUtils.createJSON(const pSql: String): TDwsJSONArray;
-var
-  FSql: TDataSet;
-  FJSon: TdwsJSONArray;
-begin
-  FSql:= RetornaDataSet(pSql);
-  try
-    TDataSetJSONConverter.UnMarshalToJSON(FSql, FJson);
-    Result:= FJSon;
-  except
-    FSql.Free;
-    raise;
-  end;
-end;                 }
 
-function TDmSqlUtils.CriaSqlQuery(sql: String = ''): TSqlQuery;
+procedure ReopenDataSet(pDataSet: TDataSet);
 begin
-  Result:= TSqlQuery.Create(Self);
+  if pDataSet.Active then
+    pDataSet.Close;
+
+  pDataSet.Open;
+end;
+
+procedure CopyFieldDefs(pSource, pDest: TDataSet);
+var
+  Field, NewField: TField;
+  FieldDef: TFieldDef;
+begin
+  for Field in pSource.Fields do
+  begin
+    FieldDef := pDest.FieldDefs.AddFieldDef;
+    FieldDef.DataType := Field.DataType;
+    FieldDef.Size := Field.Size;
+    FieldDef.Name := Field.FieldName;
+
+    NewField := FieldDef.CreateField(pDest);
+    NewField.Visible := Field.Visible;
+    NewField.DisplayLabel := Field.DisplayLabel;
+    NewField.DisplayWidth := Field.DisplayWidth;
+    NewField.EditMask := Field.EditMask;
+
+   if IsPublishedProp(Field, 'currency')  then
+     SetPropValue(NewField, 'currency', GetPropValue(Field, 'currency'));
+
+  end;
+end;
+
+class procedure TDmSqlUtils.CopyFieldDefs(Dest, Source: TDataSet; pMapedFields: array of cfMapField);
+var
+  FFieldType: TFieldType;
+  Field, NewField: TField;
+  FieldDef: TFieldDef;
+
+  function GetFieldType: TFieldType;
+  var
+    I: Integer;
+  begin
+    for I := Low(pMapedFields) to High(pMapedFields) do
+    begin
+      if Field.DataType = pMapedFields[I].SourceType then
+      begin
+        Result:= pMapedFields[I].DestType;
+        Exit;
+      end;
+    end;
+
+    Result:= Field.DataType;
+  end;
+
+begin
+  for Field in Source.Fields do
+  begin
+    FFieldType:= GetFieldType;
+
+   // Skip unknown fields
+    if FFieldType = ftUnknown then
+      Continue;
+
+    FieldDef := Dest.FieldDefs.AddFieldDef;
+
+    FieldDef.DataType:= FFieldType;
+
+    FieldDef.Size := Field.Size;
+    FieldDef.Name := Field.FieldName;
+
+    NewField := FieldDef.CreateField(Dest);
+    NewField.Visible := Field.Visible;
+    NewField.DisplayLabel := Field.DisplayLabel;
+    NewField.DisplayWidth := Field.DisplayWidth;
+    NewField.EditMask := Field.EditMask;
+
+   if IsPublishedProp(Field, 'currency') then
+     SetPropValue(NewField, 'currency', GetPropValue(Field, 'currency'));
+
+  end;
+end;
+
+class procedure TDmSqlUtils.CopyFieldDefs(Dest, Source: TDataSet);
+begin
+  TDmSqlUtils.CopyFieldDefs(Dest, Source, []);
+end;
+
+function ComparaRecord(pDataSet1, pDataSet2: TDataSet; pCamposParaIgnorar: String = ''): TArray<String>;
+var
+  FField1, FField2: TField;
+
+  function CampoIgnorado(pCampo: String): Boolean;
+  var
+    fStr: String;
+  begin
+    Result:= True;
+
+    for fStr in pCamposParaIgnorar.Split([';']) do
+      if Trim(fStr).ToUpper = pCampo.ToUpper then
+        Exit;
+
+    Result:= False;
+  end;
+
+begin
+  SetLength(Result, 0);
+  for FField1 in pDataSet1.Fields do
+  begin
+    if CampoIgnorado(FField1.FieldName) then
+      Continue;
+
+    FField2:= pDataSet2.FindField(FField1.FieldName);
+    if Assigned(FField2) then
+      if FField2.Value <> FField1.Value then
+      begin
+        SetLength(Result, Length(Result)+1);
+        Result[High(Result)]:= FField1.FieldName;
+      end;
+
+  end;
+end;
+
+procedure CopiarRecord(pSource, pDest: TDataSet);
+var
+  I: Integer;
+  FSourceField: TField;
+begin
+  for I := 0 to pDest.Fields.Count - 1 do
+  begin
+    FSourceField:= pSource.FindField(pDest.Fields[I].FieldName);
+    if Assigned(FSourceField) then
+      pDest.Fields[I].Value:= FSourceField.Value;
+
+  end;
+end;
+
+procedure CopiaDadosDataSet(pSource, pDest: TDataSet);
+begin
+  pSource.First;
+  while not pSource.Eof do
+  begin
+    pDest.Insert;
+    CopiarRecord(pSource, pDest);
+    pDest.Post;
+
+    pSource.Next;
+  end;
+end;
+
+constructor TDmSqlUtils.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+
+  ModoDesconectado:= False;
+end;
+
+function TDmSqlUtils.CriaFDQuery(sql: String = ''): TFDQuery;
+begin
+  Result:= TFDQuery.Create(Self);
   try
-    Result.SQLConnection:= FSqlConnection;
+    Result.Connection:= FDConnection;
     Result.SQL.Text:= sql;
   except
     Result.Free;
@@ -76,19 +237,20 @@ begin
   end;
 end;
 
-function TDmSqlUtils.RetornaDataSet(sql: String): TDataSet;
+function TDmSqlUtils.RetornaDataSet(Sql: String; pAbrirDataSet: Boolean = True): TDataSet;
 var
-  fSqlQuery: TSqlQuery;
+  fQuery: TFDQuery;
 begin
-  fSqlQuery:= CriaSqlQuery(sql);
+  fQuery:= CriaFDQuery(Sql);
   try
-    fSqlQuery.Open;
+    if pAbrirDataSet then
+      fQuery.Open;
   except
-    fSqlQuery.Free;
+    fQuery.Free;
     raise;
   end;
 
-  Result:= fSqlQuery;
+  Result:= fQuery;
 end;
 
 function TDmSqlUtils.RetornaValor(Sql: String; ValDefault: Variant): Variant;
@@ -102,6 +264,95 @@ begin
   finally
     FDataSet.Free;
   end;
+end;
+
+procedure TDmSqlUtils.SetModoDesconectado(const Value: BOolean);
+begin
+  FModoDesconectado := Value;
+
+  if FModoDesconectado then
+    FDConnection.Offline;
+end;
+
+procedure TDmSqlUtils.ExecutaComando(pSql: String);
+var
+  FQry: TFDQuery;
+begin
+  FQry:= CriaFDQuery(pSql);
+  try
+    FQry.ExecSQL(True);
+  finally
+    FQry.Free;
+  end;
+end;
+
+function TDmSqlUtils.RetornaFDQuery(AOwner: TComponent; Sql: String; pAbrirDataSet: Boolean = True): TFDQuery;
+var
+  fQry: TFDQuery;
+begin
+  fQry:= TFDQuery.Create(AOwner);
+  try
+    fQry.Connection:= FDConnection;
+
+    fQry.SQL.Text:= Sql;
+
+    if pAbrirDataSet then
+      fQry.Open;
+  except
+    fQry.Free;
+    raise;
+  end;
+
+  Result:= fQry;
+end;
+
+procedure TDmSqlUtils.FDConnectionAfterCommit(Sender: TObject);
+begin
+  if ModoDesconectado then
+    FDConnection.Offline;
+end;
+
+procedure TDmSqlUtils.CarregaConnectionInfo(pFile, pSection: String);
+var
+  ArqIni: TIniFile;
+begin
+  FDConnection.Close;
+  if FileExists(pFile) then
+    begin
+      ArqIni:= TIniFile.Create(pFile);
+      try
+        FDConnection.Params.Values['Server'] :=
+            ArqIni.ReadString(pSection, 'Server', FDConnection.Params.Values['Server']);
+        FDConnection.Params.Values['Database'] :=
+            ArqIni.ReadString(pSection, 'Database', FDConnection.Params.Values['Database']);
+      finally
+        ArqIni.Free;
+      end;
+    end;
+
+  FDConnection.Open;
+end;
+
+procedure TDmSqlUtils.TransformaEmLookup(pField: TField; pSql: String);
+var
+  fQry: TFDQuery;
+begin
+  if pField.FieldKind <> fkCalculated then
+    raise Exception.Create('Erro TDmCon.TransformaLookup: Field deve ter a propriedade FieldKind = fkCalculated!');
+
+  fQry:= RetornaFDQuery(pField, pSql, True);
+  if fQry.Fields.Count < 2 then
+  begin
+    fQry.Free;
+    raise Exception.Create('Erro TDmCon.TransformaLookup: Query deve retornar dois campos! Qry: '+pSql);
+  end;
+
+  pField.FieldKind:= fkLookup;
+  pField.Lookup:= True;
+  pField.LookupDataSet:= fQry;
+  pField.LookupKeyFields:= fQry.Fields[0].FieldName;
+  pField.KeyFields:= fQry.Fields[0].FieldName;
+  pField.LookupResultField:= fQry.Fields[1].FieldName;
 end;
 
 function TDmSqlUtils.OrdenaClientDataSet(parCds: TClientDataSet;
@@ -134,6 +385,25 @@ begin
   parCds.IndexName := cIdx;
   Result:= True;
   parCds.IndexDefs.Update;
+end;
+
+procedure TDmSqlUtils.PopulaClientDataSet(pCds: TClientDataSet; pSql: String;
+  pEmptyDataSet: Boolean = True);
+var
+  FQry: TDataSet;
+begin
+  if not pCds.Active then
+    pCds.CreateDataSet;
+
+  if pEmptyDataSet then
+    pCds.EmptyDataSet;
+
+  FQry:= DmSqlUtils.RetornaDataSet(pSql);
+  try
+    CopiaDadosDataSet(FQry, pCds);
+  finally
+    FQry.Free;
+  end;
 end;
 
 end.

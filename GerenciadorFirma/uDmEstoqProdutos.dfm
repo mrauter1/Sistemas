@@ -120,6 +120,7 @@ object DmEstoqProdutos: TDmEstoqProdutos
       FieldName = 'ProbFaltaHoje'
       Origin = 'ProbFaltaHoje'
       ReadOnly = True
+      OnGetText = QryEstoqProbFaltaHojeGetText
       DisplayFormat = '#0.00'
     end
     object QryEstoqDIASESTOQUE: TBCDField

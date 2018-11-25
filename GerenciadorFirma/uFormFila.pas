@@ -52,6 +52,8 @@ type
     cxGridDBTableView1SITUACAO: TcxGridDBColumn;
     cxGridDBTableViewNOMEAPLICACAO: TcxGridDBColumn;
     cxGridDBTableViewRank: TcxGridDBColumn;
+    BtnExcelcxGridTarefa: TBitBtn;
+    SaveDialog: TSaveDialog;
     procedure BtnAtualizaClick(Sender: TObject);
     procedure BtnOpcoesClick(Sender: TObject);
     procedure AbrirConfigProClick(Sender: TObject);
@@ -59,12 +61,10 @@ type
     procedure VerSimilares1Click(Sender: TObject);
     procedure VerInsumos1Click(Sender: TObject);
     procedure cxGridDBTableViewDblClick(Sender: TObject);
-    procedure cxGridDBTableViewPROBFALTAHOJEGetDisplayText(
-      Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord;
-      var AText: string);
     procedure cxGridDBTableView1SITUACAOGetDisplayText(
       Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord;
       var AText: string);
+    procedure BtnExcelcxGridTarefaClick(Sender: TObject);
   private
     procedure AtualizaGrid;
     function GetCodProSelecionado: String;
@@ -79,7 +79,8 @@ var
 implementation
 
 uses
-  uFormProInfo, uFormDetalheProdutos, uFormAdicionarSimilaridade, uFormInsumos;
+  uFormProInfo, uFormDetalheProdutos, uFormAdicionarSimilaridade, uFormInsumos,
+  cxGridExportLink, WinApi.ShellApi;
 
 {$R *.dfm}
 
@@ -98,6 +99,27 @@ end;
 procedure TFormFilaProducao.BtnAtualizaClick(Sender: TObject);
 begin
   DMFilaProducao.AtualizaFilaProducao;
+end;
+
+procedure TFormFilaProducao.BtnExcelcxGridTarefaClick(Sender: TObject);
+begin
+  SaveDialog.DefaultExt:= '.xls';
+  SaveDialog.FileName:= 'Fila de produção.xls';
+  if SaveDialog.Execute then
+  begin
+    if cxGridDBTableView.DataController.FilteredRecordCount > 65000 then
+    begin
+      ShowMessage('Não é possível exportar mais de 65000 linhas para o excel! Faça um filtro e tente novamente.');
+      Exit;
+    end;
+
+    ExportGridToExcel(SaveDialog.FileName, cxGrid, True, True, True, 'xls');
+
+    begin
+      showmessage('Arquivo Exportado com Sucesso.');
+      ShellExecute(Handle, 'open', pchar(SaveDialog.FileName), nil, nil, SW_SHOW);
+    end;
+  end;
 end;
 
 procedure TFormFilaProducao.BtnOpcoesClick(Sender: TObject);
@@ -130,16 +152,6 @@ end;
 procedure TFormFilaProducao.cxGridDBTableViewDblClick(Sender: TObject);
 begin
   TFormInsumos.AbrirInsumos(GetCodProSelecionado, DmEstoqProdutos.QryEstoqAPRESENTACAO.AsString);
-end;
-
-procedure TFormFilaProducao.cxGridDBTableViewPROBFALTAHOJEGetDisplayText(
-  Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord;
-  var AText: string);
-var
-  Val: Double;
-begin
-  if TryStrToFloat(AText, Val) then
-     AText:= FormatFloat('###0.00', Val*100)+' %';
 end;
 
 procedure TFormFilaProducao.VerInsumos1Click(Sender: TObject);

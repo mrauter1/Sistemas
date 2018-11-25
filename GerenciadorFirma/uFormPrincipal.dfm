@@ -366,8 +366,6 @@ object FormPrincipal: TFormPrincipal
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 1
-      ExplicitLeft = 6
-      ExplicitTop = 38
     end
   end
   object TreeViewMenu: TdxDBTreeView

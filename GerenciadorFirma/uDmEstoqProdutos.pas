@@ -52,6 +52,8 @@ type
     QryEstoqNOMEAPLICACAO: TStringField;
     QryEstoqRank: TLargeintField;
     procedure DataModuleCreate(Sender: TObject);
+    procedure QryEstoqProbFaltaHojeGetText(Sender: TField; var Text: string;
+      DisplayText: Boolean);
   private
 {    fDataSetDiasUteis: TDataSet;
     fUltimoDiasUteis, fUltimoPeriodo: Integer;}
@@ -261,5 +263,16 @@ begin
   //fDataSetDiasUteis:= nil;
 end;
 
+
+procedure TDmEstoqProdutos.QryEstoqProbFaltaHojeGetText(Sender: TField;
+  var Text: string; DisplayText: Boolean);
+
+  function FormataFieldPercentual(Sender: TField): String;
+  begin
+    Result:= FormatFloat('###0.00', Sender.AsFloat*100)+' %';
+  end;
+begin
+  Text:= FormataFieldPercentual(Sender);
+end;
 
 end.

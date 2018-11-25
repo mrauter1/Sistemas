@@ -59,7 +59,6 @@ type
     cxGridDBTableView1Descricao: TcxGridDBColumn;
     cxGridDBTableView1TamanhoCampo: TcxGridDBColumn;
     cxGridDBTableView1Visivel: TcxGridDBColumn;
-    cxGridDBTableView1Monetario: TcxGridDBColumn;
     cxGridDBTableView1Agrupamento: TcxGridDBColumn;
     cxGridDBTableView1Cor: TcxGridDBColumn;
     QryExec: TFDQuery;
@@ -82,6 +81,7 @@ type
     QryVisualizacoesDataHora: TSQLTimeStampField;
     DsVisualizacoes: TDataSource;
     DBRadioPaginaPadrao: TDBRadioGroup;
+    cxGridDBTableView1Formatacao: TcxGridDBColumn;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure BtnSalvarClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);

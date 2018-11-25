@@ -3,7 +3,8 @@ unit uSendMail;
 interface
 
 uses
-  SysUtils, Classes, IdSMTP, IdMessage, IdEmailAddress, IdExplicitTLSClientServerBase, IdSSLOpenSSL;
+  SysUtils, Classes, IdSMTP, IdMessage, IdEmailAddress, IdExplicitTLSClientServerBase, IdSSLOpenSSL,
+  IdMessageBuilder;
 
 type
   TMailSender = class(TComponent)
@@ -19,6 +20,7 @@ type
                         pRequerAutenticacao: Boolean; pFrom: String);
 
     function EnviarEmail(pAssunto, pCorpo, pPara: String; pCC: String = ''; pBCC: String = ''): Boolean;
+    procedure EnviarEmailComAnexo(pAssunto, pCorpo, pPara, pCC, pBCC, pAnexos: String);
   end;
 
 implementation
@@ -63,8 +65,6 @@ end;
 
 function TMailSender.EnviarEmail(pAssunto, pCorpo, pPara, pCC,
   pBCC: String): Boolean;
-var
-  FStr: String;
 begin
   FIdMessage:= TIdMessage.Create(Self);
   try
@@ -96,6 +96,62 @@ begin
   end;
 
   Result:= True;
+end;
+
+procedure TMailSender.EnviarEmailComAnexo(pAssunto, pCorpo, pPara, pCC,
+  pBCC: String; pAnexos: String);
+
+  procedure FillMessage;
+  var
+    MB: TIdMessageBuilderHtml;
+    FAnexo: String;
+  begin
+    MB := TIdMessageBuilderHtml.Create;
+    try
+      MB.HtmlCharSet := 'utf-8';
+      MB.PlainTextCharSet := 'utf-8';
+
+      if pCorpo.ToUpper.Contains('<HTML>') then
+        MB.Html.Text := pCorpo
+      else
+        MB.PlainText.Text := pCorpo;
+
+//      pAnexos.Split([';'])
+      for FAnexo in pAnexos.Split([';']) do
+        MB.Attachments.Add(FAnexo);
+
+      MB.FillMessage(FIdMessage);
+    finally
+      MB.Free;
+    end;
+  end;
+
+begin
+  FIdMessage:= TIdMessage.Create(Self);
+  try
+    FIdMessage.CharSet := 'ISO-8859-1';
+    FIdMessage.OnInitializeISO:= Self.InitializeISO88591;
+
+    FIdMessage.Subject:= pAssunto;
+    FIdMessage.Body.Text:= pCorpo;
+
+    FIdMessage.FromList.EMailAddresses:= From;
+
+    FIdMessage.Recipients.EMailAddresses:= pPara;
+    FIdMessage.CCList.EMailAddresses:= pCC;
+    FIdMessage.BccList.EMailAddresses:= pBCC;
+
+    FillMessage;
+
+		if not FIdSmtp.Connected then
+			FIdSmtp.Connect();
+
+//    FIdSmtp.Authenticate;
+
+    FIdSmtp.Send(fIdMessage);
+  finally
+    FIdMessage.Free;
+  end;
 end;
 
 end.

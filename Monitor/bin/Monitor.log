@@ -1,0 +1,100 @@
+08112018-19:51:23 -> Enviando email consulta: MetaVendedores, para os emails: marcelorauter@rauter.com.br; alessandra@rauter.com.br; ricardo@rauter.com.br
+08112018-19:52:08 -> Enviando email consulta: MetaVendedores, para os emails: marcelorauter@rauter.com.br; alessandra@rauter.com.br; ricardo@rauter.com.br
+08112018-19:54:23 -> Enviando email consulta: MetaVendedores, para os emails: marcelorauter@rauter.com.br; alessandra@rauter.com.br; ricardo@rauter.com.br
+09112018-11:41:32 -> Enviando email consulta: MetaVendedores, para os emails: marcelorauter@rauter.com.br; alessandra@rauter.com.br; ricardo@rauter.com.br
+09112018-11:42:14 -> Enviando email consulta: MargemPorVenda, para os emails: marcelorauter@gmail.com
+09112018-11:51:02 -> Enviando email consulta: MargemPorVenda, para os emails: marcelorauter@gmail.com
+09112018-11:52:48 -> Enviando email consulta: DiferencaOP, para os emails: silvia.muniz@rauter.com.br
+12112018-18:55:32 -> Iniciando monitor...
+12112018-18:55:32 -> Criando TConSqlServer
+12112018-18:55:33 -> Criando TConFirebird
+12112018-18:55:33 -> Criando TForm1
+12112018-18:55:33 -> Criando TDmSqlUtils
+12112018-18:55:33 -> Criando TDmGeradorConsultas
+12112018-18:55:33 -> Criando TCon
+12112018-18:55:33 -> Inicializando message loop
+12112018-19:04:11 -> Iniciando monitor...
+12112018-19:04:11 -> Criando TConSqlServer
+12112018-19:04:12 -> Criando TConFirebird
+12112018-19:04:12 -> Criando TForm1
+12112018-19:04:12 -> Criando TDmSqlUtils
+12112018-19:04:12 -> Criando TDmGeradorConsultas
+12112018-19:04:12 -> Criando TCon
+12112018-19:04:12 -> Carregando Gatihlos.xml
+12112018-19:04:12 -> Criando Gatilhos
+14112018-12:29:16 -> Iniciando monitor...
+14112018-12:29:16 -> Criando TConSqlServer
+14112018-12:29:16 -> Criando TConFirebird
+14112018-12:29:17 -> Criando TForm1
+14112018-12:29:17 -> Criando TDmSqlUtils
+14112018-12:29:17 -> Criando TDmGeradorConsultas
+14112018-12:29:17 -> Criando TCon
+14112018-12:29:17 -> Carregando Gatihlos.xml
+14112018-12:29:17 -> Criando Gatilhos
+14112018-12:38:10 -> Iniciando monitor...
+14112018-12:38:10 -> Criando TConSqlServer
+14112018-12:38:10 -> Criando TConFirebird
+14112018-12:38:11 -> Criando TForm1
+14112018-12:38:11 -> Criando TDmSqlUtils
+14112018-12:38:11 -> Criando TDmGeradorConsultas
+14112018-12:38:11 -> Criando TCon
+14112018-12:38:11 -> Carregando Gatihlos.xml
+14112018-12:38:11 -> Criando Gatilhos
+14112018-12:41:36 -> Enviando email consulta: DiferencaOP, para os emails: marcelorauter@gmail.com
+14112018-12:41:39 -> Inicializando message loop
+19112018-16:24:45 -> Iniciando monitor...
+19112018-16:24:45 -> Criando TConSqlServer
+19112018-16:24:46 -> Criando TConFirebird
+19112018-16:24:46 -> Criando TForm1
+19112018-16:24:46 -> Criando TDmSqlUtils
+19112018-16:24:46 -> Criando TDmGeradorConsultas
+19112018-16:24:46 -> Criando TCon
+19112018-16:24:46 -> Carregando Gatihlos.xml
+19112018-16:24:49 -> Enviando email consulta: MetaVendaEvolutivo, para os emails: marcelorauter@gmail.com; alessandra@rauter.com.br; ricardo@rauter.com.br
+19112018-16:24:59 -> Inicializando message loop
+19112018-16:27:54 -> Iniciando monitor...
+19112018-16:27:54 -> Criando TConSqlServer
+19112018-16:27:55 -> Criando TConFirebird
+19112018-16:27:55 -> Criando TForm1
+19112018-16:27:55 -> Criando TDmSqlUtils
+19112018-16:27:55 -> Criando TDmGeradorConsultas
+19112018-16:27:55 -> Criando TCon
+19112018-16:27:55 -> Carregando Gatihlos.xml
+19112018-16:28:24 -> Enviando email consulta: MetaVendaEvolutivo, para os emails: marcelorauter@gmail.com; alessandra@rauter.com.br; ricardo@rauter.com.br
+19112018-16:28:33 -> Inicializando message loop
+22112018-10:21:36 -> Iniciando monitor...
+22112018-10:21:36 -> Criando TConSqlServer
+22112018-10:21:37 -> Criando TConFirebird
+22112018-10:21:37 -> Criando TForm1
+22112018-10:21:37 -> Criando TDmSqlUtils
+22112018-10:21:37 -> Criando TDmGeradorConsultas
+22112018-10:21:37 -> Criando TCon
+22112018-10:21:37 -> Carregando Gatihlos.xml
+22112018-10:21:37 -> Criando Gatilhos
+22112018-10:21:37 -> Gatilhos criados
+22112018-10:21:37 -> Inicializando message loop
+22112018-10:21:39 -> Enviando email consulta: DiferencaOP, para os emails: marcelorauter@gmail.com;silvia.muniz@rauter.com.br
+22112018-10:21:43 -> Enviando email consulta: VendasMargemBaixaOntem, para os emails: marcelorauter@gmail.com; alessandra@rauter.com.br; ricardo@rauter.com.br
+23112018-17:22:14 -> Iniciando monitor...
+23112018-17:22:14 -> Criando TConSqlServer
+23112018-17:22:15 -> Criando TConFirebird
+23112018-17:22:15 -> Criando TForm1
+23112018-17:22:15 -> Criando TDmSqlUtils
+23112018-17:22:15 -> Criando TDmGeradorConsultas
+23112018-17:22:15 -> Criando TCon
+23112018-17:22:15 -> Carregando Gatihlos.xml
+23112018-17:23:13 -> Enviando email consulta: SugestaoAumentoMargem, para os emails: marcelorauter@gmail.com;alessandra@rauter.com.br
+23112018-17:23:46 -> Enviando email consulta: SugestaoAumentoMargem, para os emails: marcelorauter@gmail.com;vendas2@rauter.com.br
+23112018-17:23:48 -> Enviando email consulta: SugestaoAumentoMargem, para os emails: marcelorauter@gmail.com;vendas1@rauter.com.br
+23112018-17:23:50 -> Enviando email consulta: SugestaoAumentoMargem, para os emails: marcelorauter@gmail.com;vendas@rauter.com.br
+23112018-17:23:54 -> Enviando email consulta: SugestaoAumentoMargem, para os emails: marcelorauter@gmail.com;jeanete@rauter.com.br
+29112018-18:17:25 -> Iniciando monitor...
+29112018-18:17:25 -> Criando TConSqlServer
+29112018-18:17:25 -> Criando TConFirebird
+29112018-18:17:25 -> Criando TForm1
+29112018-18:17:25 -> Criando TDmSqlUtils
+29112018-18:17:25 -> Criando TDmGeradorConsultas
+29112018-18:17:25 -> Criando TCon
+29112018-18:17:25 -> Carregando Gatihlos.xml
+29112018-18:17:39 -> Enviando email consulta: MetaVendedores, para os emails: marcelorauter@gmail.com
+29112018-18:18:28 -> Inicializando message loop

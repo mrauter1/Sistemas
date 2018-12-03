@@ -131,6 +131,8 @@ type
     procedure EmbedFormEmTab(pForm: TForm; pTab: TChromeTab; pTabOwnsForm: Boolean = True);
     procedure RemoveTabPanelInterno(pTabPanel: TTabPanel);
     procedure RemoveTab(pTab: TChromeTab);
+    function ObtemDescricaoConsulta(pIDConsulta: Integer): String;
+    procedure AoEditarConsulta(Sender: TObject);
     { Private declarations }
   public
     { Public declarations }
@@ -302,16 +304,15 @@ begin
     Result:= TdxDBTreeNode(FNode).KeyFieldValue;
 end;
 
+function TFormPrincipal.ObtemDescricaoConsulta(pIDConsulta: Integer): String;
+begin
+  Result:= ConSqlServer.RetornaValor(Format('SELECT DESCRICAO FROM cons.Consultas where ID = %d', [pIDConsulta]), '');
+end;
+
 procedure TFormPrincipal.NovaConsulta1Click(Sender: TObject);
 var
   FIDPai: Integer;
   FIDConsulta: Integer;
-
-  function ObtemDescricaoConsulta(pIDConsulta: Integer): String;
-  begin
-    Result:= ConSqlServer.RetornaValor(Format('SELECT DESCRICAO FROM cons.Consultas where ID = %d', [pIDConsulta]), '');
-  end;
-
 begin
   if not (puDesenvolvedor in AppConfig.GruposUsuario) then
     Exit;
@@ -356,15 +357,41 @@ begin
   QryMenu.Post;
 end;
 
-procedure TFormPrincipal.EditarConsulta1Click(Sender: TObject);
+procedure TFormPrincipal.AoEditarConsulta(Sender: TObject);
 var
-  FIDAcao: Integer;
+  FrmConsulta: TFormRelatoriosPersonalizados;
+  FIDConsulta: Integer;
+  FDescricao: String;
+begin
+  if not (Sender is TFormRelatoriosPersonalizados) then
+    Exit;
+
+  FrmConsulta:= (Sender as TFormRelatoriosPersonalizados);
+
+  FIDConsulta:= FrmConsulta.EdtID.Field.Value;
+
+  FDescricao:= FrmConsulta.EdtDescricao.Field.Value;
+
+  if not QryMenu.Locate('IDAcao', FIDConsulta, []) then
+    Exit;
+
+  if FDescricao <> QryMenuDescricao.AsString then
+  begin
+    QryMenu.Edit;
+    QryMenuDescricao.AsString:= FDescricao;
+    QryMenu.Post;
+  end;
+end;
+
+procedure TFormPrincipal.EditarConsulta1Click(Sender: TObject);
 begin
   if not (puDesenvolvedor in AppConfig.GruposUsuario) then
     Exit;
 
-  if QryMenuTipo.AsInteger = 1 then
-    TFormRelatoriosPersonalizados.AbreConsulta(QryMenuIDAcao.AsInteger);
+  if QryMenuTipo.AsInteger <> 1 then
+    Exit;
+
+  TFormRelatoriosPersonalizados.AbreConsulta(QryMenuIDAcao.AsInteger, AoEditarConsulta);
 end;
 
 procedure TFormPrincipal.Excluir1Click(Sender: TObject);

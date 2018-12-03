@@ -91,6 +91,7 @@ type
     procedure FormDestroy(Sender: TObject);
   private
     FDm: TDmGeradorConsultas;
+    AoFecharForm: TNotifyEvent;
     function ConsultaExiste: Boolean;
     procedure VerificaECriaCampos;
     procedure VerificaECriaParametros;
@@ -106,7 +107,7 @@ type
     { Private declarations }
   public
     LiberaAoFechar: Boolean;
-    class function AbreConsulta(pCodConsulta: Integer): TFormRelatoriosPersonalizados;
+    class function AbreConsulta(pCodConsulta: Integer; FAoFecharForm: TNotifyEvent = nil): TFormRelatoriosPersonalizados;
     class function CadastrarNovaConsulta: Integer;
 
     property DM: TDmGeradorConsultas read FDM;
@@ -121,10 +122,11 @@ implementation
 
 { TFormRelatoriosPersonalizados }
 
-class function TFormRelatoriosPersonalizados.AbreConsulta(pCodConsulta: Integer): TFormRelatoriosPersonalizados;
+class function TFormRelatoriosPersonalizados.AbreConsulta(pCodConsulta: Integer; FAoFecharForm: TNotifyEvent = nil): TFormRelatoriosPersonalizados;
 begin
   Result:= TFormRelatoriosPersonalizados.Create(Application);
   Result.CarregaConsulta(pCodConsulta);
+  Result.AoFecharForm:= FAoFecharForm;
   Result.Show;
 end;
 
@@ -294,6 +296,9 @@ end;
 procedure TFormRelatoriosPersonalizados.FormClose(Sender: TObject;
   var Action: TCloseAction);
 begin
+  if Assigned(AoFecharForm) then
+    AoFecharForm(Sender);
+
   if LiberaAoFechar then
     Action:= caFree;
 end;

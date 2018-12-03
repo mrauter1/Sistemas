@@ -64,6 +64,7 @@ object FormFilaProducao: TFormFilaProducao
       end
       object cxGridDBTableViewPROBFALTAHOJE: TcxGridDBColumn
         DataBinding.FieldName = 'PROBFALTAHOJE'
+        PropertiesClassName = 'TcxTextEditProperties'
         Width = 65
       end
       object cxGridDBTableViewNUMPEDIDOS: TcxGridDBColumn

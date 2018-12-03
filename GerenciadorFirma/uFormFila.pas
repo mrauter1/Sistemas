@@ -10,7 +10,7 @@ uses
   cxCustomData, cxFilter, cxData, cxDataStorage, cxEdit, cxNavigator, cxDBData,
   Vcl.ExtCtrls, cxGridLevel, cxClasses, cxGridCustomView, cxGridCustomTableView,
   cxGridTableView, cxGridDBTableView, cxGrid, uFormGlobal, uPedidos, cxTextEdit,
-  Vcl.Buttons, Vcl.Menus, uDmEstoqProdutos;
+  Vcl.Buttons, Vcl.Menus, uDmEstoqProdutos, cxSpinEdit;
 
 type
   TFormFilaProducao = class(TForm)

@@ -45,10 +45,30 @@ function Func_DataTime_Firebird(parData: TDateTime): String;
 
 function BlendColors(Color1, Color2: TColor; A: Byte): TColor;
 
+procedure BitmapFileToPNG(const Source, Dest: String);
+
 implementation
 
 uses
-  SysUtils, System.TypInfo, DateUtils;
+  SysUtils, System.TypInfo, DateUtils, Vcl.Imaging.pngImage;
+
+procedure BitmapFileToPNG(const Source, Dest: String);
+var
+  Bitmap: TBitmap;
+  PNG: TPNGObject;
+begin
+  Bitmap := TBitmap.Create;
+  PNG := TPNGObject.Create;
+  {In case something goes wrong, free booth Bitmap and PNG}
+  try
+    Bitmap.LoadFromFile(Source);
+    PNG.Assign(Bitmap);    //Convert data into png
+    PNG.SaveToFile(Dest);
+  finally
+    Bitmap.Free;
+    PNG.Free;
+  end
+end;
 
 function GetMesString(pDate: TDateTime): String;
 begin

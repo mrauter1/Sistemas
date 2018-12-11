@@ -28,7 +28,6 @@ uses
   uFormValidaModelos in 'uFormValidaModelos.pas' {FormValidaModelos},
   uConSqlServer in 'Fontes\uConSqlServer.pas' {ConSqlServer: TDataModule},
   uDmConnection in '..\utils\uDmConnection.pas' {DmConnection: TDataModule},
-  uConFirebird in 'uConFirebird.pas' {ConFirebird: TDataModule},
   uFrmConsulta in 'Fontes\uFrmConsulta.pas' {FrmConsulta},
   uFormExecSql in 'Fontes\uFormExecSql.pas' {FormExecSql},
   uFormRelatoriosPersonalizados in 'Fontes\uFormRelatoriosPersonalizados.pas' {FormRelatoriosPersonalizados},
@@ -37,7 +36,8 @@ uses
   uAtualiza in 'Fontes\uAtualiza.pas',
   uAppConfig in 'uAppConfig.pas',
   uSendMail in '..\utils\uSendMail.pas',
-  uDmGeradorConsultas in '..\utils\uDmGeradorConsultas.pas' {DmGeradorConsultas: TDataModule};
+  uDmGeradorConsultas in '..\utils\uDmGeradorConsultas.pas' {DmGeradorConsultas: TDataModule},
+  uConFirebird in '..\utils\uConFirebird.pas' {ConFirebird: TDataModule};
 
 {$R *.res}
 

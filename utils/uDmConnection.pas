@@ -9,7 +9,7 @@ uses
   Variants, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error,
   FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
   FireDAC.Phys, FireDAC.Phys.FB, FireDAC.Phys.FBDef, FireDAC.ConsoleUI.Wait,
-  FireDAC.Comp.Client, Utils, uAppConfig;
+  FireDAC.Comp.Client, Utils, uAppConfig, System.Rtti;
 
 type
  cfMapField = record
@@ -36,6 +36,8 @@ type
 
     procedure ExecutaComando(pSql: String);
 
+    function RetornaArray<T>(Sql: String; ValDefault: T): TArray<T>;
+    function RetornaVarArray(Sql: String; ValDefault: Variant): Variant;
     function RetornaValor(Sql: String; ValDefault: Variant): Variant; overload;
     function RetornaValor(Sql: String): Variant; overload;
     function RetornaInteiro(Sql: String; pDefault: Integer = 0): Integer;
@@ -283,6 +285,61 @@ begin
   FDataSet:= RetornaDataSet(Sql);
   try
      Result:= FDataSet.Fields[0].AsVariant;
+  finally
+    FDataSet.Free;
+  end;
+end;
+
+function TDmConnection.RetornaArray<T>(Sql: String; ValDefault: T): TArray<T>;
+var
+  FDataSet: TDataSet;
+  I: Integer;
+begin
+  FDataSet:= RetornaDataSet(Sql);
+  try
+    SetLength(Result, FDataSet.RecordCount);
+    I:= 0;
+
+    FDataSet.First;
+    while not FDataSet.Eof do
+    begin
+      FDataSet.Fields[0].Value;
+      if VarIsNull(FDataSet.Fields[0].Value) then
+        Result[I]:= ValDefault
+      else
+        Result[I]:= TValue.FromVariant(FDataSet.Fields[0].Value).AsType<T>;
+
+      FDataSet.Next;
+      Inc(I);
+    end;
+
+  finally
+    FDataSet.Free;
+  end;
+end;
+
+function TDmConnection.RetornaVarArray(Sql: String;
+  ValDefault: Variant): Variant;
+var
+  FDataSet: TDataSet;
+  I: Integer;
+begin
+  FDataSet:= RetornaDataSet(Sql);
+  try
+    Result:= VarArrayCreate([0, FDataSet.RecordCount-1], varVariant);
+    I:= 0;
+
+    FDataSet.First;
+    while not FDataSet.Eof do
+    begin
+      Result[I]:= FDataSet.Fields[0].AsVariant;
+      if VarIsNull(Result[I]) then
+        Result[I]:= ValDefault;
+
+      FDataSet.Next;
+      Inc(I);
+    end;
+
   finally
     FDataSet.Free;
   end;

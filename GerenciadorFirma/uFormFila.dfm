@@ -3,7 +3,7 @@ object FormFilaProducao: TFormFilaProducao
   Top = 0
   Caption = 'Fila'
   ClientHeight = 542
-  ClientWidth = 990
+  ClientWidth = 998
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,10 +16,11 @@ object FormFilaProducao: TFormFilaProducao
   object cxGrid: TcxGrid
     Left = 0
     Top = 0
-    Width = 990
+    Width = 998
     Height = 500
     Align = alClient
     TabOrder = 0
+    ExplicitWidth = 990
     object cxGridDBTableView: TcxGridDBTableView
       PopupMenu = PopupMenuOpcoes
       OnDblClick = cxGridDBTableViewDblClick
@@ -155,23 +156,25 @@ object FormFilaProducao: TFormFilaProducao
   object Panel1: TPanel
     Left = 0
     Top = 500
-    Width = 990
+    Width = 998
     Height = 42
     Align = alBottom
     Caption = 'Panel1'
     TabOrder = 1
+    ExplicitWidth = 990
     DesignSize = (
-      990
+      998
       42)
     object BtnAtualiza: TButton
       Left = 272
       Top = 9
-      Width = 439
+      Width = 447
       Height = 25
       Anchors = [akLeft, akRight, akBottom]
       Caption = 'Atualiza'
       TabOrder = 0
       OnClick = BtnAtualizaClick
+      ExplicitWidth = 439
     end
     object BtnOpcoes: TBitBtn
       Left = 5

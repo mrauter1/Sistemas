@@ -26,7 +26,7 @@ uses
   uFormInsumos in 'Fontes\uFormInsumos.pas' {FormInsumos},
   uFormSelecionaModelos in 'Fontes\uFormSelecionaModelos.pas' {FormSelecionaModelo},
   uFormValidaModelos in 'uFormValidaModelos.pas' {FormValidaModelos},
-  uConSqlServer in 'Fontes\uConSqlServer.pas' {ConSqlServer: TDataModule},
+  uConSqlServer in '..\utils\uConSqlServer.pas' {ConSqlServer: TDataModule},
   uDmConnection in '..\utils\uDmConnection.pas' {DmConnection: TDataModule},
   uFrmConsulta in 'Fontes\uFrmConsulta.pas' {FrmConsulta},
   uFormExecSql in 'Fontes\uFormExecSql.pas' {FormExecSql},

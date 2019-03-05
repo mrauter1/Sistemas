@@ -12,7 +12,7 @@ uses
   Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Menus, FireDAC.Stan.Intf, FireDAC.Stan.Option,
   FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf,
   FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet,
-  FireDAC.Comp.Client, uConSqlServer;
+  FireDAC.Comp.Client, uConSqlServer, Vcl.Buttons, WinApi.ShellApi;
 
 type
   TFormDetalheProdutos = class(TForm)
@@ -69,6 +69,11 @@ type
     cxGridDBTableViewPRODUCAOMINIMA: TcxGridDBColumn;
     cxGridDBTableViewSOMANOPESOLIQ: TcxGridDBColumn;
     cxGridLevel: TcxGridLevel;
+    Panel1: TPanel;
+    BtnAtualiza: TButton;
+    BtnOpcoes: TBitBtn;
+    BtnExcelcxGridTarefa: TBitBtn;
+    SaveDialog: TSaveDialog;
     procedure cxGridDBTableViewCellDblClick(Sender: TcxCustomGridTableView;
       ACellViewInfo: TcxGridTableDataCellViewInfo; AButton: TMouseButton;
       AShift: TShiftState; var AHandled: Boolean);
@@ -81,6 +86,7 @@ type
     procedure cxGridDBTableViewPercentDiasGetDisplayText(
       Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord;
       var AText: string);
+    procedure BtnExcelcxGridTarefaClick(Sender: TObject);
   private
     function GetCodProSelecionado: String;
     { Private declarations }
@@ -97,7 +103,7 @@ implementation
 {$R *.dfm}
 
 uses
-  uFormProInfo, uFormInsumos, uFormAdicionarSimilaridade;
+  uFormProInfo, uFormInsumos, uFormAdicionarSimilaridade, cxGridExportLink;
 
 procedure TFormDetalheProdutos.RefreshProduto(pCodProFoco: String = '');
 begin
@@ -138,6 +144,27 @@ end;
 procedure TFormDetalheProdutos.AbrirDetalheProClick(Sender: TObject);
 begin
   FormDetalheProdutos.AbreEFocaProduto(GetCodProSelecionado);
+end;
+
+procedure TFormDetalheProdutos.BtnExcelcxGridTarefaClick(Sender: TObject);
+begin
+  SaveDialog.DefaultExt:= '.xls';
+  SaveDialog.FileName:= 'Detalhamento da Análise do Produto.xls';
+  if SaveDialog.Execute then
+  begin
+    if cxGridDBTableView.DataController.FilteredRecordCount > 65000 then
+    begin
+      ShowMessage('Não é possível exportar mais de 65000 linhas para o excel! Faça um filtro e tente novamente.');
+      Exit;
+    end;
+
+    ExportGridToExcel(SaveDialog.FileName, cxGrid, True, True, True, 'xls');
+
+    begin
+      showmessage('Arquivo Exportado com Sucesso.');
+      ShellExecute(Handle, 'open', pchar(SaveDialog.FileName), nil, nil, SW_SHOW);
+    end;
+  end;
 end;
 
 function TFormDetalheProdutos.GetCodProSelecionado: String;

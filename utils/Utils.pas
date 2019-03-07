@@ -47,10 +47,30 @@ function BlendColors(Color1, Color2: TColor; A: Byte): TColor;
 
 procedure BitmapFileToPNG(const Source, Dest: String);
 
+function RemoveAcento(aText : string) : string;
+
 implementation
 
 uses
   SysUtils, System.TypInfo, DateUtils, Vcl.Imaging.pngImage;
+
+function RemoveAcento(aText : string) : string;
+const
+  ComAcento = '‡‚ÍÙ˚„ı·ÈÌÛ˙Á¸Ò˝¿¬ ‘€√’¡…Õ”⁄«‹—›';
+  SemAcento = 'aaeouaoaeioucunyAAEOUAOAEIOUCUNY';
+var
+  x: Cardinal;
+begin;
+  for x := 1 to Length(aText) do
+  try
+    if (Pos(aText[x], ComAcento) <> 0) then
+      aText[x] := SemAcento[ Pos(aText[x], ComAcento) ];
+  except on E: Exception do
+    raise Exception.Create('Erro no processo.');
+  end;
+
+  Result := aText;
+end;
 
 procedure BitmapFileToPNG(const Source, Dest: String);
 var

@@ -98,3 +98,70 @@
 29112018-18:17:25 -> Carregando Gatihlos.xml
 29112018-18:17:39 -> Enviando email consulta: MetaVendedores, para os emails: marcelorauter@gmail.com
 29112018-18:18:28 -> Inicializando message loop
+01042019-12:51:55 -> Iniciando monitor...
+01042019-12:51:55 -> Criando TConSqlServer
+01042019-12:51:56 -> Criando TConFirebird
+01042019-12:51:56 -> Criando TForm1
+01042019-12:51:56 -> Criando TDmSqlUtils
+01042019-12:51:56 -> Criando TDmGeradorConsultas
+01042019-12:51:56 -> Criando TCon
+01042019-12:53:08 -> Enviando email consulta: MetaVendaEvolutivo, para os emails: marcelorauter@gmail.com;marcelo@rauter.com.br
+01042019-12:56:34 -> Iniciando monitor...
+01042019-12:56:34 -> Criando TConSqlServer
+01042019-12:56:34 -> Criando TConFirebird
+01042019-12:56:34 -> Criando TForm1
+01042019-12:56:35 -> Criando TDmSqlUtils
+01042019-12:56:35 -> Criando TDmGeradorConsultas
+01042019-12:56:35 -> Criando TCon
+01042019-12:57:58 -> Enviando email consulta: MetaVendaEvolutivo, para os emails: marcelorauter@gmail.com;marcelo@rauter.com.br
+05042019-17:45:17 -> Iniciando monitor...
+05042019-17:45:17 -> Criando TConSqlServer
+05042019-17:45:17 -> Criando TConFirebird
+05042019-17:45:18 -> Criando TForm1
+05042019-17:45:18 -> Criando TDmSqlUtils
+05042019-17:45:18 -> Criando TDmGeradorConsultas
+05042019-17:45:18 -> Criando TCon
+05042019-17:45:18 -> Carregando Gatihlos.xml
+05042019-17:45:18 -> Criando Gatilhos
+05042019-17:46:11 -> Inicializando message loop
+25042019-12:53:48 -> Iniciando monitor...
+25042019-12:53:48 -> Criando TConSqlServer
+25042019-12:53:49 -> Criando TConFirebird
+25042019-12:53:50 -> Criando TForm1
+25042019-12:53:50 -> Criando TDmSqlUtils
+25042019-12:53:50 -> Criando TDmGeradorConsultas
+25042019-12:53:50 -> Criando TCon
+25042019-12:54:41 -> Enviando email consulta: DiaPrevistoFalta, para os emails: marcelorauter@gmail.com
+25042019-12:55:06 -> Inicializando message loop
+25042019-13:07:40 -> Iniciando monitor...
+25042019-13:07:40 -> Criando TConSqlServer
+25042019-13:07:40 -> Criando TConFirebird
+25042019-13:07:40 -> Criando TForm1
+25042019-13:07:40 -> Criando TDmSqlUtils
+25042019-13:07:40 -> Criando TDmGeradorConsultas
+25042019-13:07:41 -> Criando TCon
+25042019-13:08:53 -> Enviando email consulta: DiaPrevistoFalta, para os emails: marcelorauter@gmail.com
+25042019-13:09:30 -> Inicializando message loop
+25042019-13:12:28 -> Iniciando monitor...
+25042019-13:12:28 -> Criando TConSqlServer
+25042019-13:12:29 -> Criando TConFirebird
+25042019-13:12:29 -> Criando TForm1
+25042019-13:12:29 -> Criando TDmSqlUtils
+25042019-13:12:29 -> Criando TDmGeradorConsultas
+25042019-13:12:29 -> Criando TCon
+25042019-13:13:41 -> Iniciando monitor...
+25042019-13:13:41 -> Criando TConSqlServer
+25042019-13:13:41 -> Criando TConFirebird
+25042019-13:13:42 -> Criando TForm1
+25042019-13:13:42 -> Criando TDmSqlUtils
+25042019-13:13:42 -> Criando TDmGeradorConsultas
+25042019-13:13:42 -> Criando TCon
+25042019-13:14:28 -> Enviando email consulta: DiaPrevistoFalta, para os emails: marcelorauter@gmail.com; silvia.muniz@rauter.com.br; alessandra@rauter.com.br; ricardo@rauter.com.br
+25042019-13:15:15 -> Inicializando message loop
+25042019-15:13:53 -> Iniciando monitor...
+25042019-15:13:53 -> Criando TConSqlServer
+25042019-15:13:53 -> Criando TConFirebird
+25042019-15:13:53 -> Criando TForm1
+25042019-15:13:54 -> Criando TDmSqlUtils
+25042019-15:13:54 -> Criando TDmGeradorConsultas
+25042019-15:13:54 -> Criando TCon

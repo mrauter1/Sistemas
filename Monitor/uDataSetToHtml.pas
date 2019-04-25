@@ -18,7 +18,6 @@ type
     procedure ExecutaConsulta;
 
     function ConsultaParaHtml: String; virtual;
-    function ExportaTabelaParaExcel: String; virtual;
   public
     Titulo: String;
     Texto: String;
@@ -33,6 +32,7 @@ type
     procedure Enviar; virtual;
 
     procedure EnviarTabela; virtual;
+    function ExportaTabelaParaExcel: String; virtual;
   end;
 
 procedure WriteLog(pTexto: String);

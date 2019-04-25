@@ -48,12 +48,19 @@ type
     CdsGatilhos: TClientDataSet;
     CdsGatilhosNome: TStringField;
     CdsGatilhosUltimaExec: TDateTimeField;
+    QrySimilares: TFDQuery;
+    QrySimilaresCod1: TStringField;
+    QrySimilaresCod2: TStringField;
     procedure DataModuleCreate(Sender: TObject);
     procedure CdsGatilhosAfterPost(DataSet: TDataSet);
   private
     procedure EnviaMetaEvolutivo;
     procedure EnviaAumentoPreco;
     function GetEmailVendedor(pCodVendedor: String): String;
+    procedure EnviaMetaEvolutivoVendedor(pCodVendedor, pEmail: String);
+//    procedure AtualizaProdutosSimilares;
+    procedure EnviaDataFaltaProduto;
+    procedure FazBackup;
   protected
     FEnviaEmailConsulta: TEnviaEmailConsulta;
     function GetListaComprovantes: String;
@@ -68,9 +75,8 @@ type
   end;
 
   TEnviaEmailMetaVendas = class(TEnviaEmailConsulta)
-  protected
+  public
     function ExportaTabelaParaExcel: String; override;
-  private
     class function EnviarEmail: Boolean;
   end;
 
@@ -133,7 +139,6 @@ end;
 
 procedure TCon.DataModuleCreate(Sender: TObject);
 begin
-//  EnviaMetaVendedor
   try
     uDataSetToHtml.WriteLog('Carregando Gatihlos.xml');
     CdsGatilhos.LoadFromFile('Gatilhos.xml');
@@ -143,6 +148,22 @@ begin
     CdsGatilhos.CreateDataSet;
 
   uDataSetToHtml.WriteLog('Criando Gatilhos');
+
+  TGatilho.Create(Self,
+          'FazBackup',
+          procedure()
+          begin
+            FazBackup;
+          end,
+          StrToTime('23:10:00'), TercaASabado);
+
+{  TGatilho.Create(Self,
+          'AtualizaProdutosSimilares',
+          procedure()
+          begin
+            AtualizaProdutosSimilares;
+          end,
+          StrToTime('01:00:00'), TercaASabado);     }
 
   TGatilho.Create(Self,
           'EnviaMetaVendas',
@@ -184,7 +205,41 @@ begin
           end,
           StrToTime('04:00:00'), TercaASabado);
 
+  TGatilho.Create(Self,
+          'EnviaDataFaltaProduto',
+          procedure()
+          begin
+            EnviaDataFaltaProduto;
+          end,
+          StrToTime('04:10:00'), TercaASabado);
+
   uDataSetToHtml.WriteLog('Gatilhos criados');
+end;
+                      {
+procedure TCon.AtualizaProdutosSimilares;
+
+  procedure Adiciona(pCodPro1, pCodPro2: String);
+  const
+    cSql = ' INSERT INTO PRODUTOSIMILAR (CODPRODUTO, CODPROSIMILAR) VALUES (''%s'', ''%s'') ';
+  begin
+    ConFirebird.ExecutaComando(Format(cSql, [pCodPro1, pCodPro2]));
+  end;
+
+begin
+  QrySimilares.Close;
+  QrySimilares.Open;
+
+  QrySimilares.First;
+  while not QrySimilares.Eof do
+  begin
+    Adiciona(QrySimilaresCod1.AsString, QrySimilaresCod2.AsString);
+    QrySimilares.Next;
+  end;
+end;              }
+
+procedure TCon.FazBackup;
+begin
+  ConSqlServer.ExecutaComando('exec FazBackup');
 end;
 
 procedure TCon.EnviaMargemPorVendas;
@@ -222,6 +277,29 @@ begin
     FEnviaEmailConsulta.Free;
   end;
 end;
+
+procedure TCon.EnviaDataFaltaProduto;
+begin
+  FEnviaEmailConsulta:= TEnviaEmailConsulta.Create(Self);
+  try
+    FEnviaEmailConsulta.ConsultaNome:= 'DiaPrevistoFalta';
+//    FEnviaEmailConsulta.Destinatarios:= 'marcelorauter@gmail.com;silvia.muniz@rauter.com.br';
+    FEnviaEmailConsulta.Destinatarios:= 'marcelorauter@gmail.com; silvia.muniz@rauter.com.br; alessandra@rauter.com.br; ricardo@rauter.com.br';
+    FEnviaEmailConsulta.Titulo:= 'Previsão da Data em que a Matéria Prima vai faltar';
+    FEnviaEmailConsulta.Texto:= 'Relatório com todas as Matérias Primas e a previsão da data em que vai haver falta. '
+                                 +sLineBreak+sLineBreak
+                                 +'O cálculo da data é feito levando em consideração o estoque atual, a demanda diária e a quantidade de pedidos agendados para a matéria prima e dos produtos que se utilizam dela para sua produção.'
+                                 +' Nos casos em que o pedido é de produto industrializado se considera a quantidade proporcional de matéria prima utilizada na fabricação de acordo com a Ordem de Produção cadastrada no sistema.'
+                                 +sLineBreak+sLineBreak
+                                 +'É considerado o percentual de aproximadamente 20% de chance para a falta do produto na data calculada, ou seja, existe 80% de chance de que não ocorra falta na data ou antes dela.';
+    FEnviaEmailConsulta.TipoVisualizacao:= tvTabela;
+    FEnviaEmailConsulta.EnviarTabela;
+
+  finally
+;    FEnviaEmailConsulta.Free;
+  end;
+end;
+
 
 procedure TCon.EnviaMetaVendas;
 begin
@@ -269,14 +347,40 @@ begin
   Result:= ConSqlServer.RetornaValor('SELECT EMAIL FROM VENDEDOR WHERE CODVENDEDOR = '+QuotedStr(pCodVendedor)+' ', '');
 end;
 
+
+procedure TCon.EnviaMetaEvolutivoVendedor(pCodVendedor, pEmail: String);
+begin
+  FEnviaEmailConsulta:= TEnviaEmailConsulta.Create(Self);
+  try
+    FEnviaEmailConsulta.ConsultaNome:= 'MetaVendaEvolutivo';
+    FEnviaEmailConsulta.Visualizacao:= 'Vendas e Meta no Período';
+
+    FEnviaEmailConsulta.Params.Add('CodVendedor', pCodVendedor);
+
+    FEnviaEmailConsulta.Params.Add('geDataIni', StartOfTheMonth(Now-1));
+    FEnviaEmailConsulta.Params.Add('geDataFim', EndOfTheDay(now-1));
+
+    FEnviaEmailConsulta.Destinatarios:= 'marcelorauter@gmail.com;'+pEmail;
+    FEnviaEmailConsulta.Titulo:= 'Vendas realizadas e meta esperada até o dia '+IntToStr(DayOf(now))
+                                                                            +' de ' +GetMesString(now)
+                                                                            +' de '+IntToStr(YearOf(Now));;
+    FEnviaEmailConsulta.Texto:= 'Segue em anexo gráfico com as vendas realizadas e meta esperada até o dia '+IntToStr(DayOf(now))
+                                                                            +' de ' +GetMesString(now)
+                                                                            +' de '+IntToStr(YearOf(Now));;
+
+    FEnviaEmailConsulta.TipoVisualizacao:= tvGrafico;
+    FEnviaEmailConsulta.EnviarTabela;
+  finally
+    FEnviaEmailConsulta.Free;
+  end;
+end;
+
 procedure TCon.EnviaAumentoPreco;
 
   procedure EnviaAumentoPrecoVendedor(pCodVendedor, pEmail: String);
   begin
     FEnviaEmailConsulta:= TEnviaEmailConsulta.Create(Self);
     try
-
-
       FEnviaEmailConsulta.ConsultaNome:= 'SugestaoAumentoMargem';
   //    FEnviaEmailConsulta.Visualizacao:= '';
 
@@ -295,6 +399,7 @@ procedure TCon.EnviaAumentoPreco;
     end;
   end;
 
+
 var
   Vendedores: TDictionary<String, string>;
   Vendedor: String;
@@ -311,7 +416,10 @@ begin
     Vendedores.Add('000026', GetEmailVendedor('000026')); // Jeanete
 
     for Vendedor in Vendedores.Keys do
+    begin
       EnviaAumentoPrecoVendedor(Vendedor, Vendedores[Vendedor]);
+      EnviaMetaEvolutivoVendedor(Vendedor, Vendedores[Vendedor]);
+    end;
 
   finally
     Vendedores.Free;

@@ -15,33 +15,22 @@ type
   TFormInsumos = class(TForm)
     cxGrid: TcxGrid;
     cxGridDBTableView: TcxGridDBTableView;
-    cxGridDBTableView1: TcxGridDBTableView;
-    cxGridDBTableView1CODPEDIDO: TcxGridDBColumn;
-    cxGridDBTableView1QUANTIDADE: TcxGridDBColumn;
-    cxGridDBTableView1DIASPARAENTREGA: TcxGridDBColumn;
-    cxGridDBTableView1SIT: TcxGridDBColumn;
-    cxGridDBTableView1NOMECLIENTE: TcxGridDBColumn;
-    cxGridDBTableView1NOMETRANSPORTE: TcxGridDBColumn;
-    cxGridDBTableView1QUANTPENDENTE: TcxGridDBColumn;
     cxGridLevel: TcxGridLevel;
     DsInsumos: TDataSource;
     CdsInsumos: TClientDataSet;
     CdsInsumosCodProduto: TStringField;
     CdsInsumosAPRESENTACAO: TStringField;
     CdsInsumosQUANTINSUMO: TFloatField;
-    cxGridDBTableViewCODPRODUTO: TcxGridDBColumn;
     cxGridDBTableViewAPRESENTACAO: TcxGridDBColumn;
     cxGridDBTableViewQUANTINSUMO: TcxGridDBColumn;
     CdsInsumosDEMANDA: TFloatField;
     CdsInsumosSALDOATUAL: TFloatField;
-    cxGridDBTableViewSALDOATUAL: TcxGridDBColumn;
     CdsInsumosDIASESTOQUE: TFloatField;
     cxGridDBTableViewDIASESTOQUE: TcxGridDBColumn;
     PopupMenuOpcoes: TPopupMenu;
     VerSimilares1: TMenuItem;
     VerInsumos1: TMenuItem;
     CdsInsumosINSUMO: TStringField;
-    cxGridDBTableViewDEMANDADIARIA: TcxGridDBColumn;
     cxGridDBTableViewINSUMO: TcxGridDBColumn;
     CdsInsumosDetalhe: TClientDataSet;
     CdsInsumosDetalheDEMANDADIARIA: TFloatField;
@@ -53,12 +42,7 @@ type
     cxGridDBTableView2: TcxGridDBTableView;
     DSInsumosDetalhe: TDataSource;
     CdsInsumosDetalheCODPRO: TStringField;
-    cxGridDBTableView2CODPRODUTO: TcxGridDBColumn;
-    cxGridDBTableView2APRESENTACAO: TcxGridDBColumn;
-    cxGridDBTableView2SALDOATUAL: TcxGridDBColumn;
-    cxGridDBTableView2DEMANDADIARIA: TcxGridDBColumn;
     cxGridDBTableView2DIASESTOQUE: TcxGridDBColumn;
-    cxGridDBTableView2CODPRO: TcxGridDBColumn;
     CdsInsumosLITROS: TFloatField;
     cxGridDBTableViewLITROS: TcxGridDBColumn;
     CdsInsumosDENSIDADECALCULADA: TFloatField;
@@ -87,6 +71,14 @@ type
     CdsInsumosPERCLITROS: TFloatField;
     cxGridDBTableViewPERCPESO: TcxGridDBColumn;
     cxGridDBTableViewPERCLITROS: TcxGridDBColumn;
+    cxGridDBTableView2CODSIMILAR: TcxGridDBColumn;
+    cxGridDBTableView2PROSIMILAR: TcxGridDBColumn;
+    cxGridDBTableView2ESTOQUESUB: TcxGridDBColumn;
+    cxGridDBTableView2DEMANDASUB: TcxGridDBColumn;
+    cxGridDBTableViewESTOQUESUB: TcxGridDBColumn;
+    cxGridDBTableViewCODINSUMO: TcxGridDBColumn;
+    cxGridDBTableView2CODINSUMO: TcxGridDBColumn;
+    cxGridDBTableViewDEMANDASUB: TcxGridDBColumn;
     procedure FormCreate(Sender: TObject);
     procedure VerSimilares1Click(Sender: TObject);
     procedure VerInsumos1Click(Sender: TObject);
@@ -98,9 +90,16 @@ type
     procedure cxGridDBTableViewTcxGridDBDataControllerTcxDataSummaryFooterSummaryItems3GetText(
       Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean;
       var AText: string);
+    procedure cxGridDBTableView2MouseUp(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure cxGridDBTableViewMouseUp(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
   private
     FPesoCalculado: Double;
     FLitrosCalculado: Double;
+    FDensidadeCalc: Double;
+    FCodModelo: Integer;
+    FGridPopup: TcxGridDBTableView;
     function GetCodProSelecionado: String;
     procedure CarregarInsumosDetalhe(pCodModelo: Integer);
     procedure TotalizaPesoELitrosDosInsumos;
@@ -112,6 +111,8 @@ type
     function GetLitrosAcabado: Double;
     function GetPesoCalculado: Double;
     function GetPesoAcabado: Double;
+    function GetValorColunaSelecionada(pColuna: TcxGridDBColumn): String;
+    function GetNomeProSelecionado: String;
     { Private declarations }
   public
     procedure CarregarInsumos(pCodModelo: Integer);
@@ -128,74 +129,18 @@ type
     function ModeloDivergente: Boolean;
   end;
 
-  function GetSqlProEquivalentes(pAlias: String = 'EQUIVALENTES'): String;
-
-  function GetSqlEstoqueEquivalentes(pAlias: String = 'ESTOQ'): String;
-
 implementation
 
 uses
-  uConFirebird, uFormSelecionaModelos, uFormAdicionarSimilaridade, uFormProInfo, uFormDetalheProdutos,
+  uConSqlServer, uFormSelecionaModelos, uFormAdicionarSimilaridade, uFormProInfo, uFormDetalheProdutos,
   uDmConnection;
 
 {$R *.dfm}
 
 { TFormInsumos }
-
-function GetSqlProEquivalentes(pAlias: String = 'EQUIVALENTES'): String;
-begin
-  Result:=
-      '(   '+sLineBreak+
-      ' SELECT DISTINCT CODPRO, CODSIMILAR '+sLineBreak+
-      ' FROM ( '+sLineBreak+
-      '  SELECT P.CODPRODUTO AS CODPRO, P.CODPRODUTO AS CODSIMILAR FROM PRODUTO P '+sLineBreak+ // Todo produto é equivalente a ele mesmo
-      '  UNION ALL '+sLineBreak+
-      '  select S1.CODPRODUTO AS CODPRO, S1.CODPROSIMILAR AS CODSIMILAR '+sLineBreak+ // Se existir ligação de similaridade os produtos são equivalentes
-      '  FROM PRODUTOSIMILAR S1 '+sLineBreak+
-      '  UNION ALL '+sLineBreak+
-      '  SELECT S2.CODPROSIMILAR AS CODPRO, S2.CODPRODUTO AS CODSIMILAR '+sLineBreak+ // Se existir ligação de similaridade os produtos são equivalentes
-      '  FROM PRODUTOSIMILAR S2 '+sLineBreak+
-      '  UNION ALL '+sLineBreak+
-      '  SELECT S3.CODPROSIMILAR AS CODPRO, S4.CODPROSIMILAR AS CODSIMILAR '+sLineBreak+ // Todas os produtos que tiverem uma similaridade com um produto em comum são considerados equivalentes
-      '  FROM PRODUTOSIMILAR S3 '+sLineBreak+
-      '  INNER JOIN PRODUTOSIMILAR S4 ON S4.CODPRODUTO = S3.CODPRODUTO '+sLineBreak+
-      ' )PROEQUIVALENTES '+sLineBreak+
-      ')'+pAlias;
-end;
-
-function GetSqlEstoqEquivalenteDetalhe(pAlias: String = 'ESTOQ'): String;
-begin
-  Result:=
-   '( SELECT      '+sLineBreak+
-   '   PE.CODPRO, '+sLineBreak+
-   '   E.CODPRODUTO, '+sLineBreak+
-   '   (E.DM_DEMANDA / P.UNIDADEESTOQUE) / E.ROTACAO AS DEMANDADIARIA, '+sLineBreak+
-	 '   SALDOATUAL AS SALDOATUAL '+sLineBreak+
-   ' FROM ESTOQUE E '+sLineBreak+
-   ' INNER JOIN PRODUTO P ON P.CODPRODUTO = E.CODPRODUTO '+sLineBreak+
-	 ' INNER JOIN '+GetSqlProEquivalentes('PE')+' ON PE.CODSIMILAR = E.CODPRODUTO '+sLineBreak+
-   ' WHERE E.CODFILIAL = ''01'' '+sLineBreak+
-   ' )'+pAlias;
-end;
-
-function GetSqlEstoqueEquivalentes(pAlias: String = 'ESTOQ'): String;
-begin
-  Result:=
-   '( SELECT      '+sLineBreak+
-   '   PE.CODPRO, '+sLineBreak+
-   '   SUM((E.DM_DEMANDA / P.UNIDADEESTOQUE) / E.ROTACAO) AS DEMANDADIARIA, '+sLineBreak+
-	 '   SUM(SALDOATUAL) AS SALDOATUAL '+sLineBreak+
-   ' FROM ESTOQUE E '+sLineBreak+
-   ' INNER JOIN PRODUTO P ON P.CODPRODUTO = E.CODPRODUTO '+sLineBreak+
-	 ' INNER JOIN '+GetSqlProEquivalentes('PE')+' ON PE.CODSIMILAR = E.CODPRODUTO '+sLineBreak+
-   ' WHERE E.CODFILIAL = ''01'' '+sLineBreak+
-   ' GROUP BY PE.CODPRO '+sLineBreak+
-   ' )'+pAlias;
-end;
-
-
 procedure TFormInsumos.Inicializa(pCodModelo: Integer);
 begin
+  FCodModelo:= pCodModelo;
   CarregarProdutoAcabado(pCodModelo);
   CarregarInsumos(pCodModelo);
 end;
@@ -227,7 +172,7 @@ begin
   FFrm:= TFormInsumos.Create(Application);
   try
     FFrm.Inicializa(FCodModelo);
-    FFrm.Caption:= 'Insumos do produto '+pNomeProduto;
+    FFrm.Caption:= 'Insumos do produto ('+pCodProduto+') '+pNomeProduto;
     FFrm.ShowModal;
   finally
     FFrm.Free;
@@ -244,25 +189,23 @@ begin
 end;
 
 procedure TFormInsumos.TotalizaPesoELitrosDosInsumos;
+const
+  cSql = 'select Peso, Litros, PesoLiquidoCalc, VolumeLiquidoCalc, Densidade, DensidadeCalc '+
+        ' from PesoVolumeCalculado where CodModelo = %d ';
+var
+  FDataSet: TDataSet;
 begin
   FPesoCalculado:= 0;
   FLitrosCalculado:= 0;
+  FDensidadeCalc:= 0;
 
-  CdsInsumos.First;
-  while not CdsInsumos.Eof do
-  begin
-    if FormProInfo.NaoSomaNoPesoLiq(CdsInsumosCodProduto.AsString) = False then
-    begin
-      CdsInsumos.Edit;
-      CdsInsumosPERCPESO.AsFloat:= TryDiv(CdsInsumosPESO.AsFloat, CdsProdutoAcabadoPESO.AsFloat);
-      CdsInsumosPERCLITROS.AsFloat:= TryDiv(CdsInsumosLITROS.AsFloat, CdsProdutoAcabadoLitros.AsFloat);
-      CdsInsumos.Post;
-
-      FLitrosCalculado:= FLitrosCalculado+CdsInsumosLITROS.AsFloat;
-      FPesoCalculado:= FPesoCalculado+CdsInsumosPeso.AsFloat;
-    end;
-
-    CdsInsumos.Next;
+  FDataSet:= ConSqlServer.RetornaDataSet(Format(cSql, [FCodModelo]), True);
+  try
+    FPesoCalculado:= FDataSet.FieldByName('PesoLiquidoCalc').AsFloat;
+    FLitrosCalculado:= FDataSet.FieldByName('VolumeLiquidoCalc').AsFloat;
+    FDensidadeCalc:= FDataSet.FieldByName('DensidadeCalc').AsFloat;
+  finally
+    FDataSet.Free;
   end;
 
   LblPesoCalculado.Caption:= FormatFloat('#0.00', FPesoCalculado)+' KG';
@@ -279,14 +222,14 @@ end;
 
 procedure TFormInsumos.CarregarProdutoAcabado(pCodModelo: Integer);
 const
-  cSql = 'SELECT P.CODPRODUTO, P.APRESENTACAO, P.PESO, (P.CUBAGEM * 1000) AS LITROS '
-       +' FROM INSUMOS_ACABADO M INNER JOIN PRODUTO P ON P.CODPRODUTO = M.CODPRODUTO '
+  cSql = 'SELECT M.CODPRODUTO, P.APRESENTACAO, P.PESO, P.LITROS '
+       +' FROM INSUMOS_MODELO M INNER JOIN PRODUTO P ON P.CODPRODUTO = M.CODPRODUTO '
        +' WHERE M.CODMODELO = ''%d'' ';
 var
   FQry: TDataSet;
 begin
   CdsProdutoAcabado.EmptyDataSet;
-  FQry:= ConFirebird.RetornaDataSet(Format(cSql, [pCodModelo]));
+  FQry:= ConSqlServer.RetornaDataSet(Format(cSql, [pCodModelo]));
   try
     CopiaDadosDataSet(FQry, CdsProdutoAcabado);
   finally
@@ -308,7 +251,7 @@ var
 
   function GetSql(pCodModelo: Integer): String;
   begin
-    Result:= ' select I.CodProduto, '+
+(*    Result:= ' select I.CodProduto, '+
              ' ESTOQ.CODPRO, '+
              ' P.APRESENTACAO, '+
              ' ESTOQ.DEMANDADIARIA, '+
@@ -320,12 +263,13 @@ var
              ' INNER JOIN PRODUTO P ON P.CODPRODUTO = ESTOQ.CODPRODUTO ' +
              ' where i.codmodelo = '+IntToStr(pCodModelo)+
              ' and ESTOQ.SALDOATUAL > 0 '+
-             ' ORDER BY ESTOQ.CODPRO, ESTOQ.SALDOATUAL DESC ';
+             ' ORDER BY ESTOQ.CODPRO, ESTOQ.SALDOATUAL DESC ';        *)
+     Result:= 'select * from EstoqInsumosDetalhe where CODMODELO = '+IntToStr(pCodModelo)+' ORDER BY CodProduto, ESTOQUESUB DESC ';
   end;
 
 begin
   CdsInsumosDetalhe.EmptyDataSet;
-  FQry:= ConFirebird.RetornaDataSet(GetSql(pCodModelo));
+  FQry:= ConSqlServer.RetornaDataSet(GetSql(pCodModelo));
   try
     CopiaDadosDataSet(FQry, CdsInsumosDetalhe);
   finally
@@ -339,22 +283,12 @@ var
 
   function GetSql(pCodModelo: Integer): String;
   begin
-    Result:= ' select I.CodModelo, I.CodProduto, P.APRESENTACAO, I.QuantInsumo, '+
-             ' I.QuantInsumo * (P.CUBAGEM * 1000 / P.UNIDADEESTOQUE) AS LITROS, '+
-             ' I.QuantInsumo * (P.PESO / P.UNIDADEESTOQUE) AS PESO, '+
-             ' (0.001 / NULLIF(P.CUBAGEM, 0)) as DENSIDADECALCULADA, '+
-             ' (SELECT TRIM(G.NOMESUBGRUPO) FROM GRUPOSUB G WHERE G.CODGRUPOSUB = P.CODGRUPOSUB) ||'' ''|| P.UNIDADE AS INSUMO, '+
-             ' ESTOQ.DEMANDADIARIA, '+
-             ' ESTOQ.SALDOATUAL, '+
-             ' (ESTOQ.SALDOATUAL / NULLIF(ESTOQ.DEMANDADIARIA, 0)) / P.UNIDADEESTOQUE AS DIASESTOQUE '+
-             ' from INSUMOS_INSUMO I ' +
-             ' INNER JOIN PRODUTO P ON P.CODPRODUTO = I.CODPRODUTO ' +
-             ' INNER JOIN '+GetSqlEstoqueEquivalentes('ESTOQ')+' ON ESTOQ.CODPRO = P.CODPRODUTO '+
-             ' where i.codmodelo = '+IntToStr(pCodModelo);
+    Result:= ' select * from EstoqInsumos '+
+             ' where codmodelo = '+IntToStr(pCodModelo);
   end;
 begin
   CdsInsumos.EmptyDataSet;
-  FQry:= ConFirebird.RetornaDataSet(GetSql(pCodModelo));
+  FQry:= ConSqlServer.RetornaDataSet(GetSql(pCodModelo));
   try
     CopiaDadosDataSet(FQry, CdsInsumos);
   finally
@@ -365,9 +299,25 @@ begin
   CarregarInsumosDetalhe(pCodModelo);
 end;
 
+procedure TFormInsumos.cxGridDBTableView2MouseUp(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  if Button = mbRight then
+    FGridPopup:= cxGridDBTableView2;
+
+end;
+
 procedure TFormInsumos.cxGridDBTableViewDblClick(Sender: TObject);
 begin
   TFormInsumos.AbrirInsumos(GetCodProSelecionado, CdsInsumosAPRESENTACAO.AsString);
+end;
+
+procedure TFormInsumos.cxGridDBTableViewMouseUp(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  if Button = mbRight then
+    FGridPopup:= cxGridDBTableView;
+
 end;
 
 procedure TFormInsumos.cxGridDBTableViewPERCLITROSGetDataText(
@@ -397,6 +347,8 @@ end;
 
 procedure TFormInsumos.FormCreate(Sender: TObject);
 begin
+  FGridPopup:= cxGridDBTableView;
+
   FPesoCalculado:= 0;
   FLitrosCalculado:= 0;
 
@@ -412,18 +364,37 @@ end;
 
 procedure TFormInsumos.VerInsumos1Click(Sender: TObject);
 begin
-  TFormInsumos.AbrirInsumos(GetCodProSelecionado, CdsInsumosApresentacao.AsString);
+  TFormInsumos.AbrirInsumos(GetCodProSelecionado, GetNomeProSelecionado);
 end;
 
 procedure TFormInsumos.VerSimilares1Click(Sender: TObject);
 begin
-  TFormAdicionarSimilaridade.AbrirSimilares(GetCodProSelecionado, CdsInsumosApresentacao.AsString);
+  TFormAdicionarSimilaridade.AbrirSimilares(GetCodProSelecionado, GetNomeProSelecionado);
 end;
 
-function TFormInsumos.GetCodProSelecionado: String;
+function TFormInsumos.GetNomeProSelecionado: String;
+VAR
+  FRow: TcxGridDBColumn;
 begin
-  Result:= VarToStrDef(cxGridDBTableView.DataController.Values[cxGridDBTableView.DataController.FocusedRecordIndex,
-                                                                cxGridDBTableViewCODPRODUTO.Index], '');
+  if FGridPopup = cxGridDBTableView2 then
+    FRow:= cxGridDBTableView2PROSIMILAR
+  else
+    FRow:= cxGridDBTableViewAPRESENTACAO;
+
+  if Assigned((cxGrid.FocusedView as TcxGridDBTableView).Controller.FocusedRecord) then
+    Result:= VarToStrDef((cxGrid.FocusedView as TcxGridDBTableView).Controller.FocusedRecord.Values[FRow.Index], '');
+end;
+function TFormInsumos.GetCodProSelecionado: String;
+VAR
+  FRow: TcxGridDBColumn;
+begin
+  if FGridPopup = cxGridDBTableView2 then
+    FRow:= cxGridDBTableView2CODSIMILAR
+  else
+    FRow:= cxGridDBTableViewCODINSUMO;
+
+  if Assigned((cxGrid.FocusedView as TcxGridDBTableView).Controller.FocusedRecord) then
+    Result:= VarToStrDef((cxGrid.FocusedView as TcxGridDBTableView).Controller.FocusedRecord.Values[FRow.Index], '');
 end;
 
 function TFormInsumos.GetLitrosAcabado: Double;
@@ -444,6 +415,12 @@ end;
 function TFormInsumos.GetPesoCalculado: Double;
 begin
   Result:= FPesoCalculado;
+end;
+
+function TFormInsumos.GetValorColunaSelecionada(
+  pColuna: TcxGridDBColumn): String;
+begin
+
 end;
 
 procedure TFormInsumos.AlteraFontGroup(pGrouBox: TGroupBox; FontColor: TColor; Style: TFontStyles);

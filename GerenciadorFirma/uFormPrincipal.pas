@@ -50,7 +50,6 @@ type
     DetalhedosProdutos1: TMenuItem;
     Utilidades1: TMenuItem;
     Extras1: TMenuItem;
-    Pedidos21: TMenuItem;
     Timer1: TTimer;
     ValidaModelos1: TMenuItem;
     Consultas1: TMenuItem;
@@ -76,6 +75,8 @@ type
     TreeViewMenu: TdxDBTreeView;
     PanelMain: TPanel;
     cxSplitter1: TcxSplitter;
+    DadosGruposdeProdutos1: TMenuItem;
+    Feriados1: TMenuItem;
     procedure Pedidos1Click(Sender: TObject);
     procedure Fila1Click(Sender: TObject);
     procedure Densidade1Click(Sender: TObject);
@@ -114,6 +115,8 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure ChromeTabs1StateChange(Sender: TObject; PreviousState,
       CurrentState: TChromeTabStates);
+    procedure DadosGruposdeProdutos1Click(Sender: TObject);
+    procedure Feriados1Click(Sender: TObject);
   private
     FDmGeradorConsultas: TDmGeradorConsultas;
     FPopupActive: Boolean;
@@ -149,7 +152,7 @@ implementation
 
 uses
   uDmFilaProducao, Utils, uFormDetalheProdutos, uFormPedidos2, uFormValidaModelos, uFormExecSql,
-  uFormRelatoriosPersonalizados;
+  uFormRelatoriosPersonalizados, uFormSubGrupoExtras, uFormFeriados;
 
 procedure TFormPrincipal.RemoveTab(pTab: TChromeTab);
 begin
@@ -206,6 +209,11 @@ begin
 //  TFormRelatoriosPersonalizados.CadastrarNovaConsulta;
 end;
 
+procedure TFormPrincipal.DadosGruposdeProdutos1Click(Sender: TObject);
+begin
+  AbrirFormEmNovaAba(TFormSubGrupoExtras.Create(Self), True);
+end;
+
 procedure TFormPrincipal.Densidade1Click(Sender: TObject);
 begin
   AbrirFormEmNovaAba(FormDensidades, False);
@@ -236,6 +244,11 @@ procedure TFormPrincipal.MenuItemProInfoClick(Sender: TObject);
 begin
   AbrirFormEmNovaAba(FormProInfo, False);
 //  FormProInfo.Show;
+end;
+
+procedure TFormPrincipal.Feriados1Click(Sender: TObject);
+begin
+  AbrirFormEmNovaAba(TFormFeriados.Create(Self), True);
 end;
 
 procedure TFormPrincipal.Fila1Click(Sender: TObject);

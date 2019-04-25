@@ -40,24 +40,24 @@ object FormAdicionarSimilaridade: TFormAdicionarSimilaridade
         DataBinding.FieldName = 'Equivalente'
         Width = 73
       end
-      object cxGridDBTableViewCODPRODUTO: TcxGridDBColumn
-        DataBinding.FieldName = 'CODPRODUTO'
-        Options.Editing = False
+      object cxGridDBTableViewCODSIMILAR: TcxGridDBColumn
+        DataBinding.FieldName = 'CODSIMILAR'
+        Width = 60
       end
       object cxGridDBTableViewAPRESENTACAO: TcxGridDBColumn
         DataBinding.FieldName = 'APRESENTACAO'
         Options.Editing = False
-        Width = 151
+        Width = 228
       end
       object cxGridDBTableViewNOMEAPLICACAO: TcxGridDBColumn
         DataBinding.FieldName = 'NOMEAPLICACAO'
         Options.Editing = False
-        Width = 98
+        Width = 64
       end
       object cxGridDBTableViewUNIDADE: TcxGridDBColumn
         DataBinding.FieldName = 'UNIDADE'
         Options.Editing = False
-        Width = 111
+        Width = 57
       end
       object cxGridDBTableViewUNIDADEESTOQUE: TcxGridDBColumn
         DataBinding.FieldName = 'UNIDADEESTOQUE'
@@ -66,7 +66,7 @@ object FormAdicionarSimilaridade: TFormAdicionarSimilaridade
       object cxGridDBTableViewNOMESUBUNIDADE: TcxGridDBColumn
         DataBinding.FieldName = 'NOMESUBUNIDADE'
         Options.Editing = False
-        Width = 124
+        Width = 91
       end
     end
     object cxGridDBTableView1: TcxGridDBTableView
@@ -134,10 +134,10 @@ object FormAdicionarSimilaridade: TFormAdicionarSimilaridade
     Params = <>
     Left = 248
     Top = 88
-    object CdsSimilaresCodProduto: TStringField
+    object CdsSimilaresCODSIMILAR: TStringField
       DisplayLabel = 'Cod. Produto'
-      FieldName = 'CODPRODUTO'
-      Size = 10
+      FieldName = 'CODSIMILAR'
+      Size = 6
     end
     object CdsSimilaresAPRESENTACAO: TStringField
       DisplayLabel = 'Apresenta'#231#227'o'

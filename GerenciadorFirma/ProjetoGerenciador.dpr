@@ -37,7 +37,9 @@ uses
   uAppConfig in 'uAppConfig.pas',
   uSendMail in '..\utils\uSendMail.pas',
   uDmGeradorConsultas in '..\utils\uDmGeradorConsultas.pas' {DmGeradorConsultas: TDataModule},
-  uConFirebird in '..\utils\uConFirebird.pas' {ConFirebird: TDataModule};
+  uConFirebird in '..\utils\uConFirebird.pas' {ConFirebird: TDataModule},
+  uFormSubGrupoExtras in 'Fontes\uFormSubGrupoExtras.pas' {FormSubGrupoExtras},
+  uFormFeriados in 'Fontes\uFormFeriados.pas' {FormFeriados};
 
 {$R *.res}
 
@@ -67,5 +69,6 @@ begin
   Application.CreateForm(TFormShowMemo, FormShowMemo);
   Application.CreateForm(TFormGlobal, FormGlobal);
   Application.CreateForm(TFormDetalheProdutos, FormDetalheProdutos);
+  Application.CreateForm(TFormSubGrupoExtras, FormSubGrupoExtras);
   Application.Run;
 end.

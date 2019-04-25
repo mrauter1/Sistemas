@@ -1,0 +1,1 @@
+F:\Sistemas.new\upx394w\upx ProjetoGerenciador.exe

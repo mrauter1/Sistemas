@@ -9,7 +9,7 @@ uses
   cxCustomData, cxFilter, cxData, cxDataStorage, cxEdit, cxNavigator, Data.DB,
   cxDBData, cxGridLevel, cxGridCustomTableView, cxGridTableView,
   cxGridDBTableView, cxClasses, cxGridCustomView, cxGrid, Datasnap.DBClient,
-  uConFirebird, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.Menus;
+  uConSqlServer, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.Menus;
 
 type
   TFormAdicionarSimilaridade = class(TForm)
@@ -25,14 +25,12 @@ type
     cxGridDBTableView1QUANTPENDENTE: TcxGridDBColumn;
     cxGridLevel: TcxGridLevel;
     CdsSimilares: TClientDataSet;
-    CdsSimilaresCodProduto: TStringField;
     CdsSimilaresAPRESENTACAO: TStringField;
     CdsSimilaresAplicacao: TStringField;
     CdsSimilaresNOMESUBUNIDADE: TStringField;
     CdsSimilaresNOMEUNIDADE: TStringField;
     CdsSimilaresUNIDADEESTOQUE: TIntegerField;
     DataSource1: TDataSource;
-    cxGridDBTableViewCODPRODUTO: TcxGridDBColumn;
     cxGridDBTableViewAPRESENTACAO: TcxGridDBColumn;
     cxGridDBTableViewNOMEAPLICACAO: TcxGridDBColumn;
     cxGridDBTableViewUNIDADE: TcxGridDBColumn;
@@ -45,6 +43,8 @@ type
     PopupMenuOpcoes: TPopupMenu;
     VerSimilares1: TMenuItem;
     VerInsumos1: TMenuItem;
+    CdsSimilaresCODSIMILAR: TStringField;
+    cxGridDBTableViewCODSIMILAR: TcxGridDBColumn;
     procedure FormCreate(Sender: TObject);
     procedure BtnConfirmarEquivalenciasClick(Sender: TObject);
     procedure VerSimilares1Click(Sender: TObject);
@@ -53,9 +53,8 @@ type
     { Private declarations }
     FCodProduto: String;
     function ProdutosSimilares(pCodPro1, pCodPro2: String): Boolean;
-    function GetSqlEquivalentes(pCodProduto: String): String;
     procedure AdicionaSimilares(pCodPro1, pCodPro2: String);
-    procedure RemoveSimilares(pCodPro1, pCodPro2: String);
+    procedure RemoveSimilares(pCodPro1, pCodProRemove: String);
     function GetCodProSelecionado: String;
   public
     procedure CarregarPotencialmenteSimilares(pCodProduto: String);
@@ -71,35 +70,11 @@ uses
 
 { TFormAdicionarSimilaridade }
 
-function TFormAdicionarSimilaridade.GetSqlEquivalentes(pCodProduto: String): String;
-begin
-  Result:= ' SELECT X.COD, P.UNIDADE, P.UNIDADEESTOQUE, P.NOMESUBUNIDADE, A.NOMEAPLICACAO ' +
-           '  FROM ( ' +
-           '    select CODPROSIMILAR AS COD ' +
-           '    FROM PRODUTOSIMILAR S1 ' +
-           '    WHERE S1.CODPRODUTO = '''+pCodProduto+''' ' +
-           '    UNION ALL ' +
-           '    SELECT CODPRODUTO AS COD ' +
-           '    FROM PRODUTOSIMILAR S2 ' +
-           '    WHERE S2.CODPROSIMILAR = '''+pCodProduto+''' '+
-           '  )X ' +
-           '  INNER JOIN PRODUTO P ON P.CODPRODUTO = X.COD ' +
-           '  LEFT JOIN APLICA A ON A.CODAPLICACAO = P.CODAPLICACAO ';
-
-end;
-
 function TFormAdicionarSimilaridade.ProdutosSimilares(pCodPro1, pCodPro2: String): Boolean;
-var
-  FSql: String;
-  FQry: TDataSet;
 begin
-  FSql:= GetSqlEquivalentes(pCodPro1)+' WHERE X.COD = '''+pCodPro2+''' ';
-  FQry:= ConFirebird.RetornaDataSet(FSql);
-  try
-    Result:= FQry.FieldByName('COD').IsNull = False;
-  finally
-    FQry.Free;
-  end;
+  Result:= ConSqlServer.RetornaInteiro(
+                  'SELECT Count(*) from Similares where Cod1 = '''+
+                      pCodPro1+''' and Cod2 =  '''+pCodPro2+''' ') > 0;
 end;
 
 class procedure TFormAdicionarSimilaridade.AbrirSimilares(pCodProduto: String; pNomeProduto: String);
@@ -108,7 +83,7 @@ var
 begin
   FFrm:= TFormAdicionarSimilaridade.Create(Application);
   try
-    FFrm.Caption:= 'Configuração de produtos equivalentes ao '+pNomeProduto;
+    FFrm.Caption:= 'Configuração de produtos equivalentes ao ('+pCodProduto+') '+pNomeProduto;
     FFrm.CarregarPotencialmenteSimilares(pCodProduto);
     FFrm.ShowModal;
   finally
@@ -120,19 +95,22 @@ procedure TFormAdicionarSimilaridade.AdicionaSimilares(pCodPro1, pCodPro2: Strin
 const
   cSql = ' INSERT INTO PRODUTOSIMILAR (CODPRODUTO, CODPROSIMILAR) VALUES (''%s'', ''%s'') ';
 begin
-  ConFirebird.ExecutaComando(Format(cSql, [pCodPro1, pCodPro2]));
+  ConSqlServer.ExecutaComando(Format(cSql, [pCodPro1, pCodPro2]));
 end;
 
-procedure TFormAdicionarSimilaridade.RemoveSimilares(pCodPro1, pCodPro2: String);
+procedure TFormAdicionarSimilaridade.RemoveSimilares(pCodPro1, pCodProRemove: String);
   function RetornaSql: String;
   begin
-    Result:= ' DELETE FROM PRODUTOSIMILAR '+
-             ' WHERE ((CODPRODUTO = '''+pCodPro1+''') AND (CODPROSIMILAR = '''+pCodPro2+''' )) '+
-             ' OR ((CODPRODUTO = '''+pCodPro2+''' ) AND (CODPROSIMILAR = '''+pCodPro1+''' ))    ';
+    Result:= ' DELETE FROM PRODUTOSIMILAR WHERE'+
+             ' (CODPRODUTO = '''+pCodProRemove+''' and CODPROSIMILAR in '+
+             '   (SELECT s1.Cod2 from Similares s1 where s1.Cod1 = '''+pCodPro1+''' )) '+
+             ' OR '+
+             ' (CODPROSIMILAR = '''+pCodProRemove+'''  and CODPRODUTO in '+
+             '   (SELECT s1.Cod2 from Similares s1 where s1.Cod1 = '''+pCodPro1+''')) ';
   end;
 
 begin
-  ConFirebird.ExecutaComando(Format(RetornaSql, [pCodPro1, pCodPro2]));
+  ConSqlServer.ExecutaComando(RetornaSql);
 end;
 
 procedure TFormAdicionarSimilaridade.VerInsumos1Click(Sender: TObject);
@@ -148,7 +126,7 @@ end;
 function TFormAdicionarSimilaridade.GetCodProSelecionado: String;
 begin
   Result:= VarToStrDef(cxGridDBTableView.DataController.Values[cxGridDBTableView.DataController.FocusedRecordIndex,
-                                                                cxGridDBTableViewCODPRODUTO.Index], '');
+                                                                cxGridDBTableViewCODSIMILAR.Index], '');
 end;
 
 procedure TFormAdicionarSimilaridade.BtnConfirmarEquivalenciasClick(
@@ -159,14 +137,14 @@ begin
   begin
     if CdsSimilaresEquivalente.AsBoolean then
     begin
-      if not ProdutosSimilares(FCodProduto, CdsSimilaresCodProduto.AsString) then
-        AdicionaSimilares(FCodProduto, CdsSimilaresCodProduto.AsString);
+      if not ProdutosSimilares(FCodProduto, CdsSimilaresCodSimilar.AsString) then
+        AdicionaSimilares(FCodProduto, CdsSimilaresCodSimilar.AsString);
 
     end
    else
     begin
-      if ProdutosSimilares(FCodProduto, CdsSimilaresCodProduto.AsString) then
-        RemoveSimilares(FCodProduto, CdsSimilaresCodProduto.AsString);
+      if ProdutosSimilares(FCodProduto, CdsSimilaresCodSimilar.AsString) then
+        RemoveSimilares(FCodProduto, CdsSimilaresCodSimilar.AsString);
 
     end;
     CdsSimilares.Next;
@@ -178,19 +156,14 @@ end;
 procedure TFormAdicionarSimilaridade.CarregarPotencialmenteSimilares(pCodProduto: String);
 const
   cSql =
- ' SELECT P2.CODPRODUTO, P2.APRESENTACAO, P2.UNIDADE, P2.UNIDADEESTOQUE, P2.NOMESUBUNIDADE, '+
- '	(SELECT NOMEAPLICACAO FROM APLICA A WHERE A.CODAPLICACAO = P2.CODAPLICACAO) AS NOMEAPLICACAO '+
- '  FROM PRODUTO P '+
- '  inner join PRODUTO P2 on P2.codproduto <> P.CODPRODUTO '+
- '	and p2.UNIDADE = P.UNIDADE '+
- '   AND P2.UNIDADEESTOQUE = P.UNIDADEESTOQUE '+
- '   AND P2.CODGRUPOSUB = P.CODGRUPOSUB '+
- '     WHERE P.CODPRODUTO = ''%s'' '  ;
+ ' select * from PotencialmenteSimilares '+
+ '     WHERE CODPRODUTO = ''%s'' '+
+ '  ORDER BY NOMEAPLICACAO, SIMILARES DESC ';
 var
   FQry: TDataSet;
 begin
   FCodProduto:= pCodProduto;
-  FQry:= ConFirebird.RetornaDataSet(Format(cSql, [pCodProduto]));
+  FQry:= ConSqlServer.RetornaDataSet(Format(cSql, [pCodProduto]));
   try
     CopiaDadosDataSet(FQry, CdsSimilares);
 
@@ -198,7 +171,7 @@ begin
     while not CdsSimilares.Eof do
     begin
       CdsSimilares.Edit;
-      CdsSimilaresEquivalente.AsBoolean:= ProdutosSimilares(FCodProduto, CdsSimilaresCodProduto.AsString);
+      CdsSimilaresEquivalente.AsBoolean:= ProdutosSimilares(FCodProduto, CdsSimilaresCodSimilar.AsString);
       CdsSimilares.Post;
 
       CdsSimilares.Next;

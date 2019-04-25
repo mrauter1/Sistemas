@@ -421,9 +421,9 @@ object FormPrincipal: TFormPrincipal
         Caption = 'Cofig. dos Produtos'
         OnClick = MenuItemProInfoClick
       end
-      object Pedidos21: TMenuItem
-        Caption = 'Pedidos2'
-        OnClick = Pedidos21Click
+      object DadosGruposdeProdutos1: TMenuItem
+        Caption = 'Dados Grupos de Produtos'
+        OnClick = DadosGruposdeProdutos1Click
       end
     end
     object Extras1: TMenuItem
@@ -448,6 +448,10 @@ object FormPrincipal: TFormPrincipal
       object CriarConsulta1: TMenuItem
         Caption = 'Gerenciar Relat'#243'rios'
         OnClick = CriarConsulta1Click
+      end
+      object Feriados1: TMenuItem
+        Caption = 'Feriados'
+        OnClick = Feriados1Click
       end
     end
     object Consultas1: TMenuItem

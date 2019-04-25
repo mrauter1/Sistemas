@@ -3,7 +3,7 @@ object FormInsumos: TFormInsumos
   Top = 0
   Caption = 'Insumos do Produto'
   ClientHeight = 400
-  ClientWidth = 855
+  ClientWidth = 863
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,13 +17,15 @@ object FormInsumos: TFormInsumos
   object cxGrid: TcxGrid
     Left = 0
     Top = 81
-    Width = 855
+    Width = 863
     Height = 319
     Align = alClient
     TabOrder = 0
+    ExplicitTop = 87
     object cxGridDBTableView: TcxGridDBTableView
       PopupMenu = PopupMenuOpcoes
       OnDblClick = cxGridDBTableViewDblClick
+      OnMouseUp = cxGridDBTableViewMouseUp
       Navigator.Buttons.CustomButtons = <>
       DataController.DataSource = DsInsumos
       DataController.Summary.DefaultGroupSummaryItems = <>
@@ -72,9 +74,8 @@ object FormInsumos: TFormInsumos
       OptionsView.GroupByBox = False
       OptionsView.HeaderAutoHeight = True
       Styles.StyleSheet = FormGlobal.cxGridTableViewStyleSheet1
-      object cxGridDBTableViewCODPRODUTO: TcxGridDBColumn
-        DataBinding.FieldName = 'CODPRODUTO'
-        Width = 49
+      object cxGridDBTableViewCODINSUMO: TcxGridDBColumn
+        DataBinding.FieldName = 'CODINSUMO'
       end
       object cxGridDBTableViewAPRESENTACAO: TcxGridDBColumn
         Caption = 'Produto'
@@ -84,11 +85,11 @@ object FormInsumos: TFormInsumos
       end
       object cxGridDBTableViewINSUMO: TcxGridDBColumn
         DataBinding.FieldName = 'INSUMO'
-        Width = 167
+        Width = 161
       end
       object cxGridDBTableViewQUANTINSUMO: TcxGridDBColumn
         DataBinding.FieldName = 'QUANTINSUMO'
-        Width = 83
+        Width = 67
       end
       object cxGridDBTableViewLITROS: TcxGridDBColumn
         DataBinding.FieldName = 'LITROS'
@@ -110,64 +111,27 @@ object FormInsumos: TFormInsumos
       end
       object cxGridDBTableViewDENSIDADECALCULADA: TcxGridDBColumn
         DataBinding.FieldName = 'DENSIDADECALCULADA'
-        Width = 82
+        Width = 56
       end
-      object cxGridDBTableViewSALDOATUAL: TcxGridDBColumn
-        DataBinding.FieldName = 'SALDOATUAL'
-        Width = 86
+      object cxGridDBTableViewESTOQUESUB: TcxGridDBColumn
+        DataBinding.FieldName = 'ESTOQUESUB'
       end
       object cxGridDBTableViewDIASESTOQUE: TcxGridDBColumn
         DataBinding.FieldName = 'DIASESTOQUE'
-      end
-      object cxGridDBTableViewDEMANDADIARIA: TcxGridDBColumn
-        DataBinding.FieldName = 'DEMANDADIARIA'
-      end
-    end
-    object cxGridDBTableView1: TcxGridDBTableView
-      Navigator.Buttons.CustomButtons = <>
-      DataController.DetailKeyFieldNames = 'CODPRODUTO'
-      DataController.KeyFieldNames = 'CODPRODUTO'
-      DataController.MasterKeyFieldNames = 'CODPRODUTO'
-      DataController.Summary.DefaultGroupSummaryItems = <>
-      DataController.Summary.FooterSummaryItems = <>
-      DataController.Summary.SummaryGroups = <>
-      OptionsSelection.CellSelect = False
-      OptionsView.GroupByBox = False
-      Styles.StyleSheet = FormGlobal.cxGridTableViewStyleSheet1
-      object cxGridDBTableView1CODPEDIDO: TcxGridDBColumn
-        DataBinding.FieldName = 'CODPEDIDO'
-        Width = 60
-      end
-      object cxGridDBTableView1QUANTIDADE: TcxGridDBColumn
-        DataBinding.FieldName = 'QUANTIDADE'
-        Width = 60
-      end
-      object cxGridDBTableView1DIASPARAENTREGA: TcxGridDBColumn
-        DataBinding.FieldName = 'DIASPARAENTREGA'
         Width = 50
       end
-      object cxGridDBTableView1SIT: TcxGridDBColumn
-        DataBinding.FieldName = 'SIT'
-        Width = 40
-      end
-      object cxGridDBTableView1NOMECLIENTE: TcxGridDBColumn
-        DataBinding.FieldName = 'NOMECLIENTE'
-        Width = 200
-      end
-      object cxGridDBTableView1NOMETRANSPORTE: TcxGridDBColumn
-        DataBinding.FieldName = 'NOMETRANSPORTE'
-        Width = 200
-      end
-      object cxGridDBTableView1QUANTPENDENTE: TcxGridDBColumn
-        DataBinding.FieldName = 'QUANTPENDENTE'
+      object cxGridDBTableViewDEMANDASUB: TcxGridDBColumn
+        DataBinding.FieldName = 'DEMANDASUB'
       end
     end
     object cxGridDBTableView2: TcxGridDBTableView
+      PopupMenu = PopupMenuOpcoes
+      OnMouseUp = cxGridDBTableView2MouseUp
       Navigator.Buttons.CustomButtons = <>
       DataController.DataSource = DSInsumosDetalhe
-      DataController.DetailKeyFieldNames = 'CODPRO'
-      DataController.KeyFieldNames = 'CODPRO'
-      DataController.MasterKeyFieldNames = 'CODPRODUTO'
+      DataController.DetailKeyFieldNames = 'CODINSUMO'
+      DataController.KeyFieldNames = 'CODINSUMO'
+      DataController.MasterKeyFieldNames = 'CODINSUMO'
       DataController.Summary.DefaultGroupSummaryItems = <>
       DataController.Summary.FooterSummaryItems = <>
       DataController.Summary.SummaryGroups = <>
@@ -179,27 +143,24 @@ object FormInsumos: TFormInsumos
       OptionsSelection.CellSelect = False
       OptionsView.GroupByBox = False
       OptionsView.GroupFooterMultiSummaries = True
-      object cxGridDBTableView2CODPRODUTO: TcxGridDBColumn
-        DataBinding.FieldName = 'CODPRODUTO'
+      object cxGridDBTableView2CODSIMILAR: TcxGridDBColumn
+        DataBinding.FieldName = 'CODSIMILAR'
       end
-      object cxGridDBTableView2APRESENTACAO: TcxGridDBColumn
-        DataBinding.FieldName = 'APRESENTACAO'
-        Width = 214
+      object cxGridDBTableView2PROSIMILAR: TcxGridDBColumn
+        DataBinding.FieldName = 'PROSIMILAR'
       end
-      object cxGridDBTableView2SALDOATUAL: TcxGridDBColumn
-        DataBinding.FieldName = 'SALDOATUAL'
-        Width = 80
+      object cxGridDBTableView2ESTOQUESUB: TcxGridDBColumn
+        DataBinding.FieldName = 'ESTOQUESUB'
       end
-      object cxGridDBTableView2DEMANDADIARIA: TcxGridDBColumn
-        DataBinding.FieldName = 'DEMANDADIARIA'
-        Width = 80
+      object cxGridDBTableView2DEMANDASUB: TcxGridDBColumn
+        DataBinding.FieldName = 'DEMANDASUB'
       end
       object cxGridDBTableView2DIASESTOQUE: TcxGridDBColumn
         DataBinding.FieldName = 'DIASESTOQUE'
         Width = 80
       end
-      object cxGridDBTableView2CODPRO: TcxGridDBColumn
-        DataBinding.FieldName = 'CODPRO'
+      object cxGridDBTableView2CODINSUMO: TcxGridDBColumn
+        DataBinding.FieldName = 'CODINSUMO'
         Visible = False
       end
     end
@@ -213,10 +174,11 @@ object FormInsumos: TFormInsumos
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 855
+    Width = 863
     Height = 81
     Align = alTop
     TabOrder = 1
+    ExplicitWidth = 855
     object GroupPeso: TGroupBox
       Left = 24
       Top = 10
@@ -335,7 +297,7 @@ object FormInsumos: TFormInsumos
     Top = 48
     object CdsInsumosCodProduto: TStringField
       DisplayLabel = 'Cod. Produto'
-      FieldName = 'CODPRODUTO'
+      FieldName = 'CODINSUMO'
       Size = 10
     end
     object CdsInsumosAPRESENTACAO: TStringField
@@ -350,12 +312,12 @@ object FormInsumos: TFormInsumos
     end
     object CdsInsumosDEMANDA: TFloatField
       DisplayLabel = 'Demanda'
-      FieldName = 'DEMANDADIARIA'
+      FieldName = 'DEMANDASUB'
       DisplayFormat = '#0.00'
     end
     object CdsInsumosSALDOATUAL: TFloatField
       DisplayLabel = 'Estoque Atual'
-      FieldName = 'SALDOATUAL'
+      FieldName = 'ESTOQUESUB'
       DisplayFormat = '#0.00'
     end
     object CdsInsumosDIASESTOQUE: TFloatField
@@ -419,31 +381,36 @@ object FormInsumos: TFormInsumos
     Top = 152
     object CdsInsumosDetalheCODPRODUTO: TStringField
       DisplayLabel = 'Cod. Produto'
-      FieldName = 'CODPRODUTO'
+      FieldName = 'CODSIMILAR'
       Size = 10
     end
     object CdsInsumosDetalheAPRESENTACAO: TStringField
-      DisplayLabel = 'Apresenta'#231#227'o'
-      FieldName = 'APRESENTACAO'
+      DisplayLabel = 'Produto'
+      DisplayWidth = 40
+      FieldName = 'PROSIMILAR'
       Size = 80
     end
     object CdsInsumosDetalheSALDOATUAL: TFloatField
-      DisplayLabel = 'Estoque Atual'
-      FieldName = 'SALDOATUAL'
+      DisplayLabel = 'Estoque (Sub. Unid.)'
+      DisplayWidth = 15
+      FieldName = 'ESTOQUESUB'
       DisplayFormat = '#0.00'
     end
     object CdsInsumosDetalheDEMANDADIARIA: TFloatField
       DisplayLabel = 'Demanda'
-      FieldName = 'DEMANDADIARIA'
+      DisplayWidth = 15
+      FieldName = 'DEMANDASUB'
       DisplayFormat = '#0.00'
     end
     object CdsInsumosDetalheDIASESTOQUE: TFloatField
       DisplayLabel = 'Dias Estoque'
+      DisplayWidth = 15
       FieldName = 'DIASESTOQUE'
       DisplayFormat = '#0.00'
     end
     object CdsInsumosDetalheCODPRO: TStringField
-      FieldName = 'CODPRO'
+      DisplayLabel = 'Cod. Pro. Original'
+      FieldName = 'CODINSUMO'
       Visible = False
       Size = 10
     end

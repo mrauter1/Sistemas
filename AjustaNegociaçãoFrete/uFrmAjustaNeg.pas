@@ -120,6 +120,7 @@ type
     QueryCidadesParamCODPARAM: TIntegerField;
     QueryCidadesParamCODESTADO: TStringField;
     QueryCidadesParamNOMECIDADE: TStringField;
+    ConfernciadosFretesdosMovimentos2: TMenuItem;
     procedure BtnPesquisarClick(Sender: TObject);
     procedure FDQueryFaixasAfterScroll(DataSet: TDataSet);
     procedure FormShow(Sender: TObject);
@@ -133,6 +134,7 @@ type
     procedure BtnRemoveCidadeParamClick(Sender: TObject);
     procedure BtnRemoveTodasParamClick(Sender: TObject);
     procedure BtnAddCidadeParamClick(Sender: TObject);
+    procedure ConfernciadosFretesdosMovimentos2Click(Sender: TObject);
   private
     procedure CarregaNegociacao(pCodNegociacao: Integer);
     procedure AbreCidades(pCodFaixa: Integer);
@@ -228,6 +230,14 @@ var
   vForm: TFrmConsultaPersonalizada;
 begin
   vForm:= TFrmConsultaPersonalizada.AbreConsultaPersonalizadaByName('ConferenciaFreteMovs');
+  vForm.Show;
+end;
+
+procedure TFrmAjusteNeg.ConfernciadosFretesdosMovimentos2Click(Sender: TObject);
+var
+  vForm: TFrmConsultaPersonalizada;
+begin
+  vForm:= TFrmConsultaPersonalizada.AbreConsultaPersonalizadaByName('FreteConf');
   vForm.Show;
 end;
 

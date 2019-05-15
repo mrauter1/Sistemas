@@ -38,6 +38,10 @@ type
     QryGrupoSubExtrasDATAVALIDADE: TDateField;
     QryGrupoSubExtrasDiasParaEntrega: TIntegerField;
     cxGridDadosGrupoDBTableViewDiasParaEntrega: TcxGridDBColumn;
+    QryGrupoSubExtrasSubclasseRisco: TMemoField;
+    QryGrupoSubExtrasDescricaoRisco: TMemoField;
+    cxGridDadosGrupoDBTableViewSubclasserisco: TcxGridDBColumn;
+    cxGridDadosGrupoDBTableViewDescricaoRisco: TcxGridDBColumn;
     procedure QryGrupoSubExtrasMESESVALIDADEChange(Sender: TField);
     procedure FormCreate(Sender: TObject);
     procedure QryGrupoSubExtrasDATAVALIDADEChange(Sender: TField);

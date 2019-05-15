@@ -21,7 +21,6 @@ object FormSubGrupoExtras: TFormSubGrupoExtras
     Height = 513
     Align = alClient
     TabOrder = 0
-    ExplicitWidth = 765
     object cxGridDadosGrupoDBTableView: TcxGridDBTableView
       Navigator.Buttons.CustomButtons = <>
       Navigator.Buttons.PriorPage.Enabled = False
@@ -74,6 +73,13 @@ object FormSubGrupoExtras: TFormSubGrupoExtras
         PropertiesClassName = 'TcxDateEditProperties'
         Width = 104
       end
+      object cxGridDadosGrupoDBTableViewSubclasserisco: TcxGridDBColumn
+        DataBinding.FieldName = 'Subclasserisco'
+      end
+      object cxGridDadosGrupoDBTableViewDescricaoRisco: TcxGridDBColumn
+        DataBinding.FieldName = 'DescricaoRisco'
+        Width = 104
+      end
       object cxGridDadosGrupoDBTableViewDiasParaEntrega: TcxGridDBColumn
         DataBinding.FieldName = 'DiasParaEntrega'
         Width = 81
@@ -91,7 +97,6 @@ object FormSubGrupoExtras: TFormSubGrupoExtras
     VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbEdit, nbPost, nbCancel]
     Align = alBottom
     TabOrder = 1
-    ExplicitWidth = 765
   end
   object DsGrupoSubExtras: TDataSource
     DataSet = QryGrupoSubExtras
@@ -148,6 +153,20 @@ object FormSubGrupoExtras: TFormSubGrupoExtras
       DisplayLabel = 'Dias '#250'teis para Entrega'
       FieldName = 'DiasParaEntrega'
       Origin = 'DiasParaEntrega'
+    end
+    object QryGrupoSubExtrasSubclasseRisco: TMemoField
+      DisplayLabel = 'Subclasse de Risco'
+      FieldName = 'Subclasserisco'
+      Origin = 'SubclasseRisco'
+      BlobType = ftMemo
+      Size = 2147483647
+    end
+    object QryGrupoSubExtrasDescricaoRisco: TMemoField
+      DisplayLabel = 'Descri'#231#227'o Risco'
+      FieldName = 'DescricaoRisco'
+      Origin = 'DescricaoRisco'
+      BlobType = ftMemo
+      Size = 2147483647
     end
   end
 end

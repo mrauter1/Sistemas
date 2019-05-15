@@ -479,8 +479,6 @@ object FrmAjusteNeg: TFrmAjusteNeg
             Height = 471
             Align = alClient
             TabOrder = 0
-            ExplicitLeft = 6
-            ExplicitTop = 14
           end
         end
         object cxSplitter4: TcxSplitter
@@ -776,8 +774,12 @@ object FrmAjusteNeg: TFrmAjusteNeg
         Caption = 'Calculadora De Fretes'
         OnClick = CalculadoraDeFretes1Click
       end
-      object ConfernciadosFretesDosMovimentos1: TMenuItem
+      object ConfernciadosFretesdosMovimentos2: TMenuItem
         Caption = 'Confer'#234'ncia dos Fretes dos Movimentos'
+        OnClick = ConfernciadosFretesdosMovimentos2Click
+      end
+      object ConfernciadosFretesDosMovimentos1: TMenuItem
+        Caption = 'Calculo dos Fretes dos Movimentos'
         OnClick = ConfernciadosFretesDosMovimentos1Click
       end
       object N1: TMenuItem

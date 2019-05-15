@@ -355,7 +355,6 @@ begin
   if not (puDesenvolvedor in AppConfig.GruposUsuario) then
     Exit;
 
-
   FIDPai:= FIDNodeSelecionado;// VarToIntDef(ObterKeyValueSelecionado(TreeViewMenu), 0);
 
   FNomeGrupo:= InputBox('Adicionar Grupo', 'Digite o nome do grupo', '');

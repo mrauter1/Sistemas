@@ -8,7 +8,7 @@ uses
   FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
   FireDAC.Stan.Async, FireDAC.DApt, Data.DB, FireDAC.Comp.DataSet,
   FireDAC.Comp.Client, uDataSetToHtml, Datasnap.DBClient,
-  System.Generics.Collections;
+  System.Generics.Collections, WinApi.ShellAPI, Windows;
 
 type
   TTipoGatilho = (tgIntervalo, tgHora);
@@ -61,6 +61,7 @@ type
 //    procedure AtualizaProdutosSimilares;
     procedure EnviaDataFaltaProduto;
     procedure FazBackup;
+    procedure AtualizaListaPreco;
   protected
     FEnviaEmailConsulta: TEnviaEmailConsulta;
     function GetListaComprovantes: String;
@@ -89,7 +90,7 @@ function TodosOsDias: TDiasSemana;
 implementation
 
 uses
-  uConFirebird, uDmGeradorConsultas, Utils, DateUtils, Dialogs;
+  uConFirebird, uDmGeradorConsultas, Utils, DateUtils, Dialogs, uAppConfig;
 
 {%CLASSGROUP 'Vcl.Controls.TControl'}
 
@@ -156,6 +157,14 @@ begin
             FazBackup;
           end,
           StrToTime('23:10:00'), TercaASabado);
+
+  TGatilho.Create(Self,
+          'AtualizaListaPreco',
+          procedure()
+          begin
+            AtualizaListaPreco;
+          end,
+          StrToTime('00:10:00'), [dsSegunda, dsTerca, dsQuarta, dsQuinta, dsSexta, dsSabado]);
 
 {  TGatilho.Create(Self,
           'AtualizaProdutosSimilares',
@@ -237,8 +246,34 @@ begin
   end;
 end;              }
 
-procedure TCon.FazBackup;
+procedure TCon.AtualizaListaPreco;
+var
+  FListaPrecoPy: String;
 begin
+  FListaPrecoPy:= IncludeTrailingPathDelimiter(AppConfig.PythonFilePath)+'AtualizaPrecosLista.py';
+
+  if FileExists(AppConfig.PythonPath) and FileExists(FListaPrecoPy) then
+  begin
+    ShellExecute(0, 'open', pchar(AppConfig.PythonPath), pChar(FListaPrecoPy), pChar(AppConfig.PythonFilePath), SW_SHOW);
+    uDataSetToHtml.WriteLog('Script para atualizar lista de preço incializado.');
+  end
+ else
+   uDataSetToHtml.WriteLog('Caminho do executável python ou arquivo '+FListaPrecoPy+' não encontrado!');
+end;
+
+procedure TCon.FazBackup;
+const
+  cNewBkp='E:\Dados\Logistec.Bak';
+  cOldBkp='E:\Dados\Logistec.old.Bak';
+begin
+  if FileExists(cNewBkp) then
+  begin
+    if FileExists(cOldBkp) then
+      System.SysUtils.DeleteFile(cOldBkp);
+
+    RenameFile(cNewBkp, cOldBkp);
+  end;
+
   ConSqlServer.ExecutaComando('exec FazBackup');
 end;
 
@@ -247,10 +282,10 @@ begin
   FEnviaEmailConsulta:= TEnviaEmailConsulta.Create(Self);
   try
   {  FEnviaEmailConsulta.ConsultaNome:= 'VendasMargemBaixaOntem';
-    FEnviaEmailConsulta.Destinatarios:= 'marcelorauter@gmail.com';
+    FEnviaEmailConsulta.Destinatarios:= 'marcelo@rauter.com.br';
     FEnviaEmailConsulta.EnviarTabela;                }
     FEnviaEmailConsulta.ConsultaNome:= 'MargemPorVenda';
-    FEnviaEmailConsulta.Destinatarios:= 'marcelorauter@gmail.com';
+    FEnviaEmailConsulta.Destinatarios:= 'marcelo@rauter.com.br';
     FEnviaEmailConsulta.Params.Add('Data', StrToDate('01/01/2018'));
     FEnviaEmailConsulta.Params.Add('CodComprovante', GetListaComprovantes);
     FEnviaEmailConsulta.Visualizacao:= 'Margem e Valor x Período';
@@ -266,7 +301,7 @@ begin
   FEnviaEmailConsulta:= TEnviaEmailConsulta.Create(Self);
   try
     FEnviaEmailConsulta.ConsultaNome:= 'DiferencaOP';
-    FEnviaEmailConsulta.Destinatarios:= 'marcelorauter@gmail.com;silvia.muniz@rauter.com.br';
+    FEnviaEmailConsulta.Destinatarios:= 'marcelo@rauter.com.br;silvia.muniz@rauter.com.br';
     FEnviaEmailConsulta.Titulo:= 'Ordens de Produção com Erro!';
     FEnviaEmailConsulta.Texto:= 'Ordens de produção com diferença no peso da entrada e das saídas em anexo. ';
     FEnviaEmailConsulta.Params.Add('DataIni', StartOfTheDay(Now-1));
@@ -283,8 +318,8 @@ begin
   FEnviaEmailConsulta:= TEnviaEmailConsulta.Create(Self);
   try
     FEnviaEmailConsulta.ConsultaNome:= 'DiaPrevistoFalta';
-//    FEnviaEmailConsulta.Destinatarios:= 'marcelorauter@gmail.com;silvia.muniz@rauter.com.br';
-    FEnviaEmailConsulta.Destinatarios:= 'marcelorauter@gmail.com; silvia.muniz@rauter.com.br; alessandra@rauter.com.br; ricardo@rauter.com.br';
+//    FEnviaEmailConsulta.Destinatarios:= 'marcelo@rauter.com.br;silvia.muniz@rauter.com.br';
+    FEnviaEmailConsulta.Destinatarios:= 'marcelo@rauter.com.br; julio.altafini@rauter.com.br; silvia.muniz@rauter.com.br; alessandra@rauter.com.br; ricardo@rauter.com.br';
     FEnviaEmailConsulta.Titulo:= 'Previsão da Data em que a Matéria Prima vai faltar';
     FEnviaEmailConsulta.Texto:= 'Relatório com todas as Matérias Primas e a previsão da data em que vai haver falta. '
                                  +sLineBreak+sLineBreak
@@ -316,7 +351,7 @@ begin
     FEnviaEmailConsulta.Params.Add('geDataIni', StartOfTheMonth(Now-1));
     FEnviaEmailConsulta.Params.Add('geDataFim', EndOfTheDay(now-1));
 
-    FEnviaEmailConsulta.Destinatarios:= 'marcelorauter@gmail.com; alessandra@rauter.com.br; ricardo@rauter.com.br';
+    FEnviaEmailConsulta.Destinatarios:= 'marcelo@rauter.com.br; julio.altafini@rauter.com.br; alessandra@rauter.com.br; ricardo@rauter.com.br';
     FEnviaEmailConsulta.Titulo:= 'Grafico evolutivo das vendas e metas até '+DateToStr(Now-1)+'!';
     FEnviaEmailConsulta.Texto:= 'Segue em anexo gráfico evolutivo com as metas de venda e margem.';
 
@@ -332,7 +367,7 @@ begin
   FEnviaEmailConsulta:= TEnviaEmailConsulta.Create(Self);
   try
     FEnviaEmailConsulta.ConsultaNome:= 'VendasMargemBaixaOntem';
-    FEnviaEmailConsulta.Destinatarios:= 'marcelorauter@gmail.com; alessandra@rauter.com.br; ricardo@rauter.com.br';
+    FEnviaEmailConsulta.Destinatarios:= 'marcelo@rauter.com.br; julio.altafini@rauter.com.br; alessandra@rauter.com.br; ricardo@rauter.com.br';
     FEnviaEmailConsulta.Titulo:= 'Vendas com Margem Abaixo do Limite!';
     FEnviaEmailConsulta.Texto:= 'Relatório com vendas abaixo do limite em anexo.';
     FEnviaEmailConsulta.TipoVisualizacao:= tvTabela;
@@ -360,7 +395,7 @@ begin
     FEnviaEmailConsulta.Params.Add('geDataIni', StartOfTheMonth(Now-1));
     FEnviaEmailConsulta.Params.Add('geDataFim', EndOfTheDay(now-1));
 
-    FEnviaEmailConsulta.Destinatarios:= 'marcelorauter@gmail.com;'+pEmail;
+    FEnviaEmailConsulta.Destinatarios:= pEmail;
     FEnviaEmailConsulta.Titulo:= 'Vendas realizadas e meta esperada até o dia '+IntToStr(DayOf(now))
                                                                             +' de ' +GetMesString(now)
                                                                             +' de '+IntToStr(YearOf(Now));;
@@ -388,7 +423,7 @@ procedure TCon.EnviaAumentoPreco;
       FEnviaEmailConsulta.Params.Add('DataIni', Now-1);
       FEnviaEmailConsulta.Params.Add('DataFim', Now-1);
 
-      FEnviaEmailConsulta.Destinatarios:= 'marcelorauter@gmail.com;'+pEmail;
+      FEnviaEmailConsulta.Destinatarios:= pEmail;
       FEnviaEmailConsulta.Titulo:= 'Vendas de Ontem com Preço Abaixo do Ideal!';
       FEnviaEmailConsulta.Texto:= 'Segue em anexo tabela com as vendas e sugestão de aumento.';
 
@@ -434,7 +469,7 @@ var
 begin
   FEmailMeta:= TEnviaEmailMetaVendas.Create(nil);
   try
-    FEmailMeta.Destinatarios:= 'marcelorauter@gmail.com; alessandra@rauter.com.br; ricardo@rauter.com.br';
+    FEmailMeta.Destinatarios:= 'marcelorauter@gmail.com; julio.altafini@rauter.com.br; alessandra@rauter.com.br; ricardo@rauter.com.br';
 
     FEmailMeta.Titulo:= 'Vendas realizadas e metas por vendedor até o dia '+IntToStr(DayOf(now))
                                                                               +' de ' +GetMesString(now)

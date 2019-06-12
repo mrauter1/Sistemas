@@ -18,6 +18,8 @@ type
 
   TAppConfig = class
     PastaUpdate: String;
+    PythonPath: String;
+    PythonFilePath: String;
     GruposUsuario: TGruposUsuarios;
     ConSqlServer: TConnectionParams;
     ConFirebird: TConnectionParams;
@@ -59,6 +61,9 @@ begin
     PastaUpdate:= FIniFile.ReadString('GERAL', 'PastaUpdate', '');
     ConSqlServer:= LerConfigBanco(FIniFile, 'SQLSERVER');
     ConFirebird:= LerConfigBanco(FIniFile, 'FIREBIRD');
+
+    PythonPath:= FIniFile.ReadString('PYTHON', 'Path', 'C:\ProgramData\Anaconda3\python.exe');
+    PythonFilePath:= FIniFile.ReadString('PYTHON', 'FilePath', 'E:\SistemaGerenciador\ListaPrecos');
 
   finally
     FIniFile.Free;

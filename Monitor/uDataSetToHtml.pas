@@ -207,7 +207,7 @@ begin
   WriteLog('Enviando email consulta: '+ConsultaNome+', para os emails: '+Destinatarios);
 
   FMailSender.EnviarEmailComAnexo(Titulo, Texto,
-      Destinatarios, 'marcelo@rauter.com.br', '', FAnexo);
+      Destinatarios, '', '', FAnexo);
 {  FMailSender.EnviarEmail(Titulo, 'Tabela em anexo',
       Destinatarios, 'marcelo@rauter.com.br');      }
 end;

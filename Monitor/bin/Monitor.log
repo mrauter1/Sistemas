@@ -194,3 +194,19 @@
 04062019-12:02:17 -> Criando TDmSqlUtils
 04062019-12:02:17 -> Criando TDmGeradorConsultas
 04062019-12:02:17 -> Criando TCon
+10072019-19:36:38 -> Iniciando monitor...
+10072019-19:36:38 -> Criando TConSqlServer
+10072019-19:36:39 -> Criando TConFirebird
+10072019-19:36:39 -> Criando TForm1
+10072019-19:36:39 -> Criando TDmSqlUtils
+10072019-19:36:39 -> Criando TDmGeradorConsultas
+10072019-19:36:39 -> Criando TCon
+10072019-19:37:45 -> Enviando email consulta: MetaVendedores, para os emails: marcelorauter@gmail.com; ricardo@rauter.com.br; silvia.muniz@rauter.com.br
+10072019-19:39:04 -> Iniciando monitor...
+10072019-19:39:04 -> Criando TConSqlServer
+10072019-19:39:04 -> Criando TConFirebird
+10072019-19:39:04 -> Criando TForm1
+10072019-19:39:04 -> Criando TDmSqlUtils
+10072019-19:39:04 -> Criando TDmGeradorConsultas
+10072019-19:39:04 -> Criando TCon
+10072019-19:40:15 -> Enviando email consulta: CustoMedioTanques, para os emails: marcelorauter@gmail.com; ricardo@rauter.com.br; silvia.muniz@rauter.com.br

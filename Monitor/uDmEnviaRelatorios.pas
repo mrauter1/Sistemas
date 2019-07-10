@@ -81,6 +81,13 @@ type
     class function EnviarEmail: Boolean;
   end;
 
+  TEnviaModificacaoCustoMedio = class(TEnviaEmailConsulta)
+  public
+    function ExportaTabelaParaExcel: String; override;
+    class function EnviarEmail: Boolean;
+  end;
+
+
 var
   Con: TCon;
 
@@ -222,6 +229,14 @@ begin
           end,
           StrToTime('04:10:00'), TercaASabado);
 
+  TGatilho.Create(Self,
+          'EnviaModificacaoCustoMedio',
+          procedure()
+          begin
+            TEnviaModificacaoCustoMedio.EnviarEmail;
+          end,
+          StrToTime('04:15:00'), TercaASabado);
+
   uDataSetToHtml.WriteLog('Gatilhos criados');
 end;
                       {
@@ -331,7 +346,7 @@ begin
     FEnviaEmailConsulta.EnviarTabela;
 
   finally
-;    FEnviaEmailConsulta.Free;
+    FEnviaEmailConsulta.Free;
   end;
 end;
 
@@ -469,7 +484,7 @@ var
 begin
   FEmailMeta:= TEnviaEmailMetaVendas.Create(nil);
   try
-    FEmailMeta.Destinatarios:= 'marcelorauter@gmail.com; julio.altafini@rauter.com.br; alessandra@rauter.com.br; ricardo@rauter.com.br';
+    FEmailMeta.Destinatarios:= 'marcelo@rauter.com.br; julio.altafini@rauter.com.br; alessandra@rauter.com.br; ricardo@rauter.com.br';
 
     FEmailMeta.Titulo:= 'Vendas realizadas e metas por vendedor até o dia '+IntToStr(DayOf(now))
                                                                               +' de ' +GetMesString(now)
@@ -564,6 +579,7 @@ end;
 
 procedure TGatilho.FazExecucao;
 begin
+  WriteLog('Monitor.log', 'Iniciando execução do gatilho '+Nome);
   EmExecucao:= True;
   try
     try
@@ -601,6 +617,39 @@ begin
         FazExecucao;
     end;
   end;
+end;
+
+{ TEnviaModificacaoCustoMedio }
+
+class function TEnviaModificacaoCustoMedio.EnviarEmail: Boolean;
+var
+  FEmail: TEnviaModificacaoCustoMedio;
+begin
+  FEmail:= TEnviaModificacaoCustoMedio.Create(nil);
+  try
+    FEmail.Destinatarios:= 'marcelo@rauter.com.br; ricardo@rauter.com.br; silvia.muniz@rauter.com.br';
+
+    FEmail.Titulo:= 'Produtos com Alteração no Custo Médio e Custo Médio Dos Tanques';
+    FEmail.Texto:= 'Produtos com Alteração no Custo Médio Desde o Último Dia Útil e Tabela com o Custo Médio Dos Tanques na Data de Hoje';
+    FEmail.EnviarTabela;
+
+    Result:= True;
+  finally
+    FEmail.Free;
+  end;
+end;
+
+function TEnviaModificacaoCustoMedio.ExportaTabelaParaExcel: String;
+begin
+  ConsultaNome:= 'VariacaoCustoMedio';
+  TipoVisualizacao:= tvTabela;
+
+  Result:= inherited ExportaTabelaParaExcel;
+
+  ConsultaNome:= 'CustoMedioTanques';
+  TipoVisualizacao:= tvTabela;
+
+  Result:= Result+';'+inherited ExportaTabelaParaExcel;
 end;
 
 end.

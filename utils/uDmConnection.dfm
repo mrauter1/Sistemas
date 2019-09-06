@@ -1,5 +1,6 @@
 object DmConnection: TDmConnection
   OldCreateOrder = False
+  OnCreate = DataModuleCreate
   Height = 175
   Width = 305
   object FDConnection: TFDConnection
@@ -15,6 +16,7 @@ object DmConnection: TDmConnection
     ResourceOptions.AutoReconnect = True
     LoginPrompt = False
     AfterCommit = FDConnectionAfterCommit
+    AfterRollback = FDConnectionAfterCommit
     Left = 145
     Top = 64
   end

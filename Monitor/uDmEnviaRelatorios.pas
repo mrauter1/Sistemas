@@ -334,7 +334,11 @@ begin
   try
     FEnviaEmailConsulta.ConsultaNome:= 'DiaPrevistoFalta';
 //    FEnviaEmailConsulta.Destinatarios:= 'marcelo@rauter.com.br;silvia.muniz@rauter.com.br';
-    FEnviaEmailConsulta.Destinatarios:= 'marcelo@rauter.com.br; julio.altafini@rauter.com.br; silvia.muniz@rauter.com.br; alessandra@rauter.com.br; ricardo@rauter.com.br';
+    FEnviaEmailConsulta.Destinatarios:= 'marcelo@rauter.com.br; silvia.muniz@rauter.com.br; alessandra@rauter.com.br; ricardo@rauter.com.br;'+
+                                        GetEmailVendedor('000010')+';'+
+                                        GetEmailVendedor('000018')+';'+
+                                        GetEmailVendedor('000023');
+
     FEnviaEmailConsulta.Titulo:= 'Previsão da Data em que a Matéria Prima vai faltar';
     FEnviaEmailConsulta.Texto:= 'Relatório com todas as Matérias Primas e a previsão da data em que vai haver falta. '
                                  +sLineBreak+sLineBreak
@@ -366,7 +370,7 @@ begin
     FEnviaEmailConsulta.Params.Add('geDataIni', StartOfTheMonth(Now-1));
     FEnviaEmailConsulta.Params.Add('geDataFim', EndOfTheDay(now-1));
 
-    FEnviaEmailConsulta.Destinatarios:= 'marcelo@rauter.com.br; julio.altafini@rauter.com.br; alessandra@rauter.com.br; ricardo@rauter.com.br';
+    FEnviaEmailConsulta.Destinatarios:= 'marcelo@rauter.com.br; alessandra@rauter.com.br; ricardo@rauter.com.br';
     FEnviaEmailConsulta.Titulo:= 'Grafico evolutivo das vendas e metas até '+DateToStr(Now-1)+'!';
     FEnviaEmailConsulta.Texto:= 'Segue em anexo gráfico evolutivo com as metas de venda e margem.';
 
@@ -382,7 +386,7 @@ begin
   FEnviaEmailConsulta:= TEnviaEmailConsulta.Create(Self);
   try
     FEnviaEmailConsulta.ConsultaNome:= 'VendasMargemBaixaOntem';
-    FEnviaEmailConsulta.Destinatarios:= 'marcelo@rauter.com.br; julio.altafini@rauter.com.br; alessandra@rauter.com.br; ricardo@rauter.com.br';
+    FEnviaEmailConsulta.Destinatarios:= 'marcelo@rauter.com.br; alessandra@rauter.com.br; ricardo@rauter.com.br';
     FEnviaEmailConsulta.Titulo:= 'Vendas com Margem Abaixo do Limite!';
     FEnviaEmailConsulta.Texto:= 'Relatório com vendas abaixo do limite em anexo.';
     FEnviaEmailConsulta.TipoVisualizacao:= tvTabela;
@@ -484,7 +488,7 @@ var
 begin
   FEmailMeta:= TEnviaEmailMetaVendas.Create(nil);
   try
-    FEmailMeta.Destinatarios:= 'marcelo@rauter.com.br; julio.altafini@rauter.com.br; alessandra@rauter.com.br; ricardo@rauter.com.br';
+    FEmailMeta.Destinatarios:= 'marcelo@rauter.com.br; alessandra@rauter.com.br; ricardo@rauter.com.br';
 
     FEmailMeta.Titulo:= 'Vendas realizadas e metas por vendedor até o dia '+IntToStr(DayOf(now))
                                                                               +' de ' +GetMesString(now)

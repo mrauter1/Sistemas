@@ -39,6 +39,8 @@ function StringToVarArray(pSeparador, pString: String): Variant;
 function VarToIntDef(pVar: Variant; pDefault: Integer = 0): Integer;
 function VarToFloatDef(pVar: Variant; pDefault: Double = 0): Double;
 
+function Func_Date_SqlServer(parData: TDate): String;
+
 function Func_DateTime_SqlServer(parData: TDateTime): String;
 
 function Func_DataTime_Firebird(parData: TDateTime): String;
@@ -214,6 +216,11 @@ begin
   end;
 
   Abort;
+end;
+
+function Func_Date_SqlServer(parData: TDate): String;
+begin
+  Result:= QuotedStr(FormatDateTime('yyyy/mm/dd', parData));
 end;
 
 function Func_DateTime_SqlServer(parData: TDateTime): String;

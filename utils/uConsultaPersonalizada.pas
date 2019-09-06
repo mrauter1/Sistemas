@@ -1523,8 +1523,8 @@ end;
 
 function TFrmConsultaPersonalizada.Func_GetColorChartView(pAViewInfoDesc: string): Variant;
 var
-AValueCaption : string;
-AvalueCor : integer;
+  AValueCaption : string;
+  AvalueCor : integer;
 
 begin
   Result:= null;

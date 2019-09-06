@@ -383,6 +383,7 @@ object FormPrincipal: TFormPrincipal
     SeparatedSt = ' - '
     RaiseOnError = True
     ReadOnly = True
+    DragMode = dmAutomatic
     Indent = 19
     OnChange = TreeViewMenuChange
     Align = alLeft
@@ -452,6 +453,10 @@ object FormPrincipal: TFormPrincipal
       object Feriados1: TMenuItem
         Caption = 'Feriados'
         OnClick = Feriados1Click
+      end
+      object MenuCicloVendas: TMenuItem
+        Caption = 'Ciclos de Vendas'
+        OnClick = MenuCicloVendasClick
       end
     end
     object Consultas1: TMenuItem

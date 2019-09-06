@@ -3,7 +3,7 @@ object FormProInfo: TFormProInfo
   Top = 0
   Caption = 'Configura'#231#227'o dos Produtos'
   ClientHeight = 378
-  ClientWidth = 770
+  ClientWidth = 836
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,12 +18,11 @@ object FormProInfo: TFormProInfo
   object cxGrid: TcxGrid
     Left = 0
     Top = 0
-    Width = 770
+    Width = 836
     Height = 378
     Align = alClient
     TabOrder = 0
-    ExplicitWidth = 679
-    ExplicitHeight = 272
+    ExplicitWidth = 770
     object cxGridDBTableView: TcxGridDBTableView
       Navigator.Buttons.CustomButtons = <>
       DataController.DataSource = DataSource1
@@ -81,7 +80,11 @@ object FormProInfo: TFormProInfo
       end
       object cxGridDBTableViewCustoInformado: TcxGridDBColumn
         DataBinding.FieldName = 'CustoInformado'
-        Width = 92
+        Width = 61
+      end
+      object cxGridDBTableViewUtilizaCustoMedioSidicom: TcxGridDBColumn
+        DataBinding.FieldName = 'UtilizaCustoMedioSidicom'
+        Width = 67
       end
     end
     object cxGridLevel: TcxGridLevel
@@ -150,6 +153,11 @@ object FormProInfo: TFormProInfo
       FieldName = 'CustoInformado'
       Origin = 'CustoInformado'
       Precision = 16
+    end
+    object QryProInfoUtilizaCustoMedioSidicom: TBooleanField
+      DisplayLabel = 'Utiliza CustoMedio Sidicom'
+      FieldName = 'UtilizaCustoMedioSidicom'
+      Origin = 'UtilizaCustoMedioSidicom'
     end
   end
 end

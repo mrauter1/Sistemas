@@ -39,6 +39,8 @@ type
     cxGridDBTableViewSomaNoCustoLiq: TcxGridDBColumn;
     cxGridDBTableViewSomaNoCustoBruto: TcxGridDBColumn;
     cxGridDBTableViewCustoInformado: TcxGridDBColumn;
+    QryProInfoUtilizaCustoMedioSidicom: TBooleanField;
+    cxGridDBTableViewUtilizaCustoMedioSidicom: TcxGridDBColumn;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
   private

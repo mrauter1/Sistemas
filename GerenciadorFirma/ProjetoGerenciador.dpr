@@ -39,7 +39,10 @@ uses
   uDmGeradorConsultas in '..\utils\uDmGeradorConsultas.pas' {DmGeradorConsultas: TDataModule},
   uConFirebird in '..\utils\uConFirebird.pas' {ConFirebird: TDataModule},
   uFormSubGrupoExtras in 'Fontes\uFormSubGrupoExtras.pas' {FormSubGrupoExtras},
-  uFormFeriados in 'Fontes\uFormFeriados.pas' {FormFeriados};
+  uFormFeriados in 'Fontes\uFormFeriados.pas' {FormFeriados},
+  uFormCiclosVenda in 'Fontes\uFormCiclosVenda.pas' {FormCiclosVenda},
+  uFormMotivoParaIgnorar in 'uFormMotivoParaIgnorar.pas' {FormMotivoIgnorar},
+  uFormCompras in 'Fontes\uFormCompras.pas' {Form2};
 
 {$R *.res}
 
@@ -70,5 +73,6 @@ begin
   Application.CreateForm(TFormGlobal, FormGlobal);
   Application.CreateForm(TFormDetalheProdutos, FormDetalheProdutos);
   Application.CreateForm(TFormSubGrupoExtras, FormSubGrupoExtras);
+  Application.CreateForm(TForm2, Form2);
   Application.Run;
 end.

@@ -2,10 +2,13 @@ unit GerenciadorUtils;
 
 interface
 
-uses System.SysUtils, System.Variants, System.Classes, Data.DB, Datasnap.DBClient, Forms;
+uses System.SysUtils, System.Variants, System.Classes, Data.DB, Datasnap.DBClient, Forms,
+  Vcl.DbCtrls, uConSqlServer, FireDac.Comp.Client;
 
 function SortClientDataSet(ClientDataSet: TClientDataSet;
   const FieldName: String): Boolean;
+
+procedure FazLookup(DBLookup: TDBLookupComboBox; Sql: String);
 
 procedure WriteLog(Par_Texto: String);
 
@@ -17,6 +20,27 @@ uses
 procedure WriteLog(Par_Texto: String);
 begin
   Utils.WriteLog('Log.txt', Par_Texto);
+end;
+
+procedure FazLookup(DBLookup: TDBLookupComboBox; Sql: String);
+var
+  FQry: TFDQuery;
+  FDS: TDataSource;
+begin
+  FQry:= ConSqlServer.RetornaFDQuery(DBLookup, Sql, False);
+  try
+    FQry.Open;
+  except
+    FQry.Free;
+    raise Exception.Create('FazLookup: Erro ao fazer lookup. Sql: '+Sql);
+  end;
+
+  FDS:= TDataSource.Create(FQry);
+  FDS.DataSet:= FQry;
+  FDS.AutoEdit:= False;
+  DBLookup.ListSource:= FDS;
+  DBLookup.KeyField:= FQry.Fields[0].FieldName;
+  DBLookup.ListField:= FQry.Fields[1].FieldName;
 end;
 
 function SortClientDataSet(ClientDataSet: TClientDataSet;

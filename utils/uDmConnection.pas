@@ -21,6 +21,7 @@ type
   TDmConnection = class(TDataModule)
     FDConnection: TFDConnection;
     procedure FDConnectionAfterCommit(Sender: TObject);
+    procedure DataModuleCreate(Sender: TObject);
   private
     FModoDesconectado: Boolean;
     procedure SetModoDesconectado(const Value: BOolean);
@@ -223,9 +224,9 @@ end;
 
 constructor TDmConnection.Create(AOwner: TComponent);
 begin
-  inherited Create(AOwner);
-
   ModoDesconectado:= False;
+
+  inherited Create(AOwner);
 end;
 
 function TDmConnection.CriaFDQuery(sql: String = ''; AParent: TComponent = nil): TFDQuery;
@@ -245,6 +246,12 @@ begin
     Result.Free;
     raise;
   end;
+end;
+
+procedure TDmConnection.DataModuleCreate(Sender: TObject);
+begin
+  if ModoDesconectado then
+    FDConnection.Offline;
 end;
 
 function TDmConnection.RetornaDataSet(Sql: String; pAbrirDataSet: Boolean = True): TDataSet;

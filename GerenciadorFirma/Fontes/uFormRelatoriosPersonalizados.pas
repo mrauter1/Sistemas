@@ -15,7 +15,7 @@ uses
   cxDBData, cxGridLevel, cxClasses, cxGridCustomView, cxGridCustomTableView,
   cxGridTableView, cxGridDBTableView, cxGrid, cxImageComboBox, cxTextEdit,
   cxColorComboBox, uDmGeradorConsultas, uAppConfig, cxContainer, cxMaskEdit,
-  cxDropDownEdit, cxDBEdit, uConFirebird;
+  cxDropDownEdit, cxDBEdit, uConFirebird, GerenciadorUtils;
 
 type
   TFormRelatoriosPersonalizados = class(TForm)
@@ -35,10 +35,6 @@ type
     Label3: TLabel;
     DBRadioGroup1: TDBRadioGroup;
     Panel2: TPanel;
-    EdtID: TDBEdit;
-    Label1: TLabel;
-    Label2: TLabel;
-    EditNome: TDBEdit;
     cxGridParamsDBTableView1: TcxGridDBTableView;
     cxGridParamsLevel1: TcxGridLevel;
     cxGridParams: TcxGrid;
@@ -82,6 +78,10 @@ type
     DsVisualizacoes: TDataSource;
     DBRadioPaginaPadrao: TDBRadioGroup;
     cxGridDBTableView1Formatacao: TcxGridDBColumn;
+    EditNome: TDBEdit;
+    EdtID: TDBEdit;
+    Label1: TLabel;
+    Label2: TLabel;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure BtnSalvarClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -322,6 +322,8 @@ begin
 
   FDm.QryCampos.AfterPost:= QryCamposAfterPost;
   PageControl.ActivePage:= TabCadastro;
+
+//  FazLookup(CbxLookupPai, 'select null as ID, '' '' as Nome union select ID, Nome from cons.Consultas ');
 end;
 
 procedure TFormRelatoriosPersonalizados.FormDestroy(Sender: TObject);

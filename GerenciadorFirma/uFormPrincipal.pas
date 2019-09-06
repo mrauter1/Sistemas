@@ -77,6 +77,7 @@ type
     cxSplitter1: TcxSplitter;
     DadosGruposdeProdutos1: TMenuItem;
     Feriados1: TMenuItem;
+    MenuCicloVendas: TMenuItem;
     procedure Pedidos1Click(Sender: TObject);
     procedure Fila1Click(Sender: TObject);
     procedure Densidade1Click(Sender: TObject);
@@ -117,6 +118,7 @@ type
       CurrentState: TChromeTabStates);
     procedure DadosGruposdeProdutos1Click(Sender: TObject);
     procedure Feriados1Click(Sender: TObject);
+    procedure MenuCicloVendasClick(Sender: TObject);
   private
     FDmGeradorConsultas: TDmGeradorConsultas;
     FPopupActive: Boolean;
@@ -152,7 +154,7 @@ implementation
 
 uses
   uDmFilaProducao, Utils, uFormDetalheProdutos, uFormPedidos2, uFormValidaModelos, uFormExecSql,
-  uFormRelatoriosPersonalizados, uFormSubGrupoExtras, uFormFeriados;
+  uFormRelatoriosPersonalizados, uFormSubGrupoExtras, uFormFeriados, uPython, uFormCiclosVenda;
 
 procedure TFormPrincipal.RemoveTab(pTab: TChromeTab);
 begin
@@ -240,6 +242,11 @@ begin
   end;
 end;
 
+procedure TFormPrincipal.MenuCicloVendasClick(Sender: TObject);
+begin
+  AbrirFormEmNovaAba(TFormCiclosVenda.Create(Self), True);
+end;
+
 procedure TFormPrincipal.MenuItemProInfoClick(Sender: TObject);
 begin
   AbrirFormEmNovaAba(FormProInfo, False);
@@ -285,6 +292,13 @@ end;
 
 procedure TFormPrincipal.FormCreate(Sender: TObject);
 begin
+{  with TPythonExec.Create do
+  try
+    Executar;
+  finally
+    Free;
+  end;                  }
+
   FDmGeradorConsultas:= TDmGeradorConsultas.Create(Self, ConSqlServer);
 
   FIDNodeSelecionado:= 0;

@@ -29,6 +29,7 @@ implementation
 
 procedure TConFirebird.DataModuleCreate(Sender: TObject);
 begin
+
   ModoDesconectado:= True;
   LerConnectionParams(AppConfig.ConFirebird);
 

@@ -1,0 +1,76 @@
+QUEROSENE
+7  Cód. Produto Operado: 410102001
+10 Cód. Modal Utilizado na Movimentação: 1
+11 Cód. Veículo Utilizado no Modal: 1
+16 Número da Licença de importação: 0
+17 Número da Declaração de Importação: 0
+22 Cód. Característica Físico-Química do Produto: 89
+23 Cód. Método Utilizado p/aferição da Característica: 2
+24 Cód. da Unidade Medida da Característica: 33
+26 Cód. do Produto/Operação Resultante: 10002
+
+AGUARRAS
+7  Cód. Produto Operado: 330101001
+10 Cód. Modal Utilizado na Movimentação: 1
+11 Cód. Veículo Utilizado no Modal: 1
+16 Número da Licença de importação: 0
+17 Número da Declaração de Importação: 0
+22 Cód. Característica Físico-Química do Produto: 89
+23 Cód. Método Utilizado p/aferição da Característica: 2
+24 Cód. da Unidade Medida da Característica: 33
+26 Cód. do Produto/Operação Resultante: 10002
+
+TOLUENO
+7  Cód. Produto Operado: 330201002
+10 Cód. Modal Utilizado na Movimentação: 1
+11 Cód. Veículo Utilizado no Modal: 1
+16 Número da Licença de importação: 0
+17 Número da Declaração de Importação: 0
+22 Cód. Característica Físico-Química do Produto: 89
+23 Cód. Método Utilizado p/aferição da Característica: 2
+24 Cód. da Unidade Medida da Característica: 33
+26 Cód. do Produto/Operação Resultante: 10002
+
+AB9
+7  Cód. Produto Operado: 330201008
+10 Cód. Modal Utilizado na Movimentação: 1
+11 Cód. Veículo Utilizado no Modal: 1
+16 Número da Licença de importação: 0
+17 Número da Declaração de Importação: 0
+22 Cód. Característica Físico-Química do Produto: 89
+23 Cód. Método Utilizado p/aferição da Característica: 2
+24 Cód. da Unidade Medida da Característica: 33
+26 Cód. do Produto/Operação Resultante: 10002
+
+XILOL
+7  Cód. Produto Operado: 330201003
+10 Cód. Modal Utilizado na Movimentação: 1
+11 Cód. Veículo Utilizado no Modal: 1
+16 Número da Licença de importação: 0
+17 Número da Declaração de Importação: 0
+22 Cód. Característica Físico-Química do Produto: 89
+23 Cód. Método Utilizado p/aferição da Característica: 2
+24 Cód. da Unidade Medida da Característica: 33
+26 Cód. do Produto/Operação Resultante: 10002
+
+RAFINADO
+7  Cód. Produto Operado: 330101005
+10 Cód. Modal Utilizado na Movimentação: 1
+11 Cód. Veículo Utilizado no Modal: 1
+16 Número da Licença de importação: 0
+17 Número da Declaração de Importação: 0
+22 Cód. Característica Físico-Química do Produto: 89
+23 Cód. Método Utilizado p/aferição da Característica: 2
+24 Cód. da Unidade Medida da Característica: 33
+26 Cód. do Produto/Operação Resultante: 10002
+
+SOLVENTE C6
+7  Cód. Produto Operado: 330101002
+10 Cód. Modal Utilizado na Movimentação: 1
+11 Cód. Veículo Utilizado no Modal: 1
+16 Número da Licença de importação: 0
+17 Número da Declaração de Importação: 0
+22 Cód. Característica Físico-Química do Produto: 89
+23 Cód. Método Utilizado p/aferição da Característica: 2
+24 Cód. da Unidade Medida da Característica: 33
+26 Cód. do Produto/Operação Resultante: 10002

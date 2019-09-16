@@ -1,0 +1,1 @@
+- no calculo de previsão de falta de estoque incluir produtos utilizados como insumo (atualmente, somente as vendas são consideradas).

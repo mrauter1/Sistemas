@@ -1,0 +1,8 @@
+Bibliografia:
+http://www.thinsoftinc.com/download/WinConnectUserManual.pdf - manual do winConnect, programa para rodar Thin Clients Linux em servidor windows
+
+http://www.gdhpress.com.br/redeseservidores/leia/index.php?p=cap9-2 - LTSP, Thin Clients linux rodando servidor linux
+
+http://www.guiadohardware.net/tutoriais/configurando-servidor-windows/ - Tutorial para configurar windows server 2003, como servidor de arquivos.
+
+http://www.vivaolinux.com.br/artigo/Linux-Thinstation-para-estacoes-antigas/

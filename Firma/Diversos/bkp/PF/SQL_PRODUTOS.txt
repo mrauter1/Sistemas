@@ -1,0 +1,10 @@
+SQL_CliPro.Sql.Add('Select *');
+SQL_CliPro.Sql.Add('from produto');
+SQL_CliPro.Sql.Add('where produto.CodGrupoSub =:Acetona or Produto.CodGrupoSub =:=:ClorMetil or');
+SQL_CliPro.Sql.Add('Produto.CodGrupoSub =:MetilEtilCet or Produto.CodGrupoSub =:Tol or');
+SQL_CliPro.Sql.Add('Produto.CodGrupoSub =:CicloHex or Upper(Produto.CodGrupoSub) like :Thinner or');
+SQL_CliPro.Sql.Add('Produto.CodGrupoSub =:AcetEtil or Produto.CodGrupoSub =:DiacetonaAlc or');
+SQL_CliPro.Sql.Add('Produto.CodGrupoSub =:AcetBut or Produto.CodGrupoSub =:MIBK or');
+SQL_CliPro.Sql.Add('Produto.CodGrupoSub =:Isa4 or Produto.CodGrupoSub =:AcetAm or');
+SQL_CliPro.Sql.Add('Produto.CodGrupoSub =:Butanol or Produto.CodGrupoSub =:SecButanol) and');
+SQL_CliPro.Sql.Add('Produto.CodGrupoSub = Produto.CodGrupoSub');

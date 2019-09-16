@@ -1,0 +1,8 @@
+SQL_Mov.SQL.Add('Select MCli.Numero, MCli.DataDocumento, MCliPro.*');
+SQL_Mov.SQL.Add('From MCli, MCliPro');
+SQL_Mov.SQL.Add('where MCli.DataDocumento between :DataIni and :DataFim and');
+SQL_Mov.SQL.Add('(MCli.CodComprovante =:Vendas or MCli.CodComprovante =:Devolucao or');
+SQL_Mov.SQL.Add('MCli.CodComprovante =:SimplesRem or MCli.CodComprovante =:Transfer or MCli.CodComprovante =:Comp)');
+SQL_Mov.SQL.Add('and MCliPro.ChaveNF = MCli.ChaveNF and MCliPro.CodProduto =:CodPro');
+
+

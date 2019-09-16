@@ -1,0 +1,19 @@
+PETROBRAS
+
+ANP:
+6 Código de Instalação 2: 1033182
+12 Identificação do Terceiro Envolvido na Operação: 0
+13 Código do Municipio: 0
+14 Código Atividade Econômica do Terceiro: 0
+15 Código do País: 1554
+19 Código da Série da Nota Fiscal da Operação Comercial: 05
+
+COPESUL
+
+ANP:
+6 Código de Instalação 2: 1036285
+12 Identificação do Terceiro Envolvido na Operação: 0
+13 Código do Municipio: 0
+14 Código Atividade Econômica do Terceiro: 0
+15 Código do País: 1554
+19 Código da Série da Nota Fiscal da Operação Comercial: 04

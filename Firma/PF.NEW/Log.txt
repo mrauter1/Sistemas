@@ -1,0 +1,154 @@
+Criando DataModule
+Carregando Listas
+Abrindo conexão
+Abrindo CDS PRO
+Abrindo CDS CLI
+Finalizado carregamento
+30042018 - 15:00:10 -> Criando DataModule
+30042018 - 15:00:10 -> Carregando Listas
+30042018 - 15:00:10 -> Abrindo conexão
+30042018 - 15:00:10 -> Abrindo CDS PRO
+30042018 - 15:00:11 -> Abrindo CDS CLI
+30042018 - 15:00:11 -> Finalizado carregamento
+30042018-15:01:49 -> Criando DataModule
+30042018-15:01:49 -> Carregando Listas
+30042018-15:01:49 -> Abrindo conexão
+30042018-15:01:49 -> Abrindo CDS PRO
+30042018-15:01:50 -> Abrindo CDS CLI
+30042018-15:01:50 -> Finalizado carregamento
+30042018-15:06:00 -> Criando DataModule
+30042018-15:06:00 -> Carregando Listas
+30042018-15:06:00 -> Abrindo conexão
+30042018-15:06:00 -> Abrindo CDS PRO
+30042018-15:06:00 -> Abrindo CDS CLI
+30042018-15:06:01 -> Finalizado carregamento
+30042018-15:11:29 -> Criando DataModule
+30042018-15:11:29 -> Carregando Listas
+30042018-15:11:29 -> Abrindo conexão
+30042018-15:11:29 -> Abrindo CDS PRO
+30042018-15:11:29 -> Abrindo CDS CLI
+30042018-15:11:30 -> Finalizado carregamento
+30042018-15:14:11 -> Criando DataModule
+30042018-15:14:11 -> Carregando Listas
+30042018-15:14:11 -> Abrindo conexão
+30042018-15:14:11 -> Abrindo CDS PRO
+30042018-15:14:11 -> Abrindo CDS CLI
+30042018-15:14:11 -> Finalizado carregamento
+03052018-09:49:03 -> Criando DataModule
+03052018-09:49:03 -> Carregando Listas
+03052018-09:49:03 -> Abrindo conexão
+03052018-09:49:03 -> Abrindo CDS PRO
+03052018-09:49:03 -> Abrindo CDS CLI
+03052018-09:49:03 -> Finalizado carregamento
+04052018-14:52:05 -> Criando DataModule
+04052018-14:52:05 -> Carregando Listas
+04052018-14:52:05 -> Abrindo conexão
+04052018-14:52:05 -> Abrindo CDS PRO
+04052018-14:52:06 -> Abrindo CDS CLI
+04052018-14:52:06 -> Finalizado carregamento
+04052018-14:57:46 -> Criando DataModule
+04052018-14:57:46 -> Carregando Listas
+04052018-14:57:46 -> Abrindo conexão
+04052018-14:57:46 -> Abrindo CDS PRO
+04052018-14:57:46 -> Abrindo CDS CLI
+04052018-14:57:47 -> Finalizado carregamento
+04052018-15:01:23 -> Criando DataModule
+04052018-15:01:23 -> Carregando Listas
+04052018-15:01:23 -> Abrindo conexão
+04052018-15:01:23 -> Abrindo CDS PRO
+04052018-15:01:23 -> Abrindo CDS CLI
+04052018-15:01:23 -> Finalizado carregamento
+09072018-10:25:15 -> Criando DataModule
+09072018-10:25:15 -> Carregando Listas
+09072018-10:25:15 -> Abrindo conexão
+09072018-10:25:15 -> Abrindo CDS PRO
+09072018-10:25:15 -> Abrindo CDS CLI
+09072018-10:25:15 -> Finalizado carregamento
+09072018-11:48:40 -> Criando DataModule
+09072018-11:48:40 -> Carregando Listas
+09072018-11:50:00 -> Criando DataModule
+09072018-11:50:00 -> Carregando Listas
+09072018-11:53:46 -> Criando DataModule
+09072018-11:53:46 -> Carregando Listas
+09072018-11:53:48 -> Abrindo conexão
+09072018-11:53:48 -> Abrindo CDS PRO
+09072018-11:53:48 -> Abrindo CDS CLI
+09072018-11:53:48 -> Finalizado carregamento
+09072018-12:00:37 -> Criando DataModule
+09072018-12:00:37 -> Carregando Listas
+09072018-12:01:05 -> Abrindo conexão
+09072018-12:01:05 -> Abrindo CDS PRO
+09072018-12:01:05 -> Abrindo CDS CLI
+09072018-12:01:05 -> Finalizado carregamento
+09072018-12:02:01 -> Criando DataModule
+09072018-12:02:01 -> Carregando Listas
+09072018-12:02:01 -> Abrindo conexão
+09072018-12:02:01 -> Abrindo CDS PRO
+09072018-12:02:01 -> Abrindo CDS CLI
+09072018-12:02:01 -> Finalizado carregamento
+09072018-12:03:29 -> Criando DataModule
+09072018-12:03:29 -> Carregando Listas
+09072018-12:03:29 -> Abrindo conexão
+09072018-12:03:29 -> Abrindo CDS PRO
+09072018-12:03:29 -> Abrindo CDS CLI
+09072018-12:03:29 -> Finalizado carregamento
+09072018-12:05:09 -> Criando DataModule
+09072018-12:05:09 -> Carregando Listas
+09072018-12:05:09 -> Abrindo conexão
+09072018-12:05:09 -> Abrindo CDS PRO
+09072018-12:05:09 -> Abrindo CDS CLI
+09072018-12:05:10 -> Finalizado carregamento
+09072018-12:06:01 -> Criando DataModule
+09072018-12:06:01 -> Carregando Listas
+09072018-12:06:01 -> Abrindo conexão
+09072018-12:06:01 -> Abrindo CDS PRO
+09072018-12:06:01 -> Abrindo CDS CLI
+09072018-12:06:02 -> Finalizado carregamento
+09072018-12:06:14 -> Criando DataModule
+09072018-12:06:14 -> Carregando Listas
+09072018-12:06:14 -> Abrindo conexão
+09072018-12:06:14 -> Abrindo CDS PRO
+09072018-12:06:14 -> Abrindo CDS CLI
+09072018-12:06:14 -> Finalizado carregamento
+09072018-12:07:13 -> Criando DataModule
+09072018-12:07:13 -> Carregando Listas
+09072018-12:07:13 -> Abrindo conexão
+09072018-12:07:13 -> Abrindo CDS PRO
+09072018-12:07:14 -> Abrindo CDS CLI
+09072018-12:07:14 -> Finalizado carregamento
+09072018-12:07:48 -> Criando DataModule
+09072018-12:07:48 -> Carregando Listas
+09072018-12:07:48 -> Abrindo conexão
+09072018-12:07:48 -> Abrindo CDS PRO
+09072018-12:07:49 -> Abrindo CDS CLI
+09072018-12:07:49 -> Finalizado carregamento
+09072018-12:14:38 -> Criando DataModule
+09072018-12:14:38 -> Carregando Listas
+09072018-12:14:38 -> Abrindo conexão
+09072018-12:14:38 -> Abrindo CDS PRO
+09072018-12:14:39 -> Abrindo CDS CLI
+09072018-12:14:39 -> Finalizado carregamento
+08072019-20:34:47 -> Criando DataModule
+08072019-20:34:47 -> Carregando Listas
+08072019-20:34:47 -> Abrindo conexão
+08072019-20:34:47 -> Abrindo CDS PRO
+08072019-20:34:47 -> Abrindo CDS CLI
+08072019-20:34:48 -> Finalizado carregamento
+08072019-20:36:51 -> Criando DataModule
+08072019-20:36:51 -> Carregando Listas
+08072019-20:36:51 -> Abrindo conexão
+08072019-20:36:51 -> Abrindo CDS PRO
+08072019-20:36:52 -> Abrindo CDS CLI
+08072019-20:36:52 -> Finalizado carregamento
+08072019-20:43:04 -> Criando DataModule
+08072019-20:43:04 -> Carregando Listas
+08072019-20:43:04 -> Abrindo conexão
+08072019-20:43:04 -> Abrindo CDS PRO
+08072019-20:43:05 -> Abrindo CDS CLI
+08072019-20:43:05 -> Finalizado carregamento
+08072019-20:49:20 -> Criando DataModule
+08072019-20:49:20 -> Carregando Listas
+08072019-20:49:21 -> Abrindo conexão
+08072019-20:49:21 -> Abrindo CDS PRO
+08072019-20:49:21 -> Abrindo CDS CLI
+08072019-20:49:21 -> Finalizado carregamento

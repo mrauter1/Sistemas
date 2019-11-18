@@ -15,11 +15,8 @@ type
   private
     { Private declarations }
   public
-    { Public declarations }
+    class function SelecionaDiretorio(pDirPadrao: String): String;
   end;
-
-var
-  fDir: TfDir;
 
 implementation
 
@@ -30,8 +27,24 @@ uses
 
 procedure TfDir.Button1Click(Sender: TObject);
 begin
-  fPF.Edit1.Text:= DirectoryList.Directory;
+//  Diretorio:= DirectoryList.Directory;
   Close;
+end;
+
+class function TfDir.SelecionaDiretorio(pDirPadrao: String): String;
+var
+  fDir: TfDir;
+begin
+  fDir:= TfDir.Create(Application);
+  try
+//    fDir.LblDir.Caption:= pDirPadrao;
+    fDir.DirectoryList.Directory:= pDirPadrao;
+    fDir.ShowModal;
+    Result:= fDir.DirectoryList.Directory;
+  finally
+    fDir.Free;
+  end;
+
 end;
 
 end.

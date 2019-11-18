@@ -1,8 +1,8 @@
 object Con: TCon
   OldCreateOrder = False
   OnCreate = DataModuleCreate
-  Height = 239
-  Width = 394
+  Height = 283
+  Width = 500
   object TimerRelatorios: TTimer
     Left = 96
     Top = 144
@@ -82,6 +82,66 @@ object Con: TCon
       Required = True
       FixedChar = True
       Size = 6
+    end
+  end
+  object QryInsumosSugeridos: TFDQuery
+    Connection = ConSqlServer.FDConnection
+    SQL.Strings = (
+      
+        'select X.*, (select apresentacao from PRODUTO where CODPRODUTO =' +
+        ' InsumoSugerido) as NomeInsumoSugerido, ep.ESTOQUEATUAL'
+      'from '
+      '('
+      
+        'SELECT PI.APRESENTACAO as ProInsumo, pi.CODPRODUTO as CodInsumo,' +
+        ' '
+      '    case when ep.ESTOQUEATUAL = 0 then'
+      
+        #9#9'IsNull((SELECT TOP 1 S.Cod1 FROM Similares S inner join EstoqP' +
+        'rodutos ep on ep.CodProduto = S.Cod1 and ep.ESTOQUEATUAL > 0'
+      
+        #9#9' where s.Cod2 = PI.CODPRODUTO order by ep.ESTOQUEATUAL desc), ' +
+        'pi.codproduto)'
+      #9'else PI.CODPRODUTO end as InsumoSugerido'
+      'FROM PRODUTO PI '
+      'inner join EstoqProdutos ep on ep.CodProduto = PI.CODPRODUTO'
+      'where PI.CODPRODUTO in (select CodProduto from Insumos_Insumo) '
+      ')X'
+      'inner join EstoqProdutos ep on ep.CodProduto = X.InsumoSugerido'
+      'where X.CodInsumo <> X.InsumoSugerido'
+      'ORDER BY ProInsumo')
+    Left = 392
+    Top = 40
+    object QryInsumosSugeridosProInsumo: TStringField
+      FieldName = 'ProInsumo'
+      Origin = 'ProInsumo'
+      Size = 80
+    end
+    object QryInsumosSugeridosCodInsumo: TStringField
+      FieldName = 'CodInsumo'
+      Origin = 'CodInsumo'
+      Required = True
+      FixedChar = True
+      Size = 6
+    end
+    object QryInsumosSugeridosInsumoSugerido: TStringField
+      FieldName = 'InsumoSugerido'
+      Origin = 'InsumoSugerido'
+      ReadOnly = True
+      Required = True
+      FixedChar = True
+      Size = 6
+    end
+    object QryInsumosSugeridosNomeInsumoSugerido: TStringField
+      FieldName = 'NomeInsumoSugerido'
+      Origin = 'NomeInsumoSugerido'
+      ReadOnly = True
+      Size = 80
+    end
+    object QryInsumosSugeridosESTOQUEATUAL: TBCDField
+      FieldName = 'ESTOQUEATUAL'
+      Origin = 'ESTOQUEATUAL'
+      Precision = 18
     end
   end
 end

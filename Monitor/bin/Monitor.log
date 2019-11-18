@@ -210,3 +210,32 @@
 10072019-19:39:04 -> Criando TDmGeradorConsultas
 10072019-19:39:04 -> Criando TCon
 10072019-19:40:15 -> Enviando email consulta: CustoMedioTanques, para os emails: marcelorauter@gmail.com; ricardo@rauter.com.br; silvia.muniz@rauter.com.br
+13112019-19:47:23 -> Iniciando monitor...
+13112019-19:47:23 -> Criando TConSqlServer
+13112019-19:47:24 -> Criando TConFirebird
+13112019-19:47:25 -> Criando TForm1
+13112019-19:47:25 -> Criando TDmSqlUtils
+13112019-19:47:25 -> Criando TDmGeradorConsultas
+13112019-19:47:25 -> Criando TCon
+13112019-19:47:25 -> Carregando Gatihlos.xml
+13112019-19:53:55 -> Inicializando message loop
+14112019-18:22:06 -> Iniciando monitor...
+14112019-18:22:06 -> Criando TConSqlServer
+14112019-18:22:07 -> Criando TConFirebird
+14112019-18:22:08 -> Criando TForm1
+14112019-18:22:08 -> Criando TDmSqlUtils
+14112019-18:22:08 -> Criando TDmGeradorConsultas
+14112019-18:22:08 -> Criando TCon
+14112019-18:22:08 -> Carregando Gatihlos.xml
+14112019-18:37:43 -> Inicializando message loop
+18112019-11:36:37 -> Iniciando monitor...
+18112019-11:36:37 -> Criando TConSqlServer
+18112019-11:36:38 -> Criando TConFirebird
+18112019-11:36:38 -> Criando TForm1
+18112019-11:36:38 -> Criando TDmSqlUtils
+18112019-11:36:38 -> Criando TDmGeradorConsultas
+18112019-11:36:38 -> Criando TCon
+18112019-11:36:38 -> Carregando Gatihlos.xml
+18112019-11:37:10 -> Enviando email consulta: MetaEquipe, para os emails: marcelo@rauter.com.br
+18112019-11:37:27 -> Enviando email consulta: MetaEquipe, para os emails: marcelo@rauter.com.br
+18112019-11:37:30 -> Inicializando message loop

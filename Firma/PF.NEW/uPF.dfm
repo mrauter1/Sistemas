@@ -3,7 +3,7 @@ object fPF: TfPF
   Top = 176
   Caption = 'Policia Federal'
   ClientHeight = 354
-  ClientWidth = 574
+  ClientWidth = 558
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -13,14 +13,14 @@ object fPF: TfPF
   OldCreateOrder = False
   OnActivate = FormActivate
   DesignSize = (
-    574
+    558
     354)
   PixelsPerInch = 96
   TextHeight = 13
   object Gauge1: TGauge
     Left = 8
     Top = 297
-    Width = 443
+    Width = 427
     Height = 21
     Anchors = [akLeft, akRight, akBottom]
     Progress = 0
@@ -30,38 +30,35 @@ object fPF: TfPF
   object Label2: TLabel
     Left = 12
     Top = 333
-    Width = 39
+    Width = 42
     Height = 13
     Anchors = [akLeft, akBottom]
-    Caption = 'Diret'#243'rio'
-    ExplicitTop = 318
+    Caption = 'Diret'#243'rio:'
   end
   object GroupBox1: TGroupBox
-    Left = 8
+    Left = 11
     Top = 8
-    Width = 555
+    Width = 539
     Height = 57
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Gerar arquivos com data de emiss'#227'o do m'#234's de'
     TabOrder = 0
     DesignSize = (
-      555
+      539
       57)
     object Label1: TLabel
-      Left = 269
-      Top = 29
-      Width = 12
+      Left = 318
+      Top = 27
+      Width = 22
       Height = 13
       Anchors = [akTop]
-      Caption = 'de'
-      ExplicitLeft = 250
+      Caption = 'Ano:'
     end
     object CBXMes: TComboBox
       Left = 48
       Top = 24
       Width = 145
       Height = 21
-      ItemIndex = 0
       TabOrder = 0
       Text = 'Janeiro'
       OnExit = EditAnoExit
@@ -82,7 +79,7 @@ object fPF: TfPF
         'Dezembro')
     end
     object EditAno: TEdit
-      Left = 362
+      Left = 346
       Top = 24
       Width = 121
       Height = 21
@@ -95,10 +92,10 @@ object fPF: TfPF
   object DBGrid: TDBGrid
     Left = 8
     Top = 83
-    Width = 555
+    Width = 539
     Height = 177
     Anchors = [akLeft, akTop, akRight, akBottom]
-    DataSource = Dtm_PF.DS_Pro
+    DataSource = DmDados.DS_ProdutoControlado
     Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgAlwaysShowSelection, dgConfirmDelete, dgCancelOnExit]
     ReadOnly = True
     TabOrder = 1
@@ -110,27 +107,30 @@ object fPF: TfPF
     Columns = <
       item
         Expanded = False
-        FieldName = 'CODPRODUTO'
-        Title.Caption = 'C'#211'DIGO'
+        FieldName = 'CODGRUPOSUB'
         Visible = True
       end
       item
         Expanded = False
-        FieldName = 'APRESENTACAO'
-        Title.Caption = 'APRESENTA'#199#195'O'
-        Width = 340
+        FieldName = 'NOMESUBGRUPO'
+        Width = 139
         Visible = True
       end
       item
         Expanded = False
-        FieldName = 'UNIDADEESTOQUE'
-        Title.Caption = 'UNIDADE DE ESTOQUE'
-        Width = 125
+        FieldName = 'CodMercosulNCM'
+        Width = 135
+        Visible = True
+      end
+      item
+        Expanded = False
+        FieldName = 'Densidade'
+        Width = 99
         Visible = True
       end>
   end
   object BtnGerar: TButton
-    Left = 466
+    Left = 450
     Top = 297
     Width = 99
     Height = 25
@@ -140,7 +140,7 @@ object fPF: TfPF
     OnClick = BtnGerarClick
   end
   object ButtonSelDir: TButton
-    Left = 539
+    Left = 523
     Top = 327
     Width = 22
     Height = 20
@@ -149,10 +149,10 @@ object fPF: TfPF
     TabOrder = 3
     OnClick = ButtonSelDirClick
   end
-  object Edit1: TEdit
-    Left = 64
-    Top = 327
-    Width = 475
+  object EditDir: TEdit
+    Left = 57
+    Top = 328
+    Width = 459
     Height = 21
     Anchors = [akLeft, akRight, akBottom]
     TabOrder = 4
@@ -160,15 +160,15 @@ object fPF: TfPF
   object btnComprov: TButton
     Left = 8
     Top = 266
-    Width = 105
+    Width = 153
     Height = 25
     Anchors = [akLeft, akBottom]
-    Caption = 'Comprovantes'
+    Caption = 'Comprovantes Compra'
     TabOrder = 5
     OnClick = btnComprovClick
   end
   object Button2: TButton
-    Left = 122
+    Left = 330
     Top = 266
     Width = 98
     Height = 25
@@ -178,7 +178,7 @@ object fPF: TfPF
     OnClick = BtnGrupos
   end
   object BtnTransp: TButton
-    Left = 230
+    Left = 438
     Top = 266
     Width = 111
     Height = 25
@@ -186,5 +186,15 @@ object fPF: TfPF
     Caption = 'Transporte Pr'#243'prio'
     TabOrder = 7
     OnClick = BtnTranspClick
+  end
+  object Button1: TButton
+    Left = 167
+    Top = 266
+    Width = 153
+    Height = 25
+    Anchors = [akLeft, akBottom]
+    Caption = 'Comprovantes Venda'
+    TabOrder = 8
+    OnClick = Button1Click
   end
 end

@@ -152,3 +152,4 @@ Finalizado carregamento
 08072019-20:49:21 -> Abrindo CDS PRO
 08072019-20:49:21 -> Abrindo CDS CLI
 08072019-20:49:21 -> Finalizado carregamento
+03102019-20:04:37 -> Carregando Configuração dos Grupos

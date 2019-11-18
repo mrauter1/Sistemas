@@ -9,13 +9,20 @@ uses
   Variants, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error,
   FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
   FireDAC.Phys, FireDAC.Phys.FB, FireDAC.Phys.FBDef, FireDAC.ConsoleUI.Wait,
-  FireDAC.Comp.Client, Utils, uAppConfig, System.Rtti;
+  FireDAC.Comp.Client, Utils, System.Rtti;
 
 type
  cfMapField = record
    SourceType: TFieldType;
    DestType: TFieldType;
  end;
+
+  TConnectionParams = record
+    Server: String;
+    Protocol: String;
+    Port: Integer;
+    Database: String;
+  end;
 
 type
   TDmConnection = class(TDataModule)
@@ -427,6 +434,10 @@ begin
             ArqIni.ReadString(pSection, 'Server', FDConnection.Params.Values['Server']);
         FDConnection.Params.Values['Database'] :=
             ArqIni.ReadString(pSection, 'Database', FDConnection.Params.Values['Database']);
+        FDConnection.Params.Values['Port'] :=
+            ArqIni.ReadString(pSection, 'Port', FDConnection.Params.Values['Port']);
+        FDConnection.Params.Values['Protocol'] :=
+            ArqIni.ReadString(pSection, 'Protocol', FDConnection.Params.Values['Protocol']);
       finally
         ArqIni.Free;
       end;

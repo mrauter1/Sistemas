@@ -21,7 +21,7 @@ object fDir: TfDir
     Width = 281
     Height = 13
     AutoSize = False
-    Caption = 'C:\Sistemas\PF'
+    Caption = 'F:\Sistemas\Firma\PF.NEW'
   end
   object DirectoryList: TDirectoryListBox
     Left = 0
@@ -29,7 +29,6 @@ object fDir: TfDir
     Width = 281
     Height = 124
     DirLabel = LblDir
-    ItemHeight = 16
     TabOrder = 0
   end
   object Button1: TButton

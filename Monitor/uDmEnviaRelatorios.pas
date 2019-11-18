@@ -51,6 +51,12 @@ type
     QrySimilares: TFDQuery;
     QrySimilaresCod1: TStringField;
     QrySimilaresCod2: TStringField;
+    QryInsumosSugeridos: TFDQuery;
+    QryInsumosSugeridosProInsumo: TStringField;
+    QryInsumosSugeridosCodInsumo: TStringField;
+    QryInsumosSugeridosInsumoSugerido: TStringField;
+    QryInsumosSugeridosNomeInsumoSugerido: TStringField;
+    QryInsumosSugeridosESTOQUEATUAL: TBCDField;
     procedure DataModuleCreate(Sender: TObject);
     procedure CdsGatilhosAfterPost(DataSet: TDataSet);
   private
@@ -62,6 +68,8 @@ type
     procedure EnviaDataFaltaProduto;
     procedure FazBackup;
     procedure AtualizaListaPreco;
+    procedure AtualizaModelosProducao;
+    procedure EnviaMetaEquipes; // Atualiza modelos de produção por insumos equivalentes
   protected
     FEnviaEmailConsulta: TEnviaEmailConsulta;
     function GetListaComprovantes: String;
@@ -140,6 +148,30 @@ begin
   Result:= [dsTerca, dsQuarta, dsQuinta, dsSexta, dsSabado];
 end;
 
+procedure TCon.AtualizaModelosProducao;
+
+  function GetSqlUpdate(pCodInsumo, pCodInsumoSugerido: String): String;
+  begin
+    Result:= ' UPDATE INSUMOS_INSUMO SET CODPRODUTO = '+pCodInsumoSugerido.QuotedString+
+             ' WHERE CODPRODUTO = '+pCodInsumo.QuotedString+
+             ' AND CODMODELO NOT IN (SELECT CODMODELO FROM INSUMOS_ACABADO IA '+
+               ' WHERE IA.CODPRODUTO = '+pCodInsumoSugerido.QuotedString+')';
+  end;
+
+begin
+  if QryInsumosSugeridos.Active then
+    QryInsumosSugeridos.Close;
+
+  QryInsumosSugeridos.Open;
+  QryInsumosSugeridos.First;
+  while not QryInsumosSugeridos.Eof do
+  begin
+    ConFirebird.ExecutaComando(GetSqlUpdate(QryInsumosSugeridosCodInsumo.AsString, QryInsumosSugeridosInsumoSugerido.AsString));
+    QryInsumosSugeridos.Next;
+  end;
+  QryInsumosSugeridos.Close;
+end;
+
 procedure TCon.CdsGatilhosAfterPost(DataSet: TDataSet);
 begin
   CdsGatilhos.SaveToFile('Gatilhos.xml', dfXML);
@@ -152,6 +184,7 @@ begin
     CdsGatilhos.LoadFromFile('Gatilhos.xml');
   except
   end;
+
   if not CdsGatilhos.Active then
     CdsGatilhos.CreateDataSet;
 
@@ -236,6 +269,23 @@ begin
             TEnviaModificacaoCustoMedio.EnviarEmail;
           end,
           StrToTime('04:15:00'), TercaASabado);
+
+
+  TGatilho.Create(Self,
+          'AtualizaModelosProducao',
+          procedure()
+          begin
+            AtualizaModelosProducao;
+          end,
+          StrToTime('04:20:00'), TercaASabado);
+
+  TGatilho.Create(Self,
+          'AtualizaModelosProducao',
+          procedure()
+          begin
+            EnviaMetaEquipes;
+          end,
+          StrToTime('04:25:00'), TercaASabado);
 
   uDataSetToHtml.WriteLog('Gatilhos criados');
 end;
@@ -429,6 +479,43 @@ begin
   end;
 end;
 
+procedure TCon.EnviaMetaEquipes;
+
+  procedure EnviaMetaEquipe(pCodEquipe, pEmail: String);
+  begin
+    FEnviaEmailConsulta:= TEnviaEmailConsulta.Create(Self);
+    try
+      FEnviaEmailConsulta.ConsultaNome:= 'MetaEquipe';
+  //    FEnviaEmailConsulta.Visualizacao:= '';
+
+      FEnviaEmailConsulta.Params.Add('CodEquipe', pCodEquipe);
+
+      FEnviaEmailConsulta.Destinatarios:= pEmail;
+      FEnviaEmailConsulta.Titulo:= 'Meta da Venda da Equipe!';
+      FEnviaEmailConsulta.Texto:= 'Segue em anexo tabela com as metas da equipe.';
+
+      FEnviaEmailConsulta.TipoVisualizacao:= tvTabela;
+      FEnviaEmailConsulta.EnviarTabela;
+    finally
+      FEnviaEmailConsulta.Free;
+    end;
+  end;
+
+var
+  Vendedores: TDictionary<String, string>;
+  Vendedor: String;
+
+begin
+  Vendedores:= TDictionary<String, String>.Create;
+  try
+    EnviaMetaEquipe('1', GetEmailVendedor('000010')); // Equipe Édison
+    EnviaMetaEquipe('2', GetEmailVendedor('000018')); // Equipe Wagner
+
+  finally
+    Vendedores.Free;
+  end;
+end;
+
 procedure TCon.EnviaAumentoPreco;
 
   procedure EnviaAumentoPrecoVendedor(pCodVendedor, pEmail: String);
@@ -453,7 +540,6 @@ procedure TCon.EnviaAumentoPreco;
     end;
   end;
 
-
 var
   Vendedores: TDictionary<String, string>;
   Vendedor: String;
@@ -462,8 +548,8 @@ begin
   Vendedores:= TDictionary<String, String>.Create;
   try
     Vendedores.Add('000000', GetEmailVendedor('000000')+'; alessandra@rauter.com.br'); //Direto
-    Vendedores.Add('000001', GetEmailVendedor('000001')+'; alessandra@rauter.com.br'); //Filter Castilhos
-    Vendedores.Add('000006', GetEmailVendedor('000006')+'; alessandra@rauter.com.br'); // Loja
+    Vendedores.Add('000001', GetEmailVendedor('000001')+'; '+GetEmailVendedor('000018')); //Filter Castilhos
+    Vendedores.Add('000006', GetEmailVendedor('000006')+'; '+GetEmailVendedor('000018')); // Loja
     Vendedores.Add('000010', GetEmailVendedor('000010')); // Edison
     Vendedores.Add('000018', GetEmailVendedor('000018')); // Wagner
     Vendedores.Add('000023', GetEmailVendedor('000023')); // Fernanda

@@ -3,16 +3,9 @@ unit uAppConfig;
 interface
 
 uses
-  IniFiles, SysUtils, Forms;
+  IniFiles, SysUtils, Forms, uDMConnection;
 
 type
-  TConnectionParams = record
-    Server: String;
-    Protocol: String;
-    Port: Integer;
-    Database: String;
-  end;
-
   TGrupoUsuario = (puGerenteProducao, puDesenvolvedor);
   TGruposUsuarios = set of TGrupoUsuario;
 

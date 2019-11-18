@@ -51,10 +51,46 @@ procedure BitmapFileToPNG(const Source, Dest: String);
 
 function RemoveAcento(aText : string) : string;
 
+procedure CopyRecord(pSource: TDataSet; pTarget: TDataSet);
+
+procedure CopyRecordsDataSet(pSource: TDataSet; pTarget: TDataSet; pClearTarget: Boolean = False);
+
 implementation
 
 uses
   SysUtils, System.TypInfo, DateUtils, Vcl.Imaging.pngImage;
+
+procedure CopyRecord(pSource: TDataSet; pTarget: TDataSet);
+var
+  I: Integer;
+  pFieldSource, pFieldTarget: TField;
+
+begin
+  pTarget.Insert;
+  for pFieldSource in pSource.Fields do
+  begin
+    pFieldTarget:= pTarget.FindField(pFieldSource.FieldName);
+    if Assigned(pFieldTarget) then
+      pFieldTarget.Value:= pFieldSource.Value;
+  end;
+
+  pTarget.Post;
+end;
+
+procedure CopyRecordsDataSet(pSource: TDataSet; pTarget: TDataSet; pClearTarget: Boolean = False);
+begin
+  if pClearTarget then
+    while not pTarget.IsEmpty do
+      pTarget.Delete;
+
+  pSource.First;
+  while not pSource.Eof do
+  begin
+    CopyRecord(pSource, pTarget);
+    pSource.Next;
+  end;
+
+end;
 
 function RemoveAcento(aText : string) : string;
 const

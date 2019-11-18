@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, uDtm_PF,
-  Data.DB, Vcl.Grids, Vcl.DBGrids;
+  Data.DB, Vcl.Grids, Vcl.DBGrids, uDmDados;
 
 type
   TFormConfGrupo = class(TForm)
@@ -18,6 +18,7 @@ type
     DBGrid1: TDBGrid;
     procedure BtnAddClick(Sender: TObject);
     procedure BtnDelClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
   public
@@ -31,17 +32,23 @@ implementation
 
 {$R *.dfm}
 
+
 procedure TFormConfGrupo.BtnAddClick(Sender: TObject);
 begin
-  Dtm_PF.CdsConfGrupo.Append;
-  Dtm_PF.CdsConfGrupoCodGrupoSub.AsString:= EditComprov.Text;
-  Dtm_PF.AtualizaConfGrupoAtual;
-  Dtm_PF.CdsConfGrupo.Post;
+  DmDados.CdsConfGrupo.Append;
+  DmDados.CdsConfGrupoCodGrupoSub.AsString:= EditComprov.Text;
+  DmDados.AtualizaConfGrupoAtual;
+  DmDados.CdsConfGrupo.Post;
 end;
 
 procedure TFormConfGrupo.BtnDelClick(Sender: TObject);
 begin
-  Dtm_PF.CdsConfGrupo.Delete;
+  DmDados.CdsConfGrupo.Delete;
+end;
+
+procedure TFormConfGrupo.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  DmDados.RevalidaConfGrupos;
 end;
 
 end.

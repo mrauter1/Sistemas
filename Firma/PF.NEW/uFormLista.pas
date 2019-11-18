@@ -59,23 +59,20 @@ procedure TFormLista.FormClose(Sender: TObject; var Action: TCloseAction);
 var
   ArqIni: TIniFile;
 begin
-  if FileExists(ExtractFilePath(Application.ExeName) + 'Banco.Ini') then
-    begin
-      ArqIni:= TIniFile.Create(ExtractFilePath(Application.ExeName) +  'Banco.Ini');
-      ArqIni.WriteString('Banco', NomeIdent, ListComprov.Items.CommaText);
-      ArqIni.Free;
-    end
+  ArqIni:= TIniFile.Create(ExtractFilePath(Application.ExeName) +  'Config.Ini');
+  ArqIni.WriteString('Config', NomeIdent, ListComprov.Items.CommaText);
+  ArqIni.Free;
 end;
 
 procedure TFormLista.FormShow(Sender: TObject);
 var
   ArqIni: TIniFile;
 begin
-  if FileExists(ExtractFilePath(Application.ExeName) + 'Banco.Ini') then
+  if FileExists(ExtractFilePath(Application.ExeName) + 'Config.Ini') then
     begin
-      ArqIni:= TIniFile.Create(ExtractFilePath(Application.ExeName) +  'Banco.Ini');
+      ArqIni:= TIniFile.Create(ExtractFilePath(Application.ExeName) +  'Config.Ini');
       ListComprov.Items.CommaText :=
-          ArqIni.ReadString('Banco', NomeIdent, ValoresDefault);
+          ArqIni.ReadString('Config', NomeIdent, ValoresDefault);
       ArqIni.Free;
     end
   else

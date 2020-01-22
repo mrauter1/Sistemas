@@ -185,6 +185,9 @@ begin
   except
   end;
 
+  ShowMessage('Avisos automáticos não estão sendo executados.');
+  Exit;
+
   if not CdsGatilhos.Active then
     CdsGatilhos.CreateDataSet;
 
@@ -229,6 +232,14 @@ begin
             EnviaMetaEvolutivo;
           end,
           StrToTime('04:35:00'), TercaASabado);
+
+  TGatilho.Create(Self,
+          'EnviaMetaEquipes',
+          procedure()
+          begin
+            EnviaMetaEquipes;
+          end,
+          StrToTime('04:40:00'), TercaASabado);
 
   TGatilho.Create(Self,
           'EnviaVendasMargemBaixa',
@@ -278,14 +289,6 @@ begin
             AtualizaModelosProducao;
           end,
           StrToTime('04:20:00'), TercaASabado);
-
-  TGatilho.Create(Self,
-          'AtualizaModelosProducao',
-          procedure()
-          begin
-            EnviaMetaEquipes;
-          end,
-          StrToTime('04:25:00'), TercaASabado);
 
   uDataSetToHtml.WriteLog('Gatilhos criados');
 end;
@@ -503,7 +506,6 @@ procedure TCon.EnviaMetaEquipes;
 
 var
   Vendedores: TDictionary<String, string>;
-  Vendedor: String;
 
 begin
   Vendedores:= TDictionary<String, String>.Create;
@@ -548,12 +550,14 @@ begin
   Vendedores:= TDictionary<String, String>.Create;
   try
     Vendedores.Add('000000', GetEmailVendedor('000000')+'; alessandra@rauter.com.br'); //Direto
-    Vendedores.Add('000001', GetEmailVendedor('000001')+'; '+GetEmailVendedor('000018')); //Filter Castilhos
-    Vendedores.Add('000006', GetEmailVendedor('000006')+'; '+GetEmailVendedor('000018')); // Loja
-    Vendedores.Add('000010', GetEmailVendedor('000010')); // Edison
+    Vendedores.Add('000001', GetEmailVendedor('000001')+'; '+GetEmailVendedor('000018')+'; vendas@rauter.com.br'); //Filter Castilhos
+    Vendedores.Add('000006', GetEmailVendedor('000006')+'; '+GetEmailVendedor('000018')+'; vendas@rauter.com.br'); // Loja
+//    Vendedores.Add('000010', GetEmailVendedor('000010')); // Edison
     Vendedores.Add('000018', GetEmailVendedor('000018')); // Wagner
     Vendedores.Add('000023', GetEmailVendedor('000023')); // Fernanda
     Vendedores.Add('000026', GetEmailVendedor('000026')); // Jeanete
+    Vendedores.Add('000043', GetEmailVendedor('000043')); // Micheline
+    Vendedores.Add('000040', GetEmailVendedor('000040')); // Anderson
 
     for Vendedor in Vendedores.Keys do
     begin

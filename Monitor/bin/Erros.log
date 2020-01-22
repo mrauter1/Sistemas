@@ -2,3 +2,8 @@
 Connection timed out.
 08112018-19:54:54 -> Socket Error # 10060
 Connection timed out.
+27112019-18:49:39 -> QryAvisos: Field 'Título' not found
+03122019-12:17:22 -> Invalid pointer operation
+03122019-12:20:21 -> Invalid pointer operation
+09122019-12:58:29 -> QryAvisoConsulta: Field 'Descrição' not found
+09122019-12:59:50 -> QryParametros: Duplicate field name 'IDParametro'

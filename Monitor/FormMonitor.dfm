@@ -1,7 +1,7 @@
-object Form1: TForm1
+object MonitorMain: TMonitorMain
   Left = 0
   Top = 0
-  Caption = 'Form1'
+  Caption = 'MonitorMain'
   ClientHeight = 227
   ClientWidth = 488
   Color = clBtnFace
@@ -103,6 +103,10 @@ object Form1: TForm1
     object Fechar1: TMenuItem
       Caption = 'Fechar'
       OnClick = Fechar1Click
+    end
+    object AvisosAutomaticos1: TMenuItem
+      Caption = 'Avisos Autom'#225'ticos'
+      OnClick = AvisosAutomaticos1Click
     end
   end
 end

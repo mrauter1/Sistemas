@@ -239,3 +239,298 @@
 18112019-11:37:10 -> Enviando email consulta: MetaEquipe, para os emails: marcelo@rauter.com.br
 18112019-11:37:27 -> Enviando email consulta: MetaEquipe, para os emails: marcelo@rauter.com.br
 18112019-11:37:30 -> Inicializando message loop
+26112019-19:47:51 -> Iniciando monitor...
+26112019-19:47:51 -> Criando TConSqlServer
+26112019-19:47:52 -> Criando TConFirebird
+26112019-19:47:53 -> Criando TForm1
+26112019-19:47:53 -> Criando TDmSqlUtils
+26112019-19:47:53 -> Criando TDmGeradorConsultas
+26112019-19:47:53 -> Criando TCon
+26112019-19:47:53 -> Carregando Gatihlos.xml
+26112019-19:55:55 -> Enviando email consulta: MetaEquipe, para os emails: vendas2@rauter.com.br
+26112019-19:57:50 -> Enviando email consulta: MetaEquipe, para os emails: vendas1@rauter.com.br; marcelo@rauter.com.br
+26112019-19:58:27 -> Inicializando message loop
+27112019-18:38:17 -> Iniciando monitor...
+27112019-18:38:17 -> Criando TConSqlServer
+27112019-18:38:18 -> Criando TConFirebird
+27112019-18:38:18 -> Criando TForm1
+27112019-18:38:19 -> Criando TDmSqlUtils
+27112019-18:38:19 -> Criando TDmGeradorConsultas
+27112019-18:38:19 -> Criando TCon
+27112019-18:38:19 -> Carregando Gatihlos.xml
+27112019-18:38:21 -> Inicializando message loop
+27112019-18:40:50 -> Iniciando monitor...
+27112019-18:40:50 -> Criando TConSqlServer
+27112019-18:40:51 -> Criando TConFirebird
+27112019-18:40:51 -> Criando TForm1
+27112019-18:40:51 -> Criando TDmSqlUtils
+27112019-18:40:51 -> Criando TDmGeradorConsultas
+27112019-18:40:51 -> Criando TCon
+27112019-18:40:51 -> Carregando Gatihlos.xml
+27112019-18:42:00 -> Inicializando message loop
+27112019-18:42:50 -> Iniciando monitor...
+27112019-18:42:50 -> Criando TConSqlServer
+27112019-18:42:50 -> Criando TConFirebird
+27112019-18:42:51 -> Criando TForm1
+27112019-18:42:51 -> Criando TDmSqlUtils
+27112019-18:42:51 -> Criando TDmGeradorConsultas
+27112019-18:42:51 -> Criando TCon
+27112019-18:42:51 -> Carregando Gatihlos.xml
+27112019-18:42:54 -> Inicializando message loop
+27112019-18:46:28 -> Iniciando monitor...
+27112019-18:46:28 -> Criando TConSqlServer
+27112019-18:46:28 -> Criando TConFirebird
+27112019-18:46:28 -> Criando TForm1
+27112019-18:46:29 -> Criando TDmSqlUtils
+27112019-18:46:29 -> Criando TDmGeradorConsultas
+27112019-18:46:29 -> Criando TCon
+27112019-18:46:29 -> Carregando Gatihlos.xml
+27112019-18:46:32 -> Inicializando message loop
+27112019-18:49:28 -> Iniciando monitor...
+27112019-18:49:28 -> Criando TConSqlServer
+27112019-18:49:28 -> Criando TConFirebird
+27112019-18:49:28 -> Criando TForm1
+27112019-18:49:28 -> Criando TDmSqlUtils
+27112019-18:49:28 -> Criando TDmGeradorConsultas
+27112019-18:49:28 -> Criando TCon
+27112019-18:49:28 -> Carregando Gatihlos.xml
+27112019-18:49:29 -> Inicializando message loop
+27112019-18:51:07 -> Iniciando monitor...
+27112019-18:51:07 -> Criando TConSqlServer
+27112019-18:51:07 -> Criando TConFirebird
+27112019-18:51:08 -> Criando TForm1
+27112019-18:51:08 -> Criando TDmSqlUtils
+27112019-18:51:08 -> Criando TDmGeradorConsultas
+27112019-18:51:08 -> Criando TCon
+27112019-18:51:08 -> Carregando Gatihlos.xml
+27112019-18:52:21 -> Inicializando message loop
+27112019-19:00:42 -> Iniciando monitor...
+27112019-19:00:42 -> Criando TConSqlServer
+27112019-19:00:43 -> Criando TConFirebird
+27112019-19:00:43 -> Criando TForm1
+27112019-19:00:43 -> Criando TDmSqlUtils
+27112019-19:00:43 -> Criando TDmGeradorConsultas
+27112019-19:00:43 -> Criando TCon
+27112019-19:00:43 -> Carregando Gatihlos.xml
+27112019-19:00:45 -> Inicializando message loop
+27112019-19:07:36 -> Iniciando monitor...
+27112019-19:07:36 -> Criando TConSqlServer
+27112019-19:07:37 -> Criando TConFirebird
+27112019-19:07:37 -> Criando TForm1
+27112019-19:07:37 -> Criando TDmSqlUtils
+27112019-19:07:37 -> Criando TDmGeradorConsultas
+27112019-19:07:37 -> Criando TCon
+27112019-19:07:37 -> Carregando Gatihlos.xml
+27112019-19:07:39 -> Inicializando message loop
+27112019-19:19:52 -> Iniciando monitor...
+27112019-19:19:52 -> Criando TConSqlServer
+27112019-19:19:53 -> Criando TConFirebird
+27112019-19:19:53 -> Criando TForm1
+27112019-19:19:53 -> Criando TDmSqlUtils
+27112019-19:19:53 -> Criando TDmGeradorConsultas
+27112019-19:19:53 -> Criando TCon
+27112019-19:19:53 -> Carregando Gatihlos.xml
+27112019-19:20:02 -> Inicializando message loop
+27112019-19:26:28 -> Iniciando monitor...
+27112019-19:26:28 -> Criando TConSqlServer
+27112019-19:26:29 -> Criando TConFirebird
+27112019-19:26:29 -> Criando TForm1
+27112019-19:26:29 -> Criando TDmSqlUtils
+27112019-19:26:29 -> Criando TDmGeradorConsultas
+27112019-19:26:29 -> Criando TCon
+27112019-19:26:29 -> Carregando Gatihlos.xml
+27112019-19:26:47 -> Inicializando message loop
+27112019-19:26:58 -> Iniciando monitor...
+27112019-19:26:58 -> Criando TConSqlServer
+27112019-19:26:59 -> Criando TConFirebird
+27112019-19:26:59 -> Criando TForm1
+27112019-19:26:59 -> Criando TDmSqlUtils
+27112019-19:26:59 -> Criando TDmGeradorConsultas
+27112019-19:26:59 -> Criando TCon
+27112019-19:26:59 -> Carregando Gatihlos.xml
+27112019-19:27:03 -> Inicializando message loop
+27112019-19:32:41 -> Iniciando monitor...
+27112019-19:32:41 -> Criando TConSqlServer
+27112019-19:32:42 -> Criando TConFirebird
+27112019-19:32:42 -> Criando TForm1
+27112019-19:32:42 -> Criando TDmSqlUtils
+27112019-19:32:42 -> Criando TDmGeradorConsultas
+27112019-19:32:42 -> Criando TCon
+27112019-19:32:42 -> Carregando Gatihlos.xml
+27112019-19:33:15 -> Inicializando message loop
+29112019-18:57:09 -> Iniciando monitor...
+29112019-18:57:09 -> Criando TConSqlServer
+29112019-18:57:10 -> Criando TConFirebird
+29112019-18:57:10 -> Criando TForm1
+29112019-18:57:10 -> Criando TDmSqlUtils
+29112019-18:57:10 -> Criando TDmGeradorConsultas
+29112019-18:57:10 -> Criando TCon
+29112019-18:57:10 -> Carregando Gatihlos.xml
+29112019-18:57:12 -> Inicializando message loop
+02122019-18:31:03 -> Iniciando monitor...
+02122019-18:31:03 -> Criando TConSqlServer
+02122019-18:31:04 -> Criando TConFirebird
+02122019-18:31:04 -> Criando TForm1
+02122019-18:31:04 -> Criando TDmSqlUtils
+02122019-18:31:04 -> Criando TDmGeradorConsultas
+02122019-18:31:04 -> Criando TCon
+02122019-18:31:04 -> Carregando Gatihlos.xml
+02122019-18:32:40 -> Inicializando message loop
+02122019-20:10:59 -> Iniciando monitor...
+02122019-20:10:59 -> Criando TConSqlServer
+02122019-20:10:59 -> Criando TConFirebird
+02122019-20:10:59 -> Criando TForm1
+02122019-20:10:59 -> Criando TDmSqlUtils
+02122019-20:11:00 -> Criando TDmGeradorConsultas
+02122019-20:11:00 -> Criando TCon
+02122019-20:11:00 -> Carregando Gatihlos.xml
+02122019-20:11:31 -> Inicializando message loop
+02122019-20:11:59 -> Iniciando monitor...
+02122019-20:11:59 -> Criando TConSqlServer
+02122019-20:12:00 -> Criando TConFirebird
+02122019-20:12:00 -> Criando TForm1
+02122019-20:12:00 -> Criando TDmSqlUtils
+02122019-20:12:00 -> Criando TDmGeradorConsultas
+02122019-20:12:00 -> Criando TCon
+02122019-20:12:00 -> Carregando Gatihlos.xml
+02122019-20:12:03 -> Inicializando message loop
+02122019-20:33:23 -> Iniciando monitor...
+02122019-20:33:23 -> Criando TConSqlServer
+02122019-20:33:24 -> Criando TConFirebird
+02122019-20:33:24 -> Criando TMonitorMain
+02122019-20:33:24 -> Criando TDmSqlUtils
+02122019-20:33:24 -> Criando TDmGeradorConsultas
+02122019-20:33:24 -> Criando TCon
+02122019-20:33:24 -> Carregando Gatihlos.xml
+02122019-20:33:38 -> Inicializando message loop
+02122019-20:37:48 -> Iniciando monitor...
+02122019-20:37:48 -> Criando TConSqlServer
+02122019-20:37:49 -> Criando TConFirebird
+02122019-20:37:49 -> Criando TMonitorMain
+02122019-20:37:49 -> Criando TDmSqlUtils
+02122019-20:37:49 -> Criando TDmGeradorConsultas
+02122019-20:37:49 -> Criando TCon
+02122019-20:37:49 -> Carregando Gatihlos.xml
+02122019-20:38:23 -> Inicializando message loop
+02122019-20:42:30 -> Iniciando monitor...
+02122019-20:42:30 -> Criando TConSqlServer
+02122019-20:42:31 -> Criando TConFirebird
+02122019-20:42:31 -> Criando TMonitorMain
+02122019-20:42:31 -> Criando TDmSqlUtils
+02122019-20:42:31 -> Criando TDmGeradorConsultas
+02122019-20:42:31 -> Criando TCon
+02122019-20:42:31 -> Carregando Gatihlos.xml
+02122019-20:43:02 -> Inicializando message loop
+03122019-10:50:52 -> Iniciando monitor...
+03122019-10:50:52 -> Criando TConSqlServer
+03122019-10:50:53 -> Criando TConFirebird
+03122019-10:50:53 -> Criando TMonitorMain
+03122019-10:50:53 -> Criando TDmSqlUtils
+03122019-10:50:53 -> Criando TDmGeradorConsultas
+03122019-10:50:53 -> Criando TCon
+03122019-10:50:53 -> Carregando Gatihlos.xml
+03122019-10:51:01 -> Inicializando message loop
+03122019-12:11:10 -> Iniciando monitor...
+03122019-12:11:10 -> Criando TConSqlServer
+03122019-12:11:10 -> Criando TConFirebird
+03122019-12:11:11 -> Criando TMonitorMain
+03122019-12:11:11 -> Criando TDmSqlUtils
+03122019-12:11:11 -> Criando TDmGeradorConsultas
+03122019-12:11:11 -> Criando TCon
+03122019-12:11:11 -> Carregando Gatihlos.xml
+03122019-12:11:39 -> Inicializando message loop
+03122019-12:15:18 -> Iniciando monitor...
+03122019-12:15:18 -> Criando TConSqlServer
+03122019-12:15:18 -> Criando TConFirebird
+03122019-12:15:18 -> Criando TMonitorMain
+03122019-12:15:18 -> Criando TDmSqlUtils
+03122019-12:15:18 -> Criando TDmGeradorConsultas
+03122019-12:15:18 -> Criando TCon
+03122019-12:15:18 -> Carregando Gatihlos.xml
+03122019-12:15:30 -> Inicializando message loop
+03122019-12:19:50 -> Iniciando monitor...
+03122019-12:19:50 -> Criando TConSqlServer
+03122019-12:19:51 -> Criando TConFirebird
+03122019-12:19:51 -> Criando TMonitorMain
+03122019-12:19:51 -> Criando TDmSqlUtils
+03122019-12:19:51 -> Criando TDmGeradorConsultas
+03122019-12:19:51 -> Criando TCon
+03122019-12:19:51 -> Carregando Gatihlos.xml
+03122019-12:19:53 -> Inicializando message loop
+03122019-12:21:03 -> Iniciando monitor...
+03122019-12:21:03 -> Criando TConSqlServer
+03122019-12:21:03 -> Criando TConFirebird
+03122019-12:21:04 -> Criando TMonitorMain
+03122019-12:21:04 -> Criando TDmSqlUtils
+03122019-12:21:04 -> Criando TDmGeradorConsultas
+03122019-12:21:04 -> Criando TCon
+03122019-12:21:04 -> Carregando Gatihlos.xml
+03122019-12:21:05 -> Inicializando message loop
+03122019-12:22:11 -> Iniciando monitor...
+03122019-12:22:11 -> Criando TConSqlServer
+03122019-12:22:12 -> Criando TConFirebird
+03122019-12:22:12 -> Criando TMonitorMain
+03122019-12:22:12 -> Criando TDmSqlUtils
+03122019-12:22:12 -> Criando TDmGeradorConsultas
+03122019-12:22:12 -> Criando TCon
+03122019-12:22:12 -> Carregando Gatihlos.xml
+03122019-12:22:22 -> Inicializando message loop
+03122019-12:34:29 -> Iniciando monitor...
+03122019-12:34:29 -> Criando TConSqlServer
+03122019-12:34:29 -> Criando TConFirebird
+03122019-12:34:30 -> Criando TMonitorMain
+03122019-12:34:30 -> Criando TDmSqlUtils
+03122019-12:34:30 -> Criando TDmGeradorConsultas
+03122019-12:34:30 -> Criando TCon
+03122019-12:34:30 -> Carregando Gatihlos.xml
+03122019-12:35:12 -> Inicializando message loop
+09122019-10:57:50 -> Iniciando monitor...
+09122019-10:57:50 -> Criando TConSqlServer
+09122019-10:57:51 -> Criando TConFirebird
+09122019-10:57:52 -> Criando TMonitorMain
+09122019-10:57:52 -> Criando TDmSqlUtils
+09122019-10:57:52 -> Criando TDmGeradorConsultas
+09122019-10:57:52 -> Criando TCon
+09122019-10:57:52 -> Carregando Gatihlos.xml
+09122019-10:58:11 -> Inicializando message loop
+09122019-11:23:44 -> Iniciando monitor...
+09122019-11:23:44 -> Criando TConSqlServer
+09122019-11:23:45 -> Criando TConFirebird
+09122019-11:23:46 -> Criando TMonitorMain
+09122019-11:23:46 -> Criando TDmSqlUtils
+09122019-11:23:46 -> Criando TDmGeradorConsultas
+09122019-11:23:46 -> Criando TCon
+09122019-11:23:46 -> Carregando Gatihlos.xml
+09122019-11:25:09 -> Inicializando message loop
+09122019-11:29:36 -> Iniciando monitor...
+09122019-11:29:36 -> Criando TConSqlServer
+09122019-11:29:36 -> Criando TConFirebird
+09122019-11:29:37 -> Criando TMonitorMain
+09122019-11:29:37 -> Criando TDmSqlUtils
+09122019-11:29:37 -> Criando TDmGeradorConsultas
+09122019-11:29:37 -> Criando TCon
+09122019-11:29:37 -> Carregando Gatihlos.xml
+09122019-11:29:41 -> Inicializando message loop
+09122019-11:30:38 -> Iniciando monitor...
+09122019-11:30:38 -> Criando TConSqlServer
+09122019-11:30:39 -> Criando TConFirebird
+09122019-11:30:39 -> Criando TMonitorMain
+09122019-11:30:39 -> Criando TDmSqlUtils
+09122019-11:30:39 -> Criando TDmGeradorConsultas
+09122019-11:30:39 -> Criando TCon
+09122019-11:30:39 -> Carregando Gatihlos.xml
+09122019-11:30:46 -> Inicializando message loop
+09122019-11:33:59 -> Iniciando monitor...
+09122019-11:33:59 -> Criando TConSqlServer
+09122019-11:34:00 -> Criando TConFirebird
+09122019-11:34:00 -> Criando TMonitorMain
+09122019-11:34:00 -> Criando TDmSqlUtils
+09122019-11:34:00 -> Criando TDmGeradorConsultas
+09122019-11:34:00 -> Criando TCon
+09122019-11:34:00 -> Carregando Gatihlos.xml
+09122019-11:34:14 -> Inicializando message loop
+09122019-12:52:47 -> Carregando Gatihlos.xml
+09122019-12:56:36 -> Carregando Gatihlos.xml
+09122019-12:58:17 -> Carregando Gatihlos.xml
+09122019-12:59:28 -> Carregando Gatihlos.xml
+09122019-13:28:43 -> Carregando Gatihlos.xml

@@ -7,15 +7,17 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.AppEvnts, Vcl.ExtCtrls, Vcl.Menus;
 
 type
-  TForm1 = class(TForm)
+  TMonitorMain = class(TForm)
     TrayIcon1: TTrayIcon;
     ApplicationEvents1: TApplicationEvents;
     PopupMenu1: TPopupMenu;
     Fechar1: TMenuItem;
+    AvisosAutomaticos1: TMenuItem;
     procedure ApplicationEvents1Exception(Sender: TObject; E: Exception);
     procedure Fechar1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure ApplicationEvents1Minimize(Sender: TObject);
+    procedure AvisosAutomaticos1Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -23,21 +25,21 @@ type
   end;
 
 var
-  Form1: TForm1;
+  MonitorMain: TMonitorMain;
 
 implementation
 
 {$R *.dfm}
 
 uses
-  Utils;
+  Utils, uFormPesquisaAviso;
 
-procedure TForm1.ApplicationEvents1Exception(Sender: TObject; E: Exception);
+procedure TMonitorMain.ApplicationEvents1Exception(Sender: TObject; E: Exception);
 begin
   WriteLog('Erros.log', E.Message);
 end;
 
-procedure TForm1.ApplicationEvents1Minimize(Sender: TObject);
+procedure TMonitorMain.ApplicationEvents1Minimize(Sender: TObject);
 begin
   { Hide the window and set its state variable to wsMinimized. }
   Hide();
@@ -49,13 +51,18 @@ begin
   TrayIcon1.ShowBalloonHint;
 end;
 
-procedure TForm1.Fechar1Click(Sender: TObject);
+procedure TMonitorMain.AvisosAutomaticos1Click(Sender: TObject);
+begin
+  TFormPesquisaAviso.AbrirPesquisa;
+end;
+
+procedure TMonitorMain.Fechar1Click(Sender: TObject);
 begin
   Self.Close;
   Application.Terminate;
 end;
 
-procedure TForm1.FormCreate(Sender: TObject);
+procedure TMonitorMain.FormCreate(Sender: TObject);
 begin
   Application.ShowMainForm := false;
   TrayIcon1.Visible := True;

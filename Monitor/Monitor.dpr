@@ -5,7 +5,7 @@ uses
   Vcl.Forms,
   windows,
   SysUtils,
-  FormMonitor in 'FormMonitor.pas' {Form1},
+  FormMonitor in 'FormMonitor.pas' {MonitorMain},
   uDMEnviaPedidos in 'uDMEnviaPedidos.pas' {DMEnviaPedidos: TDataModule},
   Utils in '..\utils\Utils.pas',
   udmSqlUtils in '..\utils\udmSqlUtils.pas' {DmSqlUtils: TDataModule},
@@ -17,7 +17,12 @@ uses
   uConFirebird in 'uConFirebird.pas' {ConFirebird: TDataModule},
   uConSqlServer in 'uConSqlServer.pas' {ConSqlServer: TDataModule},
   uDmEnviaRelatorios in 'uDmEnviaRelatorios.pas' {Con: TDataModule},
-  uConsultaPersonalizada in '..\utils\uConsultaPersonalizada.pas' {FrmConsultaPersonalizada};
+  uConsultaPersonalizada in '..\utils\uConsultaPersonalizada.pas' {FrmConsultaPersonalizada},
+  uFormCadastroAviso in 'uFormCadastroAviso.pas' {FormCadastroAviso},
+  uFormAvisoConsulta in 'uFormAvisoConsulta.pas' {FormAvisoConsulta},
+  uFormPesquisaAviso in 'uFormPesquisaAviso.pas' {FormPesquisaAviso},
+  uFormSelecionaConsulta in 'uFormSelecionaConsulta.pas' {FormSelecionaConsulta},
+  uDmGravaLista in 'uDmGravaLista.pas' {DmGravaLista: TDataModule};
 
 {$R *.res}
 
@@ -36,10 +41,11 @@ begin
   Application.MainFormOnTaskbar := True;
   WriteLog('Criando TConSqlServer');
   Application.CreateForm(TConSqlServer, ConSqlServer);
+  Application.CreateForm(TDmGravaLista, DmGravaLista);
   WriteLog('Criando TConFirebird');
   Application.CreateForm(TConFirebird, ConFirebird);
-  WriteLog('Criando TForm1');
-  Application.CreateForm(TForm1, Form1);
+  WriteLog('Criando TMonitorMain');
+  Application.CreateForm(TMonitorMain, MonitorMain);
   WriteLog('Criando TDmSqlUtils');
   Application.CreateForm(TDmSqlUtils, DmSqlUtils);
   WriteLog('Criando TDmGeradorConsultas');

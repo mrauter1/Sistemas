@@ -103,7 +103,7 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="FormMonitor.pas">
-            <Form>Form1</Form>
+            <Form>MonitorMain</Form>
         </DCCReference>
         <DCCReference Include="uDMEnviaPedidos.pas">
             <Form>DMEnviaPedidos</Form>
@@ -140,6 +140,27 @@
         <DCCReference Include="..\utils\uConsultaPersonalizada.pas">
             <Form>FrmConsultaPersonalizada</Form>
         </DCCReference>
+        <DCCReference Include="uFormCadastroAviso.pas">
+            <Form>FormCadastroAviso</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="uFormAvisoConsulta.pas">
+            <Form>FormAvisoConsulta</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="uFormPesquisaAviso.pas">
+            <Form>FormPesquisaAviso</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="uFormSelecionaConsulta.pas">
+            <Form>FormSelecionaConsulta</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="uDmGravaLista.pas">
+            <Form>DmGravaLista</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -166,7 +187,7 @@
                 </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="3">
-                <DeployFile LocalName="..\GerenciadorFirma\bin\Monitor.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="bin\Monitor.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>Monitor.exe</RemoteName>
                         <Overwrite>true</Overwrite>

@@ -3,11 +3,18 @@ unit uAppConfig;
 interface
 
 uses
-  IniFiles, SysUtils, Forms, uDMConnection;
+  IniFiles, SysUtils, Forms;
 
 type
   TGrupoUsuario = (puGerenteProducao, puDesenvolvedor);
   TGruposUsuarios = set of TGrupoUsuario;
+
+TConnectionParams = record
+    Server: String;
+    Protocol: String;
+    Port: Integer;
+    Database: String;
+  end;
 
   TAppConfig = class
     PastaUpdate: String;

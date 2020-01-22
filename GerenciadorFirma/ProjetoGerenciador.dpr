@@ -8,7 +8,6 @@ uses
   uDmEstoqProdutos in 'uDmEstoqProdutos.pas' {DmEstoqProdutos: TDataModule},
   uFuncProbabilidades in 'uFuncProbabilidades.pas',
   uFormPedidos in 'uFormPedidos.pas' {FormPedidos},
-  GerenciadorUtils in 'GerenciadorUtils.pas',
   uFormFila in 'uFormFila.pas' {FormFilaProducao},
   uFormDensidades in 'uFormDensidades.pas' {FormDensidades},
   uFormConversorLKG in 'uFormConversorLKG.pas' {FormConversorLKG},
@@ -42,7 +41,9 @@ uses
   uFormFeriados in 'Fontes\uFormFeriados.pas' {FormFeriados},
   uFormCiclosVenda in 'Fontes\uFormCiclosVenda.pas' {FormCiclosVenda},
   uFormMotivoParaIgnorar in 'uFormMotivoParaIgnorar.pas' {FormMotivoIgnorar},
-  uFormCompras in 'Fontes\uFormCompras.pas' {Form2};
+  uFormCompras in 'Fontes\uFormCompras.pas' {Form2},
+  uDmGravaLista in 'uDmGravaLista.pas' {DmGravaLista: TDataModule},
+  GerenciadorUtils in '..\utils\GerenciadorUtils.pas';
 
 {$R *.res}
 
@@ -74,5 +75,6 @@ begin
   Application.CreateForm(TFormDetalheProdutos, FormDetalheProdutos);
   Application.CreateForm(TFormSubGrupoExtras, FormSubGrupoExtras);
   Application.CreateForm(TForm2, Form2);
+  Application.CreateForm(TDmGravaLista, DmGravaLista);
   Application.Run;
 end.

@@ -105,7 +105,6 @@ type
     QryVisualizacoesDescricao: TStringField;
     TabSheetSql: TTabSheet;
     MemoSqlGerado: TMemo;
-    BtnSalvaImg: TBitBtn;
     cxStyleRepository: TcxStyleRepository;
     cxStyleLinhaPar: TcxStyle;
     cxStyleLinhaImpar: TcxStyle;
@@ -113,6 +112,8 @@ type
     cxGridTableViewStyleSheet1: TcxGridTableViewStyleSheet;
     cxStyleHeader: TcxStyle;
     cxStyleTitulo: TcxStyle;
+    BtnSalvaImg: TBitBtn;
+    CbxFormatoNativo: TCheckBox;
     procedure BtnFecharClick(Sender: TObject);
     procedure VOLTAR_PARAMETROSClick(Sender: TObject);
     procedure IR_EXECUTANDOCONSULTAClick(Sender: TObject);
@@ -190,7 +191,7 @@ type
     function Apenas_Parametros: Boolean;
     procedure ConfiguraTipoFormulario;
     function ExportaTabelaParaExcelInterno(pNomeArquivo: String;
-      pMostraDialog: Boolean = False): Boolean;
+      pMostraDialog: Boolean = False; pUsarFormatoNativo: Boolean = False): Boolean;
     function ExecutaConsulta: Boolean;
     function CarregaVisualizacaoAtual: Boolean;
     function CarregaVisualizacaoByName(pNome: String): Boolean;
@@ -1374,7 +1375,7 @@ begin
   end;
 end;
 
-function TFrmConsultaPersonalizada.ExportaTabelaParaExcelInterno(pNomeArquivo: String; pMostraDialog: Boolean = False): Boolean;
+function TFrmConsultaPersonalizada.ExportaTabelaParaExcelInterno(pNomeArquivo: String; pMostraDialog: Boolean = False; pUsarFormatoNativo: Boolean = False): Boolean;
 begin
   Result:= False;
 
@@ -1386,7 +1387,7 @@ begin
     Exit;
   end;
 
-  ExportGridToExcel(pNomeArquivo, cxGridTabela, True, True, False, 'xls');
+  ExportGridToExcel(pNomeArquivo, cxGridTabela, True, True, pUsarFormatoNativo, 'xls');
   Result:= True;
 end;
 
@@ -1399,7 +1400,7 @@ begin
     SaveDialog.FileName:= FDm.QryConsultasDescricao.AsString+'.xls';
     if SaveDialog.Execute then
     begin
-      if ExportaTabelaParaExcelInterno(SaveDialog.FileName, True) then
+      if ExportaTabelaParaExcelInterno(SaveDialog.FileName, True, CbxFormatoNativo.Checked) then
       begin
         showmessage('Arquivo Exportado com Sucesso.');
         ShellExecute(Handle, 'open', pchar(SaveDialog.FileName), nil, nil, SW_SHOW);

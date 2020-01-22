@@ -9,7 +9,7 @@ uses
   Variants, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error,
   FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
   FireDAC.Phys, FireDAC.Phys.FB, FireDAC.Phys.FBDef, FireDAC.ConsoleUI.Wait,
-  FireDAC.Comp.Client, Utils, System.Rtti;
+  FireDAC.Comp.Client, Utils, System.Rtti, uAppConfig;
 
 type
  cfMapField = record
@@ -17,12 +17,12 @@ type
    DestType: TFieldType;
  end;
 
-  TConnectionParams = record
+{  TConnectionParams = record
     Server: String;
     Protocol: String;
     Port: Integer;
     Database: String;
-  end;
+  end;              }
 
 type
   TDmConnection = class(TDataModule)

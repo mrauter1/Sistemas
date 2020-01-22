@@ -62,7 +62,6 @@ uses
 
 procedure CopyRecord(pSource: TDataSet; pTarget: TDataSet);
 var
-  I: Integer;
   pFieldSource, pFieldTarget: TField;
 
 begin
@@ -149,7 +148,8 @@ end;
 function IsCurrencyField(pField: TField): Boolean;
 begin
   if IsPublishedProp(pField, 'currency')  then
-    Result:= GetPropValue(pField, 'currency');
+    Result:= GetPropValue(pField, 'currency')
+  else Result:= False;
 end;
 
 function BlendColors(Color1, Color2: TColor; A: Byte): TColor;
@@ -330,8 +330,6 @@ begin
 end;
 
 class function TValorChave.ObterValorPorIndex(StringList: TStrings; Index: Integer): variant;
-var
-  I: Integer;
 begin
   if StringList.Objects[Index] is TValorChave then
     Result:= TValorChave(StringList.Objects[Index]).Chave
@@ -340,3 +338,4 @@ begin
 end;
 
 end.
+

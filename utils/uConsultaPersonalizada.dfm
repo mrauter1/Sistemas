@@ -28,7 +28,7 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
     Top = 0
     Width = 824
     Height = 566
-    ActivePage = TabParametros
+    ActivePage = TabSheetResultado
     Align = alClient
     Style = tsFlatButtons
     TabOrder = 0
@@ -728,7 +728,7 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
           ExplicitTop = 9
         end
         object LbTime: TLabel
-          Left = 485
+          Left = 466
           Top = 6
           Width = 42
           Height = 13
@@ -897,7 +897,7 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
           end
         end
         object BtnSalvaImg: TBitBtn
-          Left = 549
+          Left = 173
           Top = 0
           Width = 89
           Height = 25
@@ -941,6 +941,15 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
           TabOrder = 3
           Visible = False
           OnClick = BtnSalvaImgClick
+        end
+        object CbxFormatoNativo: TCheckBox
+          Left = 539
+          Top = 4
+          Width = 99
+          Height = 17
+          Anchors = [akRight, akBottom]
+          Caption = 'Formato Nativo'
+          TabOrder = 4
         end
       end
     end

@@ -120,7 +120,6 @@
             <Form>DmGeradorConsultas</Form>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
-        <DCCReference Include="uAppConfig.pas"/>
         <DCCReference Include="..\utils\uDmConnection.pas">
             <Form>DmConnection</Form>
             <DesignClass>TDataModule</DesignClass>
@@ -156,11 +155,7 @@
             <Form>FormSelecionaConsulta</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="uDmGravaLista.pas">
-            <Form>DmGravaLista</Form>
-            <FormType>dfm</FormType>
-            <DesignClass>TDataModule</DesignClass>
-        </DCCReference>
+        <DCCReference Include="..\utils\uAppConfig.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

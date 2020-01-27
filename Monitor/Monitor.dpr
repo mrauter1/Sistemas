@@ -12,7 +12,6 @@ uses
   uSendMail in '..\utils\uSendMail.pas',
   uDataSetToHtml in 'uDataSetToHtml.pas',
   uDmGeradorConsultas in '..\utils\uDmGeradorConsultas.pas' {DmGeradorConsultas: TDataModule},
-  uAppConfig in 'uAppConfig.pas',
   uDmConnection in '..\utils\uDmConnection.pas' {DmConnection: TDataModule},
   uConFirebird in 'uConFirebird.pas' {ConFirebird: TDataModule},
   uConSqlServer in 'uConSqlServer.pas' {ConSqlServer: TDataModule},
@@ -22,7 +21,7 @@ uses
   uFormAvisoConsulta in 'uFormAvisoConsulta.pas' {FormAvisoConsulta},
   uFormPesquisaAviso in 'uFormPesquisaAviso.pas' {FormPesquisaAviso},
   uFormSelecionaConsulta in 'uFormSelecionaConsulta.pas' {FormSelecionaConsulta},
-  uDmGravaLista in 'uDmGravaLista.pas' {DmGravaLista: TDataModule};
+  uAppConfig in '..\utils\uAppConfig.pas';
 
 {$R *.res}
 
@@ -41,7 +40,6 @@ begin
   Application.MainFormOnTaskbar := True;
   WriteLog('Criando TConSqlServer');
   Application.CreateForm(TConSqlServer, ConSqlServer);
-  Application.CreateForm(TDmGravaLista, DmGravaLista);
   WriteLog('Criando TConFirebird');
   Application.CreateForm(TConFirebird, ConFirebird);
   WriteLog('Criando TMonitorMain');

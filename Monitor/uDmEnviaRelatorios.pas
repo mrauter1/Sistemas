@@ -105,7 +105,7 @@ function TodosOsDias: TDiasSemana;
 implementation
 
 uses
-  uConFirebird, uDmGeradorConsultas, Utils, DateUtils, Dialogs, uAppConfig;
+  uConFirebird, uDmGeradorConsultas, Utils, DateUtils, Dialogs, uAppConfig, uDmGravaLista;
 
 {%CLASSGROUP 'Vcl.Controls.TControl'}
 
@@ -315,10 +315,11 @@ begin
 end;              }
 
 procedure TCon.AtualizaListaPreco;
-var
-  FListaPrecoPy: String;
+{var
+  FListaPrecoPy: String;  }
 begin
-  FListaPrecoPy:= IncludeTrailingPathDelimiter(AppConfig.PythonFilePath)+'AtualizaPrecosLista.py';
+  TDmGravaLista.AtualizaTodasListasDePreco;
+{*  FListaPrecoPy:= IncludeTrailingPathDelimiter(AppConfig.PythonFilePath)+'AtualizaPrecosLista.py';
 
   if FileExists(AppConfig.PythonPath) and FileExists(FListaPrecoPy) then
   begin
@@ -326,7 +327,7 @@ begin
     uDataSetToHtml.WriteLog('Script para atualizar lista de preço incializado.');
   end
  else
-   uDataSetToHtml.WriteLog('Caminho do executável python ou arquivo '+FListaPrecoPy+' não encontrado!');
+   uDataSetToHtml.WriteLog('Caminho do executável python ou arquivo '+FListaPrecoPy+' não encontrado!');*}
 end;
 
 procedure TCon.FazBackup;

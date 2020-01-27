@@ -534,3 +534,41 @@
 09122019-12:58:17 -> Carregando Gatihlos.xml
 09122019-12:59:28 -> Carregando Gatihlos.xml
 09122019-13:28:43 -> Carregando Gatihlos.xml
+23012020-15:16:31 -> Iniciando monitor...
+23012020-15:16:31 -> Criando TConSqlServer
+23012020-15:16:32 -> Criando TConFirebird
+23012020-15:16:33 -> Criando TMonitorMain
+23012020-15:16:34 -> Criando TDmSqlUtils
+23012020-15:16:34 -> Criando TDmGeradorConsultas
+23012020-15:16:34 -> Criando TCon
+23012020-15:16:35 -> Script para atualizar lista de preço incializado.
+23012020-15:16:35 -> Inicializando message loop
+23012020-16:13:40 -> Iniciando monitor...
+23012020-16:13:40 -> Criando TConSqlServer
+23012020-16:13:41 -> Criando TConFirebird
+23012020-16:13:41 -> Criando TMonitorMain
+23012020-16:13:41 -> Criando TDmSqlUtils
+23012020-16:13:41 -> Criando TDmGeradorConsultas
+23012020-16:13:41 -> Criando TCon
+23012020-16:13:42 -> Script para atualizar lista de preço incializado.
+23012020-16:13:42 -> Inicializando message loop
+27012020-16:18:09 -> Iniciando monitor...
+27012020-16:18:09 -> Criando TConSqlServer
+27012020-16:18:10 -> Criando TConFirebird
+27012020-16:18:10 -> Criando TMonitorMain
+27012020-16:18:10 -> Criando TDmSqlUtils
+27012020-16:18:10 -> Criando TDmGeradorConsultas
+27012020-16:18:10 -> Criando TCon
+27012020-16:18:33 -> Script para atualizar lista de preço incializado.
+27012020-16:19:20 -> Script para atualizar lista de preço incializado.
+27012020-16:20:43 -> Script para atualizar lista de preço incializado.
+27012020-16:21:30 -> Iniciando monitor...
+27012020-16:21:30 -> Criando TConSqlServer
+27012020-16:21:31 -> Criando TConFirebird
+27012020-16:21:31 -> Criando TMonitorMain
+27012020-16:21:31 -> Criando TDmSqlUtils
+27012020-16:21:31 -> Criando TDmGeradorConsultas
+27012020-16:21:31 -> Criando TCon
+27012020-16:21:57 -> Script para atualizar lista de preço incializado.
+27012020-16:22:21 -> Script para atualizar lista de preço incializado.
+27012020-16:23:41 -> Script para atualizar lista de preço incializado.

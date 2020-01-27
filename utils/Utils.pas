@@ -3,7 +3,7 @@ unit Utils;
 interface
 
 uses
-  Data.DB, Datasnap.DBClient, Controls, Forms, Variants, Dialogs, System.Classes, StdCtrls, CheckLst,
+  Winapi.ShellAPI, Winapi.SHLOBJ, Winapi.Windows, Data.DB, Datasnap.DBClient, Controls, Forms, Variants, Dialogs, System.Classes, StdCtrls, CheckLst,
   Graphics;
 
 type
@@ -23,6 +23,8 @@ type
     class function ObterValor(pComboBox: TComboBox): Variant;
     class function ObterValoresSelecionados(pCheckListBox: TCheckListBox; pSeparador: String=','): String;
   end;
+
+function ExecAndWait(const pFile, pParametros: String; const ShowCmd: Word; pTimeOut: Integer; WorkDir: String = ''): boolean;
 
 function GetMesString(pDate: TDateTime): String;
 
@@ -59,6 +61,64 @@ implementation
 
 uses
   SysUtils, System.TypInfo, DateUtils, Vcl.Imaging.pngImage;
+
+function ExecAndWait(const pFile, pParametros: String; const ShowCmd: Word; pTimeOut: Integer; WorkDir: String = ''): boolean;
+var
+  SUInfo: TStartupInfo;
+  ProcInfo: TProcessInformation;
+  CmdLine: string;
+  pWorkDir: PChar;
+begin
+  if WorkDir <> '' then pWorkDir := PChar(WorkDir)
+  else pWorkDir := nil;//PCHar(ExtractFilePath(pFile));
+
+  {por nome do arquivo entre aspas devido espaco em nome longo}
+  CmdLine := pFile +' '+ pParametros;
+  FillChar(SUInfo, SizeOf(SUInfo), #0);
+  with SUInfo do
+  begin
+    cb := SizeOf(SUInfo);
+    dwFlags := STARTF_USESHOWWINDOW;
+    wShowWindow := ShowCmd;
+  end;
+  Result := CreateProcess(nil, PChar(CmdLine), nil, nil, false,
+                          CREATE_NEW_CONSOLE or
+                          NORMAL_PRIORITY_CLASS, nil,
+                          pWorkDir,
+                          SUInfo, ProcInfo);
+  {aguarda ate ser finalizado}
+  if Result then
+  begin
+    WaitForSingleObject(ProcInfo.hProcess, INFINITE);
+    {libera os Handles}
+    CloseHandle(ProcInfo.hProcess);
+    CloseHandle(ProcInfo.hThread);
+  end;
+end;
+{
+procedure ExecAndWait(const pFile, pParametros: String; const ShowCmd, pTimeOut: Integer);
+var
+  ExecInfo: TShellExecuteInfo;     // info object for ShellExecuteEx()
+  pInfo: PShellExecuteInfo;
+begin
+    pInfo:=@ExecInfo;
+    // prepare information about the application being executed by ShellExecuteEx()
+    ExecInfo.cbSize := SizeOf(ExecInfo);
+    ExecInfo.fMask := SEE_MASK_NOCLOSEPROCESS;
+    ExecInfo.lpVerb:= 'Open';
+    ExecInfo.Wnd := 0;
+    ExecInfo.lpFile := PWideChar(pFile);
+    ExecInfo.lpParameters := PWideChar(pParametros);
+    ExecInfo.nShow := ShowCmd;
+
+    if ShellExecuteEx(pInfo) then
+    begin
+      while WaitForSingleObject(ExecInfo.hProcess, pTimeOut) = WAIT_TIMEOUT do begin
+        Sleep(10);
+      end;
+      CloseHandle(ExecInfo.hProcess);
+   end;
+end;}
 
 procedure CopyRecord(pSource: TDataSet; pTarget: TDataSet);
 var

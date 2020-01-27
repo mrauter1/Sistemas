@@ -72,3 +72,6 @@ __recovery/
 *.stat
 /GerenciadorFirma/bin/ql.sql
 /Firma/PF.NEW/Arquivos
+/Monitor/ListaPrecos/credentials.json
+/Monitor/ListaPrecos/token.pickle
+/Monitor/ListaPrecos/token.pickle

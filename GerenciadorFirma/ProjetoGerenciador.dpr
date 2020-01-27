@@ -75,6 +75,5 @@ begin
   Application.CreateForm(TFormDetalheProdutos, FormDetalheProdutos);
   Application.CreateForm(TFormSubGrupoExtras, FormSubGrupoExtras);
   Application.CreateForm(TForm2, Form2);
-  Application.CreateForm(TDmGravaLista, DmGravaLista);
   Application.Run;
 end.

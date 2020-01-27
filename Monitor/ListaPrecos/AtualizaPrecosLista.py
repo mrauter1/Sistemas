@@ -131,8 +131,8 @@ class LeitorLista:
             except ValueError:
                 Preco= 0.00
                 
-            if (temIPI):
-                Preco=Preco*1.1                
+#           if (temIPI):
+#               Preco=Preco*1.1                
                 
             if CodAplicacao=='0003':
                 Preco=Preco*6.0

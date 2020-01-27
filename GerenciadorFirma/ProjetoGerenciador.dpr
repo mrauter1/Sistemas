@@ -33,7 +33,6 @@ uses
   uConsultaPersonalizada in '..\utils\uConsultaPersonalizada.pas' {FrmConsultaPersonalizada},
   UCopyFolder3Test in 'Fontes\UCopyFolder3Test.pas',
   uAtualiza in 'Fontes\uAtualiza.pas',
-  uAppConfig in 'uAppConfig.pas',
   uSendMail in '..\utils\uSendMail.pas',
   uDmGeradorConsultas in '..\utils\uDmGeradorConsultas.pas' {DmGeradorConsultas: TDataModule},
   uConFirebird in '..\utils\uConFirebird.pas' {ConFirebird: TDataModule},
@@ -43,7 +42,8 @@ uses
   uFormMotivoParaIgnorar in 'uFormMotivoParaIgnorar.pas' {FormMotivoIgnorar},
   uFormCompras in 'Fontes\uFormCompras.pas' {Form2},
   uDmGravaLista in 'uDmGravaLista.pas' {DmGravaLista: TDataModule},
-  GerenciadorUtils in '..\utils\GerenciadorUtils.pas';
+  GerenciadorUtils in '..\utils\GerenciadorUtils.pas',
+  uAppConfig in '..\utils\uAppConfig.pas';
 
 {$R *.res}
 

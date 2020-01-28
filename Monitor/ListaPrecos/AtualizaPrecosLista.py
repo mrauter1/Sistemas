@@ -110,7 +110,7 @@ class LeitorLista:
         cursor = conn.cursor()
         
         sqlLog= """
-        insert into loglistapreco (nomeLista, dataleitura, icmPisCofins, lucrobruto, impostofaturamento)  values ('{nomeLista}', '{dataleitura}', {lucrobruto:.4f}, {lucrobruto:.4f}, {impostofaturamento:.4f})
+        insert into lista.loglistapreco (nomeLista, dataleitura, icmPisCofins, lucrobruto, impostofaturamento)  values ('{nomeLista}', '{dataleitura}', {lucrobruto:.4f}, {lucrobruto:.4f}, {impostofaturamento:.4f})
         """.format(nomeLista=self.nomeLista, dataleitura=datetime.datetime.today().strftime('%Y/%m/%d %H:%M:%S'), 
                    icmPisCofins=self.icmPisCofins, lucrobruto=self.lucroBruto, impostofaturamento=self.impostoFaturamento)
         cursor.execute(sqlLog)        
@@ -142,7 +142,7 @@ class LeitorLista:
 ##            Preco = Preco*(1-self.icmPisCofins) ##Retira os impostos      
                        
             sql= """
-            exec dbo.AtualizaPrecoLista @IDLog = {IDLog}, @CodGrupoSub = '{CodGrupo}', @CodAplicacao = '{CodAplicacao}', @ComEmbalagem = {ComEmbalagem}, @Preco = {Preco:.2f}
+            exec lista.AtualizaPrecoLista @IDLog = {IDLog}, @CodGrupoSub = '{CodGrupo}', @CodAplicacao = '{CodAplicacao}', @ComEmbalagem = {ComEmbalagem}, @Preco = {Preco:.2f}
             """.format(IDLog=IDLog, CodGrupo=CodGrupo, CodAplicacao=CodAplicacao, ComEmbalagem=ComEmbalagem, Preco=Preco)
             
             print(sql)

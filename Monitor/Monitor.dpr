@@ -21,7 +21,8 @@ uses
   uFormAvisoConsulta in 'uFormAvisoConsulta.pas' {FormAvisoConsulta},
   uFormPesquisaAviso in 'uFormPesquisaAviso.pas' {FormPesquisaAviso},
   uFormSelecionaConsulta in 'uFormSelecionaConsulta.pas' {FormSelecionaConsulta},
-  uAppConfig in '..\utils\uAppConfig.pas';
+  uAppConfig in '..\utils\uAppConfig.pas',
+  uDmGravaLista in '..\utils\uDmGravaLista.pas' {DmGravaLista: TDataModule};
 
 {$R *.res}
 

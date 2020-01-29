@@ -185,8 +185,8 @@ begin
   except
   end;
 
-  ShowMessage('Avisos automáticos não estão sendo executados.');
-  Exit;
+{  ShowMessage('Avisos automáticos não estão sendo executados.');
+  Exit;            }
 
   if not CdsGatilhos.Active then
     CdsGatilhos.CreateDataSet;

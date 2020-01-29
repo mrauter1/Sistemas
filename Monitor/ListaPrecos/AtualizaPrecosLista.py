@@ -70,12 +70,14 @@ class LeitorLista:
         print('Inicio, lista '+self.nomeLista)
 	
         self.InicializarPlanilha()
-		
+        
         #Grava ND no campo estado Faz com que todos os impostos fiquem zerados        
         self.writeCellValue('ESTADO', self.nomeLista.upper()) 
         
         #Grava a data e a hora da ultima leitura
         self.writeCellValue('DATALEITURA', datetime.datetime.today().strftime('%d/%m/%Y %H:%M:%S')) 
+        
+        
              
         self.icmPisCofins = float(self.readCellValue('IcmPisCofins').replace('%', ''))/100.00
         print('IcmPisCofins: '+str(self.icmPisCofins))
@@ -104,13 +106,37 @@ class LeitorLista:
                     print('%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s' % 
                          (row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9],row[10],row[12]))        
         self.GravaListaNoBanco(values)        
+        
 
     def GravaListaNoBanco(self, values):      
         conn = pymssql.connect(host=r'10.0.0.201', port=1433, user=r'user', password=r'28021990', database=r'logistec')
         cursor = conn.cursor()
         
+        def lerCustoEmbalagem(cell, codAplicacao):
+            valorCusto = self.readCellValue(cell)            
+            try:
+                valorCusto=float(valorCusto)
+            except ValueError:
+                valorCusto= 0.00
+                
+            sql= """
+                 exec lista.AualizaCustoEmbalagem @CodAplicacao = '{CodAplicacao}', @Custo = {Custo:.2f}
+                 """.format(CodAplicacao=codAplicacao, Custo=valorCusto)   
+            print(sql)
+            cursor.execute(sql)        
+            conn.commit()  
+
+        lerCustoEmbalagem('CustoTambor', '0000')
+        lerCustoEmbalagem('CustoManutencao', '1111')
+        lerCustoEmbalagem('CustoTambor100', '0001')
+        lerCustoEmbalagem('CustoLata18', '0002')
+        lerCustoEmbalagem('CustoGalao', '0003')
+        lerCustoEmbalagem('CustoLata900', '0004')
+        lerCustoEmbalagem('CustoBombona50', '0006')
+        lerCustoEmbalagem('CustoBombona20', '0005')
+        
         sqlLog= """
-        insert into lista.loglistapreco (nomeLista, dataleitura, icmPisCofins, lucrobruto, impostofaturamento)  values ('{nomeLista}', '{dataleitura}', {lucrobruto:.4f}, {lucrobruto:.4f}, {impostofaturamento:.4f})
+        insert into lista.loglistapreco (nomeLista, dataleitura, icmPisCofins, lucrobruto, impostofaturamento)  values ('{nomeLista}', '{dataleitura}', {icmPisCofins:.4f}, {lucrobruto:.4f}, {impostofaturamento:.4f})
         """.format(nomeLista=self.nomeLista, dataleitura=datetime.datetime.today().strftime('%Y/%m/%d %H:%M:%S'), 
                    icmPisCofins=self.icmPisCofins, lucrobruto=self.lucroBruto, impostofaturamento=self.impostoFaturamento)
         cursor.execute(sqlLog)        

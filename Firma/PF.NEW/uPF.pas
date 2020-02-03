@@ -25,6 +25,7 @@ type
     Button2: TButton;
     BtnTransp: TButton;
     Button1: TButton;
+    BtnIdentificacao: TButton;
     procedure EditAnoExit(Sender: TObject);
     procedure EditAnoKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
@@ -35,8 +36,8 @@ type
     procedure ButtonSelDirClick(Sender: TObject);
     procedure btnComprovClick(Sender: TObject);
     procedure BtnGrupos(Sender: TObject);
-    procedure BtnTranspClick(Sender: TObject);
     procedure Button1Click(Sender: TObject);
+    procedure BtnIdentificacaoClick(Sender: TObject);
   private
     procedure GerarArquivo;
     { Private declarations }
@@ -51,7 +52,7 @@ var
 
 implementation
 
-uses uDir, uDmDados, uSecoes;
+uses uDir, uDmDados, uSecoes, uFormIdentificacao;
 
 {$R *.dfm}
 
@@ -345,18 +346,9 @@ begin
   DmDados.RecarregarDataSets;
 end;
 
-procedure TfPF.BtnTranspClick(Sender: TObject);
+procedure TfPF.BtnIdentificacaoClick(Sender: TObject);
 begin
-  FormLista:= TFormLista.Create(Self);
-  try
-    FormLista.Caption:= 'Lista de códigos de transportadoras próprias';
-    FormLista.NomeIdent:= 'TRANSP';
-    FormLista.ValoresDefault:= cTranspPadrao;
-    FormLista.ShowModal;
-  finally
-    FormLista.Free;
-  end;
-  DmDados.CarregaListas;
+  FormIdentificacaoEmpresa.ShowModal;
 end;
 
 end.

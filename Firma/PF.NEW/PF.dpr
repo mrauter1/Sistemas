@@ -11,7 +11,8 @@ uses
   uDmConnection in '..\..\utils\uDmConnection.pas' {DmConnection: TDataModule},
   uFormConfGrupo in 'uFormConfGrupo.pas' {FormConfGrupo},
   uDtm_PF in 'uDtm_PF.pas' {Dtm_PF: TDataModule},
-  uDmDados in 'uDmDados.pas' {DmDados: TDataModule};
+  uDmDados in 'uDmDados.pas' {DmDados: TDataModule},
+  uFormIdentificacao in 'uFormIdentificacao.pas' {FormIdentificacaoEmpresa};
 
 {$R *.res}
 
@@ -20,6 +21,6 @@ begin
   Application.CreateForm(TDmDados, DmDados);
   Application.CreateForm(TDtm_PF, Dtm_PF);
   Application.CreateForm(TfPF, fPF);
-  Application.CreateForm(TfDir, fDir);
+  Application.CreateForm(TFormIdentificacaoEmpresa, FormIdentificacaoEmpresa);
   Application.Run;
 end.

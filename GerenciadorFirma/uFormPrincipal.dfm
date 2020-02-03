@@ -366,6 +366,8 @@ object FormPrincipal: TFormPrincipal
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 1
+      ExplicitLeft = -2
+      ExplicitTop = 38
     end
   end
   object TreeViewMenu: TdxDBTreeView
@@ -475,7 +477,7 @@ object FormPrincipal: TFormPrincipal
       'SELECT v.* FROM '
       'sys.views v'
       'where v.schema_id = schema_id('#39'cons'#39')')
-    Left = 320
+    Left = 344
     Top = 40
     object QryConsultasname: TWideStringField
       FieldName = 'name'
@@ -488,8 +490,8 @@ object FormPrincipal: TFormPrincipal
     Connection = ConSqlServer.FDConnection
     SQL.Strings = (
       'select * from cons.Menu')
-    Left = 248
-    Top = 136
+    Left = 264
+    Top = 40
     object QryMenuID: TFDAutoIncField
       FieldName = 'ID'
       Origin = 'ID'

@@ -41,9 +41,9 @@ uses
   uFormCiclosVenda in 'Fontes\uFormCiclosVenda.pas' {FormCiclosVenda},
   uFormMotivoParaIgnorar in 'uFormMotivoParaIgnorar.pas' {FormMotivoIgnorar},
   uFormCompras in 'Fontes\uFormCompras.pas' {Form2},
-  uDmGravaLista in 'uDmGravaLista.pas' {DmGravaLista: TDataModule},
   GerenciadorUtils in '..\utils\GerenciadorUtils.pas',
-  uAppConfig in '..\utils\uAppConfig.pas';
+  uAppConfig in '..\utils\uAppConfig.pas',
+  uDmGravaLista in '..\utils\uDmGravaLista.pas' {DmGravaLista: TDataModule};
 
 {$R *.res}
 

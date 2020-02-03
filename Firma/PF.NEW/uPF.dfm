@@ -2,8 +2,8 @@ object fPF: TfPF
   Left = 169
   Top = 176
   Caption = 'Policia Federal'
-  ClientHeight = 354
-  ClientWidth = 558
+  ClientHeight = 362
+  ClientWidth = 676
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -13,14 +13,14 @@ object fPF: TfPF
   OldCreateOrder = False
   OnActivate = FormActivate
   DesignSize = (
-    558
-    354)
+    676
+    362)
   PixelsPerInch = 96
   TextHeight = 13
   object Gauge1: TGauge
     Left = 8
-    Top = 297
-    Width = 427
+    Top = 305
+    Width = 545
     Height = 21
     Anchors = [akLeft, akRight, akBottom]
     Progress = 0
@@ -29,30 +29,33 @@ object fPF: TfPF
   end
   object Label2: TLabel
     Left = 12
-    Top = 333
+    Top = 341
     Width = 42
     Height = 13
     Anchors = [akLeft, akBottom]
     Caption = 'Diret'#243'rio:'
+    ExplicitTop = 333
   end
   object GroupBox1: TGroupBox
     Left = 11
     Top = 8
-    Width = 539
+    Width = 657
     Height = 57
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Gerar arquivos com data de emiss'#227'o do m'#234's de'
     TabOrder = 0
+    ExplicitWidth = 539
     DesignSize = (
-      539
+      657
       57)
     object Label1: TLabel
-      Left = 318
+      Left = 390
       Top = 27
       Width = 22
       Height = 13
       Anchors = [akTop]
       Caption = 'Ano:'
+      ExplicitLeft = 318
     end
     object CBXMes: TComboBox
       Left = 48
@@ -79,7 +82,7 @@ object fPF: TfPF
         'Dezembro')
     end
     object EditAno: TEdit
-      Left = 346
+      Left = 464
       Top = 24
       Width = 121
       Height = 21
@@ -87,13 +90,14 @@ object fPF: TfPF
       TabOrder = 1
       OnExit = EditAnoExit
       OnKeyDown = EditAnoKeyDown
+      ExplicitLeft = 346
     end
   end
   object DBGrid: TDBGrid
     Left = 8
     Top = 83
-    Width = 539
-    Height = 177
+    Width = 657
+    Height = 185
     Anchors = [akLeft, akTop, akRight, akBottom]
     DataSource = DmDados.DS_ProdutoControlado
     Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgAlwaysShowSelection, dgConfirmDelete, dgCancelOnExit]
@@ -130,71 +134,89 @@ object fPF: TfPF
       end>
   end
   object BtnGerar: TButton
-    Left = 450
-    Top = 297
+    Left = 568
+    Top = 305
     Width = 99
     Height = 25
     Anchors = [akRight, akBottom]
     Caption = 'Gerar Arquivo'
     TabOrder = 2
     OnClick = BtnGerarClick
+    ExplicitLeft = 450
+    ExplicitTop = 297
   end
   object ButtonSelDir: TButton
-    Left = 523
-    Top = 327
+    Left = 641
+    Top = 335
     Width = 22
     Height = 20
     Anchors = [akRight, akBottom]
     Caption = '...'
     TabOrder = 3
     OnClick = ButtonSelDirClick
+    ExplicitLeft = 523
+    ExplicitTop = 327
   end
   object EditDir: TEdit
     Left = 57
-    Top = 328
-    Width = 459
+    Top = 336
+    Width = 577
     Height = 21
     Anchors = [akLeft, akRight, akBottom]
     TabOrder = 4
+    ExplicitTop = 328
+    ExplicitWidth = 459
   end
   object btnComprov: TButton
     Left = 8
-    Top = 266
+    Top = 274
     Width = 153
     Height = 25
     Anchors = [akLeft, akBottom]
     Caption = 'Comprovantes Compra'
     TabOrder = 5
     OnClick = btnComprovClick
+    ExplicitTop = 266
   end
   object Button2: TButton
     Left = 330
-    Top = 266
+    Top = 274
     Width = 98
     Height = 25
     Anchors = [akLeft, akBottom]
     Caption = 'Grupos'
     TabOrder = 6
     OnClick = BtnGrupos
+    ExplicitTop = 266
   end
   object BtnTransp: TButton
     Left = 438
-    Top = 266
-    Width = 111
+    Top = 274
+    Width = 99
     Height = 25
     Anchors = [akLeft, akBottom]
     Caption = 'Transporte Pr'#243'prio'
     TabOrder = 7
-    OnClick = BtnTranspClick
   end
   object Button1: TButton
     Left = 167
-    Top = 266
+    Top = 274
     Width = 153
     Height = 25
     Anchors = [akLeft, akBottom]
     Caption = 'Comprovantes Venda'
     TabOrder = 8
     OnClick = Button1Click
+    ExplicitTop = 266
+  end
+  object BtnIdentificacao: TButton
+    Left = 543
+    Top = 274
+    Width = 123
+    Height = 25
+    Anchors = [akLeft, akBottom]
+    Caption = 'Identifica'#231#227'o Empresa'
+    TabOrder = 9
+    OnClick = BtnIdentificacaoClick
   end
 end

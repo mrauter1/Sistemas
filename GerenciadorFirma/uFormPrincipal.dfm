@@ -366,8 +366,6 @@ object FormPrincipal: TFormPrincipal
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 1
-      ExplicitLeft = -2
-      ExplicitTop = 38
     end
   end
   object TreeViewMenu: TdxDBTreeView
@@ -459,6 +457,10 @@ object FormPrincipal: TFormPrincipal
       object MenuCicloVendas: TMenuItem
         Caption = 'Ciclos de Vendas'
         OnClick = MenuCicloVendasClick
+      end
+      object AtualizaTodasasListasdePreo1: TMenuItem
+        Caption = 'Atualiza Todas as Listas de Pre'#231'o'
+        OnClick = AtualizaTodasasListasdePreo1Click
       end
     end
     object Consultas1: TMenuItem

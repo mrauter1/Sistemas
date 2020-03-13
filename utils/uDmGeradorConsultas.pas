@@ -7,26 +7,7 @@ uses
   FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
   FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
   FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet, FireDAC.Comp.Client,
-  uConSqlServer, System.Generics.Collections;
-
-type
-  TTipoParametro = (ptNada, ptComboBox, ptTexto, ptDateTime, ptCheckListBox);
-  TTipoConsulta = (tcNormal, tcEvolutivo, tcParametros);
-  TTipoVisualizacao = (tvTabela, tvTabelaDinamica, tvGrafico);
-  TFormatacaoCampo = (fcTexto, fcMoeda, fcPorcentagem);
-
-  TParametroCon = class(TObject)
-  public
-    Codigo: Integer;
-    Nome: String;
-    Valor: Variant;
-    Tipo: TTipoParametro;
-    Descricao: String;
-    Sql: String;
-    constructor Create(pNome: String; pValor: Variant; pTipo: TTipoParametro; pDescricao, pSql: String); overload;
-  end;
-
-  TFonteDados = (fdSqlServer=1, fdFirebird=2);
+  uConSqlServer, System.Generics.Collections, uConClasses;
 
 type
   TDmGeradorConsultas = class(TDataModule)
@@ -789,19 +770,6 @@ begin
 
     SetProximasDatas;
   end;
-end;
-
-{ TParametroCon }
-
-constructor TParametroCon.Create(pNome: String; pValor: Variant; pTipo: TTipoParametro; pDescricao, pSql: String);
-begin
-  inherited Create;
-
-  Self.Nome:= pNome;
-  Self.Valor:= pValor;
-  Self.Tipo:= pTipo;
-  Self.Descricao:= pDescricao;
-  Self.Sql:= pSql;
 end;
 
 end.

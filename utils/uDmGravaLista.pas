@@ -117,8 +117,18 @@ begin
 end;
 
 procedure TDmGravaLista.LerEAtualizarListaDePrecoSidicom(NomeListaGoogle: String; CodListaSidicom: String);
+
+  procedure ZerarPrecoLista;
+  const
+    cSql = 'UPDATE ListaPre SET PrecoVenda=0, PrecoCompra=0 where CodLista=''%s'' ';
+  begin
+     ConFirebird.ExecutaComando(Format(cSql, [CodListaSidicom]));
+  end;
+
 begin
   LerListaGoogle(NomeListaGoogle);
+
+  ZerarPrecoLista;
 
   QryListaSidicom.Close;
   QryListaSidicom.ParamByName('CodLista').AsString:= CodListaSidicom;
@@ -154,7 +164,7 @@ begin
     FDM.LerEAtualizarListaDePrecoSidicom('IPC2725', '0004'); // ICM + Pis + Cofins = 27,25%
     FDM.LerEAtualizarListaDePrecoSidicom('IPC2125', '0005'); // ICM + Pis + Cofins = 21,25%
     FDM.LerEAtualizarListaDePrecoSidicom('IPC12', '0006'); // ICM + Pis + Cofins = 12%
-    FDM.LerEAtualizarListaDePrecoSidicom('ND', '0007'); // ICM + Pis + Cofins = 0%
+//    FDM.LerEAtualizarListaDePrecoSidicom('ND', '0007'); // ICM + Pis + Cofins = 0%
   finally
     FDM.Free;
   end;

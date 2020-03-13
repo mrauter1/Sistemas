@@ -1,6 +1,5 @@
 inherited ConSqlServer: TConSqlServer
   OldCreateOrder = True
-  OnCreate = DataModuleCreate
   Height = 159
   Width = 246
   inherited FDConnection: TFDConnection

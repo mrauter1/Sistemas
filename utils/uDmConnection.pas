@@ -42,13 +42,16 @@ type
     function RetornaDataSet(sql: String; pAbrirDataSet: Boolean = True): TDataSet;
     function RetornaFDQuery(AOwner: TComponent; Sql: String; pAbrirDataSet: Boolean = True): TFDQuery;
 
-    procedure ExecutaComando(pSql: String);
+    function ExecutaComando(pSql: String): LongInt;
 
     function RetornaArray<T>(Sql: String; ValDefault: T): TArray<T>;
     function RetornaVarArray(Sql: String; ValDefault: Variant): Variant;
     function RetornaValor(Sql: String; ValDefault: Variant): Variant; overload;
     function RetornaValor(Sql: String): Variant; overload;
+    function RetornaValores(const pSql: String): Variant;
+
     function RetornaInteiro(Sql: String; pDefault: Integer = 0): Integer;
+    function RetornaDouble(const pSQL: String; pValorDef: Double = 0): Double;
 
     // transforma um field do tipo fkCalculated em fkLookup
     procedure TransformaEmLookup(pField: TField; pSql: String);
@@ -332,6 +335,33 @@ begin
   end;
 end;
 
+function TDmConnection.RetornaValores(const pSql: String): Variant;
+var
+  vQuery: TFDQuery;
+  I: Integer;
+begin
+  vQuery:= CriaFDQuery(pSql);
+  try
+    vQuery.SQL.Text:= pSql;
+    vQuery.Active:= True;
+
+    if vQuery.Fields.Count = 0 then
+    begin
+      Result:= null;
+    end
+   else
+    begin
+      Result:= VarArrayCreate([0, vQuery.Fields.Count], varVariant);
+      for I:= 0 to vQuery.Fields.Count - 1 do
+        Result[I]:= vQuery.Fields[I].Value;
+    end;
+
+    vQuery.Close;
+  finally
+    vQuery.Free;
+  end;
+end;
+
 function TDmConnection.RetornaVarArray(Sql: String;
   ValDefault: Variant): Variant;
 var
@@ -367,7 +397,7 @@ begin
     FDConnection.Offline;
 end;
 
-procedure TDmConnection.ExecutaComando(pSql: String);
+function TDmConnection.ExecutaComando(pSql: String): LongInt;
 var
   FQry: TFDQuery;
 begin
@@ -402,6 +432,11 @@ end;
 function TDmConnection.RetornaInteiro(Sql: String; pDefault: Integer): Integer;
 begin
   Result:=  VarToIntDef(RetornaValor(Sql), pDefault);
+end;
+
+function TDmConnection.RetornaDouble(const pSQL: String; pValorDef: Double = 0): Double;
+begin
+  Result:= VarToFloatDef(RetornaValor(pSQL), pValorDef);
 end;
 
 procedure TDmConnection.FDConnectionAfterCommit(Sender: TObject);

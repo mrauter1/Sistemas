@@ -671,3 +671,28 @@
 03022020-13:18:05 -> Script para atualizar lista de preço incializado.
 03022020-13:20:10 -> Script para atualizar lista de preço incializado.
 03022020-13:22:25 -> Inicializando message loop
+05022020-18:53:33 -> Iniciando monitor...
+05022020-18:53:33 -> Criando TConSqlServer
+05022020-18:53:34 -> Criando TConFirebird
+05022020-18:53:34 -> Criando TMonitorMain
+05022020-18:53:34 -> Criando TDmSqlUtils
+05022020-18:53:34 -> Criando TDmGeradorConsultas
+05022020-18:53:34 -> Criando TCon
+05022020-18:53:38 -> Enviando email consulta: VendasDescontoAltoOntem, para os emails: marcelo@rauter.com.br
+05022020-19:13:55 -> Iniciando monitor...
+05022020-19:13:55 -> Criando TConSqlServer
+05022020-19:13:56 -> Criando TConFirebird
+05022020-19:13:56 -> Criando TMonitorMain
+05022020-19:13:56 -> Criando TDmSqlUtils
+05022020-19:13:56 -> Criando TDmGeradorConsultas
+05022020-19:13:56 -> Criando TCon
+05022020-19:13:58 -> Enviando email consulta: VendasDescontoAltoOntem, para os emails: marcelo@rauter.com.br
+27022020-17:57:29 -> Iniciando monitor...
+27022020-17:57:29 -> Criando TConSqlServer
+27022020-17:57:30 -> Criando TConFirebird
+27022020-17:57:31 -> Criando TMonitorMain
+27022020-17:57:31 -> Criando TDmSqlUtils
+27022020-17:57:31 -> Criando TDmGeradorConsultas
+27022020-17:57:31 -> Criando TCon
+27022020-17:57:31 -> Carregando Gatihlos.xml
+27022020-17:57:34 -> Inicializando message loop

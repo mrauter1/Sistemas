@@ -78,6 +78,7 @@ type
     DadosGruposdeProdutos1: TMenuItem;
     Feriados1: TMenuItem;
     MenuCicloVendas: TMenuItem;
+    AtualizaTodasasListasdePreo1: TMenuItem;
     procedure Pedidos1Click(Sender: TObject);
     procedure Fila1Click(Sender: TObject);
     procedure Densidade1Click(Sender: TObject);
@@ -119,6 +120,7 @@ type
     procedure DadosGruposdeProdutos1Click(Sender: TObject);
     procedure Feriados1Click(Sender: TObject);
     procedure MenuCicloVendasClick(Sender: TObject);
+    procedure AtualizaTodasasListasdePreo1Click(Sender: TObject);
   private
     FDmGeradorConsultas: TDmGeradorConsultas;
     FPopupActive: Boolean;
@@ -154,7 +156,8 @@ implementation
 
 uses
   uDmFilaProducao, Utils, uFormDetalheProdutos, uFormPedidos2, uFormValidaModelos, uFormExecSql,
-  uFormRelatoriosPersonalizados, uFormSubGrupoExtras, uFormFeriados, uPython, uFormCiclosVenda;
+  uFormRelatoriosPersonalizados, uFormSubGrupoExtras, uFormFeriados, uPython, uFormCiclosVenda,
+  uDmGravaLista;
 
 procedure TFormPrincipal.RemoveTab(pTab: TChromeTab);
 begin
@@ -668,6 +671,11 @@ begin
   if FFormExiste then
     FPanelTab.Visible:= True;
 
+end;
+
+procedure TFormPrincipal.AtualizaTodasasListasdePreo1Click(Sender: TObject);
+begin
+  TDmGravaLista.AtualizaTodasListasDePreco;
 end;
 
 procedure TFormPrincipal.MostraNovoForm(pForm: TForm);

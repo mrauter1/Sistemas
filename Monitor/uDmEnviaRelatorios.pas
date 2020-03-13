@@ -185,8 +185,8 @@ begin
   except
   end;
 
-{  ShowMessage('Avisos automáticos não estão sendo executados.');
-  Exit;            }
+  ShowMessage('Avisos automáticos não estão sendo executados.');
+  Exit;
 
   if not CdsGatilhos.Active then
     CdsGatilhos.CreateDataSet;
@@ -525,7 +525,7 @@ procedure TCon.EnviaAumentoPreco;
   begin
     FEnviaEmailConsulta:= TEnviaEmailConsulta.Create(Self);
     try
-      FEnviaEmailConsulta.ConsultaNome:= 'SugestaoAumentoMargem';
+      FEnviaEmailConsulta.ConsultaNome:= 'VendasDescontoAltoOntem';
   //    FEnviaEmailConsulta.Visualizacao:= '';
 
       FEnviaEmailConsulta.Params.Add('CodVendedor', pCodVendedor);
@@ -533,8 +533,10 @@ procedure TCon.EnviaAumentoPreco;
       FEnviaEmailConsulta.Params.Add('DataFim', Now-1);
 
       FEnviaEmailConsulta.Destinatarios:= pEmail;
-      FEnviaEmailConsulta.Titulo:= 'Vendas de Ontem com Preço Abaixo do Ideal!';
-      FEnviaEmailConsulta.Texto:= 'Segue em anexo tabela com as vendas e sugestão de aumento.';
+      FEnviaEmailConsulta.Titulo:= 'Vendas de ontem com desconto acima de 27%!';
+      FEnviaEmailConsulta.Texto:= 'Segue em anexo tabela com as vendas de ontem e o desconto real para cada uma. '
+                                  +sLineBreak+sLineBreak+
+                                  'O desconto real é calculado com base no preço de lista mais frete mais custo financeiro.';
 
       FEnviaEmailConsulta.TipoVisualizacao:= tvTabela;
       FEnviaEmailConsulta.EnviarTabela;

@@ -6,7 +6,7 @@ uses
   Utils, uSendMail, System.Classes, Data.DB, SysUtils,
   System.Generics.Collections, uDmGeradorConsultas, uConSqlServer,
   uConFirebird, FireDAC.Comp.DataSet, FireDAC.Comp.Client, uConsultaPersonalizada,
-  Forms;
+  Forms, uConClasses;
 
 type
   TEnviaEmailConsulta = class(TComponent)

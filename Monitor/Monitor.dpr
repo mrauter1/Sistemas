@@ -22,7 +22,10 @@ uses
   uFormPesquisaAviso in 'uFormPesquisaAviso.pas' {FormPesquisaAviso},
   uFormSelecionaConsulta in 'uFormSelecionaConsulta.pas' {FormSelecionaConsulta},
   uAppConfig in '..\utils\uAppConfig.pas',
-  uDmGravaLista in '..\utils\uDmGravaLista.pas' {DmGravaLista: TDataModule};
+  uDmGravaLista in '..\utils\uDmGravaLista.pas' {DmGravaLista: TDataModule},
+  UntClasses in 'UntClasses.pas',
+  uConClasses in '..\utils\uConClasses.pas',
+  uTesteAtividades in 'uTesteAtividades.pas';
 
 {$R *.res}
 
@@ -39,18 +42,19 @@ begin
 
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  WriteLog('Criando TConSqlServer');
-  Application.CreateForm(TConSqlServer, ConSqlServer);
-  WriteLog('Criando TConFirebird');
-  Application.CreateForm(TConFirebird, ConFirebird);
-  WriteLog('Criando TMonitorMain');
+{  WriteLog('Criando TConSqlServer');
+  Application.CreateForm(TConSqlServer, ConSqlServer);  }
+{  WriteLog('Criando TConFirebird');
+  Application.CreateForm(TConFirebird, ConFirebird);  }
+
+  ExecutaTestes;
+
+{  WriteLog('Criando TMonitorMain');
   Application.CreateForm(TMonitorMain, MonitorMain);
   WriteLog('Criando TDmSqlUtils');
   Application.CreateForm(TDmSqlUtils, DmSqlUtils);
-  WriteLog('Criando TDmGeradorConsultas');
-  Application.CreateForm(TDmGeradorConsultas, DmGeradorConsultas);
   WriteLog('Criando TCon');
   Application.CreateForm(TCon, Con);
   WriteLog('Inicializando message loop');
-  Application.Run;
+  Application.Run;                                }
 end.

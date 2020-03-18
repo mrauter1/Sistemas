@@ -8,7 +8,8 @@ uses
   FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
   FireDAC.Stan.Async, FireDAC.DApt, Data.DB, FireDAC.Comp.DataSet,
   FireDAC.Comp.Client, uDataSetToHtml, Datasnap.DBClient,
-  System.Generics.Collections, WinApi.ShellAPI, Windows;
+  System.Generics.Collections, WinApi.ShellAPI, Windows,
+  uConClasses;
 
 type
   TTipoGatilho = (tgIntervalo, tgHora);

@@ -1,19 +1,15 @@
-unit UntFuncoes;
+unit Ladder.ORM.Functions;
 
 interface
 
 uses
-  Mormot, SysUtils, DB, DBClient, ADODB, Variants, VarUtils, Classes, StdCtrls, Controls,
-  Clipbrd, DBGrids, ComObj, Dialogs, StrUtils,
-  cxData, cxDataStorage, cxNavigator, cxDBData, cxGridCustomTableView, cxGridTableView,
-  cxGridDBTableView, cxGridLevel, cxClasses, cxGridCustomView, cxGrid, Windows,
-  VCLTee.Chart, VCLTee.DBChart, VCLTee.TeEngine, ppReport, cxGridChartView, graphics, cxDBLookupComboBox, ExtCtrls,
-  Forms, TypInfo, Math, Types, DBCtrls, PSApi, SynVirtualDataSet, SynCommons,
-  generics.collections, MormotVCL, Vcl.CheckLst, Tlhelp32, Contnrs, System.Rtti;
+  Winapi.ShellAPI, Winapi.SHLOBJ, Winapi.Windows, Data.DB, Datasnap.DBClient, Controls, Forms, Variants, Dialogs,
+  System.Classes, StdCtrls, CheckLst, System.Rtti, uDmConnection, System.Generics.Collections, System.Contnrs, System.SysUtils,
+  VCL.DBCtrls, VCL.DBGrids, StrUtils, VCL.clipbrd, VCL.OLEAuto, VCL.ExtCtrls,
+  SynCommons, SynVirtualDataSet, mORMotVCL, mORMot,
+  System.Math, System.Types, System.TypInfo, PsAPI, TLHelp32;
 
 type
-  PrjBoolean = (Verdadeiro = 0, Falso = 1);
-
   TCell = array of array of String;
 
   TArrayOfString = array of String;
@@ -21,49 +17,48 @@ type
 type
   TFuncoes = class
   public
+    DmConnection: TDmConnection;
+
+    constructor Create(pDmConnection: TDmConnection);
+
     class var RttiContext: TRttiContext;
-    class function CriaQuery(pConnection: TADOConnection; AOwner: TComponent = nil): TADOQuery;
-    class function CriaStoredProc(pConnection: TADOConnection): TADOStoredProc;
-    class function RetornaValor(pConnection: TADOConnection; const pSQL: String): Variant;
-    class function Func_CriaEClonaCDS(pCdsOrigem: TClientDataSet): TClientDataSet;
-    class procedure Tira_ParentBackground_Labels(pParent: TComponent);
-    class function RetornaValores(pConnection: TADOConnection; const pSql: String): Variant;
-    class function RetornaDouble(pConnection: TADOConnection;
-      const pSQL: String; pValorDef: Double = 0): Double;
-    class function RetornaInteiro(pConnection: TADOConnection;
-      const pSQL: String; pValorDef: Integer = 0): Integer;
-    class function RetornaDocVariant(pConnection: TADOConnection; const pSql: String): Variant;
-    class function RetornaJSon(pConnection: TADOConnection; const pSql: String): String;
+//   class function CriaStoredProc(pConnection: TADOConnection): TADOStoredProc;
+//   function RetornaValor(const pSQL: String): Variant;
+//   function RetornaDouble(const pSQL: String; pValorDef: Double = 0): Double;
+//   function RetornaInteiro(const pSQL: String; pValorDef: Integer = 0): Integer;
 
+    function RetornaDocVariant(const pSql: String): Variant;
+    function RetornaJSon(const pSql: String): String;
     // Popula o record com o primeiro registro retornado pelo banco
-    class function RetornaRecord(var Rec; TypeInfo: pointer; pConnection: TAdoConnection; const pSql: String): Boolean;
+    function RetornaRecord(var Rec; TypeInfo: pointer; const pSql: String): Boolean;
 
-    class function RetornaArray(var pArray; TypeInfo: pointer; pConnection: TAdoConnection; const pSql: String): Boolean;
+    function RetornaArray(var pArray; TypeInfo: pointer; const pSql: String): Boolean;
+
+    function Func_CriaEClonaCDS(pCdsOrigem: TClientDataSet): TClientDataSet;
+    procedure Proc_CopiarFields(pOrigem, pDestino: TClientDataSet);
 
     // Popula o objeto com o primeiro registro retornado pelo banco
     // ATENÇÃO:: AS PROPRIEDADES DO OBJETO QUE VÃO SER RETORNADAS TEM QUE ESTAR NA SEÇÃO PUBLISHED!!!
-    class function RetornaObjeto(var ObjectInstance; pConnection: TAdoConnection; const pSql: String): Boolean;
+    function RetornaObjeto(var ObjectInstance; const pSql: String): Boolean;
 
     // Popula um objectlist, cada registro retornado será um objeto na lista. TItemClass = Classe dos Itens do ObjectList
     // ATENÇÃO:: AS PROPRIEDADES DO OBJETO QUE DEVEM SER RETORNADAS TEM QUE ESTAR NA SEÇÃO PUBLISHED!!!
-    class function RetornaListaObjetos(var ObjectList: TObjectList; ItemClass: TClass; pConnection: TAdoConnection; const pSql: String): Boolean; overload; static;
+    function RetornaListaObjetos(var ObjectList: TObjectList; ItemClass: TClass; const pSql: String): Boolean; overload;
     // Igual à anterior, mas recebe uma lista de objetos genérica por parâmetro
-    class function RetornaListaObjetos<T: class>(var ObjectList: TObjectList<T>; ItemClass: TClass; pConnection: TAdoConnection; const pSql: String): Boolean; overload; static;
+    function RetornaListaObjetos<T: class>(var ObjectList: TObjectList<T>; ItemClass: TClass; const pSql: String): Boolean; overload;
 
-    class function ExecutaProcedure(pConnection: TADOConnection;
-      const pSQL: String; pValorDef: Integer = 0): Integer;
-
-    class function Dias_Uteis(DtaI, DataF: TDateTime):Integer;
+    function Dias_Uteis(DtaI, DataF: TDateTime):Integer;
 //    class procedure Proc_CopiarFields(pOrigem, pDestino: TClientDataSet);
 
-    class procedure ObjectListToDataSet(pObjectList: TObjectList; pDataSet: TDataSet); overload;
-    class procedure ObjectListToDataSet<T: Class>(pObjectList: TObjectList<T>; pDataSet: TDataSet); overload;
+    procedure ObjectListToDataSet(pObjectList: TObjectList; pDataSet: TDataSet); overload;
+    procedure ObjectListToDataSet<T: Class>(pObjectList: TObjectList<T>; pDataSet: TDataSet); overload;
 
-    class function ObjectToFieldValue(pProp: TRttiProperty; pObject: TObject): Variant;
+    function ObjectToFieldValue(pProp: TRttiProperty; pObject: TObject): Variant;
 
-    class procedure ObjectToDataSet(pObject: TObject; pDataSet: TDataSet);
+    procedure ObjectToDataSet(pObject: TObject; pDataSet: TDataSet);
   end;
 
+type
   TAsync = class
   private
     fTimer: TTimer;
@@ -82,18 +77,16 @@ procedure FillDataSetFromObjectList(pDataSet: TDataSet; pObjectList: TObjectList
 
 procedure FillDataSetFromJSon(pDataSet: TDataSet; pJson: String);
 
-function IntToBooleano(Valor: Integer): Boolean;
 function RoundUp(Valor: Double; Digitos: Integer): Double;
 
 // Cria uma tabela em memória e configura automáticamente o cxColumn para buscar o valor do ListField que Corresponde ao KeyField
-procedure CriaLookupField(pDatasetDestino: TDataSet; pConnection: TAdoConnection; pSql, pKeyField: String);
-procedure FazLookupCxLookup(AOwner: TComponent; pCxComboBox: TcxDBLookupComboBox; pConnection: TAdoConnection; pSql, pKeyFieldNames, pListFieldNames: String);
-procedure FazLookupCxColumn(AOwner: TComponent; pCol: TcxGridDBColumn; pConnection: TAdoConnection; pSql, pKeyFieldNames, pListFieldNames: String);
-procedure FazLookupComboBox(pLookupComboBox: TDBLookupComboBox; pConnection: TAdoConnection; pSql: String);
+//procedure CriaLookupField(pDatasetDestino: TDataSet; pConnection: TFDConnection; pSql, pKeyField: String);
+//procedure FazLookupCxLookup(AOwner: TComponent; pCxComboBox: TcxDBLookupComboBox; pConnection: TAdoConnection; pSql, pKeyFieldNames, pListFieldNames: String);
+//procedure FazLookupCxColumn(AOwner: TComponent; pCol: TcxGridDBColumn; pConnection: TAdoConnection; pSql, pKeyFieldNames, pListFieldNames: String);
+//procedure FazLookupComboBox(pLookupComboBox: TDBLookupComboBox; pConnection: TFDConnection; pSql: String);
 
 function CopiaECriaField(pFieldOrigem: TField; pDataSetDest: TDataSet): TField;
-function VerficarSeAplicaticoEstarRodando(Nome:String) : Boolean;
-function Get_Handle_Of_Application(partialTitle: string): HWND;
+
 procedure CopiaValoresDataSet(Origem, Destino: TDataSet);
 
 function VarToIntDef(pVar: Variant; pValorDef: Integer = 0): Integer;
@@ -111,9 +104,9 @@ function StrParaDate(fStr: String): TDate;
 
 function ExcluiQuebra( pStr, pStrSubst: String): String;
 procedure Func_DBGrid_Para_Excel(pGrid: TDBGrid);
-procedure Proc_cxChart_Para_Bmp(pChart: TcxGridChartView; const pArquivo: String);
+//procedure Proc_cxChart_Para_Bmp(pChart: TcxGridChartView; const pArquivo: String);
 
-// Funções de conversão de data
+{Funções de conversão e maniipulação de data e hora }
 procedure GetTimeSettings(var pFormatSettings: TFormatSettings);
 function TryHoraParaInt(const pHora: String; out Resultado: Integer): Boolean;
 //function TryHoraParaDateTime(const pHora: String; out Resultado: TDateTime): Boolean;
@@ -122,48 +115,44 @@ function DateTimeParaHoras(const pDate: TDateTime): String;
 function IntParaHora(FInt: Integer): String;
 function HoraParaInt(const AText: String): Integer;
 function TempoTotal(fMin: Integer): String;
-
 function GetDateTime(FDate : TDateTime; FHora : String) : Boolean;
 function MontaDateTime(FDate : TDateTime; FHora : String) : TDateTime;
 
+{ Strings }
 function TryStrCurToFloat(const pStr: String; var Valor: Double): Boolean;
-
 function StringToStrList(const pDelimiter: Char; const pDelimitedText: String): TStringList;
+function StringToVarArray(const aSeparator, aString: String): Variant;
+function SplitString(const aSeparator, aString: String; aMax: Integer = 0): TArrayOfString;
 
 function PrjMessage(const pText: String; const pTitulo: String; pFlags: Integer = 0): Integer;
 
 procedure CopiaValorCampos(pSource, pDest: TDataSet; const pFieldsParaIgnorar: String = ''; pApenasExistentes: Boolean = false);
 
+function FormatedFloat(pValor: Extended): String;
+
 // Funções de gráfico
-procedure GfCopiarSerie(pOrigem, pDestino: TChartSeries);
+//procedure GfCopiarSerie(pOrigem, pDestino: TChartSeries);
 
 function GetCellsFromExcelClipbrd: TCell;
 
-function StringToVarArray(const aSeparator, aString: String): Variant;
+procedure Tira_ParentBackground_Labels(pParent: TComponent);
 
-function SplitString(const aSeparator, aString: String; aMax: Integer = 0): TArrayOfString;
-
-procedure SavalReportParaPDF(rReport: TppReport; sNomeArquivo: String);
+//procedure SavalReportParaPDF(rReport: TppReport; sNomeArquivo: String);
 
 function CurIn(pValor: Currency; Valores: array of currency): Boolean;
-
 function CurrToSqlStr(pValor: Currency): String;
-
 function FloatToSqlStr(pValor: Extended): String;
-
 function AreaIntToArea(pArea: Integer): Currency;
-
 function AreaIntToStrArea(pArea: Integer): String;
-
-function BlendColors(Color1, Color2: TColor; A: Byte): TColor;
 
 procedure CarregaFormEmPanel(pForm: TForm; pPanel: TPanel);
 
 function RetornaValoresCheckBox(Check:TCheckListBox) : string;
 
+function AplicativoRodando(Nome:String) : Boolean;
+function Get_Handle_Of_Application(partialTitle: string): HWND;
 function ProcessoExiste(ExeFileName: string): boolean;
 
-function FormatedFloat(pValor: Extended): String;
 
 const
   cHorasDia = 8;
@@ -218,14 +207,6 @@ begin
     Result := buffer
   else
     Result := ''
-end;
-
-function IntToBooleano(Valor: Integer): Boolean;
-begin
-  if PrjBoolean(Valor) = Verdadeiro then
-    Result:= True
-  else
-    Result:= False;
 end;
 
 function FormatedFloat(pValor: Extended): String;
@@ -316,7 +297,7 @@ begin
 
   Result:= NewField;
 end;
-
+                                            {
 // Primeiro campo do Sql deve ser o Código (LookupKeyField), o segundo deve ser o nome (LookupResultField);
 procedure CriaLookupField(pDatasetDestino: TDataSet; pConnection: TAdoConnection; pSql, pKeyField: String);
 var
@@ -389,7 +370,7 @@ begin
     FQry.Free;
     raise;
   end;
-end;
+end;                                         }
 
 function Get_Handle_Of_Application(partialTitle: string): HWND;
 var
@@ -412,7 +393,7 @@ begin
 end;
 
 
-function VerficarSeAplicaticoEstarRodando(Nome:String):Boolean;
+function AplicativoRodando(Nome:String):Boolean;
 var rId:array[0..999] of DWord; i,NumProc,NumMod:DWord;
     HProc,HMod:THandle; sNome:String;
     Tamanho, Count:Integer;
@@ -478,8 +459,7 @@ begin
     end;
     CloseHandle(FSnapshotHandle);
 end;
-
-
+{
 procedure FazLookupCxLookup(AOwner: TComponent; pCxComboBox: TcxDBLookupComboBox; pConnection: TAdoConnection; pSql, pKeyFieldNames, pListFieldNames: String);
 var
   FQry: TADOQuery;
@@ -502,7 +482,7 @@ begin
     raise;
   end;
 end;
-
+ }
 { Dataset deve Destino deve estar em edição! É copiada apenas os valores dos campos de mesmo nome e da linha corrente; }
 procedure CopiaValoresDataSet(Origem, Destino: TDataSet);
 var
@@ -517,27 +497,6 @@ begin
       FField.Value:= Origem.Fields[I].Value;
     end;
   end;
-end;
-
-// Usage  NewColor:= Blend(Color1, Color2, blending level 0 to 100);
-function BlendColors(Color1, Color2: TColor; A: Byte): TColor;
-var
-  c1, c2: LongInt;
-  r, g, b, v1, v2: byte;
-begin
-  A:= Round(2.55 * A);
-  c1 := ColorToRGB(Color1);
-  c2 := ColorToRGB(Color2);
-  v1:= Byte(c1);
-  v2:= Byte(c2);
-  r:= A * (v1 - v2) shr 8 + v2;
-  v1:= Byte(c1 shr 8);
-  v2:= Byte(c2 shr 8);
-  g:= A * (v1 - v2) shr 8 + v2;
-  v1:= Byte(c1 shr 16);
-  v2:= Byte(c2 shr 16);
-  b:= A * (v1 - v2) shr 8 + v2;
-  Result := (b shl 16) + (g shl 8) + r;
 end;
 
 function CurrToSqlStr(pValor: Currency): String;
@@ -577,7 +536,7 @@ end;
 
 { TFuncoes }
 
-class function TFuncoes.ObjectToFieldValue(pProp: TRttiProperty; pObject: TObject): Variant;
+function TFuncoes.ObjectToFieldValue(pProp: TRttiProperty; pObject: TObject): Variant;
 const
   cMsgErro = 'Propriedade %s do tipo %s não foi possível ser mapeada!';
 begin
@@ -593,7 +552,7 @@ begin
   end;
 end;
 
-class procedure TFuncoes.ObjectToDataSet(pObject: TObject; pDataSet: TDataSet);
+procedure TFuncoes.ObjectToDataSet(pObject: TObject; pDataSet: TDataSet);
 var
   RttiType: TRttiType;
   Prop: TRttiProperty;
@@ -613,7 +572,7 @@ begin
   end;
 end;
 
-class procedure TFuncoes.ObjectListToDataSet<T>(pObjectList: TObjectList<T>; pDataSet: TDataSet);
+procedure TFuncoes.ObjectListToDataSet<T>(pObjectList: TObjectList<T>; pDataSet: TDataSet);
 var
   I: Integer;
 begin
@@ -625,7 +584,7 @@ begin
   end;
 end;
 
-class procedure TFuncoes.ObjectListToDataSet(pObjectList: TObjectList; pDataSet: TDataSet);
+procedure TFuncoes.ObjectListToDataSet(pObjectList: TObjectList; pDataSet: TDataSet);
 var
   I: Integer;
 begin
@@ -639,20 +598,7 @@ begin
 
 end;
 
-class function TFuncoes.CriaQuery(pConnection: TADOConnection; AOwner: TComponent = nil): TADOQuery;
-begin
-  if AOwner = nil then
-    Result:= TADOQuery.Create(pConnection)
-  else Result:= TADOQuery.Create(AOwner);
-  try
-    Result.Connection:= pConnection;
-  except
-    Result.Free;
-    raise;
-  end;
-end;
-
-class function TFuncoes.CriaStoredProc(pConnection: TADOConnection): TADOStoredProc;
+{class function TFuncoes.CriaStoredProc(pConnection: TADOConnection): TADOStoredProc;
 begin
   Result:= TADOStoredProc.Create(pConnection);
   try
@@ -661,9 +607,15 @@ begin
     Result.Free;
     raise;
   end;
+end;              }
+
+constructor TFuncoes.Create(pDmConnection: TDmConnection);
+begin
+  inherited Create;
+  DmConnection:= pDmConnection;
 end;
 
-class function TFuncoes.Dias_Uteis(DtaI, DataF: TDateTime): Integer;
+function TFuncoes.Dias_Uteis(DtaI, DataF: TDateTime): Integer;
 var
  contador:Integer;
 begin
@@ -683,58 +635,12 @@ begin
 
 end;
 
-class function TFuncoes.RetornaValores(pConnection: TADOConnection;
-  const pSql: String): Variant;
+function TFuncoes.RetornaJSon(const pSql: String): String;
 var
-  vQuery: TADOQuery;
-  I: Integer;
+  vQuery: TDataSet;
 begin
-  vQuery:= CriaQuery(pConnection);
+  vQuery:= DmConnection.RetornaFDQuery(nil, pSql, True);
   try
-    vQuery.SQL.Text:= pSql;
-    vQuery.Active:= True;
-
-    if vQuery.Fields.Count = 0 then
-    begin
-      Result:= null;
-    end
-   else
-    begin
-      Result:= VarArrayCreate([0, vQuery.Fields.Count], varVariant);
-      for I:= 0 to vQuery.Fields.Count - 1 do
-        Result[I]:= vQuery.Fields[I].Value;
-    end;
-
-    vQuery.Close;
-  finally
-    vQuery.Free;
-  end;
-end;
-
-class function TFuncoes.RetornaValor(pConnection: TADOConnection; const pSQL: String): Variant;
-var
-  vQuery: TADOQuery;
-begin
-  vQuery:= CriaQuery(pConnection);
-  try
-    vQuery.SQL.Text:= pSql;
-    vQuery.Active:= True;
-    Result:= vQuery.Fields[0].Value;
-    vQuery.Close;
-  finally
-    vQuery.Free;
-  end;
-end;
-
-class function TFuncoes.RetornaJSon(pConnection: TADOConnection;
-  const pSql: String): String;
-var
-  vQuery: TADOQuery;
-begin
-  vQuery:= CriaQuery(pConnection);
-  try
-    vQuery.SQL.Text:= pSql;
-    vQuery.Active:= True;
     Result:= DataSetToJson(vQuery);
     vQuery.Close;
   finally
@@ -743,19 +649,18 @@ begin
 end;
 
 // Classe dos Itens do ObjectList
-class function TFuncoes.RetornaListaObjetos(var ObjectList: TObjectList; ItemClass: TClass;
- pConnection: TAdoConnection; const pSql: String): Boolean;
+function TFuncoes.RetornaListaObjetos(var ObjectList: TObjectList; ItemClass: TClass; const pSql: String): Boolean;
 var
   FJson: String;
 begin
-  FJson:= RetornaJSon(pConnection, pSql);
+  FJson:= RetornaJSon(pSql);
 
   Result:= ObjectLoadJSon(ObjectList, FJson, ItemClass);
 end;
 
 // Classe dos Itens do ObjectList
-class function TFuncoes.RetornaListaObjetos<T>(var ObjectList: TObjectList<T>; ItemClass: TClass;
- pConnection: TAdoConnection; const pSql: String): Boolean;
+function TFuncoes.RetornaListaObjetos<T>(var ObjectList: TObjectList<T>; ItemClass: TClass;
+  const pSql: String): Boolean;
 var
   FResults, fVariant: Variant;
   I: Integer;
@@ -763,7 +668,7 @@ var
 begin
   Result:= False;
 
-  FResults:= TFuncoes.RetornaDocVariant(pConnection, pSql);
+  FResults:= RetornaDocVariant(pSql);
 
   if FResults._Count = 0 then Exit;
 
@@ -776,14 +681,13 @@ begin
   end;
 end;
 
-class function TFuncoes.RetornaObjeto(var ObjectInstance;
-  pConnection: TAdoConnection; const pSql: String): Boolean;
+function TFuncoes.RetornaObjeto(var ObjectInstance; const pSql: String): Boolean;
 var
   FResults, fVariant: Variant;
 begin
   Result:= False;
 
-  FResults:= TFuncoes.RetornaDocVariant(pConnection, pSql);
+  FResults:= RetornaDocVariant(pSql);
 
   if FResults._Count = 0 then Exit;
 
@@ -792,14 +696,14 @@ begin
   Result:= ObjectLoadJSon(ObjectInstance, fVariant._JSON, nil);
 end;
 
-class function TFuncoes.RetornaRecord(var Rec; TypeInfo: pointer; pConnection: TAdoConnection;
+function TFuncoes.RetornaRecord(var Rec; TypeInfo: pointer;
   const pSql: String): Boolean;
 var
   FResults, fVariant: Variant;
 begin
   Result:= False;
 
-  FResults:= TFuncoes.RetornaDocVariant(pConnection, pSql);
+  FResults:= RetornaDocVariant(pSql);
 
   if FResults._Count = 0 then Exit;
 
@@ -810,8 +714,8 @@ begin
   Result:= True;
 end;
 
-class function TFuncoes.RetornaArray(var pArray; TypeInfo: pointer;
-      pConnection: TAdoConnection; const pSql: String): Boolean;
+function TFuncoes.RetornaArray(var pArray; TypeInfo: pointer;
+      const pSql: String): Boolean;
 var
   FResults, fVariant: Variant;
   fJson: String;
@@ -822,68 +726,39 @@ begin
 
   aDynArray.Init(TypeInfo,pArray);
 
-  fJSon:= TFuncoes.RetornaJSon(pConnection,pSql);
+  fJSon:= RetornaJSon(pSql);
 
   aDynArray.LoadFromJSON(PUTF8Char(WinAnsiToUtf8(fJSon)));
 
   Result:= True;
 end;
 
-class function TFuncoes.RetornaDocVariant(pConnection: TADOConnection;
-  const pSql: String): Variant;
+function TFuncoes.RetornaDocVariant(const pSql: String): Variant;
 begin
-    Result:= _JSon(RetornaJSon(pConnection, pSql));
+  Result:= _JSon(RetornaJSon(pSql));
 end;
 
-class function TFuncoes.RetornaDouble(pConnection: TADOConnection; const pSQL: String; pValorDef: Double = 0): Double;
-begin
-  Result:= VarToFloatDef(RetornaValor(pConnection, pSQL), pValorDef);
-end;
-
-class function TFuncoes.RetornaInteiro(pConnection: TADOConnection;
-  const pSQL: String; pValorDef: Integer): Integer;
-begin
-  Result:= VarToIntDef(RetornaValor(pConnection, pSQL), pValorDef);
-end;
-
-class function TFuncoes.ExecutaProcedure(pConnection: TADOConnection;
-  const pSQL: String; pValorDef: Integer = 0): Integer;
-var
-  vQuery: TADOQuery;
-begin
-  Result:= pValorDef;
-  vQuery:= CriaQuery(pConnection);
-  try
-    vQuery.SQL.Text:= pSql;
-    Result:= vQuery.ExecSQL;
-//    Result:= vQuery.Fields[0].Value;
-  finally
-    vQuery.Free;
-  end;
-end;
-
-
-{class procedure TFuncoes.Proc_CopiarFields(pOrigem, pDestino: TClientDataSet);
+procedure TFuncoes.Proc_CopiarFields(pOrigem, pDestino: TClientDataSet);
 var
   Field, NewField: TField;
   FieldDef: TFieldDef;
 begin
   for Field in pOrigem.Fields do
   begin
-    FieldDef := FieldDefs.AddFieldDef;
+    FieldDef := pDestino.FieldDefs.AddFieldDef;
     FieldDef.DataType := Field.DataType;
     FieldDef.Size := Field.Size;
     FieldDef.Name := Field.FieldName;
 
-    NewField := FieldDef.CreateField(Self);
+    NewField := FieldDef.CreateField(pDestino);
     NewField.Visible := Field.Visible;
     NewField.DisplayLabel := Field.DisplayLabel;
     NewField.DisplayWidth := Field.DisplayWidth;
     NewField.EditMask := Field.EditMask;
   end;
-end;                 }
+end;
 
-class function TFuncoes.Func_CriaEClonaCDS(pCdsOrigem: TClientDataSet): TClientDataSet;
+function TFuncoes.Func_CriaEClonaCDS(pCdsOrigem: TClientDataSet): TClientDataSet;
 begin
   Result:= TClientDataSet.Create(pCdsOrigem);
   try
@@ -897,7 +772,7 @@ begin
   end;
 end;
 
-class procedure TFuncoes.Tira_ParentBackground_Labels(pParent: TComponent);
+procedure Tira_ParentBackground_Labels(pParent: TComponent);
 var
   Cpt: Integer;
 begin
@@ -970,7 +845,7 @@ begin
    vDia:= StrToInt(copy(fStr, 9, 2));
    Result:= EncodeDate(vAno, vMes, vDia);
 end;
-
+                                           {
 procedure Proc_cxChart_Para_Bmp(pChart: TcxGridChartView; const pArquivo: String);
 var
  ImageExport : TGraphic;
@@ -982,7 +857,7 @@ begin
    finally
      ImageExport.free;
    end;
-end;
+end;                                }
 
 procedure AbortMessage(Mensagem: String; const pTitulo: String; pFlags: Integer = 0);
 begin
@@ -1055,6 +930,7 @@ begin
     Linhas.Free;
     Clipboard.Close;
   end;
+
   planilha.WorkBooks[1].Sheets.Add;
   PlanName:=InttoStr(Plan)+'Audit_Project';
   planilha.WorkBooks[1].WorkSheets[1].Name :=PlanName ;
@@ -1240,13 +1116,13 @@ else
   Result := True;
   end
 end;
-
+                                               {
 // Funções de gráfico
 procedure GfCopiarSerie(pOrigem, pDestino: TChartSeries);
 begin
   pDestino.Assign(pOrigem);
 end;
-
+                                                }
 function TryStrCurToFloat(const pStr: String; var Valor: Double): Boolean;
 var
   s: string;
@@ -1428,9 +1304,9 @@ begin
     FIgnoreList.Free;
   end;
 end;
-
+(*
 procedure SavalReportParaPDF(rReport: TppReport; sNomeArquivo: String);
-var 
+var
   wNomarq : string;
   oOldDevice: String;
   oAllowPrintToFile, oShowPrintDialog, oSaveAsTemplate, oSavePrinterSetup: Boolean;
@@ -1491,12 +1367,12 @@ begin
           raise E;
       end;
     end;
-    
+
   finally
     CarregaOldConfig;
   end;
 end;
-
+*)
 function RetornaValoresCheckBox(Check:TCheckListBox) : string;
 var
   Lista : String;
@@ -1521,6 +1397,7 @@ begin
 end;
 
 initialization
+//  Funcoes:= nil;
   TFuncoes.RttiContext:= TRttiContext.Create;
 
 

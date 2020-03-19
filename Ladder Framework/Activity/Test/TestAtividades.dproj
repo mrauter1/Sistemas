@@ -1,16 +1,21 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <ProjectGuid>{3F961CE5-7480-4E3B-B39D-40379AFF7FC7}</ProjectGuid>
+        <ProjectGuid>{B49FD513-5194-415E-AE57-22C5BB6CB827}</ProjectGuid>
         <ProjectVersion>18.2</ProjectVersion>
         <FrameworkType>VCL</FrameworkType>
-        <MainSource>Monitor.dpr</MainSource>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
         <TargetedPlatforms>1</TargetedPlatforms>
-        <AppType>Application</AppType>
+        <AppType>Console</AppType>
+        <MainSource>TestAtividades.dpr</MainSource>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='OSX32' and '$(Base)'=='true') or '$(Base_OSX32)'!=''">
+        <Base_OSX32>true</Base_OSX32>
+        <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
@@ -39,19 +44,12 @@
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
-        <Cfg_2_Win32>true</Cfg_2_Win32>
-        <CfgParent>Cfg_2</CfgParent>
-        <Cfg_2>true</Cfg_2>
-        <Base>true</Base>
-    </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
-        <SanitizedProjectName>Monitor</SanitizedProjectName>
-        <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
-        <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
-        <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
+        <SanitizedProjectName>TestAtividades</SanitizedProjectName>
+        <DCC_Define>_CONSOLE_TESTRUNNER;$(DCC_Define)</DCC_Define>
+        <DCC_UnitSearchPath>$(BDS)\Source\DUnit\src;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
-        <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
+        <DCC_DcuOutput>.</DCC_DcuOutput>
         <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
         <DCC_E>false</DCC_E>
         <DCC_N>false</DCC_N>
@@ -59,17 +57,18 @@
         <DCC_F>false</DCC_F>
         <DCC_K>false</DCC_K>
     </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_OSX32)'!=''">
+        <DCC_UsePackage>DBXSqliteDriver;tethering;FireDACMSSQLDriver;FireDACDBXDriver;RESTBackendComponents;bindengine;CloudService;FireDACMySQLDriver;DataSnapClient;bindcompdbx;IndyIPServer;IndySystem;fmxFireDAC;emshosting;FireDACTDataDriver;FMXTee;soaprtl;DbxCommonDriver;xmlrtl;soapmidas;DataSnapNativeClient;fmxobj;rtl;DbxClientDriver;DBXSybaseASADriver;IndyIPClient;FireDACODBCDriver;DataSnapIndy10ServerTransport;DataSnapProviderClient;FireDACMongoDBDriver;DataSnapServerMidas;RESTComponents;DBXInterBaseDriver;emsclientfiredac;DataSnapFireDAC;bindcompfmx;DBXOracleDriver;inetdb;FmxTeeUI;emsedge;FireDACIBDriver;fmx;fmxdae;dbexpress;IndyCore;dsnap;DataSnapCommon;emsclient;FireDACCommon;soapserver;FireDACOracleDriver;DBXMySQLDriver;DBXFirebirdDriver;FireDACCommonODBC;FireDACCommonDriver;inet;IndyIPCommon;FireDAC;FireDACSqliteDriver;FireDACPgDriver;ibmonitor;FireDACASADriver;ibxpress;DataSnapServer;ibxbindings;FireDACDSDriver;CustomIPTransport;bindcomp;DBXInformixDriver;dbxcds;dsnapxml;dbrtl;inetdbxpress;IndyProtocols;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
+    </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
-        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+        <DCC_UsePackage>DBXSqliteDriver;dxSkinBlueprintRS24;DBXDb2Driver;dxPSDBTeeChartRS24;dxPSdxGaugeControlLnkRS24;vclactnband;dxSpreadSheetRS24;vclFireDAC;dxDockingRS24;tethering;dxSkinVisualStudio2013BlueRS24;dxPScxTLLnkRS24;dxBarExtItemsRS24;FireDACADSDriver;dxFireDACServerModeRS24;dxPSTeeChartRS24;dxSkinOffice2007BlackRS24;FireDACMSSQLDriver;vcltouch;vcldb;Intraweb;svn;dxSkinXmas2008BlueRS24;dxSkinscxSchedulerPainterRS24;dxSkinsdxBarPainterRS24;dxSkinOffice2010BlackRS24;dxADOServerModeRS24;dxGDIPlusRS24;dxPSdxDBTVLnkRS24;frx24;vclib;dxSkinLilianRS24;FireDACDBXDriver;dxNavBarRS24;vclx;cxTreeListRS24;dxSkinDevExpressDarkStyleRS24;dxtrmdRS24;RESTBackendComponents;dxRibbonRS24;VCLRESTComponents;cxExportRS24;cxPivotGridChartRS24;cxTreeListdxBarPopupMenuRS24;dxSkinOffice2013LightGrayRS24;dxTabbedMDIRS24;vclie;dxSkinVisualStudio2013LightRS24;bindengine;CloudService;FireDACMySQLDriver;cxPivotGridOLAPRS24;dxSkinSharpRS24;dxSkinBlackRS24;DataSnapClient;dxPSLnksRS24;bindcompdbx;dxSkinCoffeeRS24;DBXSybaseASEDriver;IndyIPServer;dxSkinsdxRibbonPainterRS24;dxCoreRS24;IndySystem;dxSkinOffice2013DarkGrayRS24;dsnapcon;FireDACMSAccDriver;fmxFireDAC;FireDACInfxDriver;vclimg;emshosting;dxBarDBNavRS24;dxSkinDarkSideRS24;dxSkinOffice2013WhiteRS24;DBXOdbcDriver;FireDACTDataDriver;FMXTee;dxPScxExtCommonRS24;dxPSdxLCLnkRS24;soaprtl;DbxCommonDriver;dxPScxPivotGridLnkRS24;xmlrtl;soapmidas;DataSnapNativeClient;fmxobj;dxSkinMcSkinRS24;rtl;dxLayoutControlRS24;DbxClientDriver;cxGridRS24;DBXSybaseASADriver;dxSkinBlueRS24;dxSpellCheckerRS24;cxLibraryRS24;dxSkinStardustRS24;dxSkinCaramelRS24;appanalytics;dxSkinsCoreRS24;dxDBXServerModeRS24;dxMapControlRS24;IndyIPClient;dxSkinHighContrastRS24;bindcompvcl;dxSkinTheAsphaltWorldRS24;TeeUI;frxe24;cxPageControlRS24;cxEditorsRS24;dxPsPrVwAdvRS24;dxSkinSevenClassicRS24;VclSmp;cxSchedulerRibbonStyleEventEditorRS24;FireDACODBCDriver;dxSkinPumpkinRS24;DataSnapIndy10ServerTransport;dxSkinscxPCPainterRS24;dxPSPrVwRibbonRS24;DataSnapProviderClient;FireDACMongoDBDriver;dxSkinSevenRS24;dxdborRS24;dxmdsRS24;DataSnapServerMidas;RESTComponents;cxSchedulerGridRS24;dxHttpIndyRequestRS24;cxPivotGridRS24;DBXInterBaseDriver;emsclientfiredac;DataSnapFireDAC;svnui;dxdbtrRS24;dxSkinMetropolisRS24;dxSkinMoneyTwinsRS24;dxPScxPCProdRS24;DBXMSSQLDriver;DatasnapConnectorsFreePascal;dxWizardControlRS24;bindcompfmx;dxPSdxOCLnkRS24;dxBarExtDBItemsRS24;DBXOracleDriver;dxPSdxFCLnkRS24;inetdb;cxSchedulerTreeBrowserRS24;dxSkinOffice2016ColorfulRS24;FmxTeeUI;emsedge;FireDACIBDriver;fmx;fmxdae;dxSkinSpringTimeRS24;dxSkinValentineRS24;dxSkinLondonLiquidSkyRS24;dxSkinWhiteprintRS24;dbexpress;IndyCore;dxSkiniMaginaryRS24;dxTileControlRS24;dxSkinOffice2016DarkRS24;dsnap;DataSnapCommon;emsclient;cxDataRS24;FireDACCommon;dxSkinOffice2007PinkRS24;dxPSdxSpreadSheetLnkRS24;DataSnapConnectors;dxSkinDevExpressStyleRS24;soapserver;dxBarRS24;dxSkinMetropolisDarkRS24;FireDACOracleDriver;DBXMySQLDriver;dxPSRichEditControlLnkRS24;DBXFirebirdDriver;dxPScxCommonRS24;FireDACCommonODBC;FireDACCommonDriver;inet;IndyIPCommon;dxSkinVS2010RS24;vcl;dxSkinSharpPlusRS24;dxPSdxDBOCLnkRS24;FireDACDb2Driver;dxThemeRS24;dxSkinOffice2007GreenRS24;TeeDB;FireDAC;dxPScxGridLnkRS24;dxPScxVGridLnkRS24;FireDACSqliteDriver;FireDACPgDriver;ibmonitor;FireDACASADriver;dxSkinOffice2010BlueRS24;ChromeTabs_R;dxServerModeRS24;ibxpress;Tee;DataSnapServer;ibxbindings;cxSchedulerRS24;vclwinx;FireDACDSDriver;dxSkinsdxDLPainterRS24;dxPSCoreRS24;dxSkinOffice2007BlueRS24;frxTee24;CustomIPTransport;vcldsnap;dxSkinGlassOceansRS24;dxRibbonCustomizationFormRS24;dxPScxSchedulerLnkRS24;dxSkinSummer2008RS24;dxSkinDarkRoomRS24;bindcomp;dxSkinFoggyRS24;DBXInformixDriver;dxorgcRS24;dxSkinOffice2010SilverRS24;dxRichEditControlRS24;dxSkinsdxNavBarPainterRS24;dbxcds;adortl;dxSkinSilverRS24;dxSkinVisualStudio2013DarkRS24;dxComnRS24;cxVerticalGridRS24;dxFlowChartRS24;frxDB24;dsnapxml;dbrtl;inetdbxpress;IndyProtocols;dxGaugeControlRS24;dxSkinOffice2007SilverRS24;dxSkinLiquidSkyRS24;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
-        <DCC_UsePackage>DBXSqliteDriver;dxSkinBlueprintRS24;DBXDb2Driver;dxPSDBTeeChartRS24;dxPSdxGaugeControlLnkRS24;vclactnband;dxSpreadSheetRS24;vclFireDAC;dxDockingRS24;tethering;dxSkinVisualStudio2013BlueRS24;dxPScxTLLnkRS24;dxBarExtItemsRS24;FireDACADSDriver;dxFireDACServerModeRS24;dxPSTeeChartRS24;dxSkinOffice2007BlackRS24;FireDACMSSQLDriver;vcltouch;vcldb;Intraweb;svn;dxSkinXmas2008BlueRS24;dxSkinscxSchedulerPainterRS24;dxSkinsdxBarPainterRS24;dxSkinOffice2010BlackRS24;dxADOServerModeRS24;dxGDIPlusRS24;dxPSdxDBTVLnkRS24;frx24;vclib;dxSkinLilianRS24;FireDACDBXDriver;dxNavBarRS24;vclx;cxTreeListRS24;dxSkinDevExpressDarkStyleRS24;dxtrmdRS24;RESTBackendComponents;dxRibbonRS24;VCLRESTComponents;cxExportRS24;cxPivotGridChartRS24;cxTreeListdxBarPopupMenuRS24;dxSkinOffice2013LightGrayRS24;dxTabbedMDIRS24;vclie;dxSkinVisualStudio2013LightRS24;bindengine;CloudService;FireDACMySQLDriver;cxPivotGridOLAPRS24;dxSkinSharpRS24;dxSkinBlackRS24;DataSnapClient;dxPSLnksRS24;bindcompdbx;dxSkinCoffeeRS24;DBXSybaseASEDriver;IndyIPServer;dxSkinsdxRibbonPainterRS24;dxCoreRS24;IndySystem;dxSkinOffice2013DarkGrayRS24;dsnapcon;FireDACMSAccDriver;fmxFireDAC;FireDACInfxDriver;vclimg;emshosting;dxBarDBNavRS24;dxSkinDarkSideRS24;dxSkinOffice2013WhiteRS24;DBXOdbcDriver;FireDACTDataDriver;FMXTee;dxPScxExtCommonRS24;dxPSdxLCLnkRS24;soaprtl;DbxCommonDriver;dxPScxPivotGridLnkRS24;xmlrtl;soapmidas;DataSnapNativeClient;fmxobj;dxSkinMcSkinRS24;rtl;dxLayoutControlRS24;DbxClientDriver;cxGridRS24;DBXSybaseASADriver;dxSkinBlueRS24;dxSpellCheckerRS24;cxLibraryRS24;dxSkinStardustRS24;dxSkinCaramelRS24;appanalytics;dxSkinsCoreRS24;dxDBXServerModeRS24;dxMapControlRS24;IndyIPClient;dxSkinHighContrastRS24;bindcompvcl;dxSkinTheAsphaltWorldRS24;TeeUI;frxe24;cxPageControlRS24;cxEditorsRS24;dxPsPrVwAdvRS24;dxSkinSevenClassicRS24;VclSmp;cxSchedulerRibbonStyleEventEditorRS24;FireDACODBCDriver;dxSkinPumpkinRS24;DataSnapIndy10ServerTransport;dxSkinscxPCPainterRS24;dxPSPrVwRibbonRS24;DataSnapProviderClient;FireDACMongoDBDriver;dxSkinSevenRS24;dxdborRS24;dxmdsRS24;DataSnapServerMidas;RESTComponents;cxSchedulerGridRS24;dxHttpIndyRequestRS24;cxPivotGridRS24;DBXInterBaseDriver;emsclientfiredac;DataSnapFireDAC;svnui;dxdbtrRS24;dxSkinMetropolisRS24;dxSkinMoneyTwinsRS24;dxPScxPCProdRS24;DBXMSSQLDriver;DatasnapConnectorsFreePascal;dxWizardControlRS24;bindcompfmx;dxPSdxOCLnkRS24;dxBarExtDBItemsRS24;DBXOracleDriver;dxPSdxFCLnkRS24;inetdb;cxSchedulerTreeBrowserRS24;dxSkinOffice2016ColorfulRS24;FmxTeeUI;emsedge;FireDACIBDriver;fmx;fmxdae;dxSkinSpringTimeRS24;dxSkinValentineRS24;dxSkinLondonLiquidSkyRS24;dxSkinWhiteprintRS24;dbexpress;IndyCore;dxSkiniMaginaryRS24;dxTileControlRS24;dxSkinOffice2016DarkRS24;dsnap;DataSnapCommon;emsclient;cxDataRS24;FireDACCommon;dxSkinOffice2007PinkRS24;dxPSdxSpreadSheetLnkRS24;DataSnapConnectors;dxSkinDevExpressStyleRS24;soapserver;dxBarRS24;dxSkinMetropolisDarkRS24;FireDACOracleDriver;DBXMySQLDriver;dxPSRichEditControlLnkRS24;DBXFirebirdDriver;dxPScxCommonRS24;FireDACCommonODBC;FireDACCommonDriver;inet;IndyIPCommon;dxSkinVS2010RS24;vcl;dxSkinSharpPlusRS24;dxPSdxDBOCLnkRS24;FireDACDb2Driver;dxThemeRS24;dxSkinOffice2007GreenRS24;TeeDB;FireDAC;dxPScxGridLnkRS24;dxPScxVGridLnkRS24;FireDACSqliteDriver;FireDACPgDriver;ibmonitor;FireDACASADriver;dxSkinOffice2010BlueRS24;dxServerModeRS24;ibxpress;Tee;DataSnapServer;ibxbindings;cxSchedulerRS24;vclwinx;FireDACDSDriver;dxSkinsdxDLPainterRS24;dxPSCoreRS24;dxSkinOffice2007BlueRS24;frxTee24;CustomIPTransport;vcldsnap;dxSkinGlassOceansRS24;dxRibbonCustomizationFormRS24;dxPScxSchedulerLnkRS24;dxSkinSummer2008RS24;dxSkinDarkRoomRS24;bindcomp;dxSkinFoggyRS24;DBXInformixDriver;dxorgcRS24;dxSkinOffice2010SilverRS24;dxRichEditControlRS24;dxSkinsdxNavBarPainterRS24;dbxcds;adortl;dxSkinSilverRS24;dxSkinVisualStudio2013DarkRS24;dxComnRS24;cxVerticalGridRS24;dxFlowChartRS24;frxDB24;dsnapxml;dbrtl;inetdbxpress;IndyProtocols;dxGaugeControlRS24;dxSkinOffice2007SilverRS24;dxSkinLiquidSkyRS24;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
         <BT_BuildType>Debug</BT_BuildType>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
-        <DCC_UsePackage>DBXSqliteDriver;dxSkinBlueprintRS24;DBXDb2Driver;dxPSDBTeeChartRS24;dxPSdxGaugeControlLnkRS24;vclactnband;dxSpreadSheetRS24;vclFireDAC;dxDockingRS24;tethering;dxSkinVisualStudio2013BlueRS24;dxPScxTLLnkRS24;dxBarExtItemsRS24;FireDACADSDriver;dxFireDACServerModeRS24;dxPSTeeChartRS24;dxSkinOffice2007BlackRS24;FireDACMSSQLDriver;vcltouch;vcldb;Intraweb;dxSkinXmas2008BlueRS24;dxSkinscxSchedulerPainterRS24;dxSkinsdxBarPainterRS24;dxSkinOffice2010BlackRS24;dxADOServerModeRS24;dxGDIPlusRS24;dxPSdxDBTVLnkRS24;vclib;dxSkinLilianRS24;FireDACDBXDriver;dxNavBarRS24;vclx;cxTreeListRS24;dxSkinDevExpressDarkStyleRS24;dxtrmdRS24;RESTBackendComponents;dxRibbonRS24;VCLRESTComponents;cxExportRS24;cxPivotGridChartRS24;cxTreeListdxBarPopupMenuRS24;dxSkinOffice2013LightGrayRS24;dxTabbedMDIRS24;vclie;dxSkinVisualStudio2013LightRS24;bindengine;CloudService;FireDACMySQLDriver;cxPivotGridOLAPRS24;dxSkinSharpRS24;dxSkinBlackRS24;DataSnapClient;dxPSLnksRS24;bindcompdbx;dxSkinCoffeeRS24;DBXSybaseASEDriver;IndyIPServer;dxSkinsdxRibbonPainterRS24;dxCoreRS24;IndySystem;dxSkinOffice2013DarkGrayRS24;dsnapcon;FireDACMSAccDriver;fmxFireDAC;FireDACInfxDriver;vclimg;emshosting;dxBarDBNavRS24;dxSkinDarkSideRS24;dxSkinOffice2013WhiteRS24;DBXOdbcDriver;FireDACTDataDriver;FMXTee;dxPScxExtCommonRS24;dxPSdxLCLnkRS24;soaprtl;DbxCommonDriver;dxPScxPivotGridLnkRS24;xmlrtl;soapmidas;DataSnapNativeClient;fmxobj;dxSkinMcSkinRS24;rtl;dxLayoutControlRS24;DbxClientDriver;cxGridRS24;DBXSybaseASADriver;dxSkinBlueRS24;dxSpellCheckerRS24;cxLibraryRS24;dxSkinStardustRS24;dxSkinCaramelRS24;appanalytics;dxSkinsCoreRS24;dxDBXServerModeRS24;dxMapControlRS24;IndyIPClient;dxSkinHighContrastRS24;bindcompvcl;dxSkinTheAsphaltWorldRS24;TeeUI;cxPageControlRS24;cxEditorsRS24;dxPsPrVwAdvRS24;dxSkinSevenClassicRS24;VclSmp;cxSchedulerRibbonStyleEventEditorRS24;FireDACODBCDriver;dxSkinPumpkinRS24;DataSnapIndy10ServerTransport;dxSkinscxPCPainterRS24;dxPSPrVwRibbonRS24;DataSnapProviderClient;FireDACMongoDBDriver;dxSkinSevenRS24;dxdborRS24;dxmdsRS24;DataSnapServerMidas;RESTComponents;cxSchedulerGridRS24;dxHttpIndyRequestRS24;cxPivotGridRS24;DBXInterBaseDriver;emsclientfiredac;DataSnapFireDAC;dxdbtrRS24;dxSkinMetropolisRS24;dxSkinMoneyTwinsRS24;dxPScxPCProdRS24;DBXMSSQLDriver;DatasnapConnectorsFreePascal;dxWizardControlRS24;bindcompfmx;dxPSdxOCLnkRS24;dxBarExtDBItemsRS24;DBXOracleDriver;dxPSdxFCLnkRS24;inetdb;cxSchedulerTreeBrowserRS24;dxSkinOffice2016ColorfulRS24;FmxTeeUI;emsedge;FireDACIBDriver;fmx;fmxdae;dxSkinSpringTimeRS24;dxSkinValentineRS24;dxSkinLondonLiquidSkyRS24;dxSkinWhiteprintRS24;dbexpress;IndyCore;dxSkiniMaginaryRS24;dxTileControlRS24;dxSkinOffice2016DarkRS24;dsnap;DataSnapCommon;emsclient;cxDataRS24;FireDACCommon;dxSkinOffice2007PinkRS24;dxPSdxSpreadSheetLnkRS24;DataSnapConnectors;dxSkinDevExpressStyleRS24;soapserver;dxBarRS24;dxSkinMetropolisDarkRS24;FireDACOracleDriver;DBXMySQLDriver;dxPSRichEditControlLnkRS24;DBXFirebirdDriver;dxPScxCommonRS24;FireDACCommonODBC;FireDACCommonDriver;inet;IndyIPCommon;dxSkinVS2010RS24;vcl;dxSkinSharpPlusRS24;dxPSdxDBOCLnkRS24;FireDACDb2Driver;dxThemeRS24;dxSkinOffice2007GreenRS24;TeeDB;FireDAC;dxPScxGridLnkRS24;dxPScxVGridLnkRS24;FireDACSqliteDriver;FireDACPgDriver;ibmonitor;FireDACASADriver;dxSkinOffice2010BlueRS24;dxServerModeRS24;ibxpress;Tee;DataSnapServer;ibxbindings;cxSchedulerRS24;vclwinx;FireDACDSDriver;dxSkinsdxDLPainterRS24;dxPSCoreRS24;dxSkinOffice2007BlueRS24;CustomIPTransport;vcldsnap;dxSkinGlassOceansRS24;dxRibbonCustomizationFormRS24;dxPScxSchedulerLnkRS24;dxSkinSummer2008RS24;dxSkinDarkRoomRS24;bindcomp;dxSkinFoggyRS24;DBXInformixDriver;dxorgcRS24;dxSkinOffice2010SilverRS24;dxRichEditControlRS24;dxSkinsdxNavBarPainterRS24;dbxcds;adortl;dxSkinSilverRS24;dxSkinVisualStudio2013DarkRS24;dxComnRS24;cxVerticalGridRS24;dxFlowChartRS24;dsnapxml;dbrtl;inetdbxpress;IndyProtocols;dxGaugeControlRS24;dxSkinOffice2007SilverRS24;dxSkinLiquidSkyRS24;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
+        <DCC_UsePackage>DBXSqliteDriver;dxSkinBlueprintRS24;DBXDb2Driver;dxPSDBTeeChartRS24;dxPSdxGaugeControlLnkRS24;vclactnband;dxSpreadSheetRS24;vclFireDAC;dxDockingRS24;tethering;dxSkinVisualStudio2013BlueRS24;dxPScxTLLnkRS24;dxBarExtItemsRS24;FireDACADSDriver;dxFireDACServerModeRS24;dxPSTeeChartRS24;dxSkinOffice2007BlackRS24;FireDACMSSQLDriver;vcltouch;vcldb;Intraweb;dxSkinXmas2008BlueRS24;dxSkinscxSchedulerPainterRS24;dxSkinsdxBarPainterRS24;dxSkinOffice2010BlackRS24;dxADOServerModeRS24;dxGDIPlusRS24;dxPSdxDBTVLnkRS24;vclib;dxSkinLilianRS24;FireDACDBXDriver;dxNavBarRS24;vclx;cxTreeListRS24;dxSkinDevExpressDarkStyleRS24;dxtrmdRS24;RESTBackendComponents;dxRibbonRS24;VCLRESTComponents;cxExportRS24;cxPivotGridChartRS24;cxTreeListdxBarPopupMenuRS24;dxSkinOffice2013LightGrayRS24;dxTabbedMDIRS24;vclie;dxSkinVisualStudio2013LightRS24;bindengine;CloudService;FireDACMySQLDriver;cxPivotGridOLAPRS24;dxSkinSharpRS24;dxSkinBlackRS24;DataSnapClient;dxPSLnksRS24;bindcompdbx;dxSkinCoffeeRS24;DBXSybaseASEDriver;IndyIPServer;dxSkinsdxRibbonPainterRS24;dxCoreRS24;IndySystem;dxSkinOffice2013DarkGrayRS24;dsnapcon;FireDACMSAccDriver;fmxFireDAC;FireDACInfxDriver;vclimg;emshosting;dxBarDBNavRS24;dxSkinDarkSideRS24;dxSkinOffice2013WhiteRS24;DBXOdbcDriver;FireDACTDataDriver;FMXTee;dxPScxExtCommonRS24;dxPSdxLCLnkRS24;soaprtl;DbxCommonDriver;dxPScxPivotGridLnkRS24;xmlrtl;soapmidas;DataSnapNativeClient;fmxobj;dxSkinMcSkinRS24;rtl;dxLayoutControlRS24;DbxClientDriver;cxGridRS24;DBXSybaseASADriver;dxSkinBlueRS24;dxSpellCheckerRS24;cxLibraryRS24;dxSkinStardustRS24;dxSkinCaramelRS24;appanalytics;dxSkinsCoreRS24;dxDBXServerModeRS24;dxMapControlRS24;IndyIPClient;dxSkinHighContrastRS24;bindcompvcl;dxSkinTheAsphaltWorldRS24;TeeUI;cxPageControlRS24;cxEditorsRS24;dxPsPrVwAdvRS24;dxSkinSevenClassicRS24;VclSmp;cxSchedulerRibbonStyleEventEditorRS24;FireDACODBCDriver;dxSkinPumpkinRS24;DataSnapIndy10ServerTransport;dxSkinscxPCPainterRS24;dxPSPrVwRibbonRS24;DataSnapProviderClient;FireDACMongoDBDriver;dxSkinSevenRS24;dxdborRS24;dxmdsRS24;DataSnapServerMidas;RESTComponents;cxSchedulerGridRS24;dxHttpIndyRequestRS24;cxPivotGridRS24;DBXInterBaseDriver;emsclientfiredac;DataSnapFireDAC;dxdbtrRS24;dxSkinMetropolisRS24;dxSkinMoneyTwinsRS24;dxPScxPCProdRS24;DBXMSSQLDriver;DatasnapConnectorsFreePascal;dxWizardControlRS24;bindcompfmx;dxPSdxOCLnkRS24;dxBarExtDBItemsRS24;DBXOracleDriver;dxPSdxFCLnkRS24;inetdb;cxSchedulerTreeBrowserRS24;dxSkinOffice2016ColorfulRS24;FmxTeeUI;emsedge;FireDACIBDriver;fmx;fmxdae;dxSkinSpringTimeRS24;dxSkinValentineRS24;dxSkinLondonLiquidSkyRS24;dxSkinWhiteprintRS24;dbexpress;IndyCore;dxSkiniMaginaryRS24;dxTileControlRS24;dxSkinOffice2016DarkRS24;dsnap;DataSnapCommon;emsclient;cxDataRS24;FireDACCommon;dxSkinOffice2007PinkRS24;dxPSdxSpreadSheetLnkRS24;DataSnapConnectors;dxSkinDevExpressStyleRS24;soapserver;dxBarRS24;dxSkinMetropolisDarkRS24;FireDACOracleDriver;DBXMySQLDriver;dxPSRichEditControlLnkRS24;DBXFirebirdDriver;dxPScxCommonRS24;FireDACCommonODBC;FireDACCommonDriver;inet;IndyIPCommon;dxSkinVS2010RS24;vcl;dxSkinSharpPlusRS24;dxPSdxDBOCLnkRS24;FireDACDb2Driver;dxThemeRS24;dxSkinOffice2007GreenRS24;TeeDB;FireDAC;dxPScxGridLnkRS24;dxPScxVGridLnkRS24;FireDACSqliteDriver;FireDACPgDriver;ibmonitor;FireDACASADriver;dxSkinOffice2010BlueRS24;ChromeTabs_R;dxServerModeRS24;ibxpress;Tee;DataSnapServer;ibxbindings;cxSchedulerRS24;vclwinx;FireDACDSDriver;dxSkinsdxDLPainterRS24;dxPSCoreRS24;dxSkinOffice2007BlueRS24;CustomIPTransport;vcldsnap;dxSkinGlassOceansRS24;dxRibbonCustomizationFormRS24;dxPScxSchedulerLnkRS24;dxSkinSummer2008RS24;dxSkinDarkRoomRS24;bindcomp;dxSkinFoggyRS24;DBXInformixDriver;dxorgcRS24;dxSkinOffice2010SilverRS24;dxRichEditControlRS24;dxSkinsdxNavBarPainterRS24;dbxcds;adortl;dxSkinSilverRS24;dxSkinVisualStudio2013DarkRS24;dxComnRS24;cxVerticalGridRS24;dxFlowChartRS24;dsnapxml;dbrtl;inetdbxpress;IndyProtocols;dxGaugeControlRS24;dxSkinOffice2007SilverRS24;dxSkinLiquidSkyRS24;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
         <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
@@ -80,12 +79,6 @@
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
-        <Icon_MainIcon>Monitor_Icon.ico</Icon_MainIcon>
-        <DCC_ExeOutput>F:\Sistemas\Monitor\bin</DCC_ExeOutput>
-        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <VerInfo_Locale>1033</VerInfo_Locale>
-        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
-        <AppEnableHighDPI>true</AppEnableHighDPI>
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
@@ -94,76 +87,21 @@
         <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
         <DCC_DebugInformation>0</DCC_DebugInformation>
     </PropertyGroup>
-    <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
-        <AppEnableHighDPI>true</AppEnableHighDPI>
-    </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="FormMonitor.pas">
-            <Form>MonitorMain</Form>
-        </DCCReference>
-        <DCCReference Include="uDMEnviaPedidos.pas">
-            <Form>DMEnviaPedidos</Form>
-            <DesignClass>TDataModule</DesignClass>
-        </DCCReference>
-        <DCCReference Include="..\utils\Utils.pas"/>
-        <DCCReference Include="..\utils\udmSqlUtils.pas">
-            <Form>DmSqlUtils</Form>
-            <DesignClass>TDataModule</DesignClass>
-        </DCCReference>
-        <DCCReference Include="..\utils\uSendMail.pas"/>
-        <DCCReference Include="uDataSetToHtml.pas"/>
-        <DCCReference Include="..\utils\uDmGeradorConsultas.pas">
-            <Form>DmGeradorConsultas</Form>
-            <DesignClass>TDataModule</DesignClass>
-        </DCCReference>
-        <DCCReference Include="..\utils\uDmConnection.pas">
+        <DCCReference Include="..\..\..\utils\uDmConnection.pas">
             <Form>DmConnection</Form>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
-        <DCCReference Include="uConFirebird.pas">
-            <Form>ConFirebird</Form>
-            <DesignClass>TDataModule</DesignClass>
-        </DCCReference>
-        <DCCReference Include="uConSqlServer.pas">
-            <Form>ConSqlServer</Form>
-            <DesignClass>TDataModule</DesignClass>
-        </DCCReference>
-        <DCCReference Include="uDmEnviaRelatorios.pas">
-            <Form>Con</Form>
-            <DesignClass>TDataModule</DesignClass>
-        </DCCReference>
-        <DCCReference Include="..\utils\uConsultaPersonalizada.pas">
+        <DCCReference Include="..\..\..\utils\uConSqlServer.pas"/>
+        <DCCReference Include="Ladder.TestActivity.pas"/>
+        <DCCReference Include="..\Ladder.Activity.Classes.pas"/>
+        <DCCReference Include="..\..\..\utils\uConsultaPersonalizada.pas">
             <Form>FrmConsultaPersonalizada</Form>
-        </DCCReference>
-        <DCCReference Include="uFormCadastroAviso.pas">
-            <Form>FormCadastroAviso</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="uFormAvisoConsulta.pas">
-            <Form>FormAvisoConsulta</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
-        <DCCReference Include="uFormPesquisaAviso.pas">
-            <Form>FormPesquisaAviso</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
-        <DCCReference Include="uFormSelecionaConsulta.pas">
-            <Form>FormSelecionaConsulta</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
-        <DCCReference Include="..\utils\uAppConfig.pas"/>
-        <DCCReference Include="..\utils\uDmGravaLista.pas">
-            <Form>DmGravaLista</Form>
-            <FormType>dfm</FormType>
-            <DesignClass>TDataModule</DesignClass>
-        </DCCReference>
-        <DCCReference Include="UntClasses.pas"/>
-        <DCCReference Include="..\utils\uConClasses.pas"/>
-        <DCCReference Include="uTesteAtividades.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -182,17 +120,33 @@
         <BorlandProject>
             <Delphi.Personality>
                 <Source>
-                    <Source Name="MainSource">Monitor.dpr</Source>
+                    <Source Name="MainSource">TestAtividades.dpr</Source>
                 </Source>
-                <Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k240.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp240.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
-                </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="3">
-                <DeployFile LocalName="bin\Monitor.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="$(BDS)\Redist\osx32\libcgunwind.1.0.dylib" Class="DependencyModule">
+                    <Platform Name="OSX32">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libcgunwind.1.0.dylib" Class="DependencyModule">
+                    <Platform Name="iOSSimulator">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libPCRE.dylib" Class="DependencyModule">
+                    <Platform Name="iOSSimulator">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\Redist\osx32\libcgsqlite3.dylib" Class="DependencyModule">
+                    <Platform Name="OSX32">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Win32\Debug\TestAtividades.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
-                        <RemoteName>Monitor.exe</RemoteName>
+                        <RemoteName>TestAtividades.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -613,9 +567,16 @@
                 <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
             </Deployment>
             <Platforms>
+                <Platform value="OSX32">False</Platform>
                 <Platform value="Win32">True</Platform>
                 <Platform value="Win64">False</Platform>
             </Platforms>
+            <UnitTesting>
+                <TestFramework>DUnit / Delphi Win32</TestFramework>
+                <TestRunner>GUI</TestRunner>
+                <TestProjectName/>
+                <SourceProjectName/>
+            </UnitTesting>
         </BorlandProject>
         <ProjectFileVersion>12</ProjectFileVersion>
     </ProjectExtensions>

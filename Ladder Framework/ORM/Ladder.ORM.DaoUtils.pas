@@ -1,9 +1,9 @@
-unit UntDaoUtils;
+unit Ladder.ORM.DaoUtils;
 
 interface
 
 uses
-  AdoDB, UntFuncoes, System.Contnrs, generics.collections, System.Classes, Data.DB, uDmConnection,
+  AdoDB, Ladder.ORM.Functions, System.Contnrs, generics.collections, System.Classes, Data.DB, uDmConnection,
   FireDAC.Comp.Client, System.SysUtils;
 
 type

@@ -1,6 +1,7 @@
 #Ignora todos os diretórios, menos os explicitados
 /*
 /*/
+temp/
 !/VerificadorSid/
 !/DigitalPT/
 !/Importador/
@@ -14,6 +15,7 @@
 !/Firma/
 !/GerenciadorFirma/
 !/utils/
+!/Ladder Framework/
 !/eFramework/
 !/Monitor/
 

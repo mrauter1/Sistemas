@@ -1,10 +1,10 @@
-unit uMyServiceLocator;
+unit Ladder.ServiceLocator;
 
 interface
 
 uses
   Spring.Services, System.SysUtils, System.Classes, uDmConnection, uConSqlServer, Windows,
-  UntDaoUtils, UntFuncoes, Forms;
+  Ladder.ORM.DaoUtils, Ladder.ORM.Functions, Forms;
 
 type
   TFrwServiceLocator = class;

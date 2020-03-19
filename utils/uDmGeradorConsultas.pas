@@ -612,7 +612,6 @@ end;
 function TDmGeradorConsultas.GetParam(const pNomeParam: String): TParametroCon;
 var
   I: Integer;
-  fParam: TParametroCon;
 begin
   Result:= nil;
   Params.TryGetValue(pNomeParam, Result);

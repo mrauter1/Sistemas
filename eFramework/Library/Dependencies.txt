@@ -1,4 +1,0 @@
-#spring4d
-git clone https://bitbucket.org/sglienke/spring4d.git
-#mORMot framework
-git clone https://github.com/synopse/mORMot.git

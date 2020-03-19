@@ -34,7 +34,7 @@ uses
   FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf,
   FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet,
   FireDAC.Comp.Client, uConFirebird, System.Generics.Collections, Vcl.Imaging.pngImage,
-  uConClasses, uDmConnection, uMyServiceLocator;
+  uConClasses, uDmConnection, Ladder.ServiceLocator;
 
 type
   TPosicaoPanelDinamico = (cMinimizado, cMeio, cMaximizado);

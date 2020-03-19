@@ -1,10 +1,10 @@
-unit UntClasses;
+unit Ladder.Activity.Classes;
 
 interface
 
 uses
   System.SysUtils, uConClasses, System.Classes, System.Generics.Collections, Data.DB, uConsultaPersonalizada,
-  uMyServiceLocator;
+  Ladder.ServiceLocator;
 
 type
   TTipoProcesso = (tpConsultaPersonalizada = 1);
@@ -21,7 +21,7 @@ type
     FParametros: TParametros;
   public
     constructor Create;
-    destructor Destroy;
+    destructor Destroy; override;
   published
     property ID: Integer read FID write FID;
     property Nome: String read FNome write FNome;
@@ -44,12 +44,12 @@ type
 
   TExecutorConsultaPersonalizada = class(TExecutorBase)
   private
-    constructor Create;
-    destructor Destroy;
     function ConfiguraConsulta: TFrmConsultaPersonalizada;
     procedure CheckInputs;
     procedure ProcessaOutput(pConsulta: TFrmConsultaPersonalizada; pOutput: TOutputBase);
   public
+    constructor Create;
+    destructor Destroy; override;
     function Executar: TOutputList; override;
   end;
 
@@ -64,7 +64,7 @@ type
     function GetExecutor: TExecutorBase;
   public
     constructor Create;
-    destructor Destroy;
+    destructor Destroy; override;
     function Executar: TOutputList;
   published
     property ID: Integer read FID write FID;
@@ -85,7 +85,7 @@ type
     procedure ExecutaProcesso(pProcesso: TProcessoBase);
   public
     constructor Create;
-    destructor Destroy;
+    destructor Destroy; override;
     function Executar: TOutputBase;
   published
     property ID: Integer read FID write FID;
@@ -102,6 +102,7 @@ implementation
 
 constructor TProcessoBase.Create;
 begin
+  inherited Create;
   FInputs:= TInputList.Create;
   FOutputs:= TOutputList.Create;
 end;
@@ -110,6 +111,7 @@ destructor TProcessoBase.Destroy;
 begin
   FInputs.Free;
   FOutputs.Free;
+  inherited Destroy;
 end;
 
 function TProcessoBase.Executar: TOutputList;
@@ -139,6 +141,7 @@ end;
 
 constructor TAtividade.Create;
 begin
+  inherited Create;
   FInputs:= TInputList.Create;
   FOutputs:= TOutputList.Create;
   FProcessos:= TObjectList<TProcessoBase>.Create;
@@ -149,6 +152,7 @@ begin
   FInputs.Free;
   FOutputs.Free;
   FProcessos.Free;
+  inherited Destroy;
 end;
 
 procedure TAtividade.ExecutaProcesso(pProcesso: TProcessoBase);
@@ -261,7 +265,7 @@ end;
 
 destructor TExecutorConsultaPersonalizada.Destroy;
 begin
-
+  inherited Destroy;
 end;
 
 function TExecutorConsultaPersonalizada.Executar: TOutputList;

@@ -1,0 +1,40 @@
+09122019-12:52:46 -> Iniciando monitor...
+09122019-12:52:46 -> Criando TConSqlServer
+09122019-12:52:47 -> Criando TConFirebird
+09122019-12:52:47 -> Criando TMonitorMain
+09122019-12:52:47 -> Criando TDmSqlUtils
+09122019-12:52:47 -> Criando TDmGeradorConsultas
+09122019-12:52:47 -> Criando TCon
+09122019-12:53:04 -> Inicializando message loop
+09122019-12:56:35 -> Iniciando monitor...
+09122019-12:56:35 -> Criando TConSqlServer
+09122019-12:56:35 -> Criando TConFirebird
+09122019-12:56:35 -> Criando TMonitorMain
+09122019-12:56:36 -> Criando TDmSqlUtils
+09122019-12:56:36 -> Criando TDmGeradorConsultas
+09122019-12:56:36 -> Criando TCon
+09122019-12:56:53 -> Inicializando message loop
+09122019-12:58:16 -> Iniciando monitor...
+09122019-12:58:16 -> Criando TConSqlServer
+09122019-12:58:17 -> Criando TConFirebird
+09122019-12:58:17 -> Criando TMonitorMain
+09122019-12:58:17 -> Criando TDmSqlUtils
+09122019-12:58:17 -> Criando TDmGeradorConsultas
+09122019-12:58:17 -> Criando TCon
+09122019-12:58:20 -> Inicializando message loop
+09122019-12:59:27 -> Iniciando monitor...
+09122019-12:59:27 -> Criando TConSqlServer
+09122019-12:59:27 -> Criando TConFirebird
+09122019-12:59:27 -> Criando TMonitorMain
+09122019-12:59:28 -> Criando TDmSqlUtils
+09122019-12:59:28 -> Criando TDmGeradorConsultas
+09122019-12:59:28 -> Criando TCon
+09122019-12:59:30 -> Inicializando message loop
+09122019-13:28:42 -> Iniciando monitor...
+09122019-13:28:43 -> Criando TConSqlServer
+09122019-13:28:43 -> Criando TConFirebird
+09122019-13:28:43 -> Criando TMonitorMain
+09122019-13:28:43 -> Criando TDmSqlUtils
+09122019-13:28:43 -> Criando TDmGeradorConsultas
+09122019-13:28:43 -> Criando TCon
+09122019-13:29:01 -> Inicializando message loop

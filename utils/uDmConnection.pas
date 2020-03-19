@@ -34,7 +34,8 @@ type
     procedure SetModoDesconectado(const Value: BOolean);
     { Private declarations }
   public
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(AOwner: TComponent); overload; override;
+    constructor Create(AOwner: TComponent; pConParams: TConnectionParams); overload;
 
     procedure LerConnectionParams(pConParams: TConnectionParams);
 
@@ -237,6 +238,13 @@ begin
   ModoDesconectado:= False;
 
   inherited Create(AOwner);
+end;
+
+constructor TDmConnection.Create(AOwner: TComponent;
+  pConParams: TConnectionParams);
+begin
+  Create(AOwner);
+  LerConnectionParams(pConParams);
 end;
 
 function TDmConnection.CriaFDQuery(sql: String = ''; AParent: TComponent = nil): TFDQuery;

@@ -14,9 +14,7 @@ type
     Funcoes: TFuncoes;
     Connection: TDmConnection;
 
-    constructor Create(pDmConnection: TDmConnection; pFuncoes: TFuncoes);
-
-    class procedure CheckAssigned; static;
+    constructor Create(pFuncoes: TFuncoes);
 
     function RetornaDataset(const pSql: String; AOwner: TComponent = nil): TDataSet;
 
@@ -42,9 +40,6 @@ type
     function RetornaListaObjetos<T: class>(var ObjectList: TObjectList<T>; ItemClass: TClass; const pSql: String): Boolean; overload;
   end;
 
-var
-  DaoUtils: TDaoUtils;
-
 implementation
 
 { TDaoUtils }
@@ -54,20 +49,12 @@ begin
   Result:= RetornaInteiro(' SELECT SCOPE_IDENTITY() ');
 end;
 
-class procedure TDaoUtils.CheckAssigned;
-begin
-  if not assigned(DaoUtils) then
-    raise Exception.Create('DaoUtils is not assigned!');
-end;
-
-constructor TDaoUtils.Create(pDmConnection: TDmConnection; pFuncoes: TFuncoes);
+constructor TDaoUtils.Create(pFuncoes: TFuncoes);
 begin
   inherited Create;
 
-  TFuncoes.CheckAssigned;
-
-  Connection:= pDmConnection;
   Funcoes:= pFuncoes;
+  Connection:= Funcoes.DmConnection;
 end;
 
 function TDaoUtils.CriaQuery(AOwner: TComponent = nil): TFDQuery;
@@ -141,9 +128,6 @@ function TDaoUtils.RetornaArray(var pArray; TypeInfo: pointer;
 begin
   Result:= Funcoes.RetornaArray(pArray, TypeInfo, pSql);
 end;
-
-initialization
-  DaoUtils:= nil;
 
 end.
 

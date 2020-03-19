@@ -21,8 +21,6 @@ type
 
     constructor Create(pDmConnection: TDmConnection);
 
-    class procedure CheckAssigned;
-
     class var RttiContext: TRttiContext;
 //   class function CriaStoredProc(pConnection: TADOConnection): TADOStoredProc;
 //   function RetornaValor(const pSQL: String): Variant;
@@ -59,9 +57,6 @@ type
 
     procedure ObjectToDataSet(pObject: TObject; pDataSet: TDataSet);
   end;
-
-var
-  Funcoes: TFuncoes;
 
 type
   TAsync = class
@@ -614,12 +609,6 @@ begin
   end;
 end;              }
 
-class procedure TFuncoes.CheckAssigned;
-begin
-  if not Assigned(Funcoes) then
-    raise Exception.Create('Funcoes is not assigned!');
-end;
-
 constructor TFuncoes.Create(pDmConnection: TDmConnection);
 begin
   inherited Create;
@@ -746,7 +735,7 @@ end;
 
 function TFuncoes.RetornaDocVariant(const pSql: String): Variant;
 begin
-    Result:= _JSon(RetornaJSon(pSql));
+  Result:= _JSon(RetornaJSon(pSql));
 end;
 
 procedure TFuncoes.Proc_CopiarFields(pOrigem, pDestino: TClientDataSet);
@@ -1408,7 +1397,7 @@ begin
 end;
 
 initialization
-  Funcoes:= nil;
+//  Funcoes:= nil;
   TFuncoes.RttiContext:= TRttiContext.Create;
 
 

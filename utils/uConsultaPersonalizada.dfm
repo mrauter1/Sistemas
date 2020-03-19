@@ -28,7 +28,7 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
     Top = 0
     Width = 824
     Height = 566
-    ActivePage = TabSheetResultado
+    ActivePage = TabParametros
     Align = alClient
     Style = tsFlatButtons
     TabOrder = 0
@@ -280,7 +280,7 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
         Top = 28
         Width = 816
         Height = 478
-        ActivePage = TsGrafico
+        ActivePage = TsTabela
         Align = alClient
         Style = tsFlatButtons
         TabOrder = 0

@@ -3,7 +3,8 @@ unit GerenciadorUtils;
 interface
 
 uses System.SysUtils, System.Variants, System.Classes, Data.DB, Datasnap.DBClient, Forms,
-  Vcl.DbCtrls, uConSqlServer, FireDac.Comp.Client, cxDBData, cxGridDBTableView, cxDBLookupComboBox;
+  Vcl.DbCtrls, uConSqlServer, FireDac.Comp.Client, cxDBData, cxGridDBTableView, cxDBLookupComboBox,
+  uMyServiceLocator;
 
 function SortClientDataSet(ClientDataSet: TClientDataSet;
   const FieldName: String): Boolean;
@@ -29,7 +30,7 @@ var
   FQry: TFDQuery;
   FDS: TDataSource;
 begin
-  FQry:= ConSqlServer.RetornaFDQuery(DBLookup, Sql, False);
+  FQry:= TFrwServiceLocator.getConnection.RetornaFDQuery(DBLookup, Sql, False);
   try
     FQry.Open;
   except
@@ -51,7 +52,7 @@ var
   FDS: TDataSource;
   LookupCol: TcxLookupComboBoxProperties;
 begin
-  FQry:= ConSqlServer.RetornaFDQuery(pColumn.GridView, Sql, False);
+  FQry:= TFrwServiceLocator.getConnection.RetornaFDQuery(pColumn.GridView, Sql, False);
   try
     FQry.Open;
   except

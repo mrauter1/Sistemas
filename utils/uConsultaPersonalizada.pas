@@ -33,7 +33,8 @@ uses
   cxDropDownEdit, cxShellComboBox, FireDAC.Stan.Intf, FireDAC.Stan.Option,
   FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf,
   FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet,
-  FireDAC.Comp.Client, uConFirebird, System.Generics.Collections, Vcl.Imaging.pngImage;
+  FireDAC.Comp.Client, uConFirebird, System.Generics.Collections, Vcl.Imaging.pngImage,
+  uConClasses, uDmConnection, uMyServiceLocator;
 
 type
   TPosicaoPanelDinamico = (cMinimizado, cMeio, cMaximizado);
@@ -190,19 +191,23 @@ type
     function Valida_Consulta: Boolean;
     function Apenas_Parametros: Boolean;
     procedure ConfiguraTipoFormulario;
-    function ExportaTabelaParaExcelInterno(pNomeArquivo: String;
-      pMostraDialog: Boolean = False; pUsarFormatoNativo: Boolean = False): Boolean;
-    function ExecutaConsulta: Boolean;
     function CarregaVisualizacaoAtual: Boolean;
-    function CarregaVisualizacaoByName(pNome: String): Boolean;
-    function ExportaTabelaDinamica(pNomeArquivo: String): Boolean;
-    function ExportaGrafico(pNomeArquivo: String): Boolean;
     procedure AtualizaTitulo;
-  public
-    { Public declarations }
+    procedure LoadParamsFromDic(Params: TDictionary<string, variant>);
     procedure PopulaComboBoxQry(pComboBox: TComboBox; pQry: TDataSet; ValorPadrao: variant);
     procedure PopulaCheckListBoxQry(pCheckListBox: TCheckListBox; pQry: TDataSet; ValorPadrao: variant);
+    class function Conn: TDmConnection; static;
+  public
+    { Public declarations }
+    function ExecutaConsulta: Boolean;
+    function CarregaVisualizacaoByName(pNome: String): Boolean;
+
+    function ExportaTabelaParaExcelInterno(pNomeArquivo: String;
+      pMostraDialog: Boolean = False; pUsarFormatoNativo: Boolean = False): Boolean;
+    function ExportaTabelaDinamica(pNomeArquivo: String): Boolean;
+    function ExportaGrafico(pNomeArquivo: String): Boolean;
     procedure AbrirConsultaPersonalizada(Consulta :string);
+
     class function AbreConsultaPersonalizadaByName(NomeConsulta: String; pWindowState: TWindowState = wsNormal): TFrmConsultaPersonalizada; static;
     class function AbreConsultaPersonalizada(pIDConsulta: Integer): TFrmConsultaPersonalizada;
     class function ExportaTabelaParaExcel(NomeConsulta: String; pNomeArquivo: String;
@@ -287,6 +292,11 @@ begin
   Result:= FFrmConsulta;
 end;
 
+class function TFrmConsultaPersonalizada.Conn: TDmConnection;
+begin
+  Result:= TFrwServiceLocator.getConnection;
+end;
+
 class function TFrmConsultaPersonalizada.AbreConsultaPersonalizadaByName(NomeConsulta: String; pWindowState: TWindowState = wsNormal): TFrmConsultaPersonalizada;
 var
   FCodRelatorio: Integer;
@@ -295,7 +305,7 @@ const
 begin
   Result:= nil;
 
-  FCodRelatorio:= ConSqlServer.RetornaValor(Format(cSql, [QuotedStr(NomeConsulta)]));
+  FCodRelatorio:= Conn.RetornaValor(Format(cSql, [QuotedStr(NomeConsulta)]));
 
   if FCodRelatorio = 0 then
   begin
@@ -365,6 +375,15 @@ begin
   PanelTabelaDinamica.Height:= cxSplitterResultado.MinSize;
 end;
 
+procedure TFrmConsultaPersonalizada.LoadParamsFromDic(Params: TDictionary<string, variant>);
+var
+  FKey: String;
+begin
+  if Assigned(Params) then
+    for FKey in Params.Keys do
+      FDm.SetParam(FKey, Params[FKey]);
+end;
+
 class function TFrmConsultaPersonalizada.ExportaTabelaParaExcel(NomeConsulta,
   pNomeArquivo: String; Params: TDictionary<string, variant>; pTipoVisualizacao: TTipoVisualizacao;
   pVisualizacao: String): String;
@@ -376,10 +395,7 @@ begin
 
   FFrmConsulta:= TFrmConsultaPersonalizada.AbreConsultaPersonalizadaByName(NomeConsulta);
   try
-
-    if Assigned(Params) then
-      for FKey in Params.Keys do
-        FFrmConsulta.FDm.SetParam(FKey, Params[FKey]);
+    FFrmConsulta.LoadParamsFromDic(Params);
 
     FFrmConsulta.ExecutaConsulta;
 
@@ -483,7 +499,7 @@ begin
       QryConsulta.Active:=False;
 
       if FDm.GetFonteDados = fdSqlServer then
-        QryConsulta.Connection:= ConSqlServer.FDConnection
+        QryConsulta.Connection:= Conn.FDConnection
       else
         QryConsulta.Connection:= ConFirebird.FDConnection;
 
@@ -725,7 +741,7 @@ var
     pComp: TComponent;
     FQry: TDataSet;
   begin
-    FQry:= ConSqlServer.CriaFDQuery(FDm.QryParametrosSql.Value, ScrollBox);
+    FQry:= Conn.CriaFDQuery(FDm.QryParametrosSql.Value, ScrollBox);
     try
 //      FDm.ProcSubstVarSistema(FSql);
       FQry.Active:=True;
@@ -830,36 +846,37 @@ function TFrmConsultaPersonalizada.PopulaParametrosDM: Boolean;
 var
   pComp: TComponent;
   I, Ret: Integer;
+  FParametro: TParametroCon;
 begin
 
   Result:= False;
 
-  for I:= 0 to FDm.ParamCount - 1 do
+  for FParametro in FDm.Params.Values do
   begin
 //      FDm.QryPara.Locate('CopNome', FDm.GetParam(I).Nome, [loCaseInsensitive]);
 
-    pComp:= ScrollBox.FindComponent('V'+IntToStr(FDm.GetParam(I).Codigo));
+    pComp:= ScrollBox.FindComponent('V'+IntToStr(FParametro.Codigo));
 
     if not Assigned(pComp) then continue;
 
     if (pComp is TComboBox) then
     begin
-      FDm.GetParam(I).Valor:= TValorChave.ObterValor(TComboBox(pComp));
+      FParametro.Valor:= TValorChave.ObterValor(TComboBox(pComp));
     end
    else
     if (pComp is TCheckListBox) then
     begin
-      FDm.GetParam(I).Valor:= StringToVarArray(',', TValorChave.ObterValoresSelecionados(TCheckListBox(pComp)));
+      FParametro.Valor:= StringToVarArray(',', TValorChave.ObterValoresSelecionados(TCheckListBox(pComp)));
     end
    else
     if (pComp is TMaskEdit) then
     begin
-      FDm.GetParam(I).Valor:= TMaskEdit(pComp).EditText;
+      FParametro.Valor:= TMaskEdit(pComp).EditText;
     end
    else
     if (pComp is TDateTimePicker) then
     begin
-      FDm.GetParam(I).Valor:= TDateTimePicker(pComp).DateTime;
+      FParametro.Valor:= TDateTimePicker(pComp).DateTime;
     end;
   end;
 
@@ -1270,7 +1287,7 @@ begin
 
   FUltimaConfig:= 0;
 
-  FDm:= TDmGeradorConsultas.Create(Self, ConSqlServer);
+  FDm:= TDmGeradorConsultas.Create(Self, TFrwServiceLocator.getConnection);
 
   PageControlAtiva(0);
 

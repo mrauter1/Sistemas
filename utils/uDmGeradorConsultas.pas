@@ -69,7 +69,8 @@ type
     ExcelList        : TStringList;
     ResultadoList    : TStringList;       *)
 
-    Params: TObjectList<TParametroCon>;
+//    Params: TObjectList<TParametroCon>;
+    Params: TParametros;
     SqlGerado: String;
 
     constructor Create(AOwner: TComponent; pDmConnection: TDmConnection); virtual;
@@ -85,7 +86,7 @@ type
 //    procedure ProcSubstVarSistema(var pSql: String);
     function SetParam(const pNomeParam: String; pValor: Variant): Boolean;
     function GetParamValue(const pNomeParam: String): Variant;
-    function GetParam(Index: Integer): TParametroCon; overload;
+//    function GetParam(Index: Integer): TParametroCon; overload;
     function GetParam(const pNomeParam: String): TParametroCon; overload;
     procedure SetEstilosCamposQry(Qry: TDataSet);
 
@@ -111,8 +112,8 @@ function FieldIsNumerico(pField: TField): Boolean;
 function SetFieldDisplayFormat(pField: TField; pDisplayFormat: String): Boolean;
 function GetFieldDisplayFormat(pField: TField): String;
 
-var
-  DmGeradorConsultas: TDmGeradorConsultas;
+//var
+//  DmGeradorConsultas: TDmGeradorConsultas;
 
 implementation
 
@@ -165,9 +166,13 @@ begin
 end;
 
 procedure TDmGeradorConsultas.DeletaParams;
+var
+  FKey: String;
 begin
-  while Params.Count > 0 do
-    Params.Delete(0);
+  for FKey in Params.Keys do
+    Params.Remove(FKey);
+{  while Params.Count > 0 do
+    Params.Delete(0);}
 end;
 
 constructor TDmGeradorConsultas.Create(AOwner: TComponent;
@@ -384,9 +389,9 @@ var
   I: Integer;
   FParam: TParametroCon;
 begin
-  for I := 0 to Params.Count-1 do
+  for FParam in Params.Values do
   begin
-    FParam:= TParametroCon(Params[I]);
+//    FParam:= TParametroCon(Params[I]);
 
     if Trim(FParam.Nome) = '' then
       Continue;
@@ -422,9 +427,9 @@ var
   I: Integer;
   FParam: TParametroCon;
 begin
-  for I := 0 to Params.Count-1 do
+  for FParam in Params.Values do
   begin
-    FParam:= TParametroCon(Params[I]);
+//    FParam:= TParametroCon(Params[I]);
 
     if Trim(FParam.Nome) = '' then
       Continue;
@@ -585,9 +590,13 @@ var
   I: Integer;
   fParam: TParametroCon;
 begin
-  for I:= 0 to Params.Count - 1 do
+  Result:= Params.TryGetValue(pNomeParam, fParam);
+  fParam.Valor:= pValor;
+                 {
+//  for I:= 0 to Params.Count - 1 do
+  for fParam in Params.Values do
   begin
-    fParam:= TParametroCon(Params[I]);
+//    fParam:= TParametroCon(Params[I]);
     if UpperCase(fParam.Nome) = UpperCase(pNomeParam) then
     begin
       fParam.Valor:= pValor;
@@ -596,7 +605,7 @@ begin
     end;
   end;
 
-  Result:= False;
+  Result:= False;}
   //Erro Parametro não encontrado!
 end;
 
@@ -606,15 +615,17 @@ var
   fParam: TParametroCon;
 begin
   Result:= nil;
-  for I:= 0 to Params.Count - 1 do
+  Params.TryGetValue(pNomeParam, Result);
+{//  for I:= 0 to Params.Count - 1 do
+  for fParam in Params.Values do
   begin
-    fParam:= TParametroCon(Params[I]);
+//    fParam:= TParametroCon(Params[I]);
     if UpperCase(fParam.Nome) = UpperCase(pNomeParam) then
     begin
       Result:= fParam;
       Exit;
     end;
-  end;
+  end;}
 end;
 
 function TDmGeradorConsultas.GetParamValue(const pNomeParam: String): Variant;
@@ -632,7 +643,7 @@ end;
 
 procedure TDmGeradorConsultas.DataModuleCreate(Sender: TObject);
 begin
-  Params:= TObjectList<TParametroCon>.Create;
+  Params:= TParametros.Create;
 end;
 
 function TDmGeradorConsultas.GetSqlOriginal: String;
@@ -643,10 +654,10 @@ begin
       Result:= QryConsultasSql.AsString;
 end;
 
-function TDmGeradorConsultas.GetParam(Index: Integer): TParametroCon;
+{function TDmGeradorConsultas.GetParam(Index: Integer): TParametroCon;
 begin
   Result:= TParametroCon(Params[Index]);
-end;
+end;                                }
 
 function TDmGeradorConsultas.ParamCount: Integer;
 begin

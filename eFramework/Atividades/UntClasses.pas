@@ -14,8 +14,9 @@ type
 
   TOutputBase = class(TPersistent)
   private
-    FRetorno: String;
+    FNome: String;
     FID: Integer;
+    FRetorno: String;
     FTipo: TTipoOutput;
     FParametros: TParametros;
   public
@@ -23,6 +24,7 @@ type
     destructor Destroy;
   published
     property ID: Integer read FID write FID;
+    property Nome: String read FNome write FNome;
     property Tipo: TTipoOutput read FTipo write FTipo;
     property Retorno: String read FRetorno write FRetorno; // Nome da tabela temporária ou nome do arquivo
     property Parametros: TParametros read FParametros write FParametros;
@@ -56,6 +58,7 @@ type
     FInputs: TInputList;
     FOutputs: TOutputList;
     FID: Integer;
+    FNome: String;
     FTipo: TTipoProcesso;
     FExecutor: TExecutorBase;
     function GetExecutor: TExecutorBase;
@@ -65,6 +68,7 @@ type
     function Executar: TOutputList;
   published
     property ID: Integer read FID write FID;
+    property Nome: String read FNome write FNome;
     property Tipo: TTipoProcesso read FTipo write FTipo;
     property Inputs: TInputList read FInputs write FInputs;
     property Outputs: TOutputList read FOutputs write FOutputs;
@@ -77,6 +81,7 @@ type
     FProcessos: TObjectList<TProcessoBase>;
     FDescricao: String;
     FID: Integer;
+    FNome: String;
     procedure ExecutaProcesso(pProcesso: TProcessoBase);
   public
     constructor Create;
@@ -84,6 +89,7 @@ type
     function Executar: TOutputBase;
   published
     property ID: Integer read FID write FID;
+    property Nome: String read FNome write FNome;
     property Descricao: String read FDescricao write FDescricao;
     property Inputs: TInputList read FInputs write FInputs;
     property Outputs: TOutputList read FOutputs write FOutputs;
@@ -200,7 +206,7 @@ end;
 
 procedure TExecutorConsultaPersonalizada.CheckInputs;
 begin
-
+  inherited Destroy;
 end;
 
 procedure TExecutorConsultaPersonalizada.ProcessaOutput(pConsulta: TFrmConsultaPersonalizada; pOutput: TOutputBase);
@@ -227,7 +233,6 @@ begin
   end;
 
   pOutput.Retorno:= NomeArquivo;
-
 end;
 
 function TExecutorConsultaPersonalizada.ConfiguraConsulta: TFrmConsultaPersonalizada;

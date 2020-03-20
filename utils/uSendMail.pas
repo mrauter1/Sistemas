@@ -4,7 +4,7 @@ interface
 
 uses
   SysUtils, Classes, IdSMTP, IdMessage, IdEmailAddress, IdExplicitTLSClientServerBase, IdSSLOpenSSL,
-  IdMessageBuilder;
+  IdMessageBuilder, IniFiles, Forms;
 
 type
   TMailSender = class(TComponent)
@@ -21,6 +21,12 @@ type
 
     function EnviarEmail(pAssunto, pCorpo, pPara: String; pCC: String = ''; pBCC: String = ''): Boolean;
     procedure EnviarEmailComAnexo(pAssunto, pCorpo, pPara, pCC, pBCC, pAnexos: String);
+  end;
+
+  TSendMailFactory = class
+    class function NewMailSender(AOwner: TComponent; pIniFile: String; pSection: String): TMailSender; overload;
+    class function NewMailSender(AOwner: TComponent; pSMTPServer: String; pPort: Integer; pUserName, pPassword: String;
+                        pRequerAutenticacao: Boolean; pFrom: String): TMailSender; overload;
   end;
 
 implementation
@@ -152,6 +158,40 @@ begin
   finally
     FIdMessage.Free;
   end;
+end;
+
+{ TSendMailFactory }
+
+class function TSendMailFactory.NewMailSender(AOwner: TComponent;
+  pIniFile: String; pSection: String): TMailSender;
+var
+  FSmtpServer: String;
+  FPort: Integer;
+  FUserName: String;
+  FPassword: String;
+  FRequerAutenticacao: Boolean;
+  FFrom: String;
+  FIni: TIniFile;
+begin
+  FIni:= TIniFile.Create(ExtractFilePath(Application.ExeName)+pIniFile);
+  try
+    FSmtpServer:= FIni.ReadString(pSection, 'SmtpServer', '');
+    FPort:= FIni.ReadInteger(pSection, 'Port', 0);
+    FUserName:= FIni.ReadString(pSection, 'UserName', '');
+    FPassword:= FIni.ReadString(pSection, 'Password', '');
+    FRequerAutenticacao:= FIni.ReadBool(pSection, 'RequerAutenticacao', True);
+    FFrom:= FIni.ReadString(pSection, 'From', '');
+  finally
+    FIni.Free;
+  end;
+  Result:= NewMailSender(AOwner, FSmtpServer, FPort, FUserName, FPassword, FRequerAutenticacao, FFrom);
+end;
+
+class function TSendMailFactory.NewMailSender(AOwner: TComponent;
+  pSMTPServer: String; pPort: Integer; pUserName, pPassword: String;
+  pRequerAutenticacao: Boolean; pFrom: String): TMailSender;
+begin
+  Result:= TMailSender.Create(AOwner, pSMTPServer, pPort, pUserName, pPassword, pRequerAutenticacao, pFrom);
 end;
 
 end.

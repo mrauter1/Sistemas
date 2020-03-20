@@ -7,8 +7,8 @@ uses
   Ladder.ServiceLocator;
 
 type
-  TTipoProcesso = (tpConsultaPersonalizada = 1);
-  TTipoOutput = (toString=1, toTabela=2, toTabelaDinamica=3, toGrafico=4);
+  TTipoProcesso = (tpConsultaPersonalizada = 1, tpEnvioEmail = 2);
+  TTipoOutput = (toValue=1, toList=2);
 
   TInputList = TParametros;
 
@@ -36,7 +36,6 @@ type
   public
     Inputs: TInputList;
     Outputs: TOutputList;
-    constructor Create; overload;
     constructor Create(pInputs: TInputList; pOutputs: TOutputList); overload;
     function Executar(pInputs: TInputList; pOutputs: TOutputList): TOutputList; overload;
     function Executar: TOutputList; overload; virtual;
@@ -48,8 +47,6 @@ type
     procedure CheckInputs;
     procedure ProcessaOutput(pConsulta: TFrmConsultaPersonalizada; pOutput: TOutputBase);
   public
-    constructor Create;
-    destructor Destroy; override;
     function Executar: TOutputList; override;
   end;
 
@@ -86,7 +83,7 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    function Executar: TOutputBase;
+    function Executar: TOutputList;
   published
     property ID: Integer read FID write FID;
     property Nome: String read FNome write FNome;
@@ -115,17 +112,16 @@ begin
 end;
 
 function TProcessoBase.Executar: TOutputList;
-var
-  FRetornos: TOutputList;
 begin
   FExecutor:= GetExecutor;
   try
     FExecutor.Inputs:= Inputs;
     FExecutor.Outputs:= Outputs;
-    Result:= FExecutor.Executar;
+    FExecutor.Executar;
   finally
     FExecutor.Free;
   end;
+  Result:= Outputs;
 end;
 
 function TProcessoBase.GetExecutor: TExecutorBase;
@@ -156,19 +152,20 @@ begin
 end;
 
 procedure TAtividade.ExecutaProcesso(pProcesso: TProcessoBase);
-var
-  fOutput: TOutputBase;
+{var
+  fOutput: TOutputBase;        }
 begin
-  for fOutput in pProcesso.Executar do
-    FOutputs.Add(fOutput);
+  pProcesso.Executar;
 end;
 
-function TAtividade.Executar: TOutputBase;
+function TAtividade.Executar: TOutputList;
 var
   FProcesso: TProcessoBase;
 begin
   for FProcesso in Processos do
     ExecutaProcesso(FProcesso);
+
+  Result:= Outputs;
 end;
 
 { TExecutorBase }
@@ -176,7 +173,7 @@ end;
 constructor TExecutorBase.Create(pInputs: TInputList;
   pOutputs: TOutputList);
 begin
-  Create;
+  inherited Create;
   Inputs:= pInputs;
   Outputs:= pOutputs;
 end;
@@ -190,11 +187,6 @@ begin
   Result:= Outputs;
 end;
 
-constructor TExecutorBase.Create;
-begin
-  inherited Create;
-end;
-
 function TExecutorBase.Executar: TOutputList;
 begin
   raise Exception.Create('TExecutorBase.Executar: Deve ser implementado na subclasse!');
@@ -203,53 +195,49 @@ end;
 
 { TExecutorConsultaPersonalizada }
 
-constructor TExecutorConsultaPersonalizada.Create;
-begin
-  inherited Create;
-end;
-
 procedure TExecutorConsultaPersonalizada.CheckInputs;
 begin
-  inherited Destroy;
+
 end;
 
 procedure TExecutorConsultaPersonalizada.ProcessaOutput(pConsulta: TFrmConsultaPersonalizada; pOutput: TOutputBase);
 var
-  Visualizacao: String;
-  NomeArquivo: String;
+  FVisualizacao: String;
+  FTipoVisualizacao: String;
+  FNomeArquivo: String;
 begin
-  NomeArquivo:= pOutput.Parametros.ParamValueByName('NomeArquivo', '');
-  if NomeArquivo = '' then
+  FNomeArquivo:= pOutput.Parametros.ParamValueByName('NomeArquivo', '');
+  if FNomeArquivo = '' then
     raise Exception.Create('TExecutorConsultaPersonalizada.ProcessaOutput: É necessário o parâmetro "NomeArquivo"!');
+  FNomeArquivo:= TFrwServiceLocator.GetTempPath+FNomeArquivo;
 
-  NomeArquivo:= TFrwServiceLocator.GetTempPath+NomeArquivo;
+  FVisualizacao:= pOutput.Parametros.ParamValueByName('Visualizacao', '');
+  if FVisualizacao <> '' then  // Carrega Visualização
+    pConsulta.CarregaVisualizacaoByName(FVisualizacao);
 
-  Visualizacao:= pOutput.Parametros.ParamValueByName('Visualizacao', '');
+  FTipoVisualizacao:= pOutput.Parametros.ParamValueByName('TipoVisualizacao', '');
+  FTipoVisualizacao:= AnsiUpperCase(Trim(FTipoVisualizacao));
 
-  // Carrega Visualização
-  if Visualizacao <> '' then
-    pConsulta.CarregaVisualizacaoByName(Visualizacao);
+  if FTipoVisualizacao = 'TABELA' then
+     pConsulta.ExportaTabelaParaExcelInterno(FNomeArquivo)
+  else if FTipoVisualizacao = 'TABELADINAMICA' then
+     pConsulta.ExportaTabelaDinamica(FNomeArquivo)
+  else if FTipoVisualizacao = 'GRAFICO' then
+     pConsulta.ExportaGrafico(FNomeArquivo)
+  else
+    pConsulta.ExportaTabelaParaExcelInterno(FNomeArquivo);
 
-  case pOutput.Tipo of
-    toTabela: pConsulta.ExportaTabelaParaExcelInterno(NomeArquivo);
-    toTabelaDinamica: pConsulta.ExportaTabelaDinamica(NomeArquivo);
-    toGrafico: pConsulta.ExportaGrafico(NomeArquivo)
-  end;
-
-  pOutput.Retorno:= NomeArquivo;
+  pOutput.Retorno:= FNomeArquivo;
 end;
 
 function TExecutorConsultaPersonalizada.ConfiguraConsulta: TFrmConsultaPersonalizada;
 var
   NomeConsulta: String;
-  Visualizacao: String;
-  FInput: TParametroCon;
   FConsultaPersonalizada: TFrmConsultaPersonalizada;
 begin
   CheckInputs;
 
   NomeConsulta:= Inputs.ParamValueByName('NomeConsulta', '');
-//  Visualizacao:= Inputs.ParamValueByName('Visualizacao', '');
 
   TFrwServiceLocator.Synchronize(
     procedure begin
@@ -261,11 +249,6 @@ begin
     raise Exception.Create('TExecutorConsultaPersonalizada.ConfiguraConsulta: Consulta "'+NomeConsulta+'" não encontrada!);');
 
   Result:= FConsultaPersonalizada;
-end;
-
-destructor TExecutorConsultaPersonalizada.Destroy;
-begin
-  inherited Destroy;
 end;
 
 function TExecutorConsultaPersonalizada.Executar: TOutputList;
@@ -285,6 +268,7 @@ begin
       end
     );
   end;
+  Result:= Outputs;
 end;
 
 { TOutputBase }

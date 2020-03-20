@@ -2,6 +2,7 @@
 /*
 /*/
 temp/
+config.ini
 !/VerificadorSid/
 !/DigitalPT/
 !/Importador/

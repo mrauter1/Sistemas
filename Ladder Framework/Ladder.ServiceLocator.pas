@@ -4,7 +4,7 @@ interface
 
 uses
   Spring.Services, System.SysUtils, System.Classes, uDmConnection, uConSqlServer, Windows,
-  Ladder.ORM.DaoUtils, Ladder.ORM.Functions, Forms;
+  Ladder.ORM.DaoUtils, Ladder.ORM.Functions, Forms, uSendMail;
 
 type
   TFrwServiceLocator = class;

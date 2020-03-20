@@ -242,7 +242,7 @@ begin
 end;
 
 initialization
-  FMailSender:= TMailSender.Create(nil, 'smtp.rauter.com.br', 587, 'marcelo@rauter.com.br', 'rtq1825', True, 'marcelo@rauter.com.br');
+  FMailSender:= TSendMailFactory.NewMailSender(nil, 'Config.ini', 'EMAIL');
 
 finalization
   FMailSender.Free;

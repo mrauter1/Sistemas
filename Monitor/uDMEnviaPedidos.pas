@@ -99,7 +99,7 @@ procedure TDMEnviaPedidos.DataModuleCreate(Sender: TObject);
 begin
   CarregarEmails;
 
-  FMailSender:= TMailSender.Create(Self, 'smtp.rauter.com.br', 587, 'marcelo@rauter.com.br', 'rtq1825', True, 'marcelo@rauter.com.br');
+  FMailSender:= TSendMailFactory.NewMailSender(nil, 'Config.ini', 'EMAIL');
   try
     FDMemTable.LoadFromFile('Pedidos.xml', sfXml);
   except

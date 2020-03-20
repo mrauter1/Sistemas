@@ -27,7 +27,7 @@ uses
   FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
   FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
   FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet, FireDAC.Comp.Client,
-  uConSqlServer, cxDBLookupComboBox, uMyServiceLocator;
+  uConSqlServer, cxDBLookupComboBox, Ladder.ServiceLocator;
 
 type
   TFormAvisoConsulta = class(TForm)

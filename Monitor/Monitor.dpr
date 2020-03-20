@@ -23,9 +23,8 @@ uses
   uFormSelecionaConsulta in 'uFormSelecionaConsulta.pas' {FormSelecionaConsulta},
   uAppConfig in '..\utils\uAppConfig.pas',
   uDmGravaLista in '..\utils\uDmGravaLista.pas' {DmGravaLista: TDataModule},
-  UntClasses in 'UntClasses.pas',
-  uConClasses in '..\utils\uConClasses.pas',
-  uTesteAtividades in 'uTesteAtividades.pas';
+  uTesteAtividades in 'uTesteAtividades.pas',
+  Ladder.Activity.EnviaEmail in '..\Ladder Framework\Activity\Ladder.Activity.EnviaEmail.pas';
 
 {$R *.res}
 

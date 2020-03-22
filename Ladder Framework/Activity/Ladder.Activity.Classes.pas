@@ -3,14 +3,49 @@ unit Ladder.Activity.Classes;
 interface
 
 uses
-  System.SysUtils, uConClasses, System.Classes, System.Generics.Collections, Data.DB, uConsultaPersonalizada,
-  Ladder.ServiceLocator;
+  System.SysUtils, System.Classes, System.Generics.Collections, Data.DB, uConsultaPersonalizada,
+  Ladder.ServiceLocator, Generics.Defaults, Variants;
 
 type
   TTipoProcesso = (tpConsultaPersonalizada = 1, tpEnvioEmail = 2);
   TTipoOutput = (toValue=1, toList=2);
+  TTipoBase = (tbString, tbLista, tbData);
 
-  TInputList = TParametros;
+  TProcessoBase = class;
+
+  TInputBase = class(TObject)
+  private
+    FCodigo: integer;
+    FTipoBase: TTipoBase;
+    FNome: String;
+    FExpression: String;
+    FValor: variant;
+  public
+    constructor Create(pNome: String; pTipoBase: TTipoBase; pExpression: String);
+    property Valor: variant read FValor write FValor;
+  published
+    property Codigo: integer read FCodigo write FCodigo;
+    property Nome: String read FNome write FNome;
+    property TipoBase: TTipoBase read FTipoBase write FTipoBase;
+    property Expression: String read FExpression write FExpression;
+  end;
+
+  TGenericInputList<T: TInputBase> = class(TObjectDictionary<String, T>)
+  public
+    constructor Create;
+    function ParamValueByName(pNome: String; pDefault: Variant): variant;
+    procedure Add(pInput: TInputBase); overload;
+    procedure Remove(pInput: TInputBase); overload;
+  end;
+
+  TInputList = TGenericInputList<TInputBase>;
+
+  TValuateInputCallback = procedure (pProcesso: TProcessoBase; pInput: TInputBase) of object; // Returns a single item for value and an array for lists
+
+{  TParserBase = class
+    function EvaluateList(pString: String): array of string;
+    function EvaluateValue(pString: String): string;
+  end;                                                                   }
 
   TOutputBase = class(TPersistent)
   private
@@ -18,16 +53,16 @@ type
     FID: Integer;
     FRetorno: String;
     FTipo: TTipoOutput;
-    FParametros: TParametros;
+    FParametros: TInputList;
   public
     constructor Create;
     destructor Destroy; override;
+    property Retorno: String read FRetorno write FRetorno; // Nome da tabela temporária ou nome do arquivo
   published
     property ID: Integer read FID write FID;
     property Nome: String read FNome write FNome;
     property Tipo: TTipoOutput read FTipo write FTipo;
-    property Retorno: String read FRetorno write FRetorno; // Nome da tabela temporária ou nome do arquivo
-    property Parametros: TParametros read FParametros write FParametros;
+    property Parametros: TInputList read FParametros write FParametros;
   end;
 
   TOutputList = TObjectList<TOutputBase>;
@@ -62,7 +97,7 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    function Executar: TOutputList;
+    function Executar(ValuateInputCallback: TValuateInputCallback): TOutputList;
   published
     property ID: Integer read FID write FID;
     property Nome: String read FNome write FNome;
@@ -80,6 +115,8 @@ type
     FID: Integer;
     FNome: String;
     procedure ExecutaProcesso(pProcesso: TProcessoBase);
+    procedure ValuateInputCallback(pProcesso: TProcessoBase; pInput: TInputBase);
+//    function ExpressionEvaluator(pExpression: String): array of string;
   public
     constructor Create;
     destructor Destroy; override;
@@ -94,6 +131,33 @@ type
   end;
 
 implementation
+
+{ TGenericInputList }
+
+constructor TGenericInputList<T>.Create;
+begin
+  inherited Create([doOwnsValues], TOrdinalIStringComparer.Create); // case insensitive
+end;
+
+function TGenericInputList<T>.ParamValueByName(pNome: String; pDefault: Variant): variant;
+var
+  FInput: TInputBase;
+begin
+  if TryGetValue(pNome, FInput) then
+    Result:= FInput.Valor
+  else
+    Result:= pDefault;
+end;
+
+procedure TGenericInputList<T>.Add(pInput: TInputBase);
+begin
+  Add(pInput.Nome, pInput);
+end;
+
+procedure TGenericInputList<T>.Remove(pInput: TInputBase);
+begin
+  Remove(pInput.Nome);
+end;
 
 { TProcessoBase }
 
@@ -111,8 +175,18 @@ begin
   inherited Destroy;
 end;
 
-function TProcessoBase.Executar: TOutputList;
+function TProcessoBase.Executar(ValuateInputCallback: TValuateInputCallback): TOutputList;
+var
+  fInput: TInputBase;
+  FOutput: TOutputBase;
 begin
+  for fInput in Inputs.Values do
+    ValuateInputCallback(Self, fInput);
+
+  for FOutput in Outputs do
+    for fInput in FOutput.Parametros.Values do
+      ValuateInputCallback(Self, fInput);
+
   FExecutor:= GetExecutor;
   try
     FExecutor.Inputs:= Inputs;
@@ -155,7 +229,7 @@ procedure TAtividade.ExecutaProcesso(pProcesso: TProcessoBase);
 {var
   fOutput: TOutputBase;        }
 begin
-  pProcesso.Executar;
+  pProcesso.Executar(ValuateInputCallback);
 end;
 
 function TAtividade.Executar: TOutputList;
@@ -166,6 +240,18 @@ begin
     ExecutaProcesso(FProcesso);
 
   Result:= Outputs;
+end;
+
+procedure TAtividade.ValuateInputCallback(pProcesso: TProcessoBase; pInput: TInputBase);
+const
+  cKeyWords = ['@', '['];
+begin
+  // Se expressão não iniciar com palavra chave trata como string
+  if not (pInput.Expression[1] in cKeyWords) then
+  begin
+    pInput.Valor:= pInput.Expression;
+    Exit;
+  end;
 end;
 
 { TExecutorBase }
@@ -275,12 +361,23 @@ end;
 
 constructor TOutputBase.Create;
 begin
-  FParametros:= TParametros.Create;
+  FParametros:= TInputList.Create;
 end;
 
 destructor TOutputBase.Destroy;
 begin
   FParametros.Free;
+end;
+
+{ TInputBase }
+
+constructor TInputBase.Create(pNome: String; pTipoBase: TTipoBase;
+  pExpression: String);
+begin
+  inherited Create;
+  Nome:= pNome;
+  TipoBase:= pTipoBase;
+  Expression:= pExpression;
 end;
 
 end.

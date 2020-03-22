@@ -3,14 +3,14 @@ unit Ladder.Activity.EnviaEmail;
 interface
 
 uses
-  Ladder.Activity.Classes, System.SysUtils, System.Classes, uSendMail;
+  Ladder.Activity.Classes, Ladder.ServiceLocator, System.SysUtils, System.Classes, uSendMail;
 
 type
   TExecutorEnviaEmail = class(TExecutorBase)
   private
     FDestinatarios: String;
-    FTitulo: String;
-    FTexto: String;
+    FAssunto: String;
+    FCorpo: String;
     FAnexos: String;
     procedure ProcessaInputs;
   public
@@ -27,14 +27,28 @@ begin
   if FDestinatarios = '' then
     raise Exception.Create('TExecutorConsultaPersonalizada.ProcessaInputs: É necessário o parâmetro "Destinatarios"!');
 
-  FTitulo:= Inputs.ParamValueByName('Titulo', '');
-  FTexto:= Inputs.ParamValueByName('Texto', '');
+  FAssunto:= Inputs.ParamValueByName('Assunto', '');
+  FCorpo:= Inputs.ParamValueByName('Corpo', '');
   FAnexos:= Inputs.ParamValueByName('Anexos', '');
 end;
 
 function TExecutorEnviaEmail.Executar: TOutputList;
+var
+  FMailSender: TMailSender;
 begin
-
+  TFrwServiceLocator.Synchronize(
+    procedure begin
+      FMailSender:= TSendMailFactory.NewMailSender(nil, ExtractFilePath(TFrwServiceLocator.ExeName)+'Config.ini', 'EMAIL');
+    end
+  );
+  try
+    if FAnexos = '' then
+      FMailSender.EnviarEmail(FAssunto, FCorpo, FDestinatarios, '', '')
+    else
+      FMailSender.EnviarEmailComAnexo(FAssunto, FCorpo, FDestinatarios, '', '', FAnexos);
+  finally
+    FMailSender.Free;
+  end;
 end;
 
 end.

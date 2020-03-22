@@ -56,6 +56,7 @@ type
 
     class function IsMainThread: Boolean;
     class function GetTempPath: string;
+    class property ExeName: String read FExeName;
   end;
 
 implementation

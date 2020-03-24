@@ -28,7 +28,6 @@ object FormRelatoriosPersonalizados: TFormRelatoriosPersonalizados
     Height = 533
     Align = alClient
     TabOrder = 0
-    ExplicitWidth = 661
     object PanelInfo: TPanel
       Left = 1
       Top = 1
@@ -36,7 +35,6 @@ object FormRelatoriosPersonalizados: TFormRelatoriosPersonalizados
       Height = 488
       Align = alClient
       TabOrder = 0
-      ExplicitWidth = 659
       object Panel2: TPanel
         Left = 1
         Top = 1
@@ -44,7 +42,6 @@ object FormRelatoriosPersonalizados: TFormRelatoriosPersonalizados
         Height = 40
         Align = alTop
         TabOrder = 1
-        ExplicitWidth = 657
         object Label1: TLabel
           Left = 143
           Top = 10
@@ -94,10 +91,8 @@ object FormRelatoriosPersonalizados: TFormRelatoriosPersonalizados
         ShowHint = False
         TabOrder = 0
         OnChange = PageControlChange
-        ExplicitWidth = 657
         object TabCadastro: TTabSheet
           Caption = 'Cadastro'
-          ExplicitWidth = 649
           DesignSize = (
             698
             418)
@@ -156,7 +151,6 @@ object FormRelatoriosPersonalizados: TFormRelatoriosPersonalizados
             DataField = 'Descricao'
             DataSource = DsConsultas
             TabOrder = 0
-            ExplicitWidth = 562
           end
           object DBMemo1: TDBMemo
             Left = 54
@@ -167,7 +161,6 @@ object FormRelatoriosPersonalizados: TFormRelatoriosPersonalizados
             DataField = 'InfoExtendida'
             DataSource = DsConsultas
             TabOrder = 1
-            ExplicitWidth = 562
           end
           object DBRadioGroup1: TDBRadioGroup
             Left = 54
@@ -188,7 +181,6 @@ object FormRelatoriosPersonalizados: TFormRelatoriosPersonalizados
               '0'
               '1'
               '2')
-            ExplicitWidth = 327
           end
           object DBMemoSql: TDBMemo
             Left = 15
@@ -199,7 +191,6 @@ object FormRelatoriosPersonalizados: TFormRelatoriosPersonalizados
             DataField = 'Sql'
             DataSource = DsConsultas
             TabOrder = 3
-            ExplicitWidth = 616
           end
           object cxDBImageComboBox1: TcxDBImageComboBox
             Left = 530
@@ -219,7 +210,6 @@ object FormRelatoriosPersonalizados: TFormRelatoriosPersonalizados
                 Value = 2
               end>
             TabOrder = 4
-            ExplicitLeft = 481
             Width = 135
           end
           object cbxConfiguracoes: TDBLookupComboBox
@@ -241,7 +231,6 @@ object FormRelatoriosPersonalizados: TFormRelatoriosPersonalizados
             ListSource = DsVisualizacoes
             ParentFont = False
             TabOrder = 5
-            ExplicitWidth = 244
           end
           object DBRadioPaginaPadrao: TDBRadioGroup
             Left = 378
@@ -262,13 +251,15 @@ object FormRelatoriosPersonalizados: TFormRelatoriosPersonalizados
               '0'
               '1'
               '2')
-            ExplicitLeft = 329
           end
         end
         object TabParametros: TTabSheet
           Caption = 'Par'#226'metros'
           ImageIndex = 1
+          ExplicitLeft = 0
+          ExplicitTop = 0
           ExplicitWidth = 649
+          ExplicitHeight = 0
           object cxGridParams: TcxGrid
             Left = 0
             Top = 0
@@ -356,7 +347,10 @@ object FormRelatoriosPersonalizados: TFormRelatoriosPersonalizados
         object TabCampos: TTabSheet
           Caption = 'Campos'
           ImageIndex = 2
+          ExplicitLeft = 0
+          ExplicitTop = 0
           ExplicitWidth = 649
+          ExplicitHeight = 0
           object cxGridCampos: TcxGrid
             Left = 0
             Top = 0
@@ -517,7 +511,6 @@ object FormRelatoriosPersonalizados: TFormRelatoriosPersonalizados
       Height = 43
       Align = alBottom
       TabOrder = 1
-      ExplicitWidth = 659
       object BtnSalvar: TButton
         Left = 20
         Top = 6
@@ -546,7 +539,6 @@ object FormRelatoriosPersonalizados: TFormRelatoriosPersonalizados
     Anchors = [akRight, akBottom]
     Caption = 'Definir Campos'
     TabOrder = 1
-    ExplicitLeft = 471
   end
   object DsConsultas: TDataSource
     DataSet = DmGeradorConsultas.QryConsultas

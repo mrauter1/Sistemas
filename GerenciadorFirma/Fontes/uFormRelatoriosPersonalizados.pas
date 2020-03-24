@@ -15,7 +15,7 @@ uses
   cxDBData, cxGridLevel, cxClasses, cxGridCustomView, cxGridCustomTableView,
   cxGridTableView, cxGridDBTableView, cxGrid, cxImageComboBox, cxTextEdit,
   cxColorComboBox, uDmGeradorConsultas, uAppConfig, cxContainer, cxMaskEdit,
-  cxDropDownEdit, cxDBEdit, uConFirebird, GerenciadorUtils;
+  cxDropDownEdit, cxDBEdit, uConFirebird, GerenciadorUtils, uConClasses;
 
 type
   TFormRelatoriosPersonalizados = class(TForm)

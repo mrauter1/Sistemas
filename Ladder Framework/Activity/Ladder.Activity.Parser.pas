@@ -20,15 +20,20 @@ type
     FLenExpression: Integer;
     FExpression: string;
     FFunElementEval: TFunElementEval;
+    procedure SetExpression(const Value: String);
+  protected
     function Ignore(var Index: Integer): Boolean; // Retorna verdadeiro se chegou no fim da string
+    procedure IgnoreAndErrorIfEOL(var Index: Integer; const Msg: String);
     function ParseString(var Index: Integer): String;
     function ParseList(var Index: Integer): Variant;
     function ParseNext(var Index: Integer): Variant;
-    procedure IgnoreAndErrorIfEOL(var Index: Integer; const Msg: String);
     function ParseElement(var Index: Integer): variant;
     function DoParseExpression(pExpression: String): variant;
   public
     class function ParseExpression(pExpression: String; pFunElementEval: TFunElementEval): variant;
+
+    property Expression: String read FExpression write SetExpression;
+    property FunElementEval: TFunElementEval read FFunElementEval write FFunElementEval;
   const
     KeyWords = [',', '[', ']', '"', '@'];
   end;
@@ -41,7 +46,7 @@ constructor EParseException.Create(const Msg, pExpression: String; pPos: Integer
 begin
   Expression:= pExpression;
   Pos:= pPos;
-  inherited Create(Msg+' Expression: '+pExpression+'; Pos: '+IntToStr(pPos));
+  inherited Create(Msg+'; Expression: '+pExpression+'; Pos: '+IntToStr(pPos));
 end;
 
 { TActivityParser }
@@ -70,6 +75,8 @@ var
   FStart: Integer;
 begin
   Result:= '';
+  IgnoreAndErrorIfEOL(Index, 'ParseString: Esperando String, nada recebido.');
+
   if FExpression[Index] <> '"' then
     raise EParseException.Create('ParseString: Deve iniciar com ".', FExpression, Index);
 
@@ -87,44 +94,53 @@ begin
   Inc(Index);
 end;
 
+procedure TActivityParser.SetExpression(const Value: String);
+begin
+  FExpression := Value;
+  FLenExpression:= Length(FExpression);
+end;
+
 function TActivityParser.ParseList(var Index: Integer): variant;
 const
   sListaAberta = 'ParseList: Lista não fechada, esperado "[" encontrado fim da linha.';
 var
   pIdItem: Integer;
   FItem: Variant;
+  FItemBefore: Boolean;
 
   procedure AddItem(pItem: Variant);
   begin
     inc(pIdItem);
     VarArrayRedim(Result, pIdItem);
-    Result[pIdItem]:= FItem;
+    Result[pIdItem]:= pItem;
+    FItemBefore:= True;
   end;
 
 begin
+  IgnoreAndErrorIfEOL(Index, 'ParseList: Esperando lista, nada recebido.');
+
   if FExpression[Index] <> '[' then
     raise EParseException.Create('ParseList: Deve iniciar com "[".', FExpression, Index);
 
   Inc(Index);
   pIdItem:= -1;
+  FItemBefore:= False;
   Result:= VarArrayCreate([0,-1], varVariant); // Incializa Empty Array
 
   while True do
   begin
     IgnoreAndErrorIfEOL(Index, sListaAberta); // Ignora caracteres em branco
-    if FExpression[Index] = ']' then
-      Exit;
-
-    FItem:= ParseNext(Index);
-    AddItem(FItem);
-
-    IgnoreAndErrorIfEOL(Index, sListaAberta); // Ignora caracteres em branco
 
     case Ord(FExpression[Index]) of
-      Ord(','): Inc(Index);
-      Ord(']'): Exit;
+      Ord(','): begin
+                  Inc(Index);
+                  IgnoreAndErrorIfEOL(Index, sListaAberta); // Ignora caracteres em branco
+                  AddItem(ParseNext(Index));
+                end;
+      Ord(']'): begin Inc(Index); Exit; end;
     else
-      raise EParseException.Create('ParseList: Esperado "," ou "]", recebido '+FExpression[Index]+'.', FExpression, Index);
+      AddItem(ParseNext(Index));
+//      raise EParseException.Create('ParseList: Esperado "," ou "]", recebido '+FExpression[Index]+'.', FExpression, Index);
     end;
   end;
 end;
@@ -134,6 +150,8 @@ var
   FStart: Integer;
   FElementName: String;
 begin
+  IgnoreAndErrorIfEOL(Index, 'ParseElement: Esperando elemento, nada recebido.');
+
   if FExpression[Index] <> '@' then
     raise EParseException.Create('ParseElement: Esperado "@" encontrado "'+FExpression[Index]+'".', FExpression, Index);
 
@@ -198,8 +216,7 @@ function TActivityParser.DoParseExpression(pExpression: String): variant;
 var
   Index: Integer;
 begin
-  FExpression:= pExpression;
-  FLenExpression:= Length(FExpression);
+  Expression:= pExpression;
   Index:= 1;
   Result:= ParseNext(Index);
   if not Ignore(Index) then

@@ -99,8 +99,8 @@ end;
 procedure TestTExecutorBase.TestExecutar;
 var
   ReturnValue: TOutputList;
-  pOutputs: TObjectList<TOutputBase>;
-  pInputs: TParametros;
+  pOutputs: TOutputList;
+  pInputs: TInputList;
 begin
   // TODO: Setup method call parameters
   ReturnValue := FExecutorBase.Executar(pInputs, pOutputs);
@@ -149,7 +149,7 @@ procedure TestTProcessoBase.TestExecutar;
 var
   ReturnValue: TOutputList;
 begin
-  ReturnValue := FProcessoBase.Executar;
+  ReturnValue := FProcessoBase.Executar(nil);
   // TODO: Validate method results
 end;
 
@@ -166,18 +166,18 @@ end;
 
 procedure TestTAtividade.TestExecutar;
 var
-  ReturnValue: TOutputBase;
+  ReturnValue: TOutputList;
 begin
   ReturnValue := FAtividade.Executar;
   // TODO: Validate method results
 end;
 
-initialization
+{initialization
   // Register any test cases with the test runner
   RegisterTest(TestTOutputBase.Suite);
   RegisterTest(TestTExecutorBase.Suite);
   RegisterTest(TestTExecutorConsultaPersonalizada.Suite);
   RegisterTest(TestTProcessoBase.Suite);
-  RegisterTest(TestTAtividade.Suite);
+  RegisterTest(TestTAtividade.Suite);        }
 end.
 

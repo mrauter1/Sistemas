@@ -15,16 +15,21 @@ program TestAtividades;
 {$ENDIF}
 
 uses
+  Forms,
   DUnitTestRunner,
-  uDmConnection in '..\..\..\utils\uDmConnection.pas' {DmConnection: TDataModule},
   uConSqlServer in '..\..\..\utils\uConSqlServer.pas',
   Ladder.TestActivity in 'Ladder.TestActivity.pas',
   Ladder.Activity.Classes in '..\Ladder.Activity.Classes.pas',
-  uConsultaPersonalizada in '..\..\..\utils\uConsultaPersonalizada.pas' {FrmConsultaPersonalizada};
+  Test.Parser in 'Test.Parser.pas',
+  Ladder.Activity.Parser in '..\Ladder.Activity.Parser.pas';
 
 {$R *.RES}
 
 begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+
   DUnitTestRunner.RunRegisteredTests;
+  Application.Run;
 end.
 

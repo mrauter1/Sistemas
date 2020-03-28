@@ -218,12 +218,17 @@ end;
 
 procedure TPedidos.LoadPedidosNew;
 begin
-  if QryPedidos.Active then
-    QryPedidos.Close;
+  QryPedidos.DisableControls;
+  try
+    if QryPedidos.Active then
+      QryPedidos.Close;
 
-  QryPedidos.Open;
+    QryPedidos.Open;
 
-  VerificaNovosPedidos;
+    VerificaNovosPedidos;
+  finally
+    QryPedidos.EnableControls;
+  end;
 end;
 
 procedure TPedidos.Refresh;

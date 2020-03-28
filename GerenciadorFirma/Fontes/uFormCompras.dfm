@@ -1,4 +1,4 @@
-object Form2: TForm2
+object FormCiclos: TFormCiclos
   Left = 0
   Top = 0
   Caption = 'Compras do Cliente'
@@ -20,7 +20,6 @@ object Form2: TForm2
     Height = 415
     Align = alClient
     TabOrder = 0
-    ExplicitLeft = 8
     object tvComprasCliente: TcxGridDBTableView
       Navigator.Buttons.CustomButtons = <>
       DataController.DataSource = DsComprasCliente

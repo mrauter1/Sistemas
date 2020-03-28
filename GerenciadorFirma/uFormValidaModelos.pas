@@ -98,12 +98,12 @@ end;
 
 procedure TFormValidaModelos.AbrirConfigProClick(Sender: TObject);
 begin
-  FormProInfo.Abrir(GetCodProSelecionado);
+  TFormProInfo.Abrir(GetCodProSelecionado);
 end;
 
 procedure TFormValidaModelos.AbrirDetalheProClick(Sender: TObject);
 begin
-  FormDetalheProdutos.AbreEFocaProduto(GetCodProSelecionado);
+  TFormDetalheProdutos.AbreEFocaProduto(GetCodProSelecionado);
 end;
 
 procedure TFormValidaModelos.VerInsumos1Click(Sender: TObject);

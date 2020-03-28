@@ -20,7 +20,6 @@ object FormDetalheProdutos: TFormDetalheProdutos
     Height = 375
     Align = alClient
     TabOrder = 0
-    ExplicitHeight = 417
     object cxGridDBTableView: TcxGridDBTableView
       PopupMenu = PopupMenu1
       Navigator.Buttons.CustomButtons = <>
@@ -132,7 +131,6 @@ object FormDetalheProdutos: TFormDetalheProdutos
     Align = alBottom
     Caption = 'Panel1'
     TabOrder = 1
-    ExplicitWidth = 998
     DesignSize = (
       1067
       42)
@@ -144,7 +142,6 @@ object FormDetalheProdutos: TFormDetalheProdutos
       Anchors = [akLeft, akRight, akBottom]
       Caption = 'Atualiza'
       TabOrder = 0
-      ExplicitWidth = 447
     end
     object BtnOpcoes: TBitBtn
       Left = 5

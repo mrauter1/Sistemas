@@ -40,10 +40,12 @@ uses
   uFormFeriados in 'Fontes\uFormFeriados.pas' {FormFeriados},
   uFormCiclosVenda in 'Fontes\uFormCiclosVenda.pas' {FormCiclosVenda},
   uFormMotivoParaIgnorar in 'uFormMotivoParaIgnorar.pas' {FormMotivoIgnorar},
-  uFormCompras in 'Fontes\uFormCompras.pas' {Form2},
+  uFormCompras in 'Fontes\uFormCompras.pas' {FormCiclos},
   GerenciadorUtils in '..\utils\GerenciadorUtils.pas',
   uAppConfig in '..\utils\uAppConfig.pas',
-  uDmGravaLista in '..\utils\uDmGravaLista.pas' {DmGravaLista: TDataModule};
+  uDmGravaLista in '..\utils\uDmGravaLista.pas' {DmGravaLista: TDataModule},
+  uFormLogistica in 'Fontes\uFormLogistica.pas' {FormLogistica},
+  uFormEntregaPorProduto in 'Fontes\uFormEntregaPorProduto.pas' {FormEntregaPorProduto};
 
 {$R *.res}
 
@@ -60,20 +62,21 @@ begin
   Application.CreateForm(TConSqlServer, ConSqlServer);
   Application.CreateForm(TConFirebird, ConFirebird);
   Application.CreateForm(TFormPrincipal, FormPrincipal);
-  Application.CreateForm(TFormProInfo, FormProInfo);
-  Application.CreateForm(TPedidos, Pedidos);
   Application.CreateForm(TDmEstoqProdutos, DmEstoqProdutos);
   Application.CreateForm(TDMFilaProducao, DMFilaProducao);
-  Application.CreateForm(TDMConsistenciaOPs, DMConsistenciaOPs);
-  Application.CreateForm(TFormPedidos, FormPedidos);
+  Application.CreateForm(TPedidos, Pedidos);
   Application.CreateForm(TFormFilaProducao, FormFilaProducao);
-  Application.CreateForm(TFormDensidades, FormDensidades);
-  Application.CreateForm(TFormConversorLKG, FormConversorLKG);
-  Application.CreateForm(TFormConsistenciaOPs, FormConsistenciaOPs);
-  Application.CreateForm(TFormShowMemo, FormShowMemo);
+  //  Application.CreateForm(TFormProInfo, FormProInfo);
+//  Application.CreateForm(TDMConsistenciaOPs, DMConsistenciaOPs);
+//  Application.CreateForm(TFormPedidos, FormPedidos);
+//  Application.CreateForm(TFormDensidades, FormDensidades);
+//  Application.CreateForm(TFormConversorLKG, FormConversorLKG);
+//  Application.CreateForm(TFormConsistenciaOPs, FormConsistenciaOPs);
+//  Application.CreateForm(TFormShowMemo, FormShowMemo);
   Application.CreateForm(TFormGlobal, FormGlobal);
-  Application.CreateForm(TFormDetalheProdutos, FormDetalheProdutos);
-  Application.CreateForm(TFormSubGrupoExtras, FormSubGrupoExtras);
-  Application.CreateForm(TForm2, Form2);
+//  Application.CreateForm(TFormDetalheProdutos, FormDetalheProdutos);
+//  Application.CreateForm(TFormSubGrupoExtras, FormSubGrupoExtras);
+//  Application.CreateForm(TFormLogistica, FormLogistica);
+//  Application.CreateForm(TForm2, Form2);
   Application.Run;
 end.

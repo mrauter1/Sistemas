@@ -139,16 +139,21 @@ procedure TDmEstoqProdutos.AtualizaEstoqueNew;
 begin
   QryEstoq.DisableControls;
   try
-
     if QryEstoq.Active then
       QryEstoq.Close;
 
     QryEstoq.Open;
 
-    if QryPedPro.Active then
-      QryPedPro.Close;
+    QryPedPro.DisableControls;
+    try
+      if QryPedPro.Active then
+        QryPedPro.Close;
 
-    QryPedPro.Open;
+      QryPedPro.Open;
+    finally
+      QryPedPro.EnableControls;
+    end;
+
   finally
     QryEstoq.EnableControls;
   end;

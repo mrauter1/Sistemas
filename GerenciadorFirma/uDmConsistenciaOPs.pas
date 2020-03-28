@@ -50,6 +50,7 @@ type
     CdsMovInsumosPESO: TFMTBCDField;
     procedure DataModuleCreate(Sender: TObject);
   private
+    FormConversorLKG: TFormConversorLKG;
     procedure CarregaOPs(pDataIni, pDataFim: TDateTime);
     procedure CarregaCdsModeloInsumo(CodModelo: Integer; pQuant: Double);
     procedure ComparaModeloELancado(pCodOp: String);
@@ -58,8 +59,8 @@ type
     { Public declarations }
   end;
 
-var
-  DMConsistenciaOPs: TDMConsistenciaOPs;
+{var
+  DMConsistenciaOPs: TDMConsistenciaOPs;}
 
 implementation
 
@@ -146,6 +147,7 @@ end;
 
 procedure TDMConsistenciaOPs.DataModuleCreate(Sender: TObject);
 begin
+  FormConversorLKG:= TFormConversorLKG.Create(Self);
   CdsModeloInsumo.CreateDataSet;
 end;
 

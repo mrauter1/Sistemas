@@ -92,18 +92,18 @@ type
     { Private declarations }
   public
     procedure RefreshProduto(pCodProFoco: String = '');
-    procedure AbreEFocaProduto(pCodProFoco: String);
+    class procedure AbreEFocaProduto(pCodProFoco: String);
   end;
 
-var
-  FormDetalheProdutos: TFormDetalheProdutos;
+{var
+  FormDetalheProdutos: TFormDetalheProdutos;     }
 
 implementation
 
 {$R *.dfm}
 
 uses
-  uFormProInfo, uFormInsumos, uFormAdicionarSimilaridade, cxGridExportLink;
+  uFormProInfo, uFormInsumos, uFormAdicionarSimilaridade, cxGridExportLink, uFormPrincipal;
 
 procedure TFormDetalheProdutos.RefreshProduto(pCodProFoco: String = '');
 begin
@@ -113,10 +113,18 @@ begin
   QryDetalhesPro.Locate('CODPRODUTO', pCodProFoco, []);
 end;
 
-procedure TFormDetalheProdutos.AbreEFocaProduto(pCodProFoco: String);
+class procedure TFormDetalheProdutos.AbreEFocaProduto(pCodProFoco: String);
+var
+  FFrm: TFormDetalheProdutos;
 begin
-  RefreshProduto(pCodProFoco);
-  Show;
+  FFrm:= TFormDetalheProdutos.Create(nil);
+  try
+    FFrm.RefreshProduto(pCodProFoco);
+    FormPrincipal.AbrirFormEmNovaAba(FFrm, True);
+  except
+    FFrm.Free;
+    raise;
+  end;
 end;
 
 procedure TFormDetalheProdutos.cxGridDBTableViewCellDblClick(
@@ -138,12 +146,12 @@ end;
 
 procedure TFormDetalheProdutos.AbrirConfigProClick(Sender: TObject);
 begin
-  FormProInfo.Abrir(GetCodProSelecionado);
+  TFormProInfo.Abrir(GetCodProSelecionado);
 end;
 
 procedure TFormDetalheProdutos.AbrirDetalheProClick(Sender: TObject);
 begin
-  FormDetalheProdutos.AbreEFocaProduto(GetCodProSelecionado);
+  TFormDetalheProdutos.AbreEFocaProduto(GetCodProSelecionado);
 end;
 
 procedure TFormDetalheProdutos.BtnExcelcxGridTarefaClick(Sender: TObject);

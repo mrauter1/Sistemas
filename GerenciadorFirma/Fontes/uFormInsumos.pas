@@ -242,7 +242,7 @@ end;
 
 procedure TFormInsumos.ConfiguraodoProduto1Click(Sender: TObject);
 begin
-  FormProInfo.Abrir(GetCodProSelecionado);
+  TFormProInfo.Abrir(GetCodProSelecionado);
 end;
 
 procedure TFormInsumos.CarregarInsumosDetalhe(pCodModelo: Integer);
@@ -342,7 +342,7 @@ end;
 
 procedure TFormInsumos.DetalhamentodoProduto1Click(Sender: TObject);
 begin
-  FormDetalheProdutos.AbreEFocaProduto(GetCodProSelecionado);
+  TFormDetalheProdutos.AbreEFocaProduto(GetCodProSelecionado);
 end;
 
 procedure TFormInsumos.FormCreate(Sender: TObject);

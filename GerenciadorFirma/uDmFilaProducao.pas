@@ -7,14 +7,16 @@ uses
   uPedidos;
 type
   TDMFilaProducao = class(TDataModule)
+    procedure DataModuleCreate(Sender: TObject);
 //    procedure CdsFilaProducaoPROBFALTAHOJEGetText(Sender: TField;
 //      var Text: string; DisplayText: Boolean);
-  private  
+  private
+    FormShowMemo: TFormShowMemo;
     function ProdutoGranel(CodProduto: String): Boolean;
 {    procedure AdicionaNaFila(const pCodProduto, pNomeProduto: String; pFalta: Double; pQuant: Double; pProducaoSugerida: Double;
                              pNumPedidos: Integer);}
     { Private declarations }
-  public   
+  public
     procedure AtualizaFilaProducao;
   end;
 
@@ -29,6 +31,11 @@ implementation
 
 uses
   Utils, uFormFila, uConFirebird;
+
+procedure TDMFilaProducao.DataModuleCreate(Sender: TObject);
+begin
+  FormShowMemo:= TFormShowMemo.Create(Self);
+end;
 
 function TDMFilaProducao.ProdutoGranel(CodProduto: String): Boolean;
 begin
@@ -135,7 +142,6 @@ procedure TDMFilaProducao.AtualizaFilaProducao;
   end;            }
 
 begin
-
   if Assigned(FormFilaProducao) then
     if FormFilaProducao.Visible then
       FormShowMemo.Parent:= FormFilaProducao

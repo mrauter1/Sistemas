@@ -14,7 +14,7 @@ uses
   cxGridTableView, cxGridDBTableView, cxGrid;
 
 type
-  TForm2 = class(TForm)
+  TFormCiclos = class(TForm)
     cxGridComprasCliente: TcxGrid;
     tvComprasCliente: TcxGridDBTableView;
     cxGridDBTableView6: TcxGridDBTableView;
@@ -41,8 +41,8 @@ type
     { Public declarations }
   end;
 
-var
-  Form2: TForm2;
+{var
+  FormCiclos: TFormCiclos;}
 
 implementation
 

@@ -52,8 +52,8 @@ type
     { Public declarations }
   end;
 
-var
-  FormSubGrupoExtras: TFormSubGrupoExtras;
+{var
+  FormSubGrupoExtras: TFormSubGrupoExtras;}
 
 implementation
 

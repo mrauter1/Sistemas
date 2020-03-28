@@ -15,8 +15,8 @@ type
     { Public declarations }
   end;
 
-var
-  FormConsistenciaOPs: TFormConsistenciaOPs;
+{var
+  FormConsistenciaOPs: TFormConsistenciaOPs;}
 
 implementation
 

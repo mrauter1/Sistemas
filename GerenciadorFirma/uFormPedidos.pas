@@ -69,8 +69,8 @@ type
     { Public declarations }
   end;
 
-var
-  FormPedidos: TFormPedidos;
+{var
+  FormPedidos: TFormPedidos;    }
 
 implementation
 
@@ -106,19 +106,19 @@ var
 begin
   FCodPro:= GetCodProSelecionado;
 
-  FormProInfo.Abrir(FCodPro);
+  TFormProInfo.Abrir(FCodPro);
 end;
 
 procedure TFormPedidos.AbrirDetalheProClick(Sender: TObject);
 begin
-  FormDetalheProdutos.AbreEFocaProduto(VarToStrDef(cxGridDBTableView.DataController.Values[cxGridDBTableView.DataController.FocusedRecordIndex,
+  TFormDetalheProdutos.AbreEFocaProduto(VarToStrDef(cxGridDBTableView.DataController.Values[cxGridDBTableView.DataController.FocusedRecordIndex,
                                                                 cxGridDBTableViewCODPRODUTO.Index], ''));
 end;
 
 procedure TFormPedidos.BtnAtualizaClick(Sender: TObject);
 begin
-  Pedidos.Refresh;
-  cxGridDBTableView.DataController.Groups.FullExpand;
+    Pedidos.Refresh;
+  //cxGridDBTableView.DataController.Groups.FullExpand;
 end;
 
 procedure TFormPedidos.BtnOpcoesClick(Sender: TObject);

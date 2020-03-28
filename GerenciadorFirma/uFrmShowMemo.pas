@@ -15,8 +15,8 @@ type
     procedure SetText(pTexto: String; pWriteLog: Boolean = True);
   end;
 
-var
-  FormShowMemo: TFormShowMemo;
+{var
+  FormShowMemo: TFormShowMemo;}
 
 implementation
 

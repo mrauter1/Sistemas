@@ -16,7 +16,7 @@ uses
   FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
   FireDAC.Comp.DataSet, FireDAC.Comp.Client, uFrmConsulta, Vcl.ComCtrls, dxtree,
   dxdbtree, uConSqlServer, uConsultaPersonalizada, cxSplitter, ChromeTabs,
-  ChromeTabsClasses, ChromeTabsTypes, uAppConfig, uDmGeradorConsultas;
+  ChromeTabsClasses, ChromeTabsTypes, uAppConfig, uDmGeradorConsultas, uFormLogistica;
 
 type
   TTabPanel = class(TPanel)
@@ -79,6 +79,7 @@ type
     Feriados1: TMenuItem;
     MenuCicloVendas: TMenuItem;
     AtualizaTodasasListasdePreo1: TMenuItem;
+    ControleLogistica1: TMenuItem;
     procedure Pedidos1Click(Sender: TObject);
     procedure Fila1Click(Sender: TObject);
     procedure Densidade1Click(Sender: TObject);
@@ -121,6 +122,7 @@ type
     procedure Feriados1Click(Sender: TObject);
     procedure MenuCicloVendasClick(Sender: TObject);
     procedure AtualizaTodasasListasdePreo1Click(Sender: TObject);
+    procedure ControleLogistica1Click(Sender: TObject);
   private
     FDmGeradorConsultas: TDmGeradorConsultas;
     FPopupActive: Boolean;
@@ -130,7 +132,6 @@ type
     function ObterKeyValueSelecionado(pTreeView: TdxDBTreeView): Variant;
     function SelecionaNodeNoMouse: Boolean;
     procedure MostraNovoForm(pForm: TForm);
-    procedure AbrirFormEmNovaAba(pForm: TForm; pTabOwnsForm: Boolean = True);
     procedure AtualizaTabAtiva(pTab: TChromeTab);
     function BuscaTabPorForm(pForm: TForm): TChromeTab;
     procedure CreateParams(var Params: TCreateParams); override;
@@ -144,6 +145,7 @@ type
   public
     { Public declarations }
     constructor CreateWithTab(pTab: TChromeTab);
+    procedure AbrirFormEmNovaAba(pForm: TForm; pTabOwnsForm: Boolean = True);
   end;
 
 var
@@ -186,9 +188,14 @@ begin
   DMFilaProducao.AtualizaFilaProducao;
 end;
 
+procedure TFormPrincipal.ControleLogistica1Click(Sender: TObject);
+begin
+  AbrirFormEmNovaAba(TFormLogistica.Create(Self), True);
+end;
+
 procedure TFormPrincipal.Conversor1Click(Sender: TObject);
 begin
-  AbrirFormEmNovaAba(FormConversorLKG, False);
+  AbrirFormEmNovaAba(TFormConversorLKG.Create(Self), True);
 end;
 
 constructor TFormPrincipal.CreateWithTab(pTab: TChromeTab);
@@ -221,13 +228,21 @@ end;
 
 procedure TFormPrincipal.Densidade1Click(Sender: TObject);
 begin
-  AbrirFormEmNovaAba(FormDensidades, False);
+  AbrirFormEmNovaAba(TFormDensidades.Create(Self), True);
 end;
 
 procedure TFormPrincipal.DetalhedosProdutos1Click(Sender: TObject);
+var
+  FormDetalheProdutos: TFormDetalheProdutos;
 begin
-  FormDetalheProdutos.RefreshProduto;
-  AbrirFormEmNovaAba(FormDetalheProdutos, False);
+  FormDetalheProdutos:= TFormDetalheProdutos.Create(Self);
+  try
+    FormDetalheProdutos.RefreshProduto;
+    AbrirFormEmNovaAba(FormDetalheProdutos, True);
+  except
+    FormDetalheProdutos.Free;
+    raise;
+  end;
 end;
 
 procedure TFormPrincipal.ExecutarSql1Click(Sender: TObject);
@@ -241,7 +256,7 @@ begin
   begin
     DMFilaProducao.AtualizaFilaProducao;
   //  EmbedForm(PanelMain, FormPedidos);
-    AbrirFormEmNovaAba(FormPedidos, False);
+    AbrirFormEmNovaAba(TFormPedidos.Create(Self), True);
   end;
 end;
 
@@ -252,7 +267,7 @@ end;
 
 procedure TFormPrincipal.MenuItemProInfoClick(Sender: TObject);
 begin
-  AbrirFormEmNovaAba(FormProInfo, False);
+  AbrirFormEmNovaAba(TFormProInfo.Create(Self), True);
 //  FormProInfo.Show;
 end;
 
@@ -269,7 +284,7 @@ end;
 
 procedure TFormPrincipal.Pedidos1Click(Sender: TObject);
 begin
-  AbrirFormEmNovaAba(FormPedidos, False);
+  AbrirFormEmNovaAba(TFormPedidos.Create(Self), true);
 //  FormPedidos.Show;
 end;
 
@@ -812,7 +827,10 @@ begin
     Tab:= pTab;
     Form:= pForm;
 
-    Form.FreeNotification(Self);
+    if OwnsForm then
+      pForm.Parent:= Self
+    else
+      pForm.FreeNotification(Self);
 {    if OwnsForm then
       InsertComponent(Form)
     else

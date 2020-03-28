@@ -11,6 +11,8 @@ object FormFilaProducao: TFormFilaProducao
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 13
   object cxGrid: TcxGrid
@@ -20,7 +22,6 @@ object FormFilaProducao: TFormFilaProducao
     Height = 500
     Align = alClient
     TabOrder = 0
-    ExplicitWidth = 990
     object cxGridDBTableView: TcxGridDBTableView
       PopupMenu = PopupMenuOpcoes
       OnDblClick = cxGridDBTableViewDblClick
@@ -161,7 +162,6 @@ object FormFilaProducao: TFormFilaProducao
     Align = alBottom
     Caption = 'Panel1'
     TabOrder = 1
-    ExplicitWidth = 990
     DesignSize = (
       998
       42)
@@ -174,7 +174,6 @@ object FormFilaProducao: TFormFilaProducao
       Caption = 'Atualiza'
       TabOrder = 0
       OnClick = BtnAtualizaClick
-      ExplicitWidth = 439
     end
     object BtnOpcoes: TBitBtn
       Left = 5

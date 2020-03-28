@@ -51,18 +51,18 @@ type
     function NaoSomaNoPesoLiq(pCodPro: String): Boolean;
     procedure LocateProInfo(pCodPro: String);
 
-    procedure Abrir(pCodProduto: String);
+    class procedure Abrir(pCodProduto: String);
   end;
 
-var
-  FormProInfo: TFormProInfo;
+{var
+  FormProInfo: TFormProInfo;  }
 
 implementation
 
 {$R *.dfm}
 
 uses
-  uConFirebird, uDmConnection;
+  uConFirebird, uDmConnection, uFormPrincipal;
 
 procedure CopiaFields(pSource, pDest: TClientDataSet);
 var
@@ -120,7 +120,7 @@ const
   cTambor = '0000';
   cTamborete = '0001';
 begin
-  with FormProInfo do
+  with Self do
   begin
     pAplicacao:= GetAplicacao(pCodProduto);
 
@@ -188,10 +188,18 @@ begin
   ReopenDataSet(QryProInfo);
 end;
 
-procedure TFormProInfo.Abrir(pCodProduto: String);
+class procedure TFormProInfo.Abrir(pCodProduto: String);
+var
+  FFrm: TFormProInfo;
 begin
-  LocateProInfo(pCodProduto);
-  Show;
+  FFrm:= TFormProInfo.Create(nil);
+  try
+    FFrm.LocateProInfo(pCodProduto);
+    FormPrincipal.AbrirFormEmNovaAba(FFrm, True);
+  except
+    FFrm.Free;
+    raise;
+  end;
 end;
 
 function TFormProInfo.NaoSomaNoPesoLiq(pCodPro: String): Boolean;

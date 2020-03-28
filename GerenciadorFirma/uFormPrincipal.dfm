@@ -2,8 +2,8 @@ object FormPrincipal: TFormPrincipal
   Left = 0
   Top = 0
   Caption = 'Informa'#231#245'es de estoque e demanda'
-  ClientHeight = 397
-  ClientWidth = 977
+  ClientHeight = 405
+  ClientWidth = 839
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -20,15 +20,15 @@ object FormPrincipal: TFormPrincipal
   object PanelTabs: TPanel
     Left = 233
     Top = 0
-    Width = 744
-    Height = 397
+    Width = 606
+    Height = 405
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
     object ChromeTabs1: TChromeTabs
       Left = 0
       Top = 0
-      Width = 744
+      Width = 606
       Height = 32
       OnActiveTabChanged = ChromeTabs1ActiveTabChanged
       OnButtonAddClick = ChromeTabs1ButtonAddClick
@@ -361,8 +361,8 @@ object FormPrincipal: TFormPrincipal
     object PanelMain: TPanel
       Left = 0
       Top = 32
-      Width = 744
-      Height = 365
+      Width = 606
+      Height = 373
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 1
@@ -372,7 +372,7 @@ object FormPrincipal: TFormPrincipal
     Left = 0
     Top = 0
     Width = 225
-    Height = 397
+    Height = 405
     RightClickSelect = True
     ShowNodeHint = True
     DataSource = DsMenu
@@ -399,7 +399,7 @@ object FormPrincipal: TFormPrincipal
     Left = 225
     Top = 0
     Width = 8
-    Height = 397
+    Height = 405
   end
   object MainMenu: TMainMenu
     Left = 178
@@ -425,6 +425,10 @@ object FormPrincipal: TFormPrincipal
       object DadosGruposdeProdutos1: TMenuItem
         Caption = 'Dados Grupos de Produtos'
         OnClick = DadosGruposdeProdutos1Click
+      end
+      object ControleLogistica1: TMenuItem
+        Caption = 'Controle Logistica'
+        OnClick = ControleLogistica1Click
       end
     end
     object Extras1: TMenuItem

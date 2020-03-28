@@ -22,7 +22,6 @@ object FormProInfo: TFormProInfo
     Height = 378
     Align = alClient
     TabOrder = 0
-    ExplicitWidth = 770
     object cxGridDBTableView: TcxGridDBTableView
       Navigator.Buttons.CustomButtons = <>
       DataController.DataSource = DataSource1

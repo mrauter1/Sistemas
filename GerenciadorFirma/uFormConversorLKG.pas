@@ -40,7 +40,9 @@ type
     EditQuantTotal: TEdit;
     procedure btnOKClick(Sender: TObject);
     procedure EditModeloExit(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
+    FormDensidades: TFormDensidades;
     FTotalLitros, FTotalKg: Double;
     procedure CarregaModelo;
     procedure CarregaInsumos(pCodModelo: String);
@@ -53,8 +55,8 @@ type
     function UnidadeIsLitro(const pNomeUnidade: String): Boolean;
   end;
 
-var
-  FormConversorLKG: TFormConversorLKG;
+{var
+  FormConversorLKG: TFormConversorLKG;       }
 
 implementation
 
@@ -219,6 +221,11 @@ end;
 procedure TFormConversorLKG.EditModeloExit(Sender: TObject);
 begin
   CarregaModelo;
+end;
+
+procedure TFormConversorLKG.FormCreate(Sender: TObject);
+begin
+  FormDensidades:= TFormDensidades.Create(Self);
 end;
 
 function TFormConversorLKG.PegaDensidade(CodGrupoSub: String): Double;

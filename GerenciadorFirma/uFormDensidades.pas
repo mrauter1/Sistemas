@@ -38,8 +38,8 @@ type
     { Public declarations }
   end;
 
-var
-  FormDensidades: TFormDensidades;
+{var
+  FormDensidades: TFormDensidades;     }
 
 implementation
 

@@ -10,7 +10,14 @@ uses
   cxCustomData, cxFilter, cxData, cxDataStorage, cxEdit, cxNavigator, cxDBData,
   Vcl.ExtCtrls, cxGridLevel, cxClasses, cxGridCustomView, cxGridCustomTableView,
   cxGridTableView, cxGridDBTableView, cxGrid, uFormGlobal, uPedidos, cxTextEdit,
-  Vcl.Buttons, Vcl.Menus, uDmEstoqProdutos, cxSpinEdit;
+  Vcl.Buttons, Vcl.Menus, uDmEstoqProdutos, cxSpinEdit, System.Generics.Collections;
+
+type
+  TViewState = record
+    TopRowIndex: Integer;
+    KeyField: String;
+    ExpandedRows: TArray<String>;
+  end;
 
 type
   TFormFilaProducao = class(TForm)
@@ -65,9 +72,15 @@ type
       Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord;
       var AText: string);
     procedure BtnExcelcxGridTarefaClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
+    FExpandedStateDic: TDictionary<String, Boolean>;
     procedure AtualizaGrid;
     function GetCodProSelecionado: String;
+    function SaveExpandedState(pView: TcxGridDBTableView;
+      KeyField: String): TViewState;
+    procedure LoadExpandedState(pView: TcxGridDBTableView; pViewState: TViewState);
     { Private declarations }
   public
     { Public declarations }
@@ -86,7 +99,7 @@ uses
 
 procedure TFormFilaProducao.AbrirDetalheProClick(Sender: TObject);
 begin
-  FormDetalheProdutos.AbreEFocaProduto(VarToStrDef(cxGridDBTableView.DataController.Values[cxGridDBTableView.DataController.FocusedRecordIndex,
+  TFormDetalheProdutos.AbreEFocaProduto(VarToStrDef(cxGridDBTableView.DataController.Values[cxGridDBTableView.DataController.FocusedRecordIndex,
                                                                 cxGridDBTableViewCODPRODUTO.Index], ''));
 end;
 
@@ -96,9 +109,65 @@ begin
   cxGridDBTableView.DataController.CreateAllItems;
 end;
 
-procedure TFormFilaProducao.BtnAtualizaClick(Sender: TObject);
+function TFormFilaProducao.SaveExpandedState(pView: TcxGridDBTableView; KeyField: String): TViewState;
+var
+  I: Integer;
+  FChave: Variant;
+  View: TcxGridDBTableView;
 begin
+  Result.KeyField:= KeyField;
+  SetLength(Result.ExpandedRows, 0);
+  Result.TopRowIndex:= pView.Controller.TopRowIndex;
+
+  for I := 0 to pView.DataController.RecordCount-1 do
+  begin
+    FChave:= pView.DataController.Values[I, pView.GetColumnByFieldName(KeyField).Index];
+
+    if pView.ViewData.Records[I].Expanded then
+    begin
+      SetLength(Result.ExpandedRows, length(Result.ExpandedRows)+1);
+      Result.ExpandedRows[High(Result.ExpandedRows)]:= FChave;
+    end;
+  end;
+end;
+
+procedure TFormFilaProducao.LoadExpandedState(pView: TcxGridDBTableView; pViewState: TViewState);
+var
+  FChave: String;
+  I: Integer;
+
+  function KeyInArray(pKey: string; pArray: TArray<String>): Boolean;
+  var
+    I: Integer;
+  begin
+    Result:= False;
+    for I := 0 to Length(pArray) -1 do
+      if pKey = pArray[I] then
+      begin
+        Result:= True;
+        Exit;
+      end;
+  end;
+
+begin
+  for I := 0 to pView.DataController.RecordCount-1 do
+  begin
+    FChave:= pView.DataController.Values[I, pView.GetColumnByFieldName(pViewState.KeyField).Index];
+    pView.ViewData.Records[I].Expanded:= KeyInArray(FChave, pViewState.ExpandedRows);
+  end;
+
+  pView.Controller.TopRowIndex:= pViewState.TopRowIndex;
+end;
+
+procedure TFormFilaProducao.BtnAtualizaClick(Sender: TObject);
+var
+  FState: TViewState;
+begin
+  FState:= SaveExpandedState(cxGridDBTableView, 'CODPRODUTO');
+
   DMFilaProducao.AtualizaFilaProducao;
+
+  LoadExpandedState(cxGridDBTableView, fState);
 end;
 
 procedure TFormFilaProducao.BtnExcelcxGridTarefaClick(Sender: TObject);
@@ -126,12 +195,12 @@ procedure TFormFilaProducao.BtnOpcoesClick(Sender: TObject);
 begin
   if BtnOpcoes.Caption = '+' then
   begin
-    cxGridDBTableView.DataController.Groups.FullExpand;
+    cxGridDBTableView.ViewData.Expand(True);
     BtnOpcoes.Caption:= '-';
   end
  else
   begin
-    cxGridDBTableView.DataController.Groups.FullCollapse;
+    cxGridDBTableView.ViewData.Collapse(True);
     BtnOpcoes.Caption:= '+';
   end;
 
@@ -154,6 +223,16 @@ begin
   TFormInsumos.AbrirInsumos(GetCodProSelecionado, DmEstoqProdutos.QryEstoqAPRESENTACAO.AsString);
 end;
 
+procedure TFormFilaProducao.FormCreate(Sender: TObject);
+begin
+  FExpandedStateDic:= TDictionary<String, Boolean>.Create;
+end;
+
+procedure TFormFilaProducao.FormDestroy(Sender: TObject);
+begin
+  FExpandedStateDic.Free;
+end;
+
 procedure TFormFilaProducao.VerInsumos1Click(Sender: TObject);
 begin
   TFormInsumos.AbrirInsumos(GetCodProSelecionado, DmEstoqProdutos.QryEstoqAPRESENTACAO.AsString);
@@ -172,7 +251,7 @@ end;
 
 procedure TFormFilaProducao.AbrirConfigProClick(Sender: TObject);
 begin
-  FormProInfo.Abrir(GetCodProSelecionado);
+  TFormProInfo.Abrir(GetCodProSelecionado);
 end;
 
 end.

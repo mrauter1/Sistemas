@@ -11,8 +11,6 @@ object FormFilaProducao: TFormFilaProducao
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
-  OnCreate = FormCreate
-  OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 13
   object cxGrid: TcxGrid
@@ -167,7 +165,7 @@ object FormFilaProducao: TFormFilaProducao
       42)
     object BtnAtualiza: TButton
       Left = 272
-      Top = 9
+      Top = 6
       Width = 447
       Height = 25
       Anchors = [akLeft, akRight, akBottom]

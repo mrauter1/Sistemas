@@ -828,13 +828,9 @@ begin
     Form:= pForm;
 
     if OwnsForm then
-      pForm.Parent:= Self
+      InsertComponent(pForm) // Changes the owner of the form to the tab;
     else
       pForm.FreeNotification(Self);
-{    if OwnsForm then
-      InsertComponent(Form)
-    else
-      Form.FreeNotification(Self);}
   finally
     FCriado:= True;
   end;

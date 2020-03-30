@@ -198,6 +198,8 @@ object FormEntregaPorProduto: TFormEntregaPorProduto
       Height = 216
       Align = alClient
       TabOrder = 0
+      ExplicitLeft = 2
+      ExplicitTop = 97
       object ViewPedidos: TcxGridDBTableView
         OnKeyDown = ViewPedidosKeyDown
         Navigator.Buttons.CustomButtons = <>
@@ -215,6 +217,7 @@ object FormEntregaPorProduto: TFormEntregaPorProduto
         OptionsView.GroupByBox = False
         OptionsView.HeaderAutoHeight = True
         Styles.Content = cxStyle1
+        Styles.OnGetContentStyle = ViewPedidosStylesGetContentStyle
         object ViewPedidosCheck: TcxGridDBColumn
           DataBinding.FieldName = 'Check'
           Width = 30
@@ -243,9 +246,8 @@ object FormEntregaPorProduto: TFormEntregaPorProduto
           DataBinding.FieldName = 'CODTRANSPORTE'
           Visible = False
         end
-        object ViewPedidosNOMETRANSPORTE: TcxGridDBColumn
-          DataBinding.FieldName = 'NOMETRANSPORTE'
-          Width = 198
+        object ViewPedidosNomeTransporte: TcxGridDBColumn
+          DataBinding.FieldName = 'NomeTransporte'
         end
         object ViewPedidosCODPRODUTO: TcxGridDBColumn
           DataBinding.FieldName = 'CODPRODUTO'
@@ -265,6 +267,10 @@ object FormEntregaPorProduto: TFormEntregaPorProduto
         object ViewPedidosDataProgramada: TcxGridDBColumn
           DataBinding.FieldName = 'DataProgramada'
           Width = 68
+        end
+        object ViewPedidosDataEntregaSidicom: TcxGridDBColumn
+          DataBinding.FieldName = 'DataEntregaSidicom'
+          Width = 66
         end
         object ViewPedidosDataPedido: TcxGridDBColumn
           DataBinding.FieldName = 'DataPedido'
@@ -428,7 +434,7 @@ object FormEntregaPorProduto: TFormEntregaPorProduto
   object DsEstoquePrevisto: TDataSource
     AutoEdit = False
     DataSet = QryEstoquePrevisto
-    Left = 112
+    Left = 88
     Top = 32
   end
   object QryEstoquePrevisto: TFDQuery
@@ -439,8 +445,8 @@ object FormEntregaPorProduto: TFormEntregaPorProduto
       'FROM LOG.EstoquePrevisto'
       'where CodGrupoSub =:CodGrupoSub'
       'order by CODGRUPOSUB, Data')
-    Left = 208
-    Top = 24
+    Left = 216
+    Top = 32
     ParamData = <
       item
         Name = 'CODGRUPOSUB'
@@ -504,6 +510,7 @@ object FormEntregaPorProduto: TFormEntregaPorProduto
       FieldName = 'PedidosDia'
       Origin = 'PedidosDia'
       Required = True
+      DisplayFormat = '#0'
       Precision = 38
     end
     object QryEstoquePrevistoSomaPedidos: TFMTBCDField
@@ -512,6 +519,7 @@ object FormEntregaPorProduto: TFormEntregaPorProduto
       FieldName = 'SomaPedidos'
       Origin = 'SomaPedidos'
       Required = True
+      DisplayFormat = '#0'
       Precision = 38
     end
     object QryEstoquePrevistoEstoquePrevisto: TFMTBCDField
@@ -579,11 +587,11 @@ object FormEntregaPorProduto: TFormEntregaPorProduto
     SQL.Strings = (
       
         'select CodGrupoSub, dbo.SituacaoPedTexto(SITUACAO) as Situacao, ' +
-        'NOMESUBGRUPO, CodPedido, NOMECLIENTE, CODTRANSPORTE, NOMETRANSPO' +
-        'RTE, '
+        'NOMESUBGRUPO, CodPedido, NOMECLIENTE, CODTRANSPORTE, '
+      '               NomeTransporte,'
       
-        #9'   CODPRODUTO, NOMEPRODUTO, Litros, Peso, DataProgramada, DataP' +
-        'edido,'
+        #9'   CODPRODUTO, NOMEPRODUTO, Litros, Peso, DataProgramada, DataE' +
+        'ntregaSidicom, DataPedido,'
       
         #9'   SUM(Litros) over (partition by CodGrupoSub order by CodGrupo' +
         'Sub, DataProgramada, Litros desc, NomeCliente ) as SomaPedidos'
@@ -658,13 +666,13 @@ object FormEntregaPorProduto: TFormEntregaPorProduto
       FixedChar = True
       Size = 6
     end
-    object QryPedidosNOMETRANSPORTE: TStringField
+    object QryPedidosNomeTransporte: TStringField
       DisplayLabel = 'Transportadora'
       DisplayWidth = 25
-      FieldName = 'NOMETRANSPORTE'
-      Origin = 'NOMETRANSPORTE'
+      FieldName = 'NomeTransporte'
+      Origin = 'NomeTransporte'
       ReadOnly = True
-      Size = 39
+      Size = 37
     end
     object QryPedidosCODPRODUTO: TStringField
       FieldName = 'CODPRODUTO'
@@ -687,6 +695,7 @@ object FormEntregaPorProduto: TFormEntregaPorProduto
       FieldName = 'Litros'
       Origin = 'Litros'
       ReadOnly = True
+      DisplayFormat = '#0'
       Precision = 37
     end
     object QryPedidosPeso: TFMTBCDField
@@ -695,6 +704,7 @@ object FormEntregaPorProduto: TFormEntregaPorProduto
       Origin = 'Peso'
       ReadOnly = True
       Visible = False
+      DisplayFormat = '#0'
       Precision = 38
       Size = 6
     end
@@ -703,6 +713,11 @@ object FormEntregaPorProduto: TFormEntregaPorProduto
       FieldName = 'DataProgramada'
       Origin = 'DataProgramada'
       ReadOnly = True
+    end
+    object QryPedidosDataEntregaSidicom: TDateField
+      DisplayLabel = 'Data Entrega Sidicom'
+      FieldName = 'DataEntregaSidicom'
+      Origin = 'DataEntregaSidicom'
     end
     object QryPedidosDataPedido: TDateField
       DisplayLabel = 'Data Pedido'
@@ -716,6 +731,7 @@ object FormEntregaPorProduto: TFormEntregaPorProduto
       FieldName = 'SomaPedidos'
       Origin = 'SomaPedidos'
       ReadOnly = True
+      DisplayFormat = '#0'
       Precision = 38
     end
   end
@@ -788,7 +804,7 @@ object FormEntregaPorProduto: TFormEntregaPorProduto
     Top = 152
   end
   object cxStyleRepository1: TcxStyleRepository
-    Left = 128
+    Left = 304
     Top = 8
     PixelsPerInch = 96
     object cxStyle1: TcxStyle
@@ -806,6 +822,10 @@ object FormEntregaPorProduto: TFormEntregaPorProduto
       Font.Height = -13
       Font.Name = 'Tahoma'
       Font.Style = []
+    end
+    object cxStyleAmarelo: TcxStyle
+      AssignedValues = [svColor]
+      Color = clYellow
     end
   end
   object Timer1: TTimer

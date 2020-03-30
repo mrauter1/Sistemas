@@ -72,10 +72,7 @@ type
       Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord;
       var AText: string);
     procedure BtnExcelcxGridTarefaClick(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
   private
-    FExpandedStateDic: TDictionary<String, Boolean>;
     procedure AtualizaGrid;
     function GetCodProSelecionado: String;
     function SaveExpandedState(pView: TcxGridDBTableView;
@@ -221,16 +218,6 @@ end;
 procedure TFormFilaProducao.cxGridDBTableViewDblClick(Sender: TObject);
 begin
   TFormInsumos.AbrirInsumos(GetCodProSelecionado, DmEstoqProdutos.QryEstoqAPRESENTACAO.AsString);
-end;
-
-procedure TFormFilaProducao.FormCreate(Sender: TObject);
-begin
-  FExpandedStateDic:= TDictionary<String, Boolean>.Create;
-end;
-
-procedure TFormFilaProducao.FormDestroy(Sender: TObject);
-begin
-  FExpandedStateDic.Free;
 end;
 
 procedure TFormFilaProducao.VerInsumos1Click(Sender: TObject);

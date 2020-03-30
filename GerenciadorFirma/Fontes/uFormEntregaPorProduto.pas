@@ -74,7 +74,6 @@ type
     QryPedidosCodPedido: TStringField;
     QryPedidosNOMECLIENTE: TStringField;
     QryPedidosCODTRANSPORTE: TStringField;
-    QryPedidosNOMETRANSPORTE: TStringField;
     QryPedidosCODPRODUTO: TStringField;
     QryPedidosNOMEPRODUTO: TStringField;
     QryPedidosLitros: TFMTBCDField;
@@ -85,7 +84,6 @@ type
     ViewPedidosCodPedido: TcxGridDBColumn;
     ViewPedidosNOMECLIENTE: TcxGridDBColumn;
     ViewPedidosCODTRANSPORTE: TcxGridDBColumn;
-    ViewPedidosNOMETRANSPORTE: TcxGridDBColumn;
     ViewPedidosCODPRODUTO: TcxGridDBColumn;
     ViewPedidosNOMEPRODUTO: TcxGridDBColumn;
     ViewPedidosLitros: TcxGridDBColumn;
@@ -120,6 +118,11 @@ type
     ViewPedidosSituacao: TcxGridDBColumn;
     BtnAtualizaDatasSidicom: TBitBtn;
     Timer1: TTimer;
+    QryPedidosDataEntregaSidicom: TDateField;
+    ViewPedidosDataEntregaSidicom: TcxGridDBColumn;
+    QryPedidosNomeTransporte: TStringField;
+    ViewPedidosNomeTransporte: TcxGridDBColumn;
+    cxStyleAmarelo: TcxStyle;
     procedure QryComprasPrevistasAfterPost(DataSet: TDataSet);
     procedure QryComprasPrevistasAfterDelete(DataSet: TDataSet);
     procedure QryComprasPrevistasBeforePost(DataSet: TDataSet);
@@ -139,6 +142,9 @@ type
     procedure FormCreate(Sender: TObject);
     procedure BtnAtualizaDatasSidicomClick(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
+    procedure ViewPedidosStylesGetContentStyle(Sender: TcxCustomGridTableView;
+      ARecord: TcxCustomGridRecord; AItem: TcxCustomGridTableItem;
+      var AStyle: TcxStyle);
   private
     FGrupo: String;
     FChecked: TDictionary<String, Boolean>;
@@ -167,6 +173,9 @@ implementation
 
 { TFormEntregaPorProduto }
 
+uses
+  uFormPrincipal;
+
 class procedure TFormEntregaPorProduto.AbreGrupo(pCodGrupo: String);
 var
   FormEntregaPorProduto: TFormEntregaPorProduto;
@@ -174,9 +183,10 @@ begin
   FormEntregaPorProduto:= TFormEntregaPorProduto.Create(nil);
   try
     FormEntregaPorProduto.SetGrupo(pCodGrupo);
-    FormEntregaPorProduto.ShowModal;
-  finally
+    FormPrincipal.AbrirFormEmNovaAba(FormEntregaPorProduto, True);
+  except
     FormEntregaPorProduto.Free;
+    raise;
   end;
 end;
 
@@ -199,7 +209,7 @@ end;
 procedure TFormEntregaPorProduto.RefreshQueries;
 begin
   RefreshQuery(QryEstoquePrevisto);
-  RefreshQuery(QryEstoquePrevisto);
+  RefreshQuery(QryPedidos);
   RefreshQuery(QryComprasPrevistas);
   RefreshQuery(QryPedidosProgramados);
 end;
@@ -425,6 +435,16 @@ procedure TFormEntregaPorProduto.ViewPedidosKeyDown(Sender: TObject;
 begin
   if Key = VK_SPACE then
     SelecionaPedido;
+
+end;
+
+procedure TFormEntregaPorProduto.ViewPedidosStylesGetContentStyle(
+  Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;
+  AItem: TcxCustomGridTableItem; var AStyle: TcxStyle);
+begin
+  if Sender.DataController.Values[ARecord.RecordIndex, ViewPedidosDataProgramada.Index] <>
+     Sender.DataController.Values[ARecord.RecordIndex, ViewPedidosDataEntregaSidicom.Index] then
+    AStyle := cxStyleAmarelo;
 
 end;
 

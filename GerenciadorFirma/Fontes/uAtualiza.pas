@@ -3,11 +3,12 @@ unit uAtualiza;
 interface
 
 uses
-  System.Classes, uCopyFolder3Test;
+  System.Classes, uCopyFolder3Test, uFrmShowMemo;
 
 type
   TAtualiza = class
   private
+    FormShowMemo: TFormShowMemo;
     FVersaoAtual: String;
     FErroAtualizacao: Boolean;
     FAtualizando: Boolean;
@@ -115,6 +116,8 @@ begin
       CanCopy:= False;
   end;
 
+  Application.ProcessMessages;
+
 end;
 
 procedure TAtualiza.SalvarConfig;
@@ -152,6 +155,7 @@ end;
 constructor TAtualiza.Create(pUpdatePath: String);
 begin
   inherited Create;
+  FormShowMemo:= TFormShowMemo.Create(nil);
 
   FArquivosParaIgnorar:= TStringList.Create;
   FArquivosParaIgnorar.Add('Usuario.ini');
@@ -169,6 +173,7 @@ end;
 
 destructor TAtualiza.Destroy;
 begin
+  FormShowMemo.Free;
   FArquivosParaIgnorar.Free;
 
   inherited;
@@ -254,13 +259,20 @@ begin
 
   if HouveAlteracao then
   begin
-    FNomeOriginal:= Application.ExeName;
-//    Renomeia;
-    if not Copiar then
-      Exit;
+    FormShowMemo.Show;
+    try
+      FormShowMemo.SetText('Atualizando Projeto Gerenciador. Aguarde...');
 
-    Exec;
-    Halt;
+      FNomeOriginal:= Application.ExeName;
+  //    Renomeia;
+      if not Copiar then
+        Exit;
+
+      Exec;
+      Halt;
+    finally
+      FormShowMemo.Close;
+    end;
   end;
 end;
 

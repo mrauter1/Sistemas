@@ -15,8 +15,8 @@ program TestAtividades;
 {$ENDIF}
 
 uses
-  Forms,
   DUnitTestRunner,
+  Forms,
   uConSqlServer in '..\..\..\utils\uConSqlServer.pas',
   Ladder.TestActivity in 'Ladder.TestActivity.pas',
   Ladder.Activity.Classes in '..\Ladder.Activity.Classes.pas',

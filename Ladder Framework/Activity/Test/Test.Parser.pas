@@ -12,7 +12,8 @@ unit Test.Parser;
 interface
 
 uses
-  TestFramework, Variants, System.SysUtils, Utils, Ladder.Activity.Parser, StrUtils, uConSqlServer;
+  TestFramework, Variants, System.SysUtils, Utils, Ladder.Activity.Parser, StrUtils, uConSqlServer,
+  Ladder.ServiceLocator, SynDB, SynCommons, Ladder.Activity.Classes;
 
 type
   THackActivityParser = class(TActivityParser); // Hack para acessar métodos protegidos
@@ -22,8 +23,8 @@ type
     FActivityParser: THackActivityParser;
     FConSqlServer: TConSqlServer;
   private
-    procedure FunElementEval(pElement: String; var Return: Variant);
-    procedure FunSqlEval(pSql: String; var Return: Variant);
+    procedure FunElementEval(const pElement: String; var Return: Variant);
+    procedure FunSqlEval(const pSql: String; var Return: Variant);
     function ParseNewString(pExpression: String): variant;
     procedure DoTest(pTest: array of string); // First Item is Expression, Second item is Expected Result
   public
@@ -41,7 +42,6 @@ type
     procedure TestParseSql;
     procedure TestDoParseExpression;
     procedure TestParseExpression;
-
     // Coupled tests
     procedure TestBigSql;
   end;
@@ -67,14 +67,17 @@ begin
 end;
 
 // Return name of element for testing purposes
-procedure TestTActivityParser.FunElementEval(pElement: String; var Return: Variant);
+procedure TestTActivityParser.FunElementEval(const pElement: String; var Return: Variant);
 begin
   Return:= pElement;
 end;
 
-procedure TestTActivityParser.FunSqlEval(pSql: String; var Return: Variant);
+procedure TestTActivityParser.FunSqlEval(const pSql: String; var Return: Variant);
+var
+  FCon: TSQLDBConnectionProperties;
 begin
-  FConSqlServer.DataSetToVarArray(pSql, Return);
+  FCon:= TFrwServiceLocator.Context.Connection;
+  Return:= _Json(FCon.Execute(pSql, []).FetchAllAsJSON(true));
 end;
 
 procedure TestTActivityParser.SetUp;
@@ -181,25 +184,31 @@ const
 
 var
   ReturnValue: Variant;
+  NewValue: Variant;
 
 begin
   CheckEquals(0, VarToIntDef(ParseNewSql(s0),1));
   CheckEquals('ABCDE',VarToStr(ParseNewSql(sString)));
-  CheckEquals(Trunc(Now()), Trunc(VarToDateTime(ParseNewSql(sDate))));
+
+  ReturnValue:= ParseNewSql(sDate);
+  Check(LadderVarIsDateTime(ReturnValue), 'Return value must be Date.');
+  CheckEquals(Trunc(Now()), Trunc(Iso8601ToDateTime(ReturnValue)));
 
   ReturnValue:= ParseNewSql(sList);
-  CheckEquals(4, VarArrayLength(ReturnValue)); // Field names are stored in index -1;
-  CheckEquals('NUM', ReturnValue[-1][0]);
-  CheckEquals(1, ReturnValue[0][0]);
-  CheckEquals(2, ReturnValue[1][0]);
-  CheckEquals(3, ReturnValue[2][0]);
+  CheckEquals(3, ReturnValue._Count); // Field names are stored in index -1;
+  NewValue:= TDocVariantData(ReturnValue).Values[0];
+  CheckEquals('NUM', TDocVariantData(NewValue).Names[0]);
+  CheckEquals(1, ReturnValue._(0)._(0));
+  CheckEquals(2, ReturnValue._(1)._(0));
+  CheckEquals(3, ReturnValue._(2)._(0));
 
   ReturnValue:= ParseNewSql(sTable);
-  CheckEquals('NUM', ReturnValue[-1][0]);
-  CheckEquals('NOME', ReturnValue[-1][1]);
-  CheckEquals(1, ReturnValue[0][0]);
-  CheckEquals('TESTE1', ReturnValue[0][1]);
-  CheckEquals('TESTE3', ReturnValue[2][1]);
+  NewValue:= TDocVariantData(ReturnValue).Values[0];
+  CheckEquals('NUM', ReturnValue._(0).Name(0));
+  CheckEquals('NOME', TDocVariantData(NewValue).Names[1]);
+  CheckEquals(1, ReturnValue._(0)._(0));
+  CheckEquals('TESTE1', ReturnValue._(0)._(1));
+  CheckEquals('TESTE3', ReturnValue._(2)._(1));
 end;
 
 procedure TestTActivityParser.TestParseString;
@@ -270,6 +279,7 @@ const
   sTest5: TArray<String> = ['$SELECT ''T'' UNION SELECT ''E''$[1][0]', 'E'];
   sTest6: TArray<String> = ['$SELECT 1 as idx, ''T'' as nome UNION SELECT 2, ''E''$[1]["idx"]', '2'];
   sTest7: TArray<String> = ['$SELECT 1 as idx, ''T'' as nome UNION SELECT 2, ''E''$[1]["NOME"]', 'E'];
+
 begin
   DoTest(sTest1);
   DoTest(sTest2);
@@ -304,26 +314,28 @@ begin
   Index:= 1;
   FActivityParser.Expression:= sEmptyList;
   FActivityParser.ParseList(Index, ReturnValue);
-  Check(VarArrayLength(ReturnValue) = 0, 'List should be empty');
+  Check(ReturnValue._Count = 0, 'List should be empty');
   Check(Index=3, 'Index should be 3');
 
   ReturnValue:= ParseNewList(sStringList);
-  Check(VarArrayLength(ReturnValue)=1, 'List should have one item.');
-  CheckEquals('bla', ReturnValue[0]);
+  Check(DocVariantType.IsOfType(ReturnValue));
+
+  Check(ReturnValue._Count=1, 'List should have one item.');
+  CheckEquals('bla', ReturnValue._(0));
 
   ReturnValue:= ParseNewList(sMultiList);
-  Check(VarArrayLength(ReturnValue)=3, 'List should have three items.');
-  CheckEquals('co', ReturnValue[0]);
-  CheckEquals('ro', ReturnValue[1]);
-  CheckEquals('na', ReturnValue[2]);
+  Check(ReturnValue._Count=3, 'List should have three items.');
+  CheckEquals('co', ReturnValue._(0));
+  CheckEquals('ro', ReturnValue._(1));
+  CheckEquals('na', ReturnValue._(2));
 
-  FCopyVal:= ReturnValue;
+{  FCopyVal:= ReturnValue;
   FCopyVal[0]:= 'Changed';
   CheckEquals('co', ReturnValue[0]);
 
   FCopyRef:= @ReturnValue;
   FCopyRef^[0]:= 'Changed';
-  CheckEquals('Changed', ReturnValue[0]);
+  CheckEquals('Changed', ReturnValue[0]);}
 
   try
     ParseNewList(sNumberList);
@@ -369,8 +381,8 @@ const
 begin
   // TODO: Setup method call parameters
   ReturnValue:= NewParseNext(sMultiList);
-  Check(VarIsArray(ReturnValue), 'Return should be VarArray');
-  Check(VarArrayLength(ReturnValue)=3, 'Return should be a VarArray with 3 items.');
+  Check(DocVariantType.IsOfType(ReturnValue), 'Return should be DocVariantData');
+  Check(ReturnValue._Count=3, 'Return should be a DocVariantData with 3 items.');
 
   ReturnValue:= NewParseNext(sString);
   Check(VarIsStr(ReturnValue), 'Return should be String');
@@ -491,8 +503,8 @@ const
 begin
   // TODO: Setup method call parameters
   FActivityParser.DoParseExpression(sMultiList, ReturnValue);
-  Check(VarIsArray(ReturnValue), 'Return should be VarArray');
-  Check(VarArrayLength(ReturnValue)=3, 'Return should be a VarArray with 3 items.');
+  Check(DocVariantType.IsOfType(ReturnValue), 'Return should be DccVariant');
+  Check(ReturnValue._Count, 'Return should be a DccVariant with 3 items.');
 
   FActivityParser.DoParseExpression(sString, ReturnValue);
   Check(VarIsStr(ReturnValue), 'Return should be String');
@@ -515,16 +527,17 @@ var
   ReturnValue: variant;
 begin
   TActivityParser.ParseExpression('[]', ReturnValue, nil); // Same as DoParseExpression, but wrapped as a class function
-  Check(VarIsArray(ReturnValue), 'Return should be VarArray');
+  Check(DocVariantType.IsOfType(ReturnValue), 'Return should be DocVariant');
 end;
 
 
 procedure TestTActivityParser.TestBigSql;
 var
-  FRes: Variant;
+  FRes, FCount: Variant;
 begin
   FActivityParser.DoParseExpression('$SELECT * FROM MFOR$', FRes);
-  FRes:= null;
+  FActivityParser.DoParseExpression('$@SELECT Count(*) FROM MFOR$', FCount);
+  CheckEquals(VarToIntDef(FCount,0), FRes._Count);
 end;
 
 initialization

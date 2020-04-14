@@ -41,19 +41,16 @@ begin
 
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-{  WriteLog('Criando TConSqlServer');
-  Application.CreateForm(TConSqlServer, ConSqlServer);  }
-{  WriteLog('Criando TConFirebird');
-  Application.CreateForm(TConFirebird, ConFirebird);  }
-
-  ExecutaTestes;
-
-{  WriteLog('Criando TMonitorMain');
+  WriteLog('Criando TConSqlServer');
+  Application.CreateForm(TConSqlServer, ConSqlServer);
+  WriteLog('Criando TConFirebird');
+  Application.CreateForm(TConFirebird, ConFirebird);
+  WriteLog('Criando TMonitorMain');
   Application.CreateForm(TMonitorMain, MonitorMain);
   WriteLog('Criando TDmSqlUtils');
   Application.CreateForm(TDmSqlUtils, DmSqlUtils);
   WriteLog('Criando TCon');
   Application.CreateForm(TCon, Con);
   WriteLog('Inicializando message loop');
-  Application.Run;                                }
+  Application.Run;
 end.

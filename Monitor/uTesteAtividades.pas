@@ -3,7 +3,7 @@ unit uTesteAtividades;
 interface
 
 uses
-  Ladder.Activity.Classes, uConClasses;
+  Ladder.Activity.Classes;
 
 type
   TTesteAtividades = class
@@ -30,9 +30,8 @@ begin
   FTesteAtividades:= TTesteAtividades.Create;
   try
     FTesteAtividades.Setup;
-//    FTesteAtividades.TestaAtividade;
-
-    FTesteAtividades.TestaAtividadeEmail;
+    FTesteAtividades.TestaAtividade;
+//    FTesteAtividades.TestaAtividadeEmail;
 
     FTesteAtividades.TearDown;
   finally
@@ -43,38 +42,37 @@ end;
 procedure TTesteAtividades.Setup;
 var
   FProcesso: TProcessoBase;
-  FInput: TParametroCon;
   FOutput: TOutputBase;
 begin
   FAtividade:= TAtividade.Create;
   FAtividade.ID:= 1;
   FAtividade.Descricao:= 'Teste envio de email';
-  FAtividade.Inputs.Add(
-    TParametroCon.Create('Titulo', 'email de teste', ptTexto, 'Título do email', ''));
+  FAtividade.Inputs.Add(TInputBase.Create('Titulo', tbString, 'email de teste'));
 
-  FAtividade.Inputs.Add(
-    TParametroCon.Create('Body', 'Este é um email para testar a classe atividade, será enviada uma lista com as vendas com margem baixa de ontem.', ptTexto, 'Corpo do email', ''));
+  FAtividade.Inputs.Add(TInputBase.Create('Body', tbString, 'Este é um email para testar a classe atividade, '+
+                        'será enviada uma lista com as vendas com margem baixa de ontem.'));
 
   FProcesso:= TProcessoBase.Create;
+  FProcesso.Nome:= 'Meta';
   FProcesso.Tipo:= tpConsultaPersonalizada;
-  FInput:= TParametroCon.Create('NomeConsulta', 'MetaVendedores', ptTexto, 'Meta Vendedores', '');
-  FProcesso.Inputs.Add(FInput);
+  FProcesso.Inputs.Add(TInputBase.Create('NomeConsulta', tbString, 'MetaVendedores'));
 
   FOutput:= TOutputBase.Create;
-  FOutput.Parametros.Add(TParametroCon.Create('Visualizacao', 'Realizado e Meta da Venda e Margem', ptTexto, 'Visualização', ''));
-  FOutput.Parametros.Add(TParametroCon.Create('NomeArquivo', 'MetaVendedores.png', ptTexto, 'Nome Arquivo', ''));
-  FOutput.Parametros.Add(TParametroCon.Create('TipoVisualizacao', 'GRAFICO', ptTexto, 'Tipo Visualização', ''));
+  FOutput.Nome:= 'Grafico';
+  FOutput.Parametros.Add(TInputBase.Create('Visualizacao', tbString, 'Realizado e Meta da Venda e Margem'));
+  FOutput.Parametros.Add(TInputBase.Create('NomeArquivo', tbString, 'MetaVendedores.png'));
+  FOutput.Parametros.Add(TInputBase.Create('TipoVisualizacao', tbString, 'GRAFICO'));
   FProcesso.Outputs.Add(FOutput);
   FOutput:= TOutputBase.Create;
-  FOutput.Parametros.Add(TParametroCon.Create('Visualizacao', 'Realizado e Meta da Venda e Margem', ptTexto, 'Visualização', ''));
-  FOutput.Parametros.Add(TParametroCon.Create('NomeArquivo', 'MetaVendedores.xls', ptTexto, 'Nome Arquivo', ''));
-  FOutput.Parametros.Add(TParametroCon.Create('TipoVisualizacao', 'TABELA', ptTexto, 'Tipo Visualização', ''));
+  FOutput.Nome:= 'Tabela';
+  FOutput.Parametros.Add(TInputBase.Create('Visualizacao', tbString, 'Realizado e Meta da Venda e Margem'));
+  FOutput.Parametros.Add(TInputBase.Create('NomeArquivo', tbString, 'MetaVendedores.xls'));
+  FOutput.Parametros.Add(TInputBase.Create('TipoVisualizacao', tbString, 'TABELA'));
   FProcesso.Outputs.Add(FOutput);
 
   FAtividade.Processos.Add(FProcesso);
 
-  FAtividade.Inputs.Add(
-    TParametroCon.Create('Anexos', 'F:\Sistemas\Monitor\Test.txt', ptCheckListBox, 'Lista de anexos', ''));
+  FAtividade.Inputs.Add(TInputBase.Create('Anexos', tbString, 'F:\Sistemas\Monitor\Test.txt'));
 end;
 
 procedure TTesteAtividades.TearDown;
@@ -90,12 +88,15 @@ end;
 procedure TTesteAtividades.TestaAtividadeEmail;
 var
   FProcessoEmail: TProcessoBase;
-  FInput: TParametroCon;
 begin
   FProcessoEmail:= TProcessoBase.Create;
-  FProcessoEmail.Tipo:= tpConsultaPersonalizada;
-  FInput:= TParametroCon.Create('NomeConsulta', 'MetaVendedores', ptTexto, 'Meta Vendedores', '');
-  FProcessoEmail.Inputs.Add(FInput);
+  FProcessoEmail.Tipo:= tpEnvioEmail;
+  FProcessoEmail.Nome:= 'ProcEnviaEmail';
+  FProcessoEmail.Inputs.Add(TInputBase.Create('Destinatarios', tbString, '@Vendedores.Destinarios'));
+  FProcessoEmail.Inputs.Add(TInputBase.Create('Assunto', tbString, 'Email de teste'));
+  FProcessoEmail.Inputs.Add(TInputBase.Create('Corpo', tbString, 'Corpo do email'));
+  FProcessoEmail.Inputs.Add(TInputBase.Create('Anexos', tbLista, '[@Meta.Grafico, @Meta.Tabela]'));
+  FAtividade.Processos.Add(FProcessoEmail);
 end;
 
 end.

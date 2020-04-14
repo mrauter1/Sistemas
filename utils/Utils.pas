@@ -37,6 +37,7 @@ procedure AbortMessage(pMensagem, pTitulo: String);
 
 function IsCurrencyField(pField: TField): Boolean;
 
+function VarArrayLength(pVar: variant; Dim: Integer=1): Integer;
 function StringToVarArray(pSeparador, pString: String): Variant;
 function VarToIntDef(pVar: Variant; pDefault: Integer = 0): Integer;
 function VarToFloatDef(pVar: Variant; pDefault: Double = 0): Double;
@@ -260,6 +261,11 @@ begin
   WriteLn(F, FormatDateTime('ddmmyyyy-hh:mm:ss', Now)+' -> '+Par_Texto);
 
   CloseFile(F);
+end;
+
+function VarArrayLength(pVar: variant; Dim: Integer=1): Integer;
+begin
+  Result:= (VarArrayHighBound(pVar, Dim) - VarArrayLowBound(pVar, Dim))+1;
 end;
 
 function StringToVarArray(pSeparador, pString: String): Variant;

@@ -206,10 +206,10 @@ type
       pMostraDialog: Boolean = False; pUsarFormatoNativo: Boolean = False): Boolean;
     function ExportaTabelaDinamica(pNomeArquivo: String): Boolean;
     function ExportaGrafico(pNomeArquivo: String): Boolean;
-    procedure AbrirConsultaPersonalizada(Consulta :string);
+    procedure AbrirConsultaPersonalizada(Consulta :string; pExecutar: Boolean = True);
 
-    class function AbreConsultaPersonalizadaByName(NomeConsulta: String; pWindowState: TWindowState = wsNormal): TFrmConsultaPersonalizada; static;
-    class function AbreConsultaPersonalizada(pIDConsulta: Integer): TFrmConsultaPersonalizada;
+    class function AbreConsultaPersonalizadaByName(NomeConsulta: String; pExecutar: Boolean = True; pWindowState: TWindowState = wsNormal): TFrmConsultaPersonalizada; static;
+    class function AbreConsultaPersonalizada(pIDConsulta: Integer; pExecutar: Boolean = True): TFrmConsultaPersonalizada;
     class function ExportaTabelaParaExcel(NomeConsulta: String; pNomeArquivo: String;
                       Params: TDictionary<string, variant> = nil;
                       pTipoVisualizacao: TTipoVisualizacao = tvTabela;
@@ -283,21 +283,21 @@ begin
   end;}
 end;
 
-class function TFrmConsultaPersonalizada.AbreConsultaPersonalizada(pIDConsulta: Integer): TFrmConsultaPersonalizada;
+class function TFrmConsultaPersonalizada.AbreConsultaPersonalizada(pIDConsulta: Integer; pExecutar: Boolean = True): TFrmConsultaPersonalizada;
 var
   FFrmConsulta: TFrmConsultaPersonalizada;
 begin
   FFrmConsulta:= TFrmConsultaPersonalizada.Create(Application);
-  FFrmConsulta.AbrirConsultaPersonalizada(IntToStr(pIDConsulta));
+  FFrmConsulta.AbrirConsultaPersonalizada(IntToStr(pIDConsulta), pExecutar);
   Result:= FFrmConsulta;
 end;
 
 class function TFrmConsultaPersonalizada.Conn: TDmConnection;
 begin
-  Result:= TFrwServiceLocator.getConnection;
+  Result:= TFrwServiceLocator.Context.DmConnection;
 end;
 
-class function TFrmConsultaPersonalizada.AbreConsultaPersonalizadaByName(NomeConsulta: String; pWindowState: TWindowState = wsNormal): TFrmConsultaPersonalizada;
+class function TFrmConsultaPersonalizada.AbreConsultaPersonalizadaByName(NomeConsulta: String; pExecutar: Boolean = True; pWindowState: TWindowState = wsNormal): TFrmConsultaPersonalizada;
 var
   FCodRelatorio: Integer;
 const
@@ -313,10 +313,10 @@ begin
     Exit;
   end;
 
-  Result:= TFrmConsultaPersonalizada.AbreConsultaPersonalizada(FCodRelatorio);
+  Result:= TFrmConsultaPersonalizada.AbreConsultaPersonalizada(FCodRelatorio, pExecutar);
 end;
 
-procedure TFrmConsultaPersonalizada.AbrirConsultaPersonalizada(Consulta :string);
+procedure TFrmConsultaPersonalizada.AbrirConsultaPersonalizada(Consulta :string; pExecutar: Boolean = True);
 begin
 {  if not FDm.UsuarioLogadoTemPermissao(StrToIntDef(Consulta,0)) then
     Close;      }
@@ -325,7 +325,8 @@ begin
 
   ConfiguraTipoFormulario;
 
-  Proc_Go_Para();
+  if pExecutar then
+    Proc_Go_Para();
 
   AtualizaTitulo;
 end;
@@ -1287,7 +1288,7 @@ begin
 
   FUltimaConfig:= 0;
 
-  FDm:= TDmGeradorConsultas.Create(Self, TFrwServiceLocator.getConnection);
+  FDm:= TDmGeradorConsultas.Create(Self, TFrwServiceLocator.Context.DmConnection);
 
   PageControlAtiva(0);
 

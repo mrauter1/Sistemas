@@ -173,7 +173,7 @@ var
   FFrom: String;
   FIni: TIniFile;
 begin
-  FIni:= TIniFile.Create(ExtractFilePath(Application.ExeName)+pIniFile);
+  FIni:= TIniFile.Create(pIniFile);
   try
     FSmtpServer:= FIni.ReadString(pSection, 'SmtpServer', '');
     FPort:= FIni.ReadInteger(pSection, 'Port', 0);

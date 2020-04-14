@@ -256,10 +256,6 @@ object FormRelatoriosPersonalizados: TFormRelatoriosPersonalizados
         object TabParametros: TTabSheet
           Caption = 'Par'#226'metros'
           ImageIndex = 1
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 649
-          ExplicitHeight = 0
           object cxGridParams: TcxGrid
             Left = 0
             Top = 0
@@ -267,7 +263,6 @@ object FormRelatoriosPersonalizados: TFormRelatoriosPersonalizados
             Height = 418
             Align = alClient
             TabOrder = 0
-            ExplicitWidth = 649
             object cxGridParamsDBTableView1: TcxGridDBTableView
               Navigator.Buttons.CustomButtons = <>
               Navigator.Buttons.First.Visible = False
@@ -347,10 +342,6 @@ object FormRelatoriosPersonalizados: TFormRelatoriosPersonalizados
         object TabCampos: TTabSheet
           Caption = 'Campos'
           ImageIndex = 2
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 649
-          ExplicitHeight = 0
           object cxGridCampos: TcxGrid
             Left = 0
             Top = 0
@@ -358,7 +349,6 @@ object FormRelatoriosPersonalizados: TFormRelatoriosPersonalizados
             Height = 225
             Align = alTop
             TabOrder = 0
-            ExplicitWidth = 649
             object cxGridDBTableView1: TcxGridDBTableView
               Navigator.Buttons.CustomButtons = <>
               Navigator.Buttons.First.Visible = False
@@ -467,7 +457,6 @@ object FormRelatoriosPersonalizados: TFormRelatoriosPersonalizados
             Height = 193
             Align = alClient
             TabOrder = 1
-            ExplicitWidth = 649
             object cxGridConsultaView: TcxGridDBTableView
               Navigator.Buttons.CustomButtons = <>
               Navigator.Buttons.First.Visible = False
@@ -500,6 +489,22 @@ object FormRelatoriosPersonalizados: TFormRelatoriosPersonalizados
             object cxGridLevel2: TcxGridLevel
               GridView = cxGridConsultaView
             end
+          end
+        end
+        object TabSql: TTabSheet
+          Caption = 'Sql'
+          ImageIndex = 3
+          object MemoSqlGerado: TMemo
+            Left = 0
+            Top = 0
+            Width = 698
+            Height = 418
+            Align = alClient
+            Lines.Strings = (
+              '')
+            TabOrder = 0
+            ExplicitWidth = 808
+            ExplicitHeight = 447
           end
         end
       end

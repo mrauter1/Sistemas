@@ -18,10 +18,12 @@ uses
   DUnitTestRunner,
   Forms,
   uConSqlServer in '..\..\..\utils\uConSqlServer.pas',
-  Ladder.TestActivity in 'Ladder.TestActivity.pas',
+  Test.Classes in 'Test.Classes.pas',
   Ladder.Activity.Classes in '..\Ladder.Activity.Classes.pas',
   Test.Parser in 'Test.Parser.pas',
-  Ladder.Activity.Parser in '..\Ladder.Activity.Parser.pas';
+  Ladder.Activity.Parser in '..\Ladder.Activity.Parser.pas',
+  Ladder.Connection in '..\..\Ladder.Connection.pas',
+  uTesteAtividades in 'uTesteAtividades.pas';
 
 {$R *.RES}
 

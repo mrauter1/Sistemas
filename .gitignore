@@ -98,3 +98,4 @@ __recovery/
 /Monitor/ListaPrecos/credentials.json
 /Monitor/ListaPrecos/token.pickle
 /Monitor/ListaPrecos/token.pickle
+/GerenciadorFirma/bin/Config.bkp.ini

@@ -13,29 +13,31 @@ type
 
   TParametroCon = class(TObject)
   private
-  public
     FCodigo: Integer;
     FNome: String;
     FValor: Variant;
     FTipo: TTipoParametro;
     FDescricao: String;
     FSql: String;
+    FValorPadrao: String;
+  public
     constructor Create(pNome: String; pValor: Variant; pTipo: TTipoParametro; pDescricao: String=''; pSql: String=''); overload;
+    property Valor: Variant read FValor write FValor;
   published
     property Codigo: integer read FCodigo write FCodigo;
     property Nome: String read FNome write FNome;
-    property Valor: Variant read FValor write FValor;
     property Tipo: TTipoParametro read FTipo write FTipo;
     property Descricao: String read FDescricao write FDescricao;
     property Sql: String read FSql write FSql;
+    property ValorPadrao: String read FValorPadrao write FValorPadrao;
   end;
 
-  TParametros = class(TDictionary<String, TParametroCon>)
+  TParametros = class(TObjectDictionary<String, TParametroCon>)
   public
     constructor Create;
     function ParamValueByName(pNome: String; pDefault: Variant): variant;
-    procedure Add(pParam: TParametroCon); overload;
-    procedure Remove(PParam: TParametroCon); overload;
+    procedure Add(pParametro: TParametroCon); overload;
+    procedure Remove(pParametro: TParametroCon); overload;
   end;
 
   TFonteDados = (fdSqlServer=1, fdFirebird=2);
@@ -57,15 +59,9 @@ begin
 end;
 
 { TParametros }
-
-procedure TParametros.Add(pParam: TParametroCon);
-begin
-  Add(pParam.Nome, pParam);
-end;
-
 constructor TParametros.Create;
 begin
-  inherited Create(TOrdinalIStringComparer.Create); // case insensitive
+  inherited Create([doOwnsValues], TOrdinalIStringComparer.Create); // case insensitive
 end;
 
 function TParametros.ParamValueByName(pNome: String; pDefault: Variant): variant;
@@ -78,9 +74,14 @@ begin
     Result:= pDefault;
 end;
 
-procedure TParametros.Remove(PParam: TParametroCon);
+procedure TParametros.Add(pParametro: TParametroCon);
 begin
-  Remove(pParam.Nome);
+  Add(pParametro.Nome, pParametro);
+end;
+
+procedure TParametros.Remove(pParametro: TParametroCon);
+begin
+  Remove(pParametro.Nome);
 end;
 
 end.

@@ -3,7 +3,7 @@ unit Ladder.Activity.Parser;
 interface
 
 uses
-  System.SysUtils, Variants, Utils;
+  System.SysUtils, Variants, Utils, SynCommons;
 
 type
   EParseException = class(Exception)
@@ -13,8 +13,8 @@ type
     constructor Create(const Msg: String; const pExpression: String; pPos: Integer);
   end;
 
-  TFunElementEval = procedure(pElement: String; var Return: Variant) of object;
-  TFunSqlEval = procedure(pSql: String; var Return: Variant) of object;
+  TFunElementEval = procedure(const pElement: String; var Return: Variant) of object;
+  TFunSqlEval = procedure(const pSql: String; var Return: Variant) of object;
 
   TFunTranslateValue = function (const pValue: Variant): String of object;
 
@@ -26,10 +26,9 @@ type
     FOnSqlEval: TFunSqlEval;
     procedure SetExpression(const Value: String);
     function LenExpression: Integer;
-
     procedure ParseOtherExpression(pNewExpression: String; var Return: Variant);
-    procedure GetValueAtIndex(const pList: Variant; var Index: Integer; var Return: Variant);
     function FunLiteralTranslation(const pValue: Variant): String;
+    function GetValueAtIndex(const pList: Variant; var Index: Integer): Variant;
   protected
     function ExtractTextDelimitedBy(var Index: Integer; const OpenDelimiter, CloseDelimiter: String): String; overload;
     function ExtractTextDelimitedBy(var Index: Integer; const OpenDelimiter, CloseDelimiter: String; pDoInterpolation: Boolean; pFunTranslateValue: TFunTranslateValue): String; overload;
@@ -37,9 +36,9 @@ type
     procedure IgnoreAndErrorIfEOL(var Index: Integer; const Msg: String);
     procedure ParseString(var Index: Integer; var Return: Variant);
     procedure ParseList(var Index: Integer; var Return: Variant);
-    procedure ParseNext(var Index: Integer; var Return: Variant);
     procedure ParseElement(var Index: Integer; var Return: Variant);
     procedure ParseSQL(var Index: Integer; var Return: Variant);
+    procedure ParseNext(var Index: Integer; var Return: Variant);
   public
     constructor Create;
     procedure DoParseExpression(pExpression: String; var Return: Variant);
@@ -95,10 +94,15 @@ var
   FSql: String;
   FSingleValue: Boolean;
   FDoInterpolation: Boolean;
+  FData: TDocVariantData;
 begin
-  FDoInterpolation:= FExpression[Index]='!';
-  if FDoInterpolation then
+  if FExpression[Index]='!' then
+  begin
+    FDoInterpolation:= False;
     Inc(Index);
+  end
+ else
+   FDoInterpolation:= True;
 
   FSql:= ExtractTextDelimitedBy(Index, '$', '$', FDoInterpolation, FunLiteralTranslation);
 
@@ -106,19 +110,25 @@ begin
     raise EParseException.Create('TActivityParser.ParseSQL: Empty Sql Expression!', FExpression, Index);
 
   FSingleValue:= FSql[1] = '@';
-
   if FSingleValue then
     Delete(FSql, 1, 1);
 
   if not Assigned(FOnSqlEval) then
-    raise EParseException.Create('TActivityParser.ParseSQL: pOnSqlEval must be assgined!', FExpression, Index);
+    raise Exception.Create('TActivityParser.ParseSQL: pOnSqlEval must be assgined!');
 
   FOnSqlEval(FSql, Return);
+
+  if not DocVariantType.IsOfType(Return) then
+    raise Exception.Create('TActivityParser.ParseSQL: Return value of OnSqlEval must be TDocVariantData!');
+
+  FData:= TDocVariantData(Return);
   if FSingleValue then
-    if VarArrayLength(Return)>0 then
-      Return:=Return[0][0]
+  begin
+    if FData.Count>0 then
+      Return:=FData._[0]^.Values[0]
     else
       Return:=null;
+  end;
 end;
 
 function TActivityParser.FunLiteralTranslation(const pValue: Variant): String;
@@ -141,11 +151,11 @@ var
   end;
 
 begin
-  if VarIsArray(pValue) then
+  if DocVariantType.IsOfType(pValue) then
   begin
     Result:= '';
-    for I := 0 to VarArrayLength(pValue)-1 do
-      AppendValue(Result, pValue[I]);
+    for I := 0 to pValue._Count-1 do
+      AppendValue(Result, pValue._(I));
 
     Result:= '['+Result+']';
   end
@@ -179,17 +189,6 @@ const
   sListaAberta = 'ParseList: Lista não fechada, esperado "[" encontrado fim da linha.';
 var
   FItem: Variant;
-  pIdItem: Integer;
-  FItemBefore: Boolean;
-
-  procedure AddItem(const pItem: Variant);
-  begin
-    inc(pIdItem);
-    VarArrayRedim(Return, pIdItem);
-    Return[pIdItem]:= pItem;
-    FItemBefore:= True;
-  end;
-
 begin
   IgnoreAndErrorIfEOL(Index, 'ParseList: Esperando lista, nada recebido.');
 
@@ -197,9 +196,7 @@ begin
     raise EParseException.Create('ParseList: Deve iniciar com "[".', FExpression, Index);
 
   Inc(Index);
-  pIdItem:= -1;
-  FItemBefore:= False;
-  Return:= VarArrayCreate([0,-1], varVariant); // Incializa Empty Array
+  Return:= _Arr([]); // Incializa Empty Array
 
   while True do
   begin
@@ -210,12 +207,12 @@ begin
                   Inc(Index);
                   IgnoreAndErrorIfEOL(Index, sListaAberta); // Ignora caracteres em branco
                   ParseNext(Index, FItem);
-                  AddItem(FItem);
+                  TDocVariantData(Return).AddItem(FItem)
                 end;
       Ord(']'): begin Inc(Index); Break; end;
     else begin
         ParseNext(Index, FItem);
-        AddItem(FItem);
+        TDocVariantData(Return).AddItem(FItem)
       end;
 //      raise EParseException.Create('ParseList: Esperado "," ou "]", recebido '+FExpression[Index]+'.', FExpression, Index);
     end;
@@ -264,49 +261,43 @@ begin
   FOnElementEval(FElementName, Return);
 end;
 
-procedure TActivityParser.GetValueAtIndex(const pList: Variant; var Index: Integer; var Return: Variant);
+function TActivityParser.GetValueAtIndex(const pList: Variant; var Index: Integer): Variant;
 var
   FIndexName: String;
   FVarIndexName: Variant;
   FListIndex: Integer;
 
-  function GetIndexValueFromIndexName(const pList: Variant; const pIndexName: String): Integer;
+  function GetValueFromIndexName(const pList: Variant; const pIndexName: String): Variant;
   var
-    FNamedIndices: Variant;
     I: Integer;
   begin
-    if VarArrayLowBound(pList, 1) > -1 then
-      raise EParseException.Create('TActivityParser.GetValueAtIndex: List does not have named indices.', FExpression, Index);
+    I:= TDocVariantData(pList).GetValueIndex(pIndexName);
+    if I < 0 then
+      raise EParseException.Create('TActivityParser.GetValueAtIndex: Index "'+pIndexName+'" not found.', FExpression, Index);
 
-    FNamedIndices:= pList[-1];
-    for I := 0 to VarArrayLength(FNamedIndices)-1 do
-      if UpperCase(pIndexName) = UpperCase(FNamedIndices) then
-      begin
-        Result:= I;
-        Exit;
-      end;
-
-    raise EParseException.Create('TActivityParser.GetValueAtIndex: Index "'+pIndexName+'" not found.', FExpression, Index);
+    Result:= TDocVariantData(pList).Values[I];
   end;
 
 begin
-  if not VarIsArray(pList) then
+  if not DocVariantType.IsOfType(pList) then
     raise EParseException.Create('TActivityParser.GetValueAtIndex: Value is not list.', FExpression, Index);
 
   FIndexName:= ExtractTextDelimitedBy(Index, '[', ']');
   if FIndexName.IsEmpty then
     raise EParseException.Create('TActivityParser.GetValueAtIndex: Index must not be empty.', FExpression, Index);
 
-  if FIndexName[1]='"' then
+  if FIndexName[1]='"' then // Named Index
   begin
     Self.ParseOtherExpression(FIndexName, FVarIndexName);
-    FListIndex:= GetIndexValueFromIndexName(pList, FVarIndexName);
+    Result:= GetValueFromIndexName(pList, FVarIndexName);
   end
-  else
+ else
+  begin
     if not TryStrToInt(FIndexName, FListIndex) then
       raise EParseException.Create('TActivityParser.GetValueAtIndex: Invalid index.', FExpression, Index);
 
-  Return:= pList[FListIndex];
+    Result:= TDocVariantData(pList).Values[FListIndex];
+  end;
 end;
 
 procedure TActivityParser.ParseNext(var Index: Integer; var Return: variant);
@@ -334,7 +325,7 @@ begin
 
   while Index<=LenExpression do
     if FExpression[Index]='[' then
-      GetValueAtIndex(Return, Index, Return)
+      Return:= GetValueAtIndex(Return, Index)
     else
       Break;
 end;

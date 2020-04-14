@@ -6,9 +6,9 @@ inherited ConSqlServer: TConSqlServer
     Params.Strings = (
       'DriverID=MSSQL'
       'Password=28021990'
-      'Server=10.0.0.201,1433'
+      'Server=177.159.99.114'
       'Protocol=TCPIP'
-      'Port=3051'
+      'Port=1433'
       'User_Name=user'
       'Database=Logistec')
     ResourceOptions.AssignedValues = [rvAutoConnect, rvAutoReconnect, rvKeepConnection]

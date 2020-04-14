@@ -30,7 +30,7 @@ var
   FQry: TFDQuery;
   FDS: TDataSource;
 begin
-  FQry:= TFrwServiceLocator.getConnection.RetornaFDQuery(DBLookup, Sql, False);
+  FQry:= TFrwServiceLocator.Context.DmConnection.RetornaFDQuery(DBLookup, Sql, False);
   try
     FQry.Open;
   except
@@ -52,7 +52,7 @@ var
   FDS: TDataSource;
   LookupCol: TcxLookupComboBoxProperties;
 begin
-  FQry:= TFrwServiceLocator.getConnection.RetornaFDQuery(pColumn.GridView, Sql, False);
+  FQry:= TFrwServiceLocator.Context.DmConnection.RetornaFDQuery(pColumn.GridView, Sql, False);
   try
     FQry.Open;
   except

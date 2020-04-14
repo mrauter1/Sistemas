@@ -242,7 +242,7 @@ begin
 end;
 
 initialization
-  FMailSender:= TSendMailFactory.NewMailSender(nil, 'Config.ini', 'EMAIL');
+  FMailSender:= TSendMailFactory.NewMailSender(nil, ExtractFilePath(Application.ExeName)+'Config.ini', 'EMAIL');
 
 finalization
   FMailSender.Free;

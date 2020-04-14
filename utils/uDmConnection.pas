@@ -9,7 +9,7 @@ uses
   Variants, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error,
   FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
   FireDAC.Phys, FireDAC.Phys.FB, FireDAC.Phys.FBDef, FireDAC.ConsoleUI.Wait,
-  FireDAC.Comp.Client, Utils, System.Rtti, uAppConfig;
+  FireDAC.Comp.Client, Utils, System.Rtti, uAppConfig, Ladder.Activity.Parser;
 
 type
  cfMapField = record
@@ -25,6 +25,8 @@ type
   end;              }
 
 type
+  TOnReturnData = procedure (DataSet: TDataSet; var Return: Variant);
+
   TDmConnection = class(TDataModule)
     FDConnection: TFDConnection;
     procedure FDConnectionAfterCommit(Sender: TObject);
@@ -44,15 +46,20 @@ type
     function RetornaFDQuery(AOwner: TComponent; Sql: String; pAbrirDataSet: Boolean = True): TFDQuery;
 
     function ExecutaComando(pSql: String): LongInt;
+    function ExecSql(pSql: String; const pParams: array of variant): LongInt;
 
-    function RetornaArray<T>(Sql: String; ValDefault: T): TArray<T>;
-    function RetornaVarArray(Sql: String; ValDefault: Variant): Variant;
     function RetornaValor(Sql: String; ValDefault: Variant): Variant; overload;
     function RetornaValor(Sql: String): Variant; overload;
-    function RetornaValores(const pSql: String): Variant;
-
     function RetornaInteiro(Sql: String; pDefault: Integer = 0): Integer;
     function RetornaDouble(const pSQL: String; pValorDef: Double = 0): Double;
+
+    function RetornaArray<T>(Sql: String; ValDefault: T): TArray<T>; // Retorna o primeiro campo de múltiplos registros
+    function RetornaVarArray(const Sql: String; ValDefault: Variant): Variant; // Retorna o primeiro campo de múltiplos registros
+    function RetornaValores(const pSql: String): Variant; //Retorna múltiplos campos de um memos registro
+
+    procedure DataSetToVarArray(const pSql: string; var Return: Variant; OnReturnData: TOnReturnData); overload;
+    //DataSetToVarArray: Retorna múltiplos campos de múltiplos registros, se AddFieldNames for True, adiciona os nomes dos campos no index -1
+    procedure DataSetToVarArray(const pSql: String; var Return: Variant; AddFieldNames: Boolean); overload;
 
     // transforma um field do tipo fkCalculated em fkLookup
     procedure TransformaEmLookup(pField: TField; pSql: String);
@@ -370,10 +377,74 @@ begin
   end;
 end;
 
-function TDmConnection.RetornaVarArray(Sql: String;
-  ValDefault: Variant): Variant;
+procedure TDmConnection.DataSetToVarArray(const pSql: string; var Return: Variant; OnReturnData: TOnReturnData);
+var
+  FDataSet: TFDQuery;
+begin
+  FDataSet:= RetornaFDQuery(nil, pSql, True);
+  try
+    FDataSet.FetchAll;
+    FDataSet.First;
+    OnReturnData(FDataSet, Return);
+  finally
+    FDataSet.Free;
+  end;
+end;
+
+procedure TDmConnection.DataSetToVarArray(const pSql: String; var Return: Variant; AddFieldNames: Boolean);
+var
+  FDataSet: TFDQuery;
+  I, F: Integer;
+  FNewRow: Variant;
+  FLowBound: Integer;
+
+  function NewRow(DataSet: TDataSet): Variant;
+  begin
+    Result:= VarArrayCreate([0, DataSet.FieldCount-1], varVariant);
+  end;
+
+begin
+  FDataSet:= RetornaFDQuery(nil, pSql, True);
+  try
+    FDataSet.FetchAll;
+    FDataSet.First;
+
+    if AddFieldNames then
+      FLowBound:= -1 // Store field name on index -1
+    else FLowBound:= 0;
+
+    Return:= VarArrayCreate([FLowBound, FDataSet.RecordCount-1], varVariant);
+
+    if AddFieldNames then
+    begin
+      FNewRow:= NewRow(FDataSet);
+      for F:= 0 to FDataSet.FieldCount-1 do
+        FNewRow[F]:= FDataSet.Fields[F].FieldName;
+
+      Return[-1]:= FNewRow;
+    end;
+
+    I:= 0;
+    while not FDataSet.Eof do
+    begin
+      FNewRow:= NewRow(FDataSet);
+      for F:= 0 to FDataSet.FieldCount-1 do
+          FNewRow[F]:= FDataSet.Fields[F].AsVariant;
+
+      Return[I]:= FNewRow;
+
+      FDataSet.Next;
+      Inc(I);
+    end;
+  finally
+    FDataSet.Free;
+  end;
+end;
+
+function TDmConnection.RetornaVarArray(const Sql: String; ValDefault: Variant): Variant;
 var
   FDataSet: TDataSet;
+  FValues: Variant;
   I: Integer;
 begin
   FDataSet:= RetornaDataSet(Sql);
@@ -405,16 +476,21 @@ begin
     FDConnection.Offline;
 end;
 
-function TDmConnection.ExecutaComando(pSql: String): LongInt;
+function TDmConnection.ExecSql(pSql: String; const pParams: array of variant): LongInt;
 var
   FQry: TFDQuery;
 begin
   FQry:= CriaFDQuery(pSql);
   try
-    FQry.ExecSQL(True);
+    FQry.ExecSQL(pSql, pParams);
   finally
     FQry.Free;
   end;
+end;
+
+function TDmConnection.ExecutaComando(pSql: String): LongInt;
+begin
+  ExecSql(pSql, []);
 end;
 
 function TDmConnection.RetornaFDQuery(AOwner: TComponent; Sql: String; pAbrirDataSet: Boolean = True): TFDQuery;

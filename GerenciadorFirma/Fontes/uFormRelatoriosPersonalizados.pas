@@ -82,6 +82,8 @@ type
     EdtID: TDBEdit;
     Label1: TLabel;
     Label2: TLabel;
+    TabSql: TTabSheet;
+    MemoSqlGerado: TMemo;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure BtnSalvarClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -278,6 +280,8 @@ begin
 end;
 
 procedure TFormRelatoriosPersonalizados.RefreshConsulta;
+var
+  FSql: String;
 begin
   QryExec.Close;
 
@@ -287,7 +291,14 @@ begin
   try
     cxGridConsultaView.ClearItems;
 
-    QryExec.Open(FDm.GeraSqlConsulta);
+    FSql:= FDm.GeraSqlConsulta;
+    MemoSqlGerado.Text:= FSql;
+    try
+      QryExec.Open(FSql);
+    except
+      PageControl.ActivePage:= TabSql;
+      raise;
+    end;
     FDm.SetEstilosCamposQry(QryExec);
 
     cxGridConsultaView.DataController.CreateAllItems;

@@ -7,7 +7,7 @@ uses
   FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf,
   FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys,
   FireDAC.Phys.FB, FireDAC.Phys.FBDef, FireDAC.VCLUI.Wait, Data.DB,
-  FireDAC.Comp.Client, uAppConfig;
+  FireDAC.Comp.Client, uAppConfig, Dialogs;
 
 type
   TConFirebird = class(TDmConnection)
@@ -29,11 +29,15 @@ implementation
 
 procedure TConFirebird.DataModuleCreate(Sender: TObject);
 begin
+  try
+    ModoDesconectado:= True;
+    LerConnectionParams(AppConfig.ConFirebird);
 
-  ModoDesconectado:= True;
-  LerConnectionParams(AppConfig.ConFirebird);
+    inherited;
+  except on E: Exception do
+    ShowMessage(E.Message);
 
-  inherited;
+  end;
 
 end;
 

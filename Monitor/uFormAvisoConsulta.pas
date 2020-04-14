@@ -160,7 +160,7 @@ var
   FNome: String;
 begin
   FNome:= '';
-  FDataSet:= TFrwServiceLocator.getConnection.RetornaDataSet(Format(cSql, [pIDConsulta]));
+  FDataSet:= TFrwServiceLocator.Context.DmConnection.RetornaDataSet(Format(cSql, [pIDConsulta]));
   try
     FDataSet.First;
     while not FDataSet.Eof do

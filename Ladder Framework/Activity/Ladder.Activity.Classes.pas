@@ -3,261 +3,402 @@ unit Ladder.Activity.Classes;
 interface
 
 uses
-  System.SysUtils, System.Classes, System.Generics.Collections, Data.DB, uConsultaPersonalizada,
-  Ladder.ServiceLocator, Generics.Defaults, Variants;
+  System.SysUtils, System.Classes, System.Generics.Collections, Data.DB,
+  Generics.Defaults, Variants, Ladder.Activity.Parser, SynDB, SynCommons;
 
 type
   TTipoProcesso = (tpConsultaPersonalizada = 1, tpEnvioEmail = 2);
-  TTipoOutput = (toValue=1, toList=2);
-  TTipoBase = (tbString, tbLista, tbData);
+  TParameterType = (tbValue=1, tbList, tbData, tbAny);
+
+  IActivityElement = interface
+  ['{505A4C16-9ED0-4D9C-8020-204B98096EC8}']
+    function GetName: String;
+  end;
+
+  IActivityValue = interface(IActivityElement)
+  ['{EA97344D-2BB9-4BCF-BD24-23206A9A7DEC}']
+    function GetValue: Variant;
+  end;
+
+  IActivityElementContainer = interface(IActivityElement)
+  ['{5B1A1673-ADA5-428F-B8A8-06772A02A449}']
+    function FindElementByName(pElementName: String): IActivityElement;
+  end;
 
   TProcessoBase = class;
 
-  TInputBase = class(TObject)
+  TParameter = class(TSingletonImplementation, IActivityElement, IActivityValue)
   private
-    FCodigo: integer;
-    FTipoBase: TTipoBase;
-    FNome: String;
+    FID: integer;
+    FParameterType: TParameterType;
+    FName: String;
     FExpression: String;
-    FValor: variant;
+    FValue: variant;
   public
-    constructor Create(pNome: String; pTipoBase: TTipoBase; pExpression: String);
-    property Valor: variant read FValor write FValor;
+    function GetName: String;
+    procedure SetValue(const Value: variant);
+    constructor Create(pName: String; pParameterType: TParameterType; pExpression: String);
+    function GetValue: Variant;
+    property Value: variant read GetValue write SetValue;
   published
-    property Codigo: integer read FCodigo write FCodigo;
-    property Nome: String read FNome write FNome;
-    property TipoBase: TTipoBase read FTipoBase write FTipoBase;
+    property ID: integer read FID write FID;
+    property Name: String read GetName write FName;
+    property ParameterType: TParameterType read FParameterType write FParameterType;
     property Expression: String read FExpression write FExpression;
   end;
 
-  TGenericInputList<T: TInputBase> = class(TObjectDictionary<String, T>)
+  TGenericInputList<T: TParameter> = class(TObjectList<T>)
   public
     constructor Create;
-    function ParamValueByName(pNome: String; pDefault: Variant): variant;
-    procedure Add(pInput: TInputBase); overload;
-    procedure Remove(pInput: TInputBase); overload;
+    function ParamValueByName(pName: String; pDefault: Variant): variant;
+//    procedure Add(pInput: TParameter); overload;
+//    procedure Remove(pInput: TParameter); overload;
   end;
 
-  TInputList = TGenericInputList<TInputBase>;
+  TInputList = TGenericInputList<TParameter>;
 
-  TValuateInputCallback = procedure (pProcesso: TProcessoBase; pInput: TInputBase) of object; // Returns a single item for value and an array for lists
+  TValuateInputExpression = procedure (pContainer: IActivityElementContainer; pInput: TParameter) of object; // Returns a single item for value and an array for lists
 
 {  TParserBase = class
     function EvaluateList(pString: String): array of string;
     function EvaluateValue(pString: String): string;
   end;                                                                   }
 
-  TOutputBase = class(TPersistent)
+  TOutputParameter = class(TParameter, IActivityElementContainer)
   private
-    FNome: String;
-    FID: Integer;
-    FRetorno: String;
-    FTipo: TTipoOutput;
     FParametros: TInputList;
   public
     constructor Create;
     destructor Destroy; override;
-    property Retorno: String read FRetorno write FRetorno; // Nome da tabela temporária ou nome do arquivo
+    function FindElementByName(pElementName: String): IActivityElement;
   published
-    property ID: Integer read FID write FID;
-    property Nome: String read FNome write FNome;
-    property Tipo: TTipoOutput read FTipo write FTipo;
     property Parametros: TInputList read FParametros write FParametros;
   end;
 
-  TOutputList = TObjectList<TOutputBase>;
+  TOutputList = TObjectList<TOutputParameter>;
 
-  TExecutorBase = class(TPersistent)
+  IExecutorBase = interface
+  ['{D3DB8B1D-A306-447C-A0EF-CE19B5D035A5}']
+    function GetInputs: TInputList;
+    function GetOutputs: TOutputList;
+    procedure SetInputs(const Value: TInputList);
+    procedure SetOutputs(const Value: TOutputList);
+
+    function Executar(pInputs: TInputList; pOutputs: TOutputList): TOutputList; overload;
+    function Executar: TOutputList; overload;
+    property Inputs: TInputList read GetInputs write SetInputs;
+    property Outputs: TOutputList read GetOutputs write SetOutputs;
+  end;
+
+  TExecutorBase = class(TInterfacedObject, IExecutorBase)
+  private
+    FInputs: TInputList;
+    FOutputs: TOutputList;
+    function GetInputs: TInputList;
+    function GetOutputs: TOutputList;
+    procedure SetInputs(const Value: TInputList);
+    procedure SetOutputs(const Value: TOutputList);
   public
-    Inputs: TInputList;
-    Outputs: TOutputList;
+    constructor Create; overload;
     constructor Create(pInputs: TInputList; pOutputs: TOutputList); overload;
+    property Inputs: TInputList read GetInputs write SetInputs;
+    property Outputs: TOutputList read GetOutputs write SetOutputs;
+
     function Executar(pInputs: TInputList; pOutputs: TOutputList): TOutputList; overload;
     function Executar: TOutputList; overload; virtual;
   end;
 
-  TExecutorConsultaPersonalizada = class(TExecutorBase)
-  private
-    function ConfiguraConsulta: TFrmConsultaPersonalizada;
-    procedure CheckInputs;
-    procedure ProcessaOutput(pConsulta: TFrmConsultaPersonalizada; pOutput: TOutputBase);
-  public
-    function Executar: TOutputList; override;
-  end;
+  TExecutorClass = class of TExecutorBase;
 
-  TProcessoBase = class(TPersistent)
+  // A process is a self contained execution, but it might belong to an activity
+  TProcessoBase = class(TSingletonImplementation, IActivityElement, IActivityElementContainer)
   private
     FInputs: TInputList;
     FOutputs: TOutputList;
     FID: Integer;
-    FNome: String;
+    FName: String;
+    FDescription: String;
     FTipo: TTipoProcesso;
-    FExecutor: TExecutorBase;
-    function GetExecutor: TExecutorBase;
+    FExecutor: IExecutorBase;
+    FConnection: TSQLDBConnectionProperties;
+    FParser: TActivityParser;
+    FCurrentContainer: IActivityElementContainer;
+  protected
+    procedure ValuateInputs(ValuateInputExpression: TValuateInputExpression);
+    procedure OnValuateInputExpression(pContainer: IActivityElementContainer; pInput: TParameter);
+    procedure OnElementEval(const pElement: String; var Return: Variant);
+    procedure OnSqlEval(const pSql: String; var Return: Variant);
+
+    function GetExecutor: IExecutorBase;
+
+    property Parser: TActivityParser read FParser;
   public
-    constructor Create;
+    constructor Create(pExecutor: IExecutorBase; pConnection: TSQLDBConnectionProperties);
     destructor Destroy; override;
-    function Executar(ValuateInputCallback: TValuateInputCallback): TOutputList;
+    function GetName: String;
+    function FindElementByName(pElementName: String): IActivityElement;
+
+    function Executar: TOutputList; overload; virtual;
+    function Executar(ValuateInputExpression: TValuateInputExpression): TOutputList; overload; virtual;
   published
     property ID: Integer read FID write FID;
-    property Nome: String read FNome write FNome;
+    property Name: String read GetName write FName;
+    property Description: String read FDescription write FDescription;
     property Tipo: TTipoProcesso read FTipo write FTipo;
     property Inputs: TInputList read FInputs write FInputs;
     property Outputs: TOutputList read FOutputs write FOutputs;
   end;
 
-  TAtividade = class(TPersistent)
+  TActivity = class(TProcessoBase, IActivityElement, IActivityElementContainer)
   private
-    FInputs: TInputList;
-    FOutputs: TOutputList;
     FProcessos: TObjectList<TProcessoBase>;
-    FDescricao: String;
-    FID: Integer;
-    FNome: String;
-    procedure ExecutaProcesso(pProcesso: TProcessoBase);
-    procedure ValuateInputCallback(pProcesso: TProcessoBase; pInput: TInputBase);
 //    function ExpressionEvaluator(pExpression: String): array of string;
+  protected
   public
-    constructor Create;
+    constructor Create(pConnection: TSQLDBConnectionProperties);
     destructor Destroy; override;
-    function Executar: TOutputList;
+    function Executar(ValuateInputExpression: TValuateInputExpression): TOutputList; overload; override;
   published
-    property ID: Integer read FID write FID;
-    property Nome: String read FNome write FNome;
-    property Descricao: String read FDescricao write FDescricao;
-    property Inputs: TInputList read FInputs write FInputs;
-    property Outputs: TOutputList read FOutputs write FOutputs;
     property Processos: TObjectList<TProcessoBase> read FProcessos write FProcessos;
   end;
 
+function LadderVarIsDateTime(pValue: Variant): Boolean;
+function LadderVarToDateTime(pValue: Variant): TDateTime;
+
 implementation
+
+function LadderVarIsDateTime(pValue: Variant): Boolean;
+var
+  pAnsi: AnsiString;
+begin
+  if VarType(pValue) = varDate then
+    Result:= True
+ else
+  begin
+    pAnsi:= VarToStrDef(pValue, '');
+    Result:= Iso8601ToDateTime(pAnsi) <> 0;
+  end;
+end;
+
+function LadderVarToDateTime(pValue: Variant): TDateTime;
+var
+  pAnsi: AnsiString;
+begin
+  pAnsi:= VarToStrDef(pValue, '');
+  Result:= Iso8601ToDateTime(pAnsi);
+  if Result = 0 then
+    Result:= VarToDateTime(pValue);
+end;
 
 { TGenericInputList }
 
 constructor TGenericInputList<T>.Create;
 begin
-  inherited Create([doOwnsValues], TOrdinalIStringComparer.Create); // case insensitive
+//  inherited Create([doOwnsValues], TOrdinalIStringComparer.Create); // case insensitive
+  inherited Create(True); // Inputs are TInterfacedObjects
 end;
 
-function TGenericInputList<T>.ParamValueByName(pNome: String; pDefault: Variant): variant;
+function TGenericInputList<T>.ParamValueByName(pName: String; pDefault: Variant): variant;
 var
-  FInput: TInputBase;
+  FInput: TParameter;
 begin
-  if TryGetValue(pNome, FInput) then
-    Result:= FInput.Valor
-  else
-    Result:= pDefault;
-end;
+  for FInput in Self do
+    if CompareText(pName, FInput.Name) = 0 then
+    begin
+      Result:= FInput.Value;
+      Exit;
+    end;
 
-procedure TGenericInputList<T>.Add(pInput: TInputBase);
-begin
-  Add(pInput.Nome, pInput);
-end;
-
-procedure TGenericInputList<T>.Remove(pInput: TInputBase);
-begin
-  Remove(pInput.Nome);
+  Result:= pDefault;
 end;
 
 { TProcessoBase }
 
-constructor TProcessoBase.Create;
+constructor TProcessoBase.Create(pExecutor: IExecutorBase; pConnection: TSQLDBConnectionProperties);
 begin
   inherited Create;
   FInputs:= TInputList.Create;
-  FOutputs:= TOutputList.Create;
+  FOutputs:= TOutputList.Create(True);
+
+  FExecutor:= pExecutor;
+
+  FConnection:= pConnection;
+
+  FParser:= TActivityParser.Create;
+  FParser.OnElementEval:= OnElementEval;
+  FParser.OnSqlEval:= OnSqlEval;
 end;
 
 destructor TProcessoBase.Destroy;
 begin
   FInputs.Free;
   FOutputs.Free;
+  FParser.Free;
   inherited Destroy;
 end;
 
-function TProcessoBase.Executar(ValuateInputCallback: TValuateInputCallback): TOutputList;
+procedure TProcessoBase.ValuateInputs(ValuateInputExpression: TValuateInputExpression);
 var
-  fInput: TInputBase;
-  FOutput: TOutputBase;
+  fInput: TParameter;
+  FOutput: TOutputParameter;
 begin
-  for fInput in Inputs.Values do
-    ValuateInputCallback(Self, fInput);
+  for fInput in Inputs do
+    ValuateInputExpression(Self, fInput);
 
   for FOutput in Outputs do
-    for fInput in FOutput.Parametros.Values do
-      ValuateInputCallback(Self, fInput);
+    for fInput in FOutput.Parametros do
+      ValuateInputExpression(fOutput, fInput);
+end;
 
-  FExecutor:= GetExecutor;
-  try
-    FExecutor.Inputs:= Inputs;
-    FExecutor.Outputs:= Outputs;
-    FExecutor.Executar;
-  finally
-    FExecutor.Free;
-  end;
+function TProcessoBase.Executar: TOutputList;
+begin
+  Result:= Executar(OnValuateInputExpression);
+end;
+
+function TProcessoBase.Executar(ValuateInputExpression: TValuateInputExpression): TOutputList;
+begin
+  { First evaluate all parameters }
+  ValuateInputs(ValuateInputExpression);
+
+  if not Assigned(FExecutor) then
+    raise Exception.Create('TProcessoBase.Executar> Executor must be assigned!');
+
+  FExecutor.Inputs:= Inputs;
+  FExecutor.Outputs:= Outputs;
+  FExecutor.Executar;
+
   Result:= Outputs;
 end;
 
-function TProcessoBase.GetExecutor: TExecutorBase;
+function TProcessoBase.FindElementByName(pElementName: String): IActivityElement;
+var
+  FInput: TParameter;
+  FOutput: TOutputParameter;
 begin
-  if Tipo = tpConsultaPersonalizada then
-    Result:= TExecutorConsultaPersonalizada.Create
+  for fInput in FInputs do
+    if CompareText(FInput.Name, pElementName) = 0 then
+    begin
+      Result:= fInput;
+      Exit;
+    end;
+
+  for fOutput in FOutputs do
+    if CompareText(fOutput.Name, pElementName) = 0 then
+    begin
+      Result:= fOutput;
+      Exit;
+    end;
+
+  Result:= nil;
+end;
+
+procedure TProcessoBase.OnSqlEval(const pSql: String; var Return: Variant);
+var
+  FCon: TSQLDBConnectionProperties;
+begin
+  Return:= _Json(FConnection.Execute(pSql, []).FetchAllAsJSON(true));
+end;
+
+procedure TProcessoBase.OnValuateInputExpression(pContainer: IActivityElementContainer; pInput: TParameter);
+const
+  cKeyWords = ['@', '[', '$', '"'];
+var
+  FValue: Variant;
+begin
+  // If expression does not start with keyword, treat as string
+  if not (pInput.Expression[1] in cKeyWords) then
+  begin
+    pInput.Value:= pInput.Expression;
+    Exit;
+  end;
+
+  FCurrentContainer:= pContainer;
+  FParser.DoParseExpression(pInput.Expression, FValue);
+  pInput.Value:= FValue;
+end;
+
+procedure TProcessoBase.OnElementEval(const pElement: String; var Return: Variant);
+var
+  FNames: TArray<String>;
+  FElement: IActivityElement;
+
+  function FindElementValue(pCurrentElement: IActivityElement; pNames: TArray<String>; pIndex: Integer): Variant;
+  begin
+    if pIndex > High(pNames) then
+    begin
+      if not Supports(pCurrentElement, IActivityValue) then
+        raise Exception.Create('TProcessoBase.OnElementEval: Element '+pCurrentElement.GetName+' is not a value!');
+
+      Result:= (pCurrentElement as IActivityValue).GetValue;
+      Exit;
+    end;
+
+    if not Supports(pCurrentElement, IActivityElementContainer) then
+      raise Exception.Create('TProcessoBase.OnElementEval: Element '+pCurrentElement.GetName+' is not a container!');
+
+    FElement:= (pCurrentElement as IActivityElementContainer).FindElementByName(pNames[pIndex]);
+
+    if not Assigned(FElement) then
+      raise Exception.Create('TProcessoBase.OnElementEval: Element '+pNames[pIndex]+' not found!');
+
+    Result:= FindElementValue(FElement, FNames, pIndex+1);
+  end;
+
+begin
+  FNames:= pElement.Split(['.']);
+  if Length(FNames) <= 0 then
+    Exit;
+
+  if FNames[0] = Self.Name then
+    Return:= FindElementValue(Self, FNames, 1)
+  else if Assigned(FCurrentContainer.FindElementByName(FNames[0])) then
+    Return:= FindElementValue(FCurrentContainer.FindElementByName(FNames[0]), FNames, 1)
   else
-    raise Exception.Create('TProcessoBase.GetExecutor: Tipo de executor não encontrado!');
+    Return:= FindElementValue(Self, FNames, 0);
 
 end;
 
-{ TAtividade }
-
-constructor TAtividade.Create;
+function TProcessoBase.GetExecutor: IExecutorBase;
 begin
-  inherited Create;
-  FInputs:= TInputList.Create;
-  FOutputs:= TOutputList.Create;
-  FProcessos:= TObjectList<TProcessoBase>.Create;
+  Result:= FExecutor;
 end;
 
-destructor TAtividade.Destroy;
+function TProcessoBase.GetName: String;
 begin
-  FInputs.Free;
-  FOutputs.Free;
+  Result:= FName;
+end;
+
+{ TActivity }
+
+constructor TActivity.Create(pConnection: TSQLDBConnectionProperties);
+begin
+  inherited Create(nil, pConnection);
+
+  FProcessos:= TObjectList<TProcessoBase>.Create(True);
+end;
+
+destructor TActivity.Destroy;
+begin
   FProcessos.Free;
   inherited Destroy;
 end;
 
-procedure TAtividade.ExecutaProcesso(pProcesso: TProcessoBase);
-{var
-  fOutput: TOutputBase;        }
-begin
-  pProcesso.Executar(ValuateInputCallback);
-end;
-
-function TAtividade.Executar: TOutputList;
+function TActivity.Executar(ValuateInputExpression: TValuateInputExpression): TOutputList;
 var
   FProcesso: TProcessoBase;
 begin
+  { First evaluate all parameters }
+  ValuateInputs(ValuateInputExpression);
+
   for FProcesso in Processos do
-    ExecutaProcesso(FProcesso);
+    FProcesso.Executar(OnValuateInputExpression); // The process inputs must be valuated from this activity, so they can find elemets that belongs to this activity, but not outside it.
 
   Result:= Outputs;
 end;
 
-procedure TAtividade.ValuateInputCallback(pProcesso: TProcessoBase; pInput: TInputBase);
-const
-  cKeyWords = ['@', '['];
-begin
-  // Se expressão não iniciar com palavra chave trata como string
-  if not (pInput.Expression[1] in cKeyWords) then
-  begin
-    pInput.Valor:= pInput.Expression;
-    Exit;
-  end;
-end;
-
 { TExecutorBase }
 
-constructor TExecutorBase.Create(pInputs: TInputList;
-  pOutputs: TOutputList);
+constructor TExecutorBase.Create(pInputs: TInputList; pOutputs: TOutputList);
 begin
   inherited Create;
   Inputs:= pInputs;
@@ -273,111 +414,117 @@ begin
   Result:= Outputs;
 end;
 
+constructor TExecutorBase.Create;
+begin
+  inherited Create;
+end;
+
 function TExecutorBase.Executar: TOutputList;
 begin
   raise Exception.Create('TExecutorBase.Executar: Deve ser implementado na subclasse!');
   { Implementar na subclass }
 end;
 
-{ TExecutorConsultaPersonalizada }
-
-procedure TExecutorConsultaPersonalizada.CheckInputs;
+function TExecutorBase.GetInputs: TInputList;
 begin
-
+  Result:= FInputs;
 end;
 
-procedure TExecutorConsultaPersonalizada.ProcessaOutput(pConsulta: TFrmConsultaPersonalizada; pOutput: TOutputBase);
-var
-  FVisualizacao: String;
-  FTipoVisualizacao: String;
-  FNomeArquivo: String;
+function TExecutorBase.GetOutputs: TOutputList;
 begin
-  FNomeArquivo:= pOutput.Parametros.ParamValueByName('NomeArquivo', '');
-  if FNomeArquivo = '' then
-    raise Exception.Create('TExecutorConsultaPersonalizada.ProcessaOutput: É necessário o parâmetro "NomeArquivo"!');
-  FNomeArquivo:= TFrwServiceLocator.GetTempPath+FNomeArquivo;
-
-  FVisualizacao:= pOutput.Parametros.ParamValueByName('Visualizacao', '');
-  if FVisualizacao <> '' then  // Carrega Visualização
-    pConsulta.CarregaVisualizacaoByName(FVisualizacao);
-
-  FTipoVisualizacao:= pOutput.Parametros.ParamValueByName('TipoVisualizacao', '');
-  FTipoVisualizacao:= AnsiUpperCase(Trim(FTipoVisualizacao));
-
-  if FTipoVisualizacao = 'TABELA' then
-     pConsulta.ExportaTabelaParaExcelInterno(FNomeArquivo)
-  else if FTipoVisualizacao = 'TABELADINAMICA' then
-     pConsulta.ExportaTabelaDinamica(FNomeArquivo)
-  else if FTipoVisualizacao = 'GRAFICO' then
-     pConsulta.ExportaGrafico(FNomeArquivo)
-  else
-    pConsulta.ExportaTabelaParaExcelInterno(FNomeArquivo);
-
-  pOutput.Retorno:= FNomeArquivo;
+  Result:= FOutputs;
 end;
 
-function TExecutorConsultaPersonalizada.ConfiguraConsulta: TFrmConsultaPersonalizada;
-var
-  NomeConsulta: String;
-  FConsultaPersonalizada: TFrmConsultaPersonalizada;
+procedure TExecutorBase.SetInputs(const Value: TInputList);
 begin
-  CheckInputs;
-
-  NomeConsulta:= Inputs.ParamValueByName('NomeConsulta', '');
-
-  TFrwServiceLocator.Synchronize(
-    procedure begin
-      FConsultaPersonalizada:= TFrmConsultaPersonalizada.AbreConsultaPersonalizadaByName(NomeConsulta);
-    end
-  );
-
-  if not Assigned(FConsultaPersonalizada) then
-    raise Exception.Create('TExecutorConsultaPersonalizada.ConfiguraConsulta: Consulta "'+NomeConsulta+'" não encontrada!);');
-
-  Result:= FConsultaPersonalizada;
+  FInputs:= Value;
 end;
 
-function TExecutorConsultaPersonalizada.Executar: TOutputList;
-var
-  FOutput: TOutputBase;
-  FConsulta: TFrmConsultaPersonalizada;
+procedure TExecutorBase.SetOutputs(const Value: TOutputList);
 begin
-  FConsulta:= ConfiguraConsulta;
-  try
-    FConsulta.ExecutaConsulta;
-    for FOutput in Outputs do
-      ProcessaOutput(FConsulta, FOutput);
-  finally
-    TFrwServiceLocator.Synchronize(
-      procedure begin
-        FConsulta.Free;
-      end
-    );
-  end;
-  Result:= Outputs;
+  FOutputs:= Value;
 end;
 
-{ TOutputBase }
+{ TOutputParameter }
 
-constructor TOutputBase.Create;
+constructor TOutputParameter.Create;
 begin
   FParametros:= TInputList.Create;
 end;
 
-destructor TOutputBase.Destroy;
+destructor TOutputParameter.Destroy;
 begin
   FParametros.Free;
 end;
 
-{ TInputBase }
+function TOutputParameter.FindElementByName(pElementName: String): IActivityElement;
+var
+  FParametro: TParameter;
+begin
+  for FParametro in FParametros do
+    if CompareText(FParametro.Name, pElementName) = 0 then
+    begin
+      Result:= FParametro;
+      Exit;
+    end;
 
-constructor TInputBase.Create(pNome: String; pTipoBase: TTipoBase;
+  Result:= nil;
+end;
+
+{ TParameter }
+
+constructor TParameter.Create(pName: String; pParameterType: TParameterType;
   pExpression: String);
 begin
   inherited Create;
-  Nome:= pNome;
-  TipoBase:= pTipoBase;
+  Name:= pName;
+  ParameterType:= pParameterType;
   Expression:= pExpression;
+end;
+
+function TParameter.GetName: String;
+begin
+  Result:= FName;
+end;
+
+function TParameter.GetValue: Variant;
+begin
+  Result:= FValue;
+end;
+
+procedure TParameter.SetValue(const Value: variant);
+
+  function VarIsNullOrUnassigned(const Value: Variant): Boolean;
+  begin
+    Result:= VarIsEmpty(Value) or VarIsNull(Value);
+  end;
+
+begin
+  if VarIsNullOrUnassigned(Value) then
+  begin
+    FValue:= Null;
+    Exit;
+  end;
+
+  try
+    case ParameterType of
+      tbValue: if DocVariantType.IsOfType(Value) then
+                 raise Exception.Create('Parameter "'+Name+'" should be a Value! List received');
+      tbList: if not DocVariantType.IsOfType(Value) then
+                 raise Exception.Create('Parameter "'+Name+'" should be a List!');
+      tbData: if not LadderVarIsDateTime(Value) then
+                 raise Exception.Create('Parameter "'+Name+'" should be a DateTime!')
+    end;
+
+    if ParameterType = tbData then
+      FValue:= LadderVarToDateTime(Value)
+    else
+      FValue:= Value;
+
+  except
+    FValue:= null;
+    raise;
+  end;
 end;
 
 end.

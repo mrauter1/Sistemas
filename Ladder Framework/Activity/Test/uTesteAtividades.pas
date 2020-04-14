@@ -3,84 +3,108 @@ unit uTesteAtividades;
 interface
 
 uses
-  UntClasses, uConClasses;
+  TestFramework, Ladder.Activity.Classes, Ladder.ServiceLocator,
+  Ladder.Executor.ConsultaPersonalizada, Ladder.Executor.Email,
+  uConClasses;
 
 type
-  TTesteAtividades = class
+  TTesteAtividades = class(TTestCase)
   private
-    FAtividade: TAtividade;
+    FAtividade: TActivity;
+    function NewProcessoRelatororiosMeta: TProcessoBase;
+    function NewProcessoEnviaEmailMeta: TProcessoBase;
+    function NewProcesso(pExecutor: IExecutorBase): TProcessoBase;
+    function NewAtividade: TActivity;
   public
-    procedure Setup;
-    procedure TearDown;
+    procedure Setup; override;
+    procedure TearDown; override;
 
+  published
     procedure TestaAtividadeEmail;
   end;
-
-procedure ExecutaTestes;
 
 implementation
 
 { TTesteAtividades }
 
-procedure ExecutaTestes;
-var
-  FTesteAtividades: TTesteAtividades;
+function TTesteAtividades.NewProcesso(pExecutor: IExecutorBase): TProcessoBase;
 begin
-  FTesteAtividades:= TTesteAtividades.Create;
-  try
-    FTesteAtividades.Setup;
-    FTesteAtividades.TestaAtividadeEmail;
-    FTesteAtividades.TearDown;
-  finally
-    FTesteAtividades.Free;
-  end;
+  Result:= TProcessoBase.Create(pExecutor, TFrwServiceLocator.Context.Connection);
+end;
+
+function TTesteAtividades.NewAtividade: TActivity;
+begin
+  Result:= TActivity.Create(TFrwServiceLocator.Context.Connection);
+end;
+
+function TTesteAtividades.NewProcessoEnviaEmailMeta: TProcessoBase;
+begin
+  Result:= NewProcesso(TExecutorSendMail.GetExecutor);
+  Result.Tipo:= tpEnvioEmail;
+  Result.Inputs.Add(TParameter.Create('Titulo', tbValue, '@EnviaEmailMeta.Titulo'));
+  Result.Inputs.Add(TParameter.Create('Body', tbValue, '@EnviaEmailMeta.Body'));
+  Result.Inputs.Add(TParameter.Create('Destinatarios', tbValue, 'marcelo@rauter.com.br'));
+  Result.Inputs.Add(TParameter.Create('Anexos', tbList, '[@Consulta.Grafico, @Consulta.Tabela]'));
+end;
+
+function TTesteAtividades.NewProcessoRelatororiosMeta: TProcessoBase;
+var
+  FOutput: TOutputParameter;
+  FInput: TParameter;
+begin
+  Result:= NewProcesso(TExecutorConsultaPersonalizada.GetExecutor);
+  Result.Name:= 'Consulta';
+  Result.Tipo:= tpConsultaPersonalizada;
+  FInput:= TParameter.Create('NomeConsulta', tbValue, 'MetaVendedores');
+  Result.Inputs.Add(FInput);
+
+  FOutput:= TOutputParameter.Create;
+  FOutput.Name:= 'Grafico';
+  FOutput.ParameterType:= tbValue;
+  FOutput.Parametros.Add(TParameter.Create('Visualizacao', tbValue, 'Realizado e Meta da Venda e Margem'));
+  FOutput.Parametros.Add(TParameter.Create('NomeArquivo', tbValue, 'MetaVendedores.png'));
+  FOutput.Parametros.Add(TParameter.Create('TipoVisualizacao', tbValue, 'Grafico'));
+  Result.Outputs.Add(FOutput);
+
+  FOutput:= TOutputParameter.Create;
+  FOutput.Name:= 'Tabela';
+  FOutput.ParameterType:= tbValue;
+  FOutput.Parametros.Add(TParameter.Create('Visualizacao', tbValue, 'Realizado e Meta da Venda e Margem'));
+  FOutput.Parametros.Add(TParameter.Create('NomeArquivo', tbValue, 'MetaVendedores.xls'));
+  FOutput.Parametros.Add(TParameter.Create('TipoVisualizacao', tbValue, 'Tabela'));
+  Result.Outputs.Add(FOutput);
 end;
 
 procedure TTesteAtividades.Setup;
-var
-  FProcesso: TProcessoBase;
-  FInput: TParametroCon;
-  FOutput: TOutputBase;
 begin
-  FAtividade:= TAtividade.Create;
+  FAtividade:= NewAtividade;
   FAtividade.ID:= 1;
-  FAtividade.Descricao:= 'Teste envio de email';
+  FAtividade.Name:= 'EnviaEmailMeta';
+  FAtividade.Description:= 'Teste envio de email';
   FAtividade.Inputs.Add(
-    TParametroCon.Create('Titulo', 'email de teste', ptTexto, 'Título do email', ''));
-
-  FAtividade.Inputs.Add(
-    TParametroCon.Create('Body', 'Este é um email para testar a classe atividade, será enviada uma lista com as vendas com margem baixa de ontem.', ptTexto, 'Corpo do email', ''));
-
-  FProcesso:= TProcessoBase.Create;
-  FProcesso.Tipo:= tpConsultaPersonalizada;
-  FInput:= TParametroCon.Create('NomeConsulta', 'MetaVendedores', ptTexto, 'Meta Vendedores', '');
-  FProcesso.Inputs.Add(FInput);
-
-  FOutput:= TOutputBase.Create;
-  FOutput.Tipo:= toGrafico;
-  FOutput.Parametros.Add(TParametroCon.Create('Visualizacao', 'Realizado e Meta da Venda e Margem', ptTexto, 'Visualização', ''));
-  FOutput.Parametros.Add(TParametroCon.Create('NomeArquivo', 'MetaVendedores.png', ptTexto, 'Nome Arquivo', ''));
-  FProcesso.Outputs.Add(FOutput);
-  FOutput:= TOutputBase.Create;
-  FOutput.Tipo:= toTabela;
-  FOutput.Parametros.Add(TParametroCon.Create('Visualizacao', 'Realizado e Meta da Venda e Margem', ptTexto, 'Visualização', ''));
-  FOutput.Parametros.Add(TParametroCon.Create('NomeArquivo', 'MetaVendedores.xls', ptTexto, 'Nome Arquivo', ''));
-  FProcesso.Outputs.Add(FOutput);
-
-  FAtividade.Processos.Add(FProcesso);
+    TParameter.Create('Titulo', tbValue, 'email de teste'));
 
   FAtividade.Inputs.Add(
-    TParametroCon.Create('Anexos', 'F:\Sistemas\Monitor\Test.txt', ptCheckListBox, 'Lista de anexos', ''));
+    TParameter.Create('Body', tbValue, 'Este é um email para testar a classe atividade, será enviada uma lista com as vendas com margem baixa de ontem.'));
+
+  FAtividade.Processos.Add(NewProcessoRelatororiosMeta);
+
+  FAtividade.Processos.Add(NewProcessoEnviaEmailMeta);
+//  FAtividade.Executar;
 end;
 
 procedure TTesteAtividades.TearDown;
 begin
-  FAtividade.Free;
+//  FAtividade.Free;
 end;
 
 procedure TTesteAtividades.TestaAtividadeEmail;
 begin
   FAtividade.Executar;
 end;
+
+initialization
+  // Register any test cases with the test runner
+  RegisterTest(TTesteAtividades.Suite);
 
 end.

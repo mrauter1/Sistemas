@@ -99,7 +99,7 @@ procedure TDMEnviaPedidos.DataModuleCreate(Sender: TObject);
 begin
   CarregarEmails;
 
-  FMailSender:= TSendMailFactory.NewMailSender(nil, 'Config.ini', 'EMAIL');
+  FMailSender:= TSendMailFactory.NewMailSender(nil, ExtractFilePath(Application.ExeName)+'Config.ini', 'EMAIL');
   try
     FDMemTable.LoadFromFile('Pedidos.xml', sfXml);
   except

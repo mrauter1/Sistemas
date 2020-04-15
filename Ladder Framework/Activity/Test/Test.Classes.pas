@@ -14,17 +14,15 @@ interface
 uses
   TestFramework, System.SysUtils, uConsultaPersonalizada, uConClasses,
   System.Generics.Collections, Ladder.Activity.Classes, Ladder.ServiceLocator,
-  Data.DB, System.Classes;
+  Data.DB, System.Classes, Variants;
 
 type
   // Test methods for class TOutputBase
 
-  TestTOutputBase = class(TTestCase)
-  strict private
-    FOutputBase: TOutputParameter;
+  TMockExecutor = class(TExecutorBase) // For every output the value returned is name of the parameter;
+  private
   public
-    procedure SetUp; override;
-    procedure TearDown; override;
+    function Executar: TOutputList; override;
   end;
 
   THackProcessoBase = class(TProcessoBase);
@@ -42,32 +40,46 @@ type
   end;
   // Test methods for class TAtividade
 
+  THackActivity = class(TActivity);
+
   TestTActivity = class(TTestCase)
   strict private
-    FActivity: TActivity;
+    FActivity: THackActivity;
+  private
   public
     procedure SetUp; override;
     procedure TearDown; override;
   published
     procedure TestExecutar;
+    procedure TestFindElementByName;
   end;
+
+function CreateMockProcess: THackProcessoBase;
 
 implementation
 
-procedure TestTOutputBase.SetUp;
+uses
+  SynCommons;
+
+procedure AddMockParameters(pProcesso: TProcessoBase);
 begin
-  FOutputBase := TOutputParameter.Create;
+  pProcesso.Inputs.Add(TParameter.Create('input1', tbValue, 'teste1'));
+
+  pProcesso.Inputs.Add(TParameter.Create('dois', tbValue, 'valordois'));
+
+  pProcesso.Inputs.Add(TParameter.Create('tres', tbList, '[@input1, @dois]'));
 end;
 
-procedure TestTOutputBase.TearDown;
+function CreateMockProcess: THackProcessoBase;
+var
+  FInput1, FInput2, FInput3: TParameter;
 begin
-  FOutputBase.Free;
-  FOutputBase := nil;
+  Result := THackProcessoBase.Create(TMockExecutor.Create, TFrwServiceLocator.Context.Connection);
 end;
 
 procedure TestTProcessoBase.SetUp;
 begin
-  FProcessoBase := THackProcessoBase.Create(nil, TFrwServiceLocator.Context.Connection);
+  FProcessoBase:= THackProcessoBase.Create(TMockExecutor.Create, TFrwServiceLocator.Context.Connection);
 end;
 
 procedure TestTProcessoBase.TearDown;
@@ -80,27 +92,30 @@ procedure TestTProcessoBase.TestExecutar;
 var
   ReturnValue: TOutputList;
 begin
-  ReturnValue := FProcessoBase.Executar(nil);
-  // TODO: Validate method results
+  AddMockParameters(FProcessoBase);
+  FProcessoBase.Outputs.Add(TOutputParameter.Create('OutTeste', tbValue, ''));
+  ReturnValue := FProcessoBase.Executar;  // Executar must evaluate the parameters
+
+  CheckEquals('teste1', FProcessoBase.Inputs.ParamValueByName('input1'));
+  CheckEquals('teste1', FProcessoBase.Inputs.ParamValueByName('tres')._(0));
+  CheckEquals('valordois', FProcessoBase.Inputs.ParamValueByName('tres')._(1));
+
+  CheckEquals('OutTeste', FProcessoBase.Outputs.ParamValueByName('OutTeste')); // MockExecutor makes the parameter value be equals name
 end;
 
 procedure TestTProcessoBase.TestFindElementByName;
 var
   FInput1, FInput2, FInput3: TParameter;
 begin
-  FInput1:= TParameter.Create('input1', tbValue, 'teste1');
-  FProcessoBase.Inputs.Add(FInput1);
-  Check(TObject(FProcessoBase.FindElementByName('input1')) = FInput1);
+  AddMockParameters(FProcessoBase);
+  FInput1:= (FProcessoBase.FindElementByName('input1') as TParameter);
+  FInput2:= (FProcessoBase.FindElementByName('dois') as TParameter);
+  FInput3:= (FProcessoBase.FindElementByName('tres') as TParameter);
 
-  FInput2:= TParameter.Create('dois', tbValue, 'valordois');
-  FProcessoBase.Inputs.Add(FInput2);
-  Check(TObject(FProcessoBase.FindElementByName('dois'))=FInput2);
+  CheckEquals('teste1', FInput1.Expression);
+  Check(VarIsNull(FInput1.Value));
 
-  FInput3:= TParameter.Create('tres', tbList, '[@input1, @dois]');
-  FProcessoBase.Inputs.Add(FInput3);
-  Check(TObject(FProcessoBase.FindElementByName('tres'))=FInput3);
-
-  FProcessoBase.ValuateInputs(FProcessoBase.OnValuateInputExpression);
+  FProcessoBase.ValuateInputs(FProcessoBase.OnValuateParameterExpression);
 
   CheckEquals('teste1', FInput1.Value);
   CheckEquals('teste1', FInput3.Value._(0));
@@ -109,7 +124,7 @@ end;
 
 procedure TestTActivity.SetUp;
 begin
-  FActivity := TActivity.Create(TFrwServiceLocator.Context.Connection);
+  FActivity := THackActivity.Create(TFrwServiceLocator.Context.Connection);
 end;
 
 procedure TestTActivity.TearDown;
@@ -121,9 +136,83 @@ end;
 procedure TestTActivity.TestExecutar;
 var
   ReturnValue: TOutputList;
+  FProcesso1, FProcesso2: THackProcessoBase;
 begin
+  FProcesso1:= CreateMockProcess;
+  FProcesso1.Name:= 'Processo1';
+  FProcesso1.Inputs.Add(TParameter.Create('p1', tbValue, 'res1'));
+  FProcesso1.Inputs.Add(TParameter.Create('p2', tbValue, 'res2'));
+  FProcesso1.Outputs.Add(TOutputParameter.Create('Out1', tbValue, ''));
+
+  FProcesso2:= CreateMockProcess;
+  FProcesso2.Name:= 'Processo2';
+  FProcesso2.Inputs.Add(TParameter.Create('Par3', tbList, '[@Processo1.p1, @Processo1.p2]'));
+  FProcesso2.Outputs.Add(TOutputParameter.Create('Out2', tbValue, ''));
+
+  FActivity.Processos.Add(FProcesso1);
+  FActivity.Processos.Add(FProcesso2);
+
+  FActivity.Outputs.Add(TOutputParameter.Create('Out1', tbValue, '@Processo1.p1'));
+  FActivity.Outputs.Add(TOutputParameter.Create('Out2', tbAny, '@Processo2.Par3'));
+  FActivity.Outputs.Add(TOutputParameter.Create('Out3', tbValue, '@Processo2.Out2'));
+
   ReturnValue := FActivity.Executar;
-  // TODO: Validate method results
+
+  CheckEquals('res1', FActivity.Outputs.ParamValueByName('Out1'));
+
+  CheckEquals(2, FActivity.Outputs.ParamValueByName('Out2')._Count);
+  CheckEquals('res1', FActivity.Outputs.ParamValueByName('Out2')._(0));
+  CheckEquals('res2', FActivity.Outputs.ParamValueByName('Out2')._(1));
+
+  CheckEquals('Out2', FActivity.Outputs.ParamValueByName('Out3'));
+end;
+
+procedure TestTActivity.TestFindElementByName;
+var
+  FInput1, FInput2, FInput3: TParameter;
+  FProcesso1, FProcesso2: THackProcessoBase;
+begin
+  FProcesso1:= CreateMockProcess;
+  FProcesso1.Name:= 'Processo1';
+  FProcesso1.Inputs.Add(TParameter.Create('p1', tbValue, 'res1'));
+  FProcesso1.Inputs.Add(TParameter.Create('p2', tbValue, 'res2'));
+  //AddMockParameters(FProcesso1);
+
+  FActivity.Processos.Add(FProcesso1);
+  FProcesso1.ValuateInputs(FActivity.OnValuateParameterExpression);
+
+  CheckEquals('res1', FProcesso1.Inputs.ParamValueByName('p1'));
+  CheckEquals('res2', FProcesso1.Inputs.ParamValueByName('p2'));
+
+  FProcesso2:= CreateMockProcess;
+  FProcesso2.Name:= 'Processo2';
+  FProcesso2.Inputs.Add(TParameter.Create('Par1', tbValue, '@Processo1.p1'));
+  FProcesso2.Inputs.Add(TParameter.Create('Par2', tbValue, '@Processo1.p2'));
+  FProcesso2.Inputs.Add(TParameter.Create('Par3', tbList, '[@Processo1.p1, @Processo1.p2]'));
+
+  FActivity.Processos.Add(FProcesso2);
+
+  FProcesso2.ValuateInputs(FActivity.OnValuateParameterExpression);
+
+  CheckEquals('res1', FProcesso2.Inputs.ParamValueByName('Par1'));
+  CheckEquals('res2', FProcesso2.Inputs.ParamValueByName('Par2'));
+  CheckEquals(2, FProcesso2.Inputs.ParamValueByName('Par3')._Count);
+  CheckEquals('res1', FProcesso2.Inputs.ParamValueByName('Par3')._(0));
+  CheckEquals('res2', FProcesso2.Inputs.ParamValueByName('Par3')._(1));
+end;
+
+{ TMockExecutor }
+
+function TMockExecutor.Executar: TOutputList;
+var
+  FOutput: TOutputParameter;
+begin
+  for FOutput in Outputs do
+    if FOutput.ParameterType = tbList then
+      FOutput.Value:= _Arr([FOutput.Name])
+    else
+      FOutput.Value:= FOutput.Name;
+
 end;
 
 initialization
@@ -132,6 +221,6 @@ initialization
 //  RegisterTest(TestTExecutorBase.Suite);
 //  RegisterTest(TestTExecutorConsultaPersonalizada.Suite);
   RegisterTest(TestTProcessoBase.Suite);
-//  RegisterTest(TestTAtividade.Suite);
+  RegisterTest(TestTActivity.Suite);
 end.
 

@@ -8,13 +8,13 @@ uses
 type
   TOnGetExecutor = function: IExecutorBase of object;
 
-  TExecutorDictionary = TDictionary<String, TOnGetExecutor>;
+  TExecutorDictionary = TDictionary<TExecutorClass, TOnGetExecutor>;
 
   TActivityManager = class
   private
     FExecutorDictionary: TExecutorDictionary;
   public
-    property ExecutorDictionary: TExecutorDictionary read FExecutorDictionary write FExecutorDictionary;
+    property ExecutorDictionary: TExecutorDictionary read FExecutorDictionary; //write FExecutorDictionary;
     procedure RegisterExecutor(ExecutorClass: TExecutorClass; pGetExecutor: TOnGetExecutor);
     procedure UnregisterExecutor(ExecutorClass: TExecutorClass);
 
@@ -44,7 +44,7 @@ function TActivityManager.GetExecutor(ExecutorClass: TExecutorClass): IExecutorB
 var
   FOnGetExecutor: TOnGetExecutor;
 begin
-  if not FExecutorDictionary.TryGetValue(ExecutorClass.ClassName, FOnGetExecutor) then
+  if not FExecutorDictionary.TryGetValue(ExecutorClass, FOnGetExecutor) then
     raise Exception.Create('TActivityManager.GetExecutor: Executor "'+ExecutorClass.ClassName+'" não registrado!');
 
   Result:= FOnGetExecutor();
@@ -53,15 +53,15 @@ end;
 procedure TActivityManager.RegisterExecutor(ExecutorClass: TExecutorClass;
   pGetExecutor: TOnGetExecutor);
 begin
-  if FExecutorDictionary.ContainsKey(ExecutorClass.ClassName) then
+  if FExecutorDictionary.ContainsKey(ExecutorClass) then
     raise Exception.Create('TActivityManager.RegisterExecutorClass: Executor "'+ExecutorClass.ClassName+'" já registrado!');
 
-  FExecutorDictionary.Add(ExecutorClass.ClassName, pGetExecutor);
+  FExecutorDictionary.Add(ExecutorClass, pGetExecutor);
 end;
 
 procedure TActivityManager.UnregisterExecutor(ExecutorClass: TExecutorClass);
 begin
-  FExecutorDictionary.Remove(ExecutorClass.ClassName);
+  FExecutorDictionary.Remove(ExecutorClass);
 end;
 
 end.

@@ -154,6 +154,7 @@ begin
   DaoUtils:= ServiceFactory.NewDaoUtils(Funcoes);
   ServiceLocator:= ServiceFactory.NewServiceLocator;
   Connection:= ServiceFactory.NewConnection;
+  ActivityManager:= ServiceFactory.NewActivityManager;
   inherited Create;
 end;
 

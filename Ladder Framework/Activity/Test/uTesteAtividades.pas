@@ -15,6 +15,7 @@ type
     function NewProcessoEnviaEmailMeta: TProcessoBase;
     function NewProcesso(pExecutor: IExecutorBase): TProcessoBase;
     function NewAtividade: TActivity;
+    function NewProcessoRelatororiosMetaEvolutivo: TProcessoBase;
   public
     procedure Setup; override;
     procedure TearDown; override;
@@ -24,6 +25,9 @@ type
   end;
 
 implementation
+
+uses
+  SysUtils, DateUtils;
 
 { TTesteAtividades }
 
@@ -40,11 +44,10 @@ end;
 function TTesteAtividades.NewProcessoEnviaEmailMeta: TProcessoBase;
 begin
   Result:= NewProcesso(TExecutorSendMail.GetExecutor);
-  Result.Tipo:= tpEnvioEmail;
   Result.Inputs.Add(TParameter.Create('Titulo', tbValue, '@EnviaEmailMeta.Titulo'));
   Result.Inputs.Add(TParameter.Create('Body', tbValue, '@EnviaEmailMeta.Body'));
   Result.Inputs.Add(TParameter.Create('Destinatarios', tbValue, 'marcelo@rauter.com.br'));
-  Result.Inputs.Add(TParameter.Create('Anexos', tbList, '[@Consulta.Grafico, @Consulta.Tabela]'));
+  Result.Inputs.Add(TParameter.Create('Anexos', tbList, '[@Consulta.Grafico, @Consulta.Tabela, @MetaEvolutivo.Grafico]'));
 end;
 
 function TTesteAtividades.NewProcessoRelatororiosMeta: TProcessoBase;
@@ -54,24 +57,39 @@ var
 begin
   Result:= NewProcesso(TExecutorConsultaPersonalizada.GetExecutor);
   Result.Name:= 'Consulta';
-  Result.Tipo:= tpConsultaPersonalizada;
   FInput:= TParameter.Create('NomeConsulta', tbValue, 'MetaVendedores');
   Result.Inputs.Add(FInput);
 
-  FOutput:= TOutputParameter.Create;
-  FOutput.Name:= 'Grafico';
-  FOutput.ParameterType:= tbValue;
+  FOutput:= TOutputParameter.Create('Grafico', tbValue, '');
   FOutput.Parametros.Add(TParameter.Create('Visualizacao', tbValue, 'Realizado e Meta da Venda e Margem'));
   FOutput.Parametros.Add(TParameter.Create('NomeArquivo', tbValue, 'MetaVendedores.png'));
   FOutput.Parametros.Add(TParameter.Create('TipoVisualizacao', tbValue, 'Grafico'));
   Result.Outputs.Add(FOutput);
 
-  FOutput:= TOutputParameter.Create;
-  FOutput.Name:= 'Tabela';
-  FOutput.ParameterType:= tbValue;
+  FOutput:= TOutputParameter.Create('Tabela', tbValue, '');
   FOutput.Parametros.Add(TParameter.Create('Visualizacao', tbValue, 'Realizado e Meta da Venda e Margem'));
   FOutput.Parametros.Add(TParameter.Create('NomeArquivo', tbValue, 'MetaVendedores.xls'));
   FOutput.Parametros.Add(TParameter.Create('TipoVisualizacao', tbValue, 'Tabela'));
+  Result.Outputs.Add(FOutput);
+end;
+
+function TTesteAtividades.NewProcessoRelatororiosMetaEvolutivo: TProcessoBase;
+var
+  FOutput: TOutputParameter;
+  FInput: TParameter;
+begin
+  Result:= NewProcesso(TExecutorConsultaPersonalizada.GetExecutor);
+  Result.Name:= 'MetaEvolutivo';
+  FInput:= TParameter.Create('NomeConsulta', tbValue, 'MetaVendaEvolutivo');
+  Result.Inputs.Add(FInput);
+
+  Result.Inputs.Add(TParameter.CreateWithValue('geDataIni', tbValue, StartOfTheMonth(Now)));
+  Result.Inputs.Add(TParameter.CreateWithValue('geDataFim', tbValue, Now));
+
+  FOutput:= TOutputParameter.Create('Grafico', tbValue, '');
+  FOutput.Parametros.Add(TParameter.Create('Visualizacao', tbValue, 'Venda e Margem Geral'));
+  FOutput.Parametros.Add(TParameter.Create('NomeArquivo', tbValue, 'MetaVendedoresEvolutivo.png'));
+  FOutput.Parametros.Add(TParameter.Create('TipoVisualizacao', tbValue, 'Grafico'));
   Result.Outputs.Add(FOutput);
 end;
 
@@ -88,6 +106,8 @@ begin
     TParameter.Create('Body', tbValue, 'Este é um email para testar a classe atividade, será enviada uma lista com as vendas com margem baixa de ontem.'));
 
   FAtividade.Processos.Add(NewProcessoRelatororiosMeta);
+
+  FAtividade.Processos.Add(NewProcessoRelatororiosMetaEvolutivo);
 
   FAtividade.Processos.Add(NewProcessoEnviaEmailMeta);
 //  FAtividade.Executar;

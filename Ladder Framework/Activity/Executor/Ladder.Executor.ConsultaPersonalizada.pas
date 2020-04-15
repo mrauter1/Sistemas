@@ -3,7 +3,7 @@ unit Ladder.Executor.ConsultaPersonalizada;
 interface
 
 uses
-  Ladder.Activity.Classes, Ladder.ServiceLocator, SysUtils, uConsultaPersonalizada;
+  Ladder.Activity.Classes, Ladder.ServiceLocator, SysUtils, uConsultaPersonalizada, uConClasses;
 
 type
   TExecutorConsultaPersonalizada = class(TExecutorBase)
@@ -15,11 +15,16 @@ type
     function Executar: TOutputList; override;
 
     class function GetExecutor: IExecutorBase;
+
+    class function Description: String; override;
   end;
 
 implementation
 
 { TExecutorConsultaPersonalizada }
+
+uses
+  Variants;
 
 procedure TExecutorConsultaPersonalizada.CheckInputs;
 begin
@@ -60,6 +65,18 @@ function TExecutorConsultaPersonalizada.ConfiguraConsulta: TFrmConsultaPersonali
 var
   NomeConsulta: String;
   FConsultaPersonalizada: TFrmConsultaPersonalizada;
+
+  procedure SetaParametros;
+  var
+    FParam: TParameter;
+  begin
+    for FParam in Inputs do
+    begin
+      if not VarIsNull(FParam.Value) then
+        if FConsultaPersonalizada.Params.ContainsKey(FParam.Name) then
+          FConsultaPersonalizada.Params[FParam.Name].Valor:= FParam.Value;
+    end;
+  end;
 begin
   CheckInputs;
 
@@ -67,14 +84,21 @@ begin
 
   TFrwServiceLocator.Synchronize(
     procedure begin
-      FConsultaPersonalizada:= TFrmConsultaPersonalizada.AbreConsultaPersonalizadaByName(NomeConsulta);
+      FConsultaPersonalizada:= TFrmConsultaPersonalizada.AbreConsultaPersonalizadaByName(NomeConsulta, False);
     end
   );
 
   if not Assigned(FConsultaPersonalizada) then
     raise Exception.Create('TExecutorConsultaPersonalizada.ConfiguraConsulta: Consulta "'+NomeConsulta+'" não encontrada!);');
 
+  SetaParametros; // Copia o valor dos parametros de input para os parametros da consulta
+
   Result:= FConsultaPersonalizada;
+end;
+
+class function TExecutorConsultaPersonalizada.Description: String;
+begin
+  Result:= 'Consulta Personalizada';
 end;
 
 function TExecutorConsultaPersonalizada.Executar: TOutputList;
@@ -102,5 +126,8 @@ class function TExecutorConsultaPersonalizada.GetExecutor: IExecutorBase;
 begin
   Result:= TExecutorConsultaPersonalizada.Create;
 end;
+
+initialization
+  TFrwServiceLocator.Context.ActivityManager.RegisterExecutor(TExecutorConsultaPersonalizada, TExecutorConsultaPersonalizada.GetExecutor);
 
 end.

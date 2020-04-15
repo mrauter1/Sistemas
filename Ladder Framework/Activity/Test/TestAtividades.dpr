@@ -23,7 +23,11 @@ uses
   Test.Parser in 'Test.Parser.pas',
   Ladder.Activity.Parser in '..\Ladder.Activity.Parser.pas',
   Ladder.Connection in '..\..\Ladder.Connection.pas',
-  uTesteAtividades in 'uTesteAtividades.pas';
+  uTesteAtividades in 'uTesteAtividades.pas',
+  Ladder.Activity.Manager in '..\Ladder.Activity.Manager.pas',
+  Ladder.ServiceLocator in '..\..\Ladder.ServiceLocator.pas',
+  Ladder.Executor.Email in '..\Executor\Ladder.Executor.Email.pas',
+  Ladder.Executor.ConsultaPersonalizada in '..\Executor\Ladder.Executor.ConsultaPersonalizada.pas';
 
 {$R *.RES}
 

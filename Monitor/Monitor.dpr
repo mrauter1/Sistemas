@@ -17,14 +17,13 @@ uses
   uConSqlServer in 'uConSqlServer.pas' {ConSqlServer: TDataModule},
   uDmEnviaRelatorios in 'uDmEnviaRelatorios.pas' {Con: TDataModule},
   uConsultaPersonalizada in '..\utils\uConsultaPersonalizada.pas' {FrmConsultaPersonalizada},
-  uFormCadastroAviso in 'uFormCadastroAviso.pas' {FormCadastroAviso},
-  uFormAvisoConsulta in 'uFormAvisoConsulta.pas' {FormAvisoConsulta},
+  Form.CadastroAtividade in 'Forms\Form.CadastroAtividade.pas' {FormCadastroAviso},
+  From.CadastroProcesso in 'Forms\From.CadastroProcesso.pas' {FormCadastroProcesso},
   uFormPesquisaAviso in 'uFormPesquisaAviso.pas' {FormPesquisaAviso},
-  uFormSelecionaConsulta in 'uFormSelecionaConsulta.pas' {FormSelecionaConsulta},
+  Form.SelecionaConsulta in 'Forms\Form.SelecionaConsulta.pas' {FormSelecionaConsulta},
   uAppConfig in '..\utils\uAppConfig.pas',
   uDmGravaLista in '..\utils\uDmGravaLista.pas' {DmGravaLista: TDataModule},
-  uTesteAtividades in 'uTesteAtividades.pas',
-  Ladder.Activity.EnviaEmail in '..\Ladder Framework\Activity\Ladder.Activity.EnviaEmail.pas';
+  Form.NovoProcesso in 'Forms\Form.NovoProcesso.pas' {FormNovoProcesso};
 
 {$R *.res}
 
@@ -49,8 +48,8 @@ begin
   Application.CreateForm(TMonitorMain, MonitorMain);
   WriteLog('Criando TDmSqlUtils');
   Application.CreateForm(TDmSqlUtils, DmSqlUtils);
-  WriteLog('Criando TCon');
-  Application.CreateForm(TCon, Con);
+{  WriteLog('Criando TCon');
+  Application.CreateForm(TCon, Con);            }
   WriteLog('Inicializando message loop');
   Application.Run;
 end.

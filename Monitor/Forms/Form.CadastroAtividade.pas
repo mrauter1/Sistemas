@@ -1,4 +1,4 @@
-unit uFormCadastroAviso;
+unit Form.CadastroAtividade;
 
 interface
 
@@ -27,52 +27,73 @@ uses
   cxGrid, Vcl.Grids, Vcl.DBGrids, Vcl.Buttons, FireDAC.Stan.Intf,
   FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS,
   FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
-  FireDAC.Comp.DataSet, FireDAC.Comp.Client, uConSqlServer;
+  FireDAC.Comp.DataSet, FireDAC.Comp.Client, uConSqlServer, Ladder.Activity.Classes;
 
 type
   TFormCadastroAviso = class(TForm)
     PanelTop: TPanel;
     PanelCentro: TPanel;
-    DBEditNomeAviso: TDBEdit;
+    DBEditNomeAtividade: TDBEdit;
     Label1: TLabel;
     Label2: TLabel;
     DBEditID: TDBEdit;
-    GroupBox1: TGroupBox;
-    GroupBox2: TGroupBox;
-    GroupBox4: TGroupBox;
-    DBEditTitulo: TDBEdit;
-    Label3: TLabel;
-    Label4: TLabel;
-    DBMemoMensagem: TDBMemo;
+    GroupBoxProcessos: TGroupBox;
     PanelControles: TPanel;
     DBGridRelatorios: TDBGrid;
     Panel1: TPanel;
-    BtnAddConsulta: TBitBtn;
-    BtnRemoveConsulta: TBitBtn;
-    BtnConfiguraConsulta: TBitBtn;
+    BtnAddProcesso: TBitBtn;
+    BtnRemoveProcesso: TBitBtn;
+    BtnConfiguraProcesso: TBitBtn;
     PanelBot: TPanel;
-    GroupBox3: TGroupBox;
     BtnSalvar: TBitBtn;
     BtnCancelar: TBitBtn;
-    QryAviso: TFDQuery;
-    DsAviso: TDataSource;
-    QryAvisoID: TFDAutoIncField;
-    QryAvisoNome: TStringField;
-    QryAvisoMensagem: TMemoField;
-    QryAvisoTitulo: TStringField;
+    QryAtividade: TFDQuery;
+    DsAtividade: TDataSource;
+    QryAtividadeID: TFDAutoIncField;
+    QryAtividadeNome: TStringField;
+    QryAtividadeMensagem: TMemoField;
+    QryAtividadeTitulo: TStringField;
     BtnFechar: TBitBtn;
-    QryAvisoConsulta: TFDQuery;
-    DsAvisoConsulta: TDataSource;
-    QryAvisoConsultaIDAviso: TIntegerField;
-    QryAvisoConsultaIDConsulta: TIntegerField;
-    QryAvisoConsultaDescricao: TStringField;
-    QryAvisoConsultaVisualizacao: TStringField;
+    QryProcessos: TFDQuery;
+    DsProcessos: TDataSource;
+    QryProcessosIDAviso: TIntegerField;
+    QryProcessosIDConsulta: TIntegerField;
+    QryProcessosDescricao: TStringField;
+    QryProcessosVisualizacao: TStringField;
+    DBEditDescricao: TDBEdit;
+    Label3: TLabel;
+    GroupBoxInputs: TGroupBox;
+    cxGridParametros: TcxGrid;
+    cxGridParametrosDBTableView1: TcxGridDBTableView;
+    cxGridParametrosDBTableView1IDParametro: TcxGridDBColumn;
+    cxGridParametrosDBTableView1Nome: TcxGridDBColumn;
+    cxGridParametrosDBTableView1Valor: TcxGridDBColumn;
+    cxGridParametrosLevel1: TcxGridLevel;
+    GroupBox1: TGroupBox;
+    cxGrid1: TcxGrid;
+    cxGridDBTableView1: TcxGridDBTableView;
+    cxGridDBColumn1: TcxGridDBColumn;
+    cxGridDBColumn2: TcxGridDBColumn;
+    cxGridDBColumn3: TcxGridDBColumn;
+    cxGridLevel1: TcxGridLevel;
+    QryInputs: TFDQuery;
+    QryInputsIDAviso: TIntegerField;
+    QryInputsIDConsulta: TIntegerField;
+    QryInputsIDParametro: TIntegerField;
+    QryInputsValor: TMemoField;
+    DsInputs: TDataSource;
+    DsOutputs: TDataSource;
+    QryOutputs: TFDQuery;
+    IntegerField1: TIntegerField;
+    IntegerField2: TIntegerField;
+    IntegerField3: TIntegerField;
+    MemoField1: TMemoField;
     procedure BtnSalvarClick(Sender: TObject);
     procedure BtnCancelarClick(Sender: TObject);
     procedure BtnFecharClick(Sender: TObject);
-    procedure BtnAddConsultaClick(Sender: TObject);
-    procedure BtnRemoveConsultaClick(Sender: TObject);
-    procedure BtnConfiguraConsultaClick(Sender: TObject);
+    procedure BtnAddProcessoClick(Sender: TObject);
+    procedure BtnRemoveProcessoClick(Sender: TObject);
+    procedure BtnConfiguraProcessoClick(Sender: TObject);
   private
     procedure RemoverConsulta;
     procedure ConfigurarConsultaAtual;
@@ -88,25 +109,25 @@ implementation
 {$R *.dfm}
 
 uses
-  uFormAvisoConsulta, uFormSelecionaConsulta;
+  uFormAvisoConsulta, Form.SelecionaConsulta;
 
 { TuFormCadastrarAvisosAutomaticos }
 
 procedure TFormCadastroAviso.AbrirConfig(pIDAviso: Integer);
 begin
-  QryAviso.Close;
-  QryAviso.ParamByName('ID').AsInteger:= pIDAviso;
-  QryAviso.Open;
+  QryAtividade.Close;
+  QryAtividade.ParamByName('ID').AsInteger:= pIDAviso;
+  QryAtividade.Open;
 
-  QryAvisoConsulta.Close;
-  QryAvisoConsulta.ParamByName('IDAviso').AsInteger:= pIDAviso;
-  QryAvisoConsulta.Open;
-
-  if QryAviso.IsEmpty then
+  if QryAtividade.IsEmpty then
   begin
     ShowMessage('Aviso cod.: '+IntToStr(pIDAviso)+' não encontrado.');
     Exit;
   end;
+
+  QryProcessos.Close;
+  QryProcessos.ParamByName('IDAviso').AsInteger:= pIDAviso;
+  QryProcessos.Open;
 
   ShowModal;
 end;
@@ -124,12 +145,12 @@ begin
   end;
 end;
 
-procedure TFormCadastroAviso.BtnConfiguraConsultaClick(Sender: TObject);
+procedure TFormCadastroAviso.BtnConfiguraProcessoClick(Sender: TObject);
 begin
   ConfigurarConsultaAtual;
 end;
 
-procedure TFormCadastroAviso.BtnAddConsultaClick(Sender: TObject);
+procedure TFormCadastroAviso.BtnAddProcessoClick(Sender: TObject);
 var
   FIDConsulta: Integer;
 begin
@@ -137,30 +158,30 @@ begin
   if FIDConsulta = 0 then
     Exit;
 
-  QryAvisoConsulta.Append;
-  QryAvisoConsultaIDAviso.AsInteger:= QryAvisoID.AsInteger;
-  QryAvisoConsultaIDConsulta.AsInteger:= FIDConsulta;
-  QryAvisoConsulta.Post;
+  QryProcessos.Append;
+  QryProcessosIDAviso.AsInteger:= QryAtividadeID.AsInteger;
+  QryProcessosIDConsulta.AsInteger:= FIDConsulta;
+  QryProcessos.Post;
   ConfigurarConsultaAtual;
 end;
 
 procedure TFormCadastroAviso.ConfigurarConsultaAtual;
 begin
-  TFormAvisoConsulta.AbrirConfigRelatorio(QryAvisoConsultaIDAviso.AsInteger, QryAvisoConsultaIDConsulta.AsInteger);
-  QryAvisoConsulta.Refresh;
+  TFormAvisoConsulta.AbrirConfigRelatorio(QryProcessosIDAviso.AsInteger, QryProcessosIDConsulta.AsInteger);
+  QryProcessos.Refresh;
 end;
 
 procedure TFormCadastroAviso.BtnCancelarClick(Sender: TObject);
 begin
-  QryAviso.Cancel;
+  QryAtividade.Cancel;
 end;
 
 procedure TFormCadastroAviso.BtnFecharClick(Sender: TObject);
 begin
-  if QryAviso.Modified then
+  if QryAtividade.Modified then
     if Application.MessageBox('Existem modificações não salvas, deseja sair sem salvar?', 'Atenção!',  MB_YESNO) = ID_Yes then
     begin
-      QryAviso.Cancel;
+      QryAtividade.Cancel;
       Close;
     end;
 end;
@@ -176,24 +197,24 @@ procedure TFormCadastroAviso.RemoverConsulta;
   end;
 
 begin
-  if not QryAvisoConsulta.IsEmpty then
+  if not QryProcessos.IsEmpty then
   begin
     if Application.MessageBox('Você tem certeza que deseja excluir este consulta?', 'Atenção!',  MB_YESNO) = ID_YES  then
     begin
-      RemoveConsultaDepencias(QryAvisoConsultaIDAviso.AsInteger, QryAvisoConsultaIDConsulta.AsInteger);
-      QryAvisoConsulta.Delete;
+      RemoveConsultaDepencias(QryProcessosIDAviso.AsInteger, QryProcessosIDConsulta.AsInteger);
+      QryProcessos.Delete;
     end;
   end;
 end;
 
-procedure TFormCadastroAviso.BtnRemoveConsultaClick(Sender: TObject);
+procedure TFormCadastroAviso.BtnRemoveProcessoClick(Sender: TObject);
 begin
   RemoverConsulta;
 end;
 
 procedure TFormCadastroAviso.BtnSalvarClick(Sender: TObject);
 begin
-  QryAviso.Post;
+  QryAtividade.Post;
 end;
 
 end.

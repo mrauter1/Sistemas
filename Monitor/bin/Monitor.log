@@ -725,3 +725,29 @@
 20032020-19:37:39 -> Iniciando monitor...
 20032020-19:49:15 -> Iniciando monitor...
 20032020-19:50:13 -> Iniciando monitor...
+15042020-19:17:14 -> Iniciando monitor...
+15042020-19:17:14 -> Criando TConSqlServer
+15042020-19:19:17 -> Iniciando monitor...
+15042020-19:19:17 -> Criando TConSqlServer
+15042020-19:19:17 -> Criando TConFirebird
+15042020-19:19:18 -> Criando TMonitorMain
+15042020-19:19:18 -> Criando TDmSqlUtils
+15042020-19:19:18 -> Inicializando message loop
+15042020-19:23:19 -> Iniciando monitor...
+15042020-19:23:19 -> Criando TConSqlServer
+15042020-19:23:19 -> Criando TConFirebird
+15042020-19:23:19 -> Criando TMonitorMain
+15042020-19:23:19 -> Criando TDmSqlUtils
+15042020-19:23:19 -> Inicializando message loop
+15042020-19:28:57 -> Iniciando monitor...
+15042020-19:28:57 -> Criando TConSqlServer
+15042020-19:28:57 -> Criando TConFirebird
+15042020-19:28:57 -> Criando TMonitorMain
+15042020-19:28:57 -> Criando TDmSqlUtils
+15042020-19:28:57 -> Inicializando message loop
+15042020-19:33:49 -> Iniciando monitor...
+15042020-19:33:49 -> Criando TConSqlServer
+15042020-19:33:49 -> Criando TConFirebird
+15042020-19:33:50 -> Criando TMonitorMain
+15042020-19:33:50 -> Criando TDmSqlUtils
+15042020-19:33:50 -> Inicializando message loop

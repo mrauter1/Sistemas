@@ -1,4 +1,4 @@
-unit uFormAvisoConsulta;
+unit From.CadastroProcesso;
 
 interface
 
@@ -30,37 +30,50 @@ uses
   uConSqlServer, cxDBLookupComboBox, Ladder.ServiceLocator;
 
 type
-  TFormAvisoConsulta = class(TForm)
+  TFormCadastroProcesso = class(TForm)
     Panel1: TPanel;
     Panel2: TPanel;
-    GroupBox1: TGroupBox;
+    GroupBoxInputs: TGroupBox;
     cxGridParametros: TcxGrid;
     cxGridParametrosDBTableView1: TcxGridDBTableView;
     cxGridParametrosLevel1: TcxGridLevel;
     BtnOK: TBitBtn;
-    GroupBox2: TGroupBox;
-    DBRadioPaginaPadrao: TDBRadioGroup;
     Label2: TLabel;
     DBEditIDConsulta: TDBEdit;
-    Label1: TLabel;
-    DBEditTitulo: TDBEdit;
-    BtnSelecionarRelatorio: TBitBtn;
     DsAvisoConsulta: TDataSource;
     QryAvisoConsulta: TFDQuery;
     QryAvisoConsultaIDAviso: TIntegerField;
     QryAvisoConsultaIDConsulta: TIntegerField;
     QryAvisoConsultaTipoVisualizacao: TIntegerField;
-    QryParametros: TFDQuery;
-    DsPaametros: TDataSource;
+    QryInputs: TFDQuery;
+    DsInputs: TDataSource;
     QryAvisoConsultaTitulo: TStringField;
-    LblConsulta: TLabel;
-    QryParametrosIDAviso: TIntegerField;
-    QryParametrosIDConsulta: TIntegerField;
-    QryParametrosIDParametro: TIntegerField;
-    QryParametrosValor: TMemoField;
+    QryInputsIDAviso: TIntegerField;
+    QryInputsIDConsulta: TIntegerField;
+    QryInputsIDParametro: TIntegerField;
+    QryInputsValor: TMemoField;
     cxGridParametrosDBTableView1IDParametro: TcxGridDBColumn;
     cxGridParametrosDBTableView1Valor: TcxGridDBColumn;
     cxGridParametrosDBTableView1Nome: TcxGridDBColumn;
+    GroupBox1: TGroupBox;
+    cxGrid1: TcxGrid;
+    cxGridDBTableView1: TcxGridDBTableView;
+    cxGridDBColumn1: TcxGridDBColumn;
+    cxGridDBColumn2: TcxGridDBColumn;
+    cxGridDBColumn3: TcxGridDBColumn;
+    cxGridLevel1: TcxGridLevel;
+    DBEditNomeProcesso: TDBEdit;
+    Label3: TLabel;
+    DBEdit1: TDBEdit;
+    Label4: TLabel;
+    Label1: TLabel;
+    DBTipoProcesso: TDBComboBox;
+    QryOutputs: TFDQuery;
+    IntegerField1: TIntegerField;
+    IntegerField2: TIntegerField;
+    IntegerField3: TIntegerField;
+    MemoField1: TMemoField;
+    DsOutputs: TDataSource;
     procedure BtnSelecionarRelatorioClick(Sender: TObject);
     procedure DBEditIDConsultaChange(Sender: TObject);
     procedure BtnOKClick(Sender: TObject);
@@ -83,9 +96,9 @@ implementation
 {$R *.dfm}
 
 uses
-  uFormSelecionaConsulta, GerenciadorUtils;
+  Form.SelecionaConsulta, GerenciadorUtils;
 
-procedure TFormAvisoConsulta.AbrirConfig(pIDAviso, pIDConsulta: Integer);
+procedure TFormCadastroProcesso.AbrirConfig(pIDAviso, pIDConsulta: Integer);
 begin
   QryAvisoConsulta.Close;
   QryAvisoConsulta.ParamByName('IDAviso').AsInteger:= pIDAviso;
@@ -108,7 +121,7 @@ begin
   ShowModal;
 end;
 
-class procedure TFormAvisoConsulta.AbrirConfigRelatorio(pIDAviso, pIDConsulta: Integer);
+class procedure TFormCadastroProcesso.AbrirConfigRelatorio(pIDAviso, pIDConsulta: Integer);
 var
   FFrm: TFormAvisoConsulta;
 begin
@@ -120,14 +133,14 @@ begin
   end;
 end;
 
-procedure TFormAvisoConsulta.BtnOKClick(Sender: TObject);
+procedure TFormCadastroProcesso.BtnOKClick(Sender: TObject);
 begin
   PostSeEmEdicao(QryAvisoConsulta);
 
   Close;
 end;
 
-procedure TFormAvisoConsulta.BtnSelecionarRelatorioClick(Sender: TObject);
+procedure TFormCadastroProcesso.BtnSelecionarRelatorioClick(Sender: TObject);
 var
   FIDConsulta: Integer;
 begin
@@ -142,7 +155,7 @@ begin
   SetDadosConsultaDefault;
 end;
 
-procedure TFormAvisoConsulta.SetNomeConsulta(pIDConsulta: Integer);
+procedure TFormCadastroProcesso.SetNomeConsulta(pIDConsulta: Integer);
 const
   cSql = 'with Menu as '+
           '(   '+
@@ -176,20 +189,20 @@ begin
     FDataSet.Free;
   end;
 
-  LblConsulta.Caption:= FNome;
+//  LblConsulta.Caption:= FNome;
 end;
 
-procedure TFormAvisoConsulta.DBEditIDConsultaChange(Sender: TObject);
+procedure TFormCadastroProcesso.DBEditIDConsultaChange(Sender: TObject);
 begin
   SetDadosConsultaAtual;
 end;
 
-procedure TFormAvisoConsulta.SetDadosConsultaAtual;
+procedure TFormCadastroProcesso.SetDadosConsultaAtual;
 begin
   SetNomeConsulta(QryAvisoConsultaIDConsulta.AsInteger);
 end;
 
-function TFormAvisoConsulta.PostSeEmEdicao(pQry: TDataSet): Boolean;
+function TFormCadastroProcesso.PostSeEmEdicao(pQry: TDataSet): Boolean;
 begin
   Result:= pQry.State in [dsEdit, dsInsert];
 
@@ -197,7 +210,7 @@ begin
     pQry.Post;
 end;
 
-procedure TFormAvisoConsulta.SetDadosConsultaDefault;
+procedure TFormCadastroProcesso.SetDadosConsultaDefault;
 const
   cSql = 'SELECT * FROM cons.Consultas where ID = %d';
 var
@@ -214,16 +227,16 @@ begin
   end;
 end;
 
-procedure TFormAvisoConsulta.FormClose(Sender: TObject;
+procedure TFormCadastroProcesso.FormClose(Sender: TObject;
   var Action: TCloseAction);
 begin
   PostSeEmEdicao(QryParametros);
   PostSeEmEdicao(QryAvisoConsulta);
 end;
 
-procedure TFormAvisoConsulta.FormCreate(Sender: TObject);
+procedure TFormCadastroProcesso.FormCreate(Sender: TObject);
 begin
-  LblConsulta.Caption:= '';
+  //LblConsulta.Caption:= '';
   FazLookupCxGrid(cxGridParametrosDBTableView1Nome, 'SELECT ID, DESCRICAO FROM cons.Parametros');
 end;
 

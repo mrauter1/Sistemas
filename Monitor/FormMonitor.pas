@@ -32,7 +32,7 @@ implementation
 {$R *.dfm}
 
 uses
-  Utils, uFormPesquisaAviso;
+  Utils, uFormPesquisaAviso, Form.NovoProcesso;
 
 procedure TMonitorMain.ApplicationEvents1Exception(Sender: TObject; E: Exception);
 begin
@@ -53,7 +53,7 @@ end;
 
 procedure TMonitorMain.AvisosAutomaticos1Click(Sender: TObject);
 begin
-  TFormPesquisaAviso.AbrirPesquisa;
+  TFormNovoProcesso.SelecionaProcesso;
 end;
 
 procedure TMonitorMain.Fechar1Click(Sender: TObject);

@@ -1,8 +1,8 @@
 object FormSelecionaConsulta: TFormSelecionaConsulta
   Left = 0
   Top = 0
-  Caption = 'FormSelecionaConsulta'
-  ClientHeight = 388
+  Caption = 'Selecione a Consulta'
+  ClientHeight = 510
   ClientWidth = 360
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -17,7 +17,7 @@ object FormSelecionaConsulta: TFormSelecionaConsulta
     Left = 0
     Top = 0
     Width = 360
-    Height = 347
+    Height = 469
     RightClickSelect = True
     ShowNodeHint = True
     DataSource = DsMenu
@@ -36,14 +36,16 @@ object FormSelecionaConsulta: TFormSelecionaConsulta
     SelectedIndex = -1
     TabOrder = 0
     OnDblClick = TreeViewMenuDblClick
+    ExplicitHeight = 347
   end
   object Panel1: TPanel
     Left = 0
-    Top = 347
+    Top = 469
     Width = 360
     Height = 41
     Align = alBottom
     TabOrder = 1
+    ExplicitTop = 347
     DesignSize = (
       360
       41)

@@ -70,7 +70,7 @@ implementation
 {$R *.dfm}
 
 uses
-  uFormCadastroAviso;
+  Form.CadastroAtividade;
 
 procedure TFormPesquisaAviso.AbrirConfigAviso;
 begin

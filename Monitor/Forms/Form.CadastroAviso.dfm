@@ -171,6 +171,8 @@ object FormCadastroAviso: TFormCadastroAviso
       Align = alTop
       Caption = 'Configura'#231#227'o'
       TabOrder = 2
+      ExplicitLeft = 2
+      ExplicitTop = -5
       DesignSize = (
         597
         136)

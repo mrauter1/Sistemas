@@ -1,4 +1,4 @@
-unit UntMensagem;
+unit Ladder.Messages;
 
 interface
 
@@ -44,10 +44,29 @@ type
     procedure Aviso(const pTexto: String; const pTitulo: String = '');
   end;
 
+procedure AbortMessage(Mensagem: String; const pTitulo: String; pFlags: Integer = 0);
+
+function PrjMessage(const pText: String; const pTitulo: String; pFlags: Integer = 0): Integer;
+
 implementation
 
 uses
-  UntFuncoes;
+  Forms;
+
+function PrjMessage(const pText: String; const pTitulo: String; pFlags: Integer = 0): Integer;
+begin
+  {$IFDEF VER150}
+    Result:= Application.MessageBox(PAnsiChar(pText),PAnsiChar(pTitulo),pFlags);
+  {$ELSE}
+    Result:= Application.MessageBox(PWideChar(pText),PWideChar(pTitulo),pFlags);
+  {$ENDIF}
+end;
+
+procedure AbortMessage(Mensagem: String; const pTitulo: String; pFlags: Integer = 0);
+begin
+  PrjMessage(Mensagem, pTitulo, pFlags);
+  Abort;
+end;
 
 { TMensagem }
 

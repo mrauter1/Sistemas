@@ -27,7 +27,14 @@ uses
   Ladder.Activity.Manager in '..\Ladder.Activity.Manager.pas',
   Ladder.ServiceLocator in '..\..\Ladder.ServiceLocator.pas',
   Ladder.Executor.Email in '..\Executor\Ladder.Executor.Email.pas',
-  Ladder.Executor.ConsultaPersonalizada in '..\Executor\Ladder.Executor.ConsultaPersonalizada.pas';
+  Ladder.Executor.ConsultaPersonalizada in '..\Executor\Ladder.Executor.ConsultaPersonalizada.pas',
+  Test.ModeloBD in 'Test.ModeloBD.pas',
+  Ladder.ORM.QueryBuilder in '..\..\ORM\Ladder.ORM.QueryBuilder.pas',
+  Ladder.Activity.DaoClasses in '..\Ladder.Activity.DaoClasses.pas',
+  Test.Repository in 'Test.Repository.pas',
+  Ladder.ORM.Repository in '..\..\ORM\Ladder.ORM.Repository.pas',
+  Test.MockClasses in 'Test.MockClasses.pas',
+  Ladder.ORM.ModeloBD in '..\..\ORM\Ladder.ORM.ModeloBD.pas';
 
 {$R *.RES}
 

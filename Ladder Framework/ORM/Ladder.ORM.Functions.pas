@@ -94,8 +94,6 @@ function VarToFloatDef(pVar: Variant; pValorDef: Double = 0): Double;
 
 function Func_DateTime_SqlServer(pData: TDateTime; withQuotes: Boolean = true): String;
 
-procedure AbortMessage(Mensagem: String; const pTitulo: String; pFlags: Integer = 0);
-
 function Func_Date_SqlServer(pData: TDateTime; pHoraIni: Boolean): String;
 function Func_DateBetween_SqlServer(pDataIni, pDataFim: TDateTime): String;
 function StrParaDate(fStr: String): TDate;
@@ -123,8 +121,6 @@ function TryStrCurToFloat(const pStr: String; var Valor: Double): Boolean;
 function StringToStrList(const pDelimiter: Char; const pDelimitedText: String): TStringList;
 function StringToVarArray(const aSeparator, aString: String): Variant;
 function SplitString(const aSeparator, aString: String; aMax: Integer = 0): TArrayOfString;
-
-function PrjMessage(const pText: String; const pTitulo: String; pFlags: Integer = 0): Integer;
 
 procedure CopiaValorCampos(pSource, pDest: TDataSet; const pFieldsParaIgnorar: String = ''; pApenasExistentes: Boolean = false);
 
@@ -158,6 +154,9 @@ const
   cHorasDia = 8;
 
 implementation
+
+uses
+  Ladder.Messages;
 
 { TAsync }
 
@@ -859,12 +858,6 @@ begin
    end;
 end;                                }
 
-procedure AbortMessage(Mensagem: String; const pTitulo: String; pFlags: Integer = 0);
-begin
-  PrjMessage(Mensagem, pTitulo, pFlags);
-  Abort;
-end;
-
 procedure Func_DBGrid_Para_Excel(pGrid: TDBGrid);
 var
     Linhas: TStringList;
@@ -1264,15 +1257,6 @@ begin
   finally
     RowList.Free;
   end;
-end;
-
-function PrjMessage(const pText: String; const pTitulo: String; pFlags: Integer = 0): Integer;
-begin
-  {$IFDEF VER150}
-    Result:= Application.MessageBox(PAnsiChar(pText),PAnsiChar(pTitulo),pFlags);
-  {$ELSE}
-    Result:= Application.MessageBox(PWideChar(pText),PWideChar(pTitulo),pFlags);
-  {$ENDIF}
 end;
 
 procedure CopiaValorCampos(pSource, pDest: TDataSet; const pFieldsParaIgnorar: String = ''; pApenasExistentes: Boolean = false);

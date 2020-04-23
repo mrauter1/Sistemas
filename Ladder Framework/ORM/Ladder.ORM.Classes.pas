@@ -1,9 +1,9 @@
-unit uFrwUtils;
+unit Ladder.ORM.Classes;
 
 interface
 
 uses
-  SysUtils, Generics.Collections, {Spring.Collections, }System.Rtti,Data.DB, Contnrs, UntFuncoes;
+  SysUtils, Generics.Collections, {Spring.Collections, }System.Rtti,Data.DB, Contnrs, Ladder.ORM.Functions;
 
 type
   // Caso seja necessário trocar para um Int64 futuramente

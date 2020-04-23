@@ -1,9 +1,9 @@
-unit FrwRepository;
+unit Ladder.ORM.Repository;
 
 interface
 
 uses
-  SysUtils, uFrwUtils, UntDaoFactory, System.Generics.Collections;
+  SysUtils, Ladder.ORM.ModeloBD, Ladder.ORM.Classes, Ladder.ORM.Dao, System.Generics.Collections;
 
 type
   TTipoAcaoRepositorio = (taInsert, taUpdate, taDelete);
@@ -31,9 +31,14 @@ type
     function GetIsLoaded: Boolean;
     procedure SetIsLoaded(const Value: Boolean);
 
+   // <summary> Insert or update item </summary>
+    procedure Save(Value: T);
+
     procedure Insert(Value: T);
     procedure Delete(Value: T);
     procedure Update(Value: T);
+
+    function GetKeyValue(Value: T): Integer;
 
    // <summary> Limpa os itens do Repositório (se houver) e seta o repositório para alteração </summary>
     procedure LoadEmpty;
@@ -55,31 +60,24 @@ type
   private
     FIsLoaded: Boolean;
     FDeveSalvarObjetos: Boolean;
+    FCurrentObject: T;
+
     FDao: IDaoGeneric<T>;
 
     FAntesDeManipularObjeto: TAoManipularObjetoEvent;
     FAposManipularObjeto: TAoManipularObjetoEvent;
+    FChaveIncremental: Boolean;
 
     procedure CheckContainsValue(Value: T);
     procedure CheckRepositoryIsLoaded;
+    procedure SetKeyValue(pKeyValue: Integer; pObject: T);
+    procedure SetChaveIncremental(const Value: Boolean);
+    function GetModeloBD: TModeloBD;
   protected
     IsLoading: Boolean;
 
-    procedure OnLoadObject(Value: TObject); virtual;
-
-    function GetDao: IDaoGeneric<T>;
-  public
-    constructor Create(pDao: IDaoGeneric<T>);
-
-    function LoadByID(const pID: FrwID): T;
-    function FindByID(const pID: FrwID): T;
-    procedure LoadAll;
-    procedure LoadWhere(const pSqlWhere: String);
-
     function GetIsLoaded: Boolean;
     procedure SetIsLoaded(const Value: Boolean);
-
-    property IsLoaded: Boolean read GetIsLoaded write SetIsLoaded;
 
     function GetDeveSalvarObjetos: Boolean;
     procedure SetDeveSalvarObjetos(const Value: Boolean);
@@ -90,20 +88,41 @@ type
     function GetAposManipularObjeto: TAoManipularObjetoEvent;
     procedure SetAposManipularObjeto(Value: TAoManipularObjetoEvent);
 
+    procedure OnLoadObject(Value: TObject); virtual;
+
+    function GetDao: IDaoGeneric<T>;
+  public
+    constructor Create(pDao: IDaoGeneric<T>); overload;
+    constructor Create(const pNomeTable, pCampoChave: String); overload;
+
+    function LoadByID(const pID: FrwID): T;
+    function FindByID(const pID: FrwID): T;
+    procedure LoadAll;
+    procedure LoadWhere(const pSqlWhere: String);
+
+    property IsLoaded: Boolean read GetIsLoaded write SetIsLoaded;
+
     procedure LoadEmpty;
 
     function Add(const Value: T): Integer; override;
 
+    function GetKeyValue(Value: T): Integer;
+
+    procedure Save(Value: T); // Insert or update value
+
     procedure Insert(Value: T); reintroduce;
-    procedure Delete(Value: T);
     procedure Update(Value: T);
+    procedure Delete(Value: T);
 
     property DeveSalvarObjetos: Boolean read GetDeveSalvarObjetos write SetDeveSalvarObjetos;
 
     property AntesDeManipularObjeto: TAoManipularObjetoEvent read GetAntesDeManipularObjeto write SetAntesDeManipularObjeto;
     property AposManipularObjeto: TAoManipularObjetoEvent read GetAposManipularObjeto write SetAposManipularObjeto;
+    property ChaveIncremental: Boolean read FChaveIncremental write SetChaveIncremental;
 
     property Dao: IDaoGeneric<T> read GetDao;
+    property ModeloBD: TModeloBD read GetModeloBD;
+    property CurrentObject: T read FCurrentObject;
   end;
 
 implementation
@@ -133,12 +152,27 @@ end;
 procedure TFrwRepository<T>.CheckRepositoryIsLoaded;
 begin
   if not FIsLoaded then
-    raise Exception.Create('Não é possível realizar esta operação! Repositório ainda não está carregado.');
+    raise Exception.Create('Repository is not loaded! Call TFrwRepository.LoadEmpty to setup an empty repository.');
+end;
+
+constructor TFrwRepository<T>.Create(const pNomeTable, pCampoChave: String);
+begin
+  Create(TDaoGeneric<T>.Create(pNomeTable, pCampoChave));
 end;
 
 procedure TFrwRepository<T>.OnLoadObject(Value: TObject);
 begin
   // Para ser implementado nos descendentes;
+end;
+
+procedure TFrwRepository<T>.Save(Value: T);
+begin
+  if Contains(Value) then
+    Update(Value)
+  else if Dao.KeyExists(GetKeyValue(Value)) then
+    Update(Value)
+  else
+    Insert(Value);
 end;
 
 procedure TFrwRepository<T>.SetAntesDeManipularObjeto(
@@ -153,6 +187,12 @@ begin
   FAposManipularObjeto:= Value;
 end;
 
+procedure TFrwRepository<T>.SetChaveIncremental(const Value: Boolean);
+begin
+  FChaveIncremental := Value;
+  Dao.ModeloBD.ChaveIncremental:= FChaveIncremental;
+end;
+
 procedure TFrwRepository<T>.SetDeveSalvarObjetos(const Value: Boolean);
 begin
   FDeveSalvarObjetos:= Value;
@@ -163,12 +203,20 @@ begin
   FIsLoaded:= Value;
 end;
 
+procedure TFrwRepository<T>.SetKeyValue(pKeyValue: Integer; pObject: T);
+begin
+
+end;
+
 function TFrwRepository<T>.Add(const Value: T): Integer;
 begin
+  if Self.Contains(Value) then
+    raise Exception.Create('Object is alread in repository! Can''t add it again.');
+
   if IsLoading then
     OnLoadObject(Value);
 
-  inherited Add(Value);
+  Result:= inherited Add(Value);
 end;
 
 procedure TFrwRepository<T>.CheckContainsValue(Value: T);
@@ -182,7 +230,7 @@ var
   fItem: T;
 begin
   for fItem in Self do
-   if Dao.ModeloBD.GetValorChave(fItem) = pID then
+   if GetKeyValue(FItem) = pID then
    begin
      Result:= fItem;
      Exit;
@@ -216,12 +264,24 @@ begin
   Result:= FIsLoaded;
 end;
 
+function TFrwRepository<T>.GetKeyValue(Value: T): Integer;
+begin
+  Result:= Dao.ModeloBD.GetValorChave(Value);
+end;
+
+function TFrwRepository<T>.GetModeloBD: TModeloBD;
+begin
+  Result:= Dao.ModeloBD;
+end;
+
 procedure TFrwRepository<T>.Insert(Value: T);
 begin
   CheckRepositoryIsLoaded;
 
   if Contains(Value) then
     raise Exception.Create('Este objeto já existe na lista, não pode ser adicionado novamente!');
+
+  FCurrentObject:= Value;
 
   if Assigned(FAntesDeManipularObjeto) then FAntesDeManipularObjeto(Value, taInsert);
 
@@ -237,28 +297,40 @@ procedure TFrwRepository<T>.Update(Value: T);
 begin
   CheckRepositoryIsLoaded;
   CheckContainsValue(Value);
+  FCurrentObject:= Value;
 
   if Assigned(FAntesDeManipularObjeto) then FAntesDeManipularObjeto(Value, taUpdate);
 
   if DeveSalvarObjetos then
-    Dao.Update(Value);
+    if not Dao.Update(Value) then
+      raise Exception.Create(Format('TFrwRepository<T>.Update: Value was not updated. Key %d not found on database', [Self.GetKeyValue(Value)]));
 
   if Assigned(FAposManipularObjeto) then FAposManipularObjeto(Value, taUpdate);
 end;
 
 procedure TFrwRepository<T>.Delete(Value: T);
+var
+  FInRepository: Boolean;
 begin
   CheckRepositoryIsLoaded;
-  CheckContainsValue(Value);
+//  CheckContainsValue(Value);
+  try
+    FCurrentObject:= Value;
+    if Assigned(FAntesDeManipularObjeto) then FAntesDeManipularObjeto(Value, taDelete);
 
-  if Assigned(FAntesDeManipularObjeto) then FAntesDeManipularObjeto(Value, taDelete);
+    if DeveSalvarObjetos then
+      Dao.Delete(Value);
 
-  if DeveSalvarObjetos then
-    Dao.Delete(Value);
+    if Self.Contains(Value) then
+      Remove(Value);
 
-  Remove(Value);
+    if Self.OwnsObjects then
+      Value:= nil;
 
-  if Assigned(FAposManipularObjeto) then FAposManipularObjeto(Value, taDelete);
+    if Assigned(FAposManipularObjeto) then FAposManipularObjeto(Value, taDelete);
+  finally
+    FCurrentObject:= nil;
+  end;
 end;
 
 procedure TFrwRepository<T>.LoadAll;

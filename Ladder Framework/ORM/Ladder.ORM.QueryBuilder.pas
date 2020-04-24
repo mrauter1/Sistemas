@@ -4,7 +4,7 @@ interface
 
 uses
   Ladder.ORM.ModeloBD, System.Classes, SysUtils, System.Rtti, Ladder.ORM.Functions,
-  Ladder.Messages;
+  Ladder.Messages, Data.DB;
 
 type
 //  TMappingType = (mtInteiro, mtFloat,
@@ -17,6 +17,8 @@ type
     constructor Create(ModeloBD: TModeloBD);
     property ModeloBD: TModeloBD read fModeloBD write fModeloBD;
     function MappedFieldList: TFieldMappingList;
+
+    function MapToSqlValue(pFieldMapping: TFieldMapping; pObject: TObject): String; virtual; abstract;
     function SelectWhereChave(FValor: Integer): String; virtual; abstract;
     function SelectWhere(const pWhere: String; pSelectOptions: TSelectOptions = []): String; virtual; abstract;
 
@@ -30,7 +32,13 @@ type
 
   TSqlServerQueryBuilder = class(TQueryBuilderBase)
   private
+    function FieldToSqlValue(pFieldName: String; pObject: TObject): String;
+    function DateTimeSqlServer(pData: TDateTime; withQuotes: Boolean = true): String;
+    function DateSqlServer(pData: TDateTime; withQuotes: Boolean = true): String;
   public
+//    function PropToSqlValue(pProp: TRttiProperty; pObject: TObject): string;
+    function MapToSqlValue(pFieldMapping: TFieldMapping; pObject: TObject): String;
+
     function SelectWhereChave(FValor: Integer): String; override;
     function SelectWhere(const pWhere: String; pSelectOptions: TSelectOptions = []): String; override;
 
@@ -58,27 +66,50 @@ end;
 
 { TSqlServerQueryBuilder }
 
-function PropToSqlValue(pProp: TRttiProperty; pObject: TObject): string;
+function TSqlServerQueryBuilder.FieldToSqlValue(pFieldName: String; pObject: TObject): String;
+var
+  FProperty: TRttiProperty;
+begin
+  FProperty:= ModeloBD.MappedFieldList.GetFieldMappingByFieldName(pFieldName).Prop;
+
+  if not Assigned(FProperty) then
+    raise Exception.Create(Format('TSqlServerQueryBuilder.FieldToSqlValue: Field %s not mapped', [pFieldName]));
+end;
+
+function TSqlServerQueryBuilder.DateTimeSqlServer(pData: TDateTime; withQuotes: Boolean = true): String;
+begin
+  if withQuotes then
+    Result:= QuotedStr(FormatDateTime('yyyymmdd hh:mm:ss', pData))
+  else
+    Result:= FormatDateTime('yyyymmdd hh:mm:ss', pData);
+end;
+
+function TSqlServerQueryBuilder.DateSqlServer(pData: TDateTime; withQuotes: Boolean = true): String;
+begin
+  if withQuotes then
+    Result:= QuotedStr(FormatDateTime('yyyymmdd', pData))
+  else
+    Result:= FormatDateTime('yyyymmdd', pData);
+end;
+
+
+function TSqlServerQueryBuilder.MapToSqlValue(pFieldMapping: TFieldMapping; pObject: TObject): String;
 const
   cMsgErro = 'Propriedade %s do tipo %s não foi possível ser mapeada!';
+var
+  Value: TValue;
 begin
-  case pProp.PropertyType.TypeKind of
-    tkString,tkLString,tkAnsiChar,tkWideString,tkUnicodeString:
-      Result:= QuotedStr(pProp.GetValue(pObject).ToString);
-    tkFloat:
-      begin
-        if SameText('TDateTime',pProp.PropertyType.Name) then
-          Result:= Func_DateTime_SqlServer(pProp.GetValue(pObject).AsExtended)
-        else
-          Result:= FloatToSqlStr(pProp.GetValue(pObject).AsExtended);
-      end;
-    tkInteger, tkInt64: Result:= IntToStr(pProp.GetValue(pObject).AsInteger);
-    tkEnumeration: Result:= IntToStr(pProp.GetValue(pObject).AsOrdinal);
+  Value:= pFieldMapping.Prop.GetValue(pObject);
 
-    else
-      TMensagem.Erro(Format(cMsgErro,[pProp.Name, pProp.PropertyType.Name]), 'Erro!', True);
+  case pFieldMapping.FieldType of
+    ftString, ftMemo, ftWideString, ftFixedChar: Result:= QuotedStr(Value.ToString);
+    ftFloat, ftCurrency, ftBCD: Result:= FloatToSqlStr(Value.AsExtended);
+    ftInteger, ftSmallint, ftShortint, ftLargeint, ftByte, ftWord, ftBoolean: Result:= IntToStr(Value.AsInteger);
+    ftDateTime: Result:= DateTimeSqlServer(Value.AsExtended);
+    ftDate: Result:=  DateSqlServer(Value.AsExtended);
+   else
+     raise Exception.Create(Format(cMsgErro,[pFieldMapping.Prop.Name, pFieldMapping.Prop.PropertyType.Name]));
   end;
-
 end;
 
 function TSqlServerQueryBuilder.SelectValorUltimaChave: String;
@@ -178,7 +209,7 @@ begin
         if not fMapeandoValores then
           fSql.Append('  ').Append(pFieldMapping.FieldName)
         else
-          fSql.Append('  ').Append(PropToSqlValue(pFieldMapping.Prop, pObject));
+          fSql.Append('  ').Append(MapToSqlValue(pFieldMapping, pObject));
 
         if fPrimeiroCampo then
           fPrimeiroCampo:= False;
@@ -223,7 +254,7 @@ begin
 
       fSql.Append('  ').Append(pFieldMapping.FieldName);
 
-      fSql.Append(' = ').AppendLine(PropToSqlValue(pFieldMapping.Prop, pObject));
+      fSql.Append(' = ').AppendLine(MapToSqlValue(pFieldMapping, pObject));
 
       if fPrimeiroCampo then
         fPrimeiroCampo:= False;

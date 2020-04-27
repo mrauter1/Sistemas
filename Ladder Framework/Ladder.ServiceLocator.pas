@@ -136,7 +136,7 @@ end;
 
 function TFrwServiceFactory.NewFuncoes(Connection: TDmConnection): TFuncoes;
 begin
-  Result:= TFuncoes.Create(Connection);
+  Result:= TFuncoes.Create;
 end;
 
 function TFrwServiceFactory.NewServiceLocator: TServiceLocator;

@@ -17,35 +17,34 @@ type
 type
   TFuncoes = class
   public
-    DmConnection: TDmConnection;
+//    DmConnection: TDmConnection;
 
-    constructor Create(pDmConnection: TDmConnection);
+    constructor Create;
 
     class var RttiContext: TRttiContext;
-//   class function CriaStoredProc(pConnection: TADOConnection): TADOStoredProc;
+
+    { The functions below are now part of Ladder.ORM.DaoUtils
+    //   class function CriaStoredProc(pConnection: TADOConnection): TADOStoredProc;
 //   function RetornaValor(const pSQL: String): Variant;
 //   function RetornaDouble(const pSQL: String; pValorDef: Double = 0): Double;
 //   function RetornaInteiro(const pSQL: String; pValorDef: Integer = 0): Integer;
-
-    function RetornaDocVariant(const pSql: String): Variant;
-    function RetornaJSon(const pSql: String): String;
+//    function RetornaDocVariant(const pSql: String): Variant;
+//    function RetornaJSon(const pSql: String): String;
     // Popula o record com o primeiro registro retornado pelo banco
-    function RetornaRecord(var Rec; TypeInfo: pointer; const pSql: String): Boolean;
-
-    function RetornaArray(var pArray; TypeInfo: pointer; const pSql: String): Boolean;
-
-    function Func_CriaEClonaCDS(pCdsOrigem: TClientDataSet): TClientDataSet;
-    procedure Proc_CopiarFields(pOrigem, pDestino: TClientDataSet);
-
+//    function RetornaRecord(var Rec; TypeInfo: pointer; const pSql: String): Boolean;
+//    function RetornaArray(var pArray; TypeInfo: pointer; const pSql: String): Boolean;
     // Popula o objeto com o primeiro registro retornado pelo banco
     // ATENÇÃO:: AS PROPRIEDADES DO OBJETO QUE VÃO SER RETORNADAS TEM QUE ESTAR NA SEÇÃO PUBLISHED!!!
     function RetornaObjeto(var ObjectInstance; const pSql: String): Boolean;
-
     // Popula um objectlist, cada registro retornado será um objeto na lista. TItemClass = Classe dos Itens do ObjectList
     // ATENÇÃO:: AS PROPRIEDADES DO OBJETO QUE DEVEM SER RETORNADAS TEM QUE ESTAR NA SEÇÃO PUBLISHED!!!
     function RetornaListaObjetos(var ObjectList: TObjectList; ItemClass: TClass; const pSql: String): Boolean; overload;
     // Igual à anterior, mas recebe uma lista de objetos genérica por parâmetro
     function RetornaListaObjetos<T: class>(var ObjectList: TObjectList<T>; ItemClass: TClass; const pSql: String): Boolean; overload;
+
+}
+    function Func_CriaEClonaCDS(pCdsOrigem: TClientDataSet): TClientDataSet;
+    procedure Proc_CopiarFields(pOrigem, pDestino: TClientDataSet);
 
     function Dias_Uteis(DtaI, DataF: TDateTime):Integer;
 //    class procedure Proc_CopiarFields(pOrigem, pDestino: TClientDataSet);
@@ -608,10 +607,10 @@ begin
   end;
 end;              }
 
-constructor TFuncoes.Create(pDmConnection: TDmConnection);
+constructor TFuncoes.Create;
 begin
   inherited Create;
-  DmConnection:= pDmConnection;
+//  DmConnection:= pDmConnection;
 end;
 
 function TFuncoes.Dias_Uteis(DtaI, DataF: TDateTime): Integer;
@@ -633,7 +632,7 @@ begin
  result := Contador;
 
 end;
-
+                                {
 function TFuncoes.RetornaJSon(const pSql: String): String;
 var
   vQuery: TDataSet;
@@ -736,7 +735,7 @@ function TFuncoes.RetornaDocVariant(const pSql: String): Variant;
 begin
   Result:= _JSon(RetornaJSon(pSql));
 end;
-
+                                 }
 procedure TFuncoes.Proc_CopiarFields(pOrigem, pDestino: TClientDataSet);
 var
   Field, NewField: TField;

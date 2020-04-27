@@ -4,129 +4,171 @@ interface
 
 uses
   AdoDB, Ladder.ORM.Functions, System.Contnrs, generics.collections, System.Classes, Data.DB, uDmConnection,
-  FireDAC.Comp.Client, System.SysUtils;
+  FireDAC.Comp.Client, System.SysUtils, SynDB;
 
 type
   TDaoUtils = class
   private
-    function CriaQuery(AOwner: TComponent = nil): TFDQuery;
+    FConnection: TSQLDBConnectionProperties;
+    property Connection: TSQLDBConnectionProperties read FConnection;
   public
-    Funcoes: TFuncoes;
-    Connection: TDmConnection;
+    constructor Create(pConnection: TSQLDBConnectionProperties);
 
-    constructor Create(pFuncoes: TFuncoes);
+    function ExecuteNoResult(const pSQL: String): Integer;
 
-    function RetornaDataset(const pSql: String; AOwner: TComponent = nil): TDataSet;
+    function SelectAsJSon(const pSql: String): String;
+    function SelectAsDataset(const pSql: String; AOwner: TComponent = nil): TDataSet;
+    function SelectAsDocVariant(const pSql: String): Variant;
 
-    function ExecutaProcedure(const pSQL: String): Integer;
+    function SelectValue(const pSql: String): Variant;
+    function SelectDouble(const pSQL: String; pValorDef: Double = 0): Double;
+    function SelectInt(const pSQL: String; pValorDef: Integer = 0): Integer;
 
-    function RetornaDouble(const pSQL: String; pValorDef: Double = 0): Double;
-    function RetornaInteiro(const pSQL: String; pValorDef: Integer = 0): Integer;
-    function RetornaDocVariant(const pSql: String): Variant;
-    function RetornaJSon(const pSql: String): String;
-
-    function GetUltimoID: Integer;
+//    function GetLastID: Integer;
 
     // Popula o record com o primeiro registro retornado pelo banco
-    function RetornaRecord(var Rec; TypeInfo: pointer; const pSql: String): Boolean;
+    function SelectAsRecord(var Rec; TypeInfo: pointer; const pSql: String): Boolean;
     // Retorna um array populado com o retorno da query
-    function RetornaArray(var pArray; TypeInfo: pointer; const pSql: String): Boolean;
+    function SelectAsArray(var pArray; TypeInfo: pointer; const pSql: String): Boolean;
     // Popula o objeto com o primeiro registro retornado pelo banco
-    function RetornaObjeto(var ObjectInstance; const pSql: String): Boolean;
+    function SelectAsObject(var ObjectInstance; const pSql: String): Boolean;
 
     // Popula um objectlist, cada registro retornado será um objeto na lista. TItemClass = Classe dos Itens do ObjectList
     // ATENÇÃO:: AS PROPRIEDADES DO OBJETO QUE DEVEM SER RETORNADAS TEM QUE ESTAR NA SEÇÃO PUBLISHED!!!
-    function RetornaListaObjetos(var ObjectInstance: TObjectList; ItemClass: TClass; const pSql: String): Boolean; overload;
-    function RetornaListaObjetos<T: class>(var ObjectList: TObjectList<T>; ItemClass: TClass; const pSql: String): Boolean; overload;
+    function SelectAsObjectList(var ObjectInstance: TObjectList; ItemClass: TClass; const pSql: String): Boolean; overload;
+    function SelectAsObjectList<T: class>(var ObjectList: TObjectList<T>; ItemClass: TClass; const pSql: String): Boolean; overload;
   end;
 
 implementation
 
+uses
+  mORMot, MormotVCL, SynCommons;
+
 { TDaoUtils }
 
-function TDaoUtils.GetUltimoID: Integer;
+{function TDaoUtils.GetUltimoID: Integer;
 begin
-  Result:= RetornaInteiro(' SELECT SCOPE_IDENTITY() ');
-end;
+  Result:= SelectInt(' SELECT SCOPE_IDENTITY() ');
+end;                  }
 
-constructor TDaoUtils.Create(pFuncoes: TFuncoes);
+constructor TDaoUtils.Create(pConnection: TSQLDBConnectionProperties);
 begin
   inherited Create;
 
-  Funcoes:= pFuncoes;
-  Connection:= Funcoes.DmConnection;
+  FConnection:= pConnection;
 end;
 
-function TDaoUtils.CriaQuery(AOwner: TComponent = nil): TFDQuery;
+function TDaoUtils.ExecuteNoResult(const pSQL: String): Integer;
 begin
-  Result:= Connection.CriaFDQuery('', AOwner);
+  Result:= Connection.ExecuteNoResult(pSql, []);
 end;
 
-function TDaoUtils.ExecutaProcedure(const pSQL: String): Integer;
+function TDaoUtils.SelectAsJSon(const pSql: String): String;
 begin
-  Result:= Connection.ExecutaComando(pSql);
+  Result:= Connection.Execute(pSql, []).FetchAllAsJSON(true);
 end;
 
-function TDaoUtils.RetornaDataset(const pSql: String; AOwner: TComponent = nil): TDataSet;
+function TDaoUtils.SelectAsDataset(const pSql: String; AOwner: TComponent = nil): TDataSet;
+begin
+  Result:= JSONToDataSet(nil, SelectAsJSon(pSql));
+end;
+
+function TDaoUtils.SelectAsDocVariant(const pSql: String): Variant;
+begin
+  Result:= _Json(SelectAsJSon(pSql));
+end;
+
+function TDaoUtils.SelectDouble(const pSQL: String; pValorDef: Double = 0): Double;
+begin
+  Result:= VarToFloatDef(SelectValue(pSql), pValorDef);
+end;
+
+function TDaoUtils.SelectInt(const pSQL: String; pValorDef: Integer = 0): Integer;
+begin
+  Result:= VarToIntDef(SelectValue(pSql), pValorDef);
+end;
+
+function TDaoUtils.SelectValue(const pSql: String): Variant;
+begin
+  with Connection.Execute(pSql, []) do
+    if Step then
+      Result:= ColumnVariant(0)
+    else
+      Result:= null;
+end;
+
+function TDaoUtils.SelectAsObjectList(var ObjectInstance: TObjectList;
+  ItemClass: TClass; const pSql: String): Boolean;
+begin
+  Result:= ObjectLoadJSon(ObjectInstance, SelectAsJSon(pSql), ItemClass);
+end;
+
+function TDaoUtils.SelectAsObjectList<T>(var ObjectList: TObjectList<T>;
+  ItemClass: TClass; const pSql: String): Boolean;
 var
-  fQuery: TFDQuery;
+  FResults, fVariant: Variant;
+  I: Integer;
+  Instance: TObject;
 begin
-  fQuery:= CriaQuery(AOwner);
-  fQuery.SQL.Text:= pSql;
-  fQuery.Open;
-  Result:= fQuery;
+  Result:= False;
+
+  FResults:= SelectAsDocVariant(pSql);
+
+  if FResults._Count = 0 then Exit;
+
+  for I := 0 to FResults._Count-1 do
+  begin
+    fVariant:= _ByRef(FResults._(I), JSON_OPTIONS[true]);
+    Instance:= ItemClass.Create;
+    Result:= ObjectLoadJSon(Instance, fVariant._JSON, nil);
+    ObjectList.Add(Instance);
+  end;
 end;
 
-function TDaoUtils.RetornaDocVariant(const pSql: String): Variant;
-begin
-  Result:= Funcoes.RetornaDocVariant(pSql);
-end;
-
-function TDaoUtils.RetornaDouble(const pSQL: String;
-  pValorDef: Double = 0): Double;
-begin
-  Result:= Connection.RetornaDouble(pSql, pValorDef);
-end;
-
-function TDaoUtils.RetornaInteiro(const pSQL: String;
-  pValorDef: Integer = 0): Integer;
-begin
-  Result:= Connection.RetornaInteiro(pSql, pValorDef);
-end;
-
-function TDaoUtils.RetornaJSon(const pSql: String): String;
-begin
-  Result:= Funcoes.RetornaJSon(pSql);
-end;
-
-function TDaoUtils.RetornaListaObjetos(var ObjectInstance: TObjectList;
-  ItemClass: TClass; const pSql: String): Boolean;
-begin
-  Result:= Funcoes.RetornaListaObjetos(ObjectInstance, ItemClass, pSql);
-end;
-
-function TDaoUtils.RetornaListaObjetos<T>(var ObjectList: TObjectList<T>;
-  ItemClass: TClass; const pSql: String): Boolean;
-begin
-  Result:= Funcoes.RetornaListaObjetos<T>(ObjectList, ItemClass, pSql);
-end;
-
-function TDaoUtils.RetornaObjeto(var ObjectInstance;
+function TDaoUtils.SelectAsObject(var ObjectInstance;
   const pSql: String): Boolean;
+var
+  FResults, fVariant: Variant;
 begin
-  Result:= Funcoes.RetornaObjeto(ObjectInstance, pSql);
+  Result:= False;
+  FResults:= SelectAsDocVariant(pSql);
+  if FResults._Count = 0 then Exit;
+
+  fVariant:= _ByRef(FResults._(0), JSON_OPTIONS[true]);
+
+  Result:= ObjectLoadJSon(ObjectInstance, fVariant._JSON, nil);
 end;
 
-function TDaoUtils.RetornaRecord(var Rec; TypeInfo: pointer;
+function TDaoUtils.SelectAsRecord(var Rec; TypeInfo: pointer;
   const pSql: String): Boolean;
+var
+  FResults, fVariant: Variant;
 begin
-  Result:= Funcoes.RetornaRecord(Rec, TypeInfo, pSql);
+  Result:= False;
+  FResults:= SelectAsDocVariant(pSql);
+  if FResults._Count = 0 then Exit;
+
+  fVariant:= _ByRef(FResults._(0), JSON_OPTIONS[true]);
+  Result:= RecordLoadJSON(Rec, fVariant._JSON, TypeInfo);
 end;
 
-function TDaoUtils.RetornaArray(var pArray; TypeInfo: pointer;
+function TDaoUtils.SelectAsArray(var pArray; TypeInfo: pointer;
   const pSql: String): Boolean;
+var
+  FResults, fVariant: Variant;
+  fJson: String;
+  I: Integer;
+  aDynArray: TDynArray;
 begin
-  Result:= Funcoes.RetornaArray(pArray, TypeInfo, pSql);
+  Result:= False;
+
+  aDynArray.Init(TypeInfo,pArray);
+
+  fJSon:= SelectAsJSon(pSql);
+
+  aDynArray.LoadFromJSON(PUTF8Char(WinAnsiToUtf8(fJSon)));
+
+  Result:= True;
 end;
 
 end.

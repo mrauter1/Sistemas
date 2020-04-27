@@ -16,7 +16,7 @@ type
   public
     function NewDmConnection: TDmConnection; virtual;
     function NewFuncoes(Connection: TDmConnection): TFuncoes; virtual;
-    function NewDaoUtils(Funcoes: TFuncoes): TDaoUtils; virtual;
+    function NewDaoUtils(Connection: TSQLDBConnectionProperties): TDaoUtils; virtual;
     function NewServiceLocator: TServiceLocator; virtual;
     function NewConnection: TSQLDBConnectionProperties; virtual;
     function NewActivityManager: TActivityManager; virtual;
@@ -129,9 +129,9 @@ begin
                                                       'user', '28021990');
 end;
 
-function TFrwServiceFactory.NewDaoUtils(Funcoes: TFuncoes): TDaoUtils;
+function TFrwServiceFactory.NewDaoUtils(Connection: TSQLDBConnectionProperties): TDaoUtils;
 begin
-  Result:= TDaoUtils.Create(Funcoes);
+  Result:= TDaoUtils.Create(Connection);
 end;
 
 function TFrwServiceFactory.NewFuncoes(Connection: TDmConnection): TFuncoes;
@@ -151,9 +151,11 @@ begin
   ServiceFactory:= pServiceFactory;
   DmConnection:= ServiceFactory.NewDmConnection;
   Funcoes:= ServiceFactory.NewFuncoes(DmConnection);
-  DaoUtils:= ServiceFactory.NewDaoUtils(Funcoes);
   ServiceLocator:= ServiceFactory.NewServiceLocator;
+
   Connection:= ServiceFactory.NewConnection;
+  DaoUtils:= ServiceFactory.NewDaoUtils(Connection);
+
   ActivityManager:= ServiceFactory.NewActivityManager;
   inherited Create;
 end;

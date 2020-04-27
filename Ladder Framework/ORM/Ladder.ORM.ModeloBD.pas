@@ -842,7 +842,7 @@ var
 begin
   Result:= nil;
 
-  fDataSet:= DaoUtils.RetornaDataset(pSql, nil);
+  fDataSet:= DaoUtils.SelectAsDataSet(pSql, nil);
   try
     Result:= ObjectListFromDataSet<T>(fDataSet);
   finally

@@ -110,8 +110,7 @@ type
   protected
     function GetQueryBuilder: TQueryBuilderBase;
     function GetModeloBD: TModeloBD; virtual;
-    function Connection: TSQLDBConnectionProperties;
-//    function DaoUtils: TDaoUtils;
+    function DaoUtils: TDaoUtils;
   public
     property QueryBuilder: TQueryBuilderBase read GetQueryBuilder write fQueryBuilder;
     property ModeloBD: TModeloBD read fModeloBD write SetModeloBD;
@@ -298,11 +297,6 @@ begin
 
   ModeloBD:= pModeloBD;
   fOwnsModelo:= pOwnsModelo;
-end;
-
-function TDaoBase.Connection: TSQLDBConnectionProperties;
-begin
-  Result:= ModeloBD.Connection;
 end;
 
 constructor TDaoBase.Create(pNomeTabela, pCampoChave: string;
@@ -556,7 +550,7 @@ procedure TDaoBase.AtualizaValorChave(pObject: TObject);
 var
   FValChave: Integer;
 begin
-  FValChave:= DaoUtils.RetornaInteiro(QueryBuilder.SelectValorUltimaChave);
+  FValChave:= DaoUtils.SelectInt(QueryBuilder.SelectValorUltimaChave);
   ModeloBD.SetKeyValue(pObject, fValChave);
 end;
 
@@ -564,7 +558,7 @@ function TDaoBase.Delete(pObject: TObject): Integer;
 var
   FChildDaoDef: TChildDaoDefs;
 begin
-  Result:= Connection.ExecuteNoResult(QueryBuilder.Delete(ModeloBD.GetKeyValue(pObject)));
+  Result:= DaoUtils.ExecuteNoResult(QueryBuilder.Delete(ModeloBD.GetKeyValue(pObject)));
 //  DaoUtils.ExecutaProcedure(QueryBuilder.Delete(ModeloBD.GetKeyValue(pObject)));
 
   for FChildDaoDef in fChildDaoList do
@@ -576,7 +570,7 @@ end;
 
 function TDaoBase.Delete(ID: Integer): Integer;
 begin
-  Result:= Connection.ExecuteNoResult(QueryBuilder.Delete(ID));
+  Result:= DaoUtils.ExecuteNoResult(QueryBuilder.Delete(ID));
 end;
 
 function TDaoBase.DaoUtils: TDaoUtils;
@@ -607,20 +601,22 @@ begin
 
 end;
 
-procedure TDaoBase.DeleteList(pObjectList: TObjectList);
+function TDaoBase.DeleteList(pObjectList: TObjectList): Integer;
 var
   I: Integer;
 begin
+  Result:= 0;
   for I := 0 to pObjectList.Count-1 do
-    Delete(pObjectList[I]);
+    Result:= Result+Delete(pObjectList[I]);
 end;
 
-procedure TDaoBase.DeleteList(pObjectList: TObjectList<TObject>);
+function TDaoBase.DeleteList(pObjectList: TObjectList<TObject>): Integer;
 var
   FObject: TObject;
 begin
+  Result:= 0;
   for FObject in pObjectList do
-    Delete(FObject);
+    Result:= Result+Delete(FObject);
 end;
 
 function TDaoBase.DeleteMissingChilds(pMasterInstance: TObject; ChildDefs: TChildDaoDefs): Integer;
@@ -679,7 +675,7 @@ begin
     if FSqlKeys <> '' then
       FDeleteWhere := FDeleteWhere + Format(' AND %s NOT IN (%s) ', [ChildDefs.Dao.ModeloBD.NomeCampoChave, FSqlKeys]);
 
-    Result:= DaoUtils.ExecutaProcedure(Format('DELETE FROM %s WHERE %s', [ChildDefs.ModeloBD.NomeTabela, FDeleteWhere]));
+    Result:= DaoUtils.ExecuteNoResult(Format('DELETE FROM %s WHERE %s', [ChildDefs.ModeloBD.NomeTabela, FDeleteWhere]));
   finally
     ChildDefs.CurrentMaster:= nil;
   end;
@@ -704,7 +700,7 @@ var
   FValChave: Integer;
   FChildDaoDef: TChildDaoDefs;
 begin
-  FValChave:= DaoUtils.RetornaInteiro(QueryBuilder.Insert(pObject, True));
+  FValChave:= DaoUtils.SelectInt(QueryBuilder.Insert(pObject, True));
 
   if ModeloBD.ChaveIncremental then
     ModeloBD.SetKeyValue(pObject, FValChave);
@@ -719,7 +715,7 @@ function TDaoBase.Update(pObject: TObject): Boolean;
 var
   FChildDaoDef: TChildDaoDefs;
 begin
-  Result:= DaoUtils.ExecutaProcedure(QueryBuilder.Update(pObject)) > 0;
+  Result:= DaoUtils.ExecuteNoResult(QueryBuilder.Update(pObject)) > 0;
 
   for FChildDaoDef in fChildDaoList do
   begin
@@ -745,7 +741,7 @@ end;
 
 function TDaoBase.KeyExists(ID: Integer): Boolean;
 begin
-  Result:= DaoUtils.RetornaInteiro(QueryBuilder.KeyExists(ID)) > 0;
+  Result:= DaoUtils.SelectInt(QueryBuilder.KeyExists(ID)) > 0;
 end;
 
 procedure TDaoBase.PopulateWhere(pList: TObjectList; const pWhere: String);
@@ -926,12 +922,12 @@ end;
 
 { TNullDao<T> }
 
-procedure TNullDao<T>.Delete(ID: Integer);
+function TNullDao<T>.Delete(ID: Integer): Integer;
 begin
   // Não faz nada;
 end;
 
-procedure TNullDao<T>.Delete(pObject: T);
+function TNullDao<T>.Delete(pObject: T): Integer;
 begin
 
 end;

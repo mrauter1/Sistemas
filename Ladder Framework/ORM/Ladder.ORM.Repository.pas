@@ -211,7 +211,7 @@ end;
 function TFrwRepository<T>.Add(const Value: T): Integer;
 begin
   if Self.Contains(Value) then
-    raise Exception.Create('Object is alread in repository! Can''t add it again.');
+    raise Exception.Create('Object is already in repository! Can''t add it again.');
 
   if IsLoading then
     OnLoadObject(Value);
@@ -266,7 +266,7 @@ end;
 
 function TFrwRepository<T>.GetKeyValue(Value: T): Integer;
 begin
-  Result:= Dao.ModeloBD.GetValorChave(Value);
+  Result:= Dao.ModeloBD.GetKeyValue(Value);
 end;
 
 function TFrwRepository<T>.GetModeloBD: TModeloBD;
@@ -357,7 +357,7 @@ begin
   Clear;
   IsLoading:= True;
   try
-    Dao.GetListWhere(Self, pSqlWhere);
+    Dao.SelectWhere(Self, pSqlWhere);
     FIsLoaded:= True;
   finally
     IsLoading:= False;

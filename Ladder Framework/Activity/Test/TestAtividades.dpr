@@ -34,7 +34,8 @@ uses
   Test.Repository in 'Test.Repository.pas',
   Ladder.ORM.Repository in '..\..\ORM\Ladder.ORM.Repository.pas',
   Test.MockClasses in 'Test.MockClasses.pas',
-  Ladder.ORM.ModeloBD in '..\..\ORM\Ladder.ORM.ModeloBD.pas';
+  Ladder.ORM.ModeloBD in '..\..\ORM\Ladder.ORM.ModeloBD.pas',
+  Test.Dao in 'Test.Dao.pas';
 
 {$R *.RES}
 

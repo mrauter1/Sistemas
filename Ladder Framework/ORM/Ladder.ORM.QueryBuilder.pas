@@ -18,6 +18,8 @@ type
     property ModeloBD: TModeloBD read fModeloBD write fModeloBD;
     function MappedFieldList: TFieldMappingList;
 
+    function FieldToSqlValue(pFieldName: String; pObject: TObject): String; virtual; abstract;
+
     function MapToSqlValue(pFieldMapping: TFieldMapping; pObject: TObject): String; virtual; abstract;
     function SelectWhereChave(FValor: Integer): String; virtual; abstract;
     function SelectWhere(const pWhere: String; pSelectOptions: TSelectOptions = []): String; virtual; abstract;
@@ -32,12 +34,12 @@ type
 
   TSqlServerQueryBuilder = class(TQueryBuilderBase)
   private
-    function FieldToSqlValue(pFieldName: String; pObject: TObject): String;
     function DateTimeSqlServer(pData: TDateTime; withQuotes: Boolean = true): String;
     function DateSqlServer(pData: TDateTime; withQuotes: Boolean = true): String;
   public
 //    function PropToSqlValue(pProp: TRttiProperty; pObject: TObject): string;
-    function MapToSqlValue(pFieldMapping: TFieldMapping; pObject: TObject): String;
+    function FieldToSqlValue(pFieldName: String; pObject: TObject): String; override;
+    function MapToSqlValue(pFieldMapping: TFieldMapping; Instance: TObject): String; override;
 
     function SelectWhereChave(FValor: Integer): String; override;
     function SelectWhere(const pWhere: String; pSelectOptions: TSelectOptions = []): String; override;
@@ -51,6 +53,9 @@ type
   end;
 
 implementation
+
+uses
+  Variants;
 
 { TQueryBuilderBase }
 
@@ -68,12 +73,14 @@ end;
 
 function TSqlServerQueryBuilder.FieldToSqlValue(pFieldName: String; pObject: TObject): String;
 var
-  FProperty: TRttiProperty;
+  FFieldMapping: TFieldMapping;
 begin
-  FProperty:= ModeloBD.MappedFieldList.GetFieldMappingByFieldName(pFieldName).Prop;
+  FFieldMapping:= ModeloBD.MappedFieldList.GetFieldMappingByFieldName(pFieldName);
 
-  if not Assigned(FProperty) then
-    raise Exception.Create(Format('TSqlServerQueryBuilder.FieldToSqlValue: Field %s not mapped', [pFieldName]));
+  if not Assigned(FFieldMapping) then
+    raise Exception.Create(Format('TSqlServerQueryBuilder.FieldToSqlValue: Field %s not mapped for class %s.', [pFieldName, ModeloBD.ItemClass.ClassName]));
+
+  Result:= MapToSqlValue(FFieldMapping, pObject);
 end;
 
 function TSqlServerQueryBuilder.DateTimeSqlServer(pData: TDateTime; withQuotes: Boolean = true): String;
@@ -93,20 +100,25 @@ begin
 end;
 
 
-function TSqlServerQueryBuilder.MapToSqlValue(pFieldMapping: TFieldMapping; pObject: TObject): String;
+function TSqlServerQueryBuilder.MapToSqlValue(pFieldMapping: TFieldMapping; Instance: TObject): String;
 const
   cMsgErro = 'Propriedade %s do tipo %s não foi possível ser mapeada!';
 var
-  Value: TValue;
+  FVar: Variant;
 begin
-  Value:= pFieldMapping.Prop.GetValue(pObject);
+  FVar:= ModeloBD.GetFieldValue(pFieldMapping.FieldName, Instance);
+  if VarIsNull(FVar) then
+  begin
+    Result:= 'NULL';
+    Exit;
+  end;
 
   case pFieldMapping.FieldType of
-    ftString, ftMemo, ftWideString, ftFixedChar: Result:= QuotedStr(Value.ToString);
-    ftFloat, ftCurrency, ftBCD: Result:= FloatToSqlStr(Value.AsExtended);
-    ftInteger, ftSmallint, ftShortint, ftLargeint, ftByte, ftWord, ftBoolean: Result:= IntToStr(Value.AsInteger);
-    ftDateTime: Result:= DateTimeSqlServer(Value.AsExtended);
-    ftDate: Result:=  DateSqlServer(Value.AsExtended);
+    ftString, ftMemo, ftWideString, ftFixedChar: Result:= QuotedStr(FVar);
+    ftFloat, ftCurrency, ftBCD: Result:= FloatToSqlStr(FVar);
+    ftInteger, ftSmallint, ftShortint, ftLargeint, ftByte, ftWord, ftBoolean: Result:= IntToStr(FVar);
+    ftDateTime: Result:= DateTimeSqlServer(VarToDateTime(FVar));
+    ftDate: Result:= DateSqlServer(VarToDateTime(FVar));
    else
      raise Exception.Create(Format(cMsgErro,[pFieldMapping.Prop.Name, pFieldMapping.Prop.PropertyType.Name]));
   end;
@@ -144,7 +156,7 @@ begin
     if Top0 in pSelectOptions then
       fSql.AppendLine(' TOP 0 ');
 
-    ModeloBD.FazMapeamentoDaClasse(fCallBack);
+    ModeloBD.FazMapeamentoDaClasse(fCallBack, True);
 
     fSql.Append('FROM ').AppendLine(ModeloBD.NomeTabela);
 
@@ -181,7 +193,7 @@ var
     fMapeandoValores:= False;
 
     fSql.Append(' (');
-    ModeloBD.FazMapeamentoDaClasse(fCallBack);
+    ModeloBD.FazMapeamentoDaClasse(fCallBack, True);
     fSql.AppendLine(')')
   end;
 
@@ -191,7 +203,7 @@ var
     fMapeandoValores:= True;
 
     fSql.Append(' VALUES(');
-    ModeloBD.FazMapeamentoDaClasse(fCallBack);
+    ModeloBD.FazMapeamentoDaClasse(fCallBack, True);
     fSql.Append(')');
   end;
 
@@ -267,9 +279,9 @@ begin
     fSql.Append(' SET ');
 
     fPrimeiroCampo:= True;
-    ModeloBD.FazMapeamentoDaClasse(fCallBack);
+    ModeloBD.FazMapeamentoDaClasse(fCallBack, True);
 
-    fSql.AppendFormat('WHERE %s = %d ', [ModeloBD.NomeCampoChave, ModeloBD.GetValorChave(pObject)]);
+    fSql.AppendFormat('WHERE %s = %d ', [ModeloBD.NomeCampoChave, ModeloBD.GetKeyValue(pObject)]);
 
     Result:= fSql.ToString;
 

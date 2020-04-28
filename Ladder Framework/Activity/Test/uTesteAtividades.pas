@@ -33,12 +33,12 @@ uses
 
 function TTesteAtividades.NewProcesso(pExecutor: IExecutorBase): TProcessoBase;
 begin
-  Result:= TProcessoBase.Create(pExecutor, TFrwServiceLocator.Context.Connection);
+  Result:= TProcessoBase.Create(pExecutor, TFrwServiceLocator.Context.DaoUtils);
 end;
 
 function TTesteAtividades.NewAtividade: TActivity;
 begin
-  Result:= TActivity.Create(TFrwServiceLocator.Context.Connection);
+  Result:= TActivity.Create(TFrwServiceLocator.Context.DaoUtils);
 end;
 
 function TTesteAtividades.NewProcessoEnviaEmailMeta: TProcessoBase;

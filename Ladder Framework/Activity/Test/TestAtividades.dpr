@@ -35,7 +35,9 @@ uses
   Ladder.ORM.Repository in '..\..\ORM\Ladder.ORM.Repository.pas',
   Test.MockClasses in 'Test.MockClasses.pas',
   Ladder.ORM.ModeloBD in '..\..\ORM\Ladder.ORM.ModeloBD.pas',
-  Test.Dao in 'Test.Dao.pas';
+  Test.Dao in 'Test.Dao.pas',
+  Ladder.Activity.Classes.Dao in '..\Ladder.Activity.Classes.Dao.pas',
+  Ladder.ORM.SQLDBRowsDataSet in '..\..\ORM\Ladder.ORM.SQLDBRowsDataSet.pas';
 
 {$R *.RES}
 

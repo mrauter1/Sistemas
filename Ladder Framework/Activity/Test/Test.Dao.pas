@@ -94,6 +94,8 @@ procedure TestTDaoBase.TearDown;
 begin
   FDaoBase.Free;
   FDaoBase := nil;
+  TFrwServiceLocator.Context.DaoUtils.ExecuteNoResult('DELETE FROM TESTE');
+  TFrwServiceLocator.Context.DaoUtils.ExecuteNoResult('DELETE FROM TestChild');
 end;
 
 procedure TestTDaoBase.TestSelectKey;
@@ -256,6 +258,8 @@ end;
 procedure TestTDaoGeneric.SetUp;
 begin
   FDaoGeneric := TDaoGeneric<TTeste>.Create('Teste', 'ID');
+  with FDaoGeneric.ModeloBD do UpdateOptions:= UpdateOptions + [DeleteMissingChilds];
+
   FDaoTestChild := TDaoGeneric<TTestChild>.Create('TestChild', 'ID');
   FDaoGeneric.AddChildDao('Childs', 'ID', 'IDPAI', FDaoTestChild);
 end;

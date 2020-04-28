@@ -74,12 +74,12 @@ function CreateMockProcess: THackProcessoBase;
 var
   FInput1, FInput2, FInput3: TParameter;
 begin
-  Result := THackProcessoBase.Create(TMockExecutor.Create, TFrwServiceLocator.Context.Connection);
+  Result := THackProcessoBase.Create(TMockExecutor.Create, TFrwServiceLocator.Context.DaoUtils);
 end;
 
 procedure TestTProcessoBase.SetUp;
 begin
-  FProcessoBase:= THackProcessoBase.Create(TMockExecutor.Create, TFrwServiceLocator.Context.Connection);
+  FProcessoBase:= THackProcessoBase.Create(TMockExecutor.Create, TFrwServiceLocator.Context.DaoUtils);
 end;
 
 procedure TestTProcessoBase.TearDown;
@@ -124,7 +124,7 @@ end;
 
 procedure TestTActivity.SetUp;
 begin
-  FActivity := THackActivity.Create(TFrwServiceLocator.Context.Connection);
+  FActivity := THackActivity.Create(TFrwServiceLocator.Context.DaoUtils);
 end;
 
 procedure TestTActivity.TearDown;

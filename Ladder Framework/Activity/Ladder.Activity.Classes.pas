@@ -4,7 +4,7 @@ interface
 
 uses
   System.SysUtils, System.Classes, System.Generics.Collections, Data.DB,
-  Generics.Defaults, Variants, Ladder.Activity.Parser, SynDB, SynCommons;
+  Generics.Defaults, Variants, Ladder.Activity.Parser, Ladder.ORM.DaoUtils, SynCommons;
 
 type
 //  TTipoProcesso = (tpConsultaPersonalizada = 1, tpEnvioEmail = 2, tpAtividade = 3);
@@ -90,6 +90,7 @@ type
     function Executar: TOutputList; overload;
     property Inputs: TInputList read GetInputs write SetInputs;
     property Outputs: TOutputList read GetOutputs write SetOutputs;
+    function ClassType: TClass;
   end;
 
   TExecutorBase = class(TInterfacedObject, IExecutorBase)
@@ -123,7 +124,7 @@ type
     FName: String;
     FDescription: String;
     FExecutor: IExecutorBase;
-    FConnection: TSQLDBConnectionProperties;
+    FDaoUtils: TDaoUtils;
     FParser: TActivityParser;
     FCurrentContainer: IActivityElementContainer;
   protected
@@ -132,14 +133,13 @@ type
     procedure OnElementEval(const pElement: String; var Return: Variant);
     procedure OnSqlEval(const pSql: String; var Return: Variant);
 
-    function GetExecutor: IExecutorBase;
-
     property Parser: TActivityParser read FParser;
   public
-    constructor Create(pExecutor: IExecutorBase; pConnection: TSQLDBConnectionProperties);
+    constructor Create(pExecutor: IExecutorBase; pDaoUtils: TDaoUtils);
     destructor Destroy; override;
     function GetName: String;
     function FindElementByName(pElementName: String): IActivityElement; virtual;
+    function GetExecutor: IExecutorBase;
 
     function Executar: TOutputList; overload; virtual;
     function Executar(ValuateParameterExpression: TValuateParameterExpression): TOutputList; overload; virtual;
@@ -157,7 +157,7 @@ type
 //    function ExpressionEvaluator(pExpression: String): array of string;
   protected
   public
-    constructor Create(pConnection: TSQLDBConnectionProperties);
+    constructor Create(pDaoUtils: TDaoUtils);
     destructor Destroy; override;
     function Executar(ValuateParameterExpression: TValuateParameterExpression): TOutputList; overload; override;
     function FindElementByName(pElementName: String): IActivityElement; override;
@@ -252,7 +252,7 @@ end;
 
 { TProcessoBase }
 
-constructor TProcessoBase.Create(pExecutor: IExecutorBase; pConnection: TSQLDBConnectionProperties);
+constructor TProcessoBase.Create(pExecutor: IExecutorBase; pDaoUtils: TDaoUtils);
 begin
   inherited Create;
   FInputs:= TInputList.Create;
@@ -260,7 +260,7 @@ begin
 
   FExecutor:= pExecutor;
 
-  FConnection:= pConnection;
+  FDaoUtils:= pDaoUtils;
 
   FParser:= TActivityParser.Create;
   FParser.OnElementEval:= OnElementEval;
@@ -337,10 +337,8 @@ begin
 end;
 
 procedure TProcessoBase.OnSqlEval(const pSql: String; var Return: Variant);
-var
-  FCon: TSQLDBConnectionProperties;
 begin
-  Return:= _Json(FConnection.Execute(pSql, []).FetchAllAsJSON(true));
+  Return:= FDaoUtils.SelectAsDocVariant(pSql);
 end;
 
 procedure TProcessoBase.OnValuateParameterExpression(pContainer: IActivityElementContainer; pParameter: TParameter);
@@ -417,9 +415,9 @@ end;
 
 { TActivity }
 
-constructor TActivity.Create(pConnection: TSQLDBConnectionProperties);
+constructor TActivity.Create(pDaoUtils: TDaoUtils);
 begin
-  inherited Create(nil, pConnection);
+  inherited Create(nil, pDaoUtils);
 
   FProcessos:= TObjectList<TProcessoBase>.Create(True);
 end;

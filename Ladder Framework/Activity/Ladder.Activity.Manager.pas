@@ -8,7 +8,7 @@ uses
 type
   TOnGetExecutor = function: IExecutorBase of object;
 
-  TExecutorDictionary = TDictionary<TExecutorClass, TOnGetExecutor>;
+  TExecutorDictionary = TDictionary<string, TOnGetExecutor>;
 
   TActivityManager = class
   private
@@ -18,7 +18,8 @@ type
     procedure RegisterExecutor(ExecutorClass: TExecutorClass; pGetExecutor: TOnGetExecutor);
     procedure UnregisterExecutor(ExecutorClass: TExecutorClass);
 
-    function GetExecutor(ExecutorClass: TExecutorClass): IExecutorBase;
+    function GetExecutor(ExecutorClass: TExecutorClass): IExecutorBase; overload;
+    function GetExecutor(pClassName: String): IExecutorBase; overload;
 
     constructor Create;
     destructor Destroy; override;
@@ -40,28 +41,33 @@ begin
   inherited Destroy;
 end;
 
-function TActivityManager.GetExecutor(ExecutorClass: TExecutorClass): IExecutorBase;
+function TActivityManager.GetExecutor(pClassName: String): IExecutorBase;
 var
   FOnGetExecutor: TOnGetExecutor;
 begin
-  if not FExecutorDictionary.TryGetValue(ExecutorClass, FOnGetExecutor) then
-    raise Exception.Create('TActivityManager.GetExecutor: Executor "'+ExecutorClass.ClassName+'" não registrado!');
+  if not FExecutorDictionary.TryGetValue(pClassName, FOnGetExecutor) then
+    raise Exception.Create('TActivityManager.GetExecutor: Executor "'+pClassName+'" não registrado!');
 
   Result:= FOnGetExecutor();
+end;
+
+function TActivityManager.GetExecutor(ExecutorClass: TExecutorClass): IExecutorBase;
+begin
+  Result:= GetExecutor(ExecutorClass.ClassName);
 end;
 
 procedure TActivityManager.RegisterExecutor(ExecutorClass: TExecutorClass;
   pGetExecutor: TOnGetExecutor);
 begin
-  if FExecutorDictionary.ContainsKey(ExecutorClass) then
+  if FExecutorDictionary.ContainsKey(ExecutorClass.ClassName) then
     raise Exception.Create('TActivityManager.RegisterExecutorClass: Executor "'+ExecutorClass.ClassName+'" já registrado!');
 
-  FExecutorDictionary.Add(ExecutorClass, pGetExecutor);
+  FExecutorDictionary.Add(ExecutorClass.ClassName, pGetExecutor);
 end;
 
 procedure TActivityManager.UnregisterExecutor(ExecutorClass: TExecutorClass);
 begin
-  FExecutorDictionary.Remove(ExecutorClass);
+  FExecutorDictionary.Remove(ExecutorClass.ClassName);
 end;
 
 end.

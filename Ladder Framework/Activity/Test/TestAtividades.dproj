@@ -91,7 +91,6 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="..\..\..\utils\uConSqlServer.pas"/>
         <DCCReference Include="Test.Classes.pas"/>
         <DCCReference Include="..\Ladder.Activity.Classes.pas"/>
         <DCCReference Include="Test.Parser.pas"/>
@@ -112,6 +111,22 @@
         <DCCReference Include="Test.Dao.pas"/>
         <DCCReference Include="..\Ladder.Activity.Classes.Dao.pas"/>
         <DCCReference Include="..\..\ORM\Ladder.ORM.SQLDBRowsDataSet.pas"/>
+        <DCCReference Include="..\..\..\utils\uDmConnection.pas">
+            <Form>DmConnection</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="..\..\..\utils\uDmGeradorConsultas.pas">
+            <Form>DmGeradorConsultas</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="..\..\..\utils\uConSqlServer.pas">
+            <Form>ConSqlServer</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="Test.Classes.Dao.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

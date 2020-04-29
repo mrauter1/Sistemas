@@ -17,7 +17,6 @@ program TestAtividades;
 uses
   DUnitTestRunner,
   Forms,
-  uConSqlServer in '..\..\..\utils\uConSqlServer.pas',
   Test.Classes in 'Test.Classes.pas',
   Ladder.Activity.Classes in '..\Ladder.Activity.Classes.pas',
   Test.Parser in 'Test.Parser.pas',
@@ -37,7 +36,11 @@ uses
   Ladder.ORM.ModeloBD in '..\..\ORM\Ladder.ORM.ModeloBD.pas',
   Test.Dao in 'Test.Dao.pas',
   Ladder.Activity.Classes.Dao in '..\Ladder.Activity.Classes.Dao.pas',
-  Ladder.ORM.SQLDBRowsDataSet in '..\..\ORM\Ladder.ORM.SQLDBRowsDataSet.pas';
+  Ladder.ORM.SQLDBRowsDataSet in '..\..\ORM\Ladder.ORM.SQLDBRowsDataSet.pas',
+  uDmConnection in '..\..\..\utils\uDmConnection.pas' {DmConnection: TDataModule},
+  uDmGeradorConsultas in '..\..\..\utils\uDmGeradorConsultas.pas' {DmGeradorConsultas: TDataModule},
+  uConSqlServer in '..\..\..\utils\uConSqlServer.pas' {ConSqlServer: TDataModule},
+  Test.Classes.Dao in 'Test.Classes.Dao.pas';
 
 {$R *.RES}
 
@@ -46,6 +49,7 @@ begin
   Application.MainFormOnTaskbar := True;
 
   DUnitTestRunner.RunRegisteredTests;
+  Application.CreateForm(TConSqlServer, ConSqlServer);
   Application.Run;
 end.
 

@@ -42,7 +42,7 @@ type
 implementation
 
 uses
-  mORMot, MormotVCL, SynCommons;
+  mORMot, MormotVCL, SynCommons, SynDBVCL;
 
 { TDaoUtils }
 
@@ -70,7 +70,7 @@ end;
 
 function TDaoUtils.SelectAsDataset(const pSql: String; AOwner: TComponent = nil): TDataSet;
 begin
-  Result:= JSONToDataSet(nil, SelectAsJSon(pSql));
+  Result:= ToDataSet(AOwner,Connection.Execute(pSql,[]));
 end;
 
 function TDaoUtils.SelectAsDocVariant(const pSql: String): Variant;

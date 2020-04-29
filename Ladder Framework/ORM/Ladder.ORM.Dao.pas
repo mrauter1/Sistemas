@@ -40,7 +40,10 @@ type
 
     function GetQueryBuilder: TQueryBuilderBase;
     function GetModeloBD: TModeloBD;
+    function GetNewObjectFunction: TFunNewObject;
+    procedure SetNewObjectFunction(const Value: TFunNewObject);
 
+    function ObjectExists(pObject: TObject): Boolean; // Check if object exists on database
     function KeyExists(ID: Integer): Boolean; // Check if object with ID exists on database
 
     procedure Insert(pObject: TObject);
@@ -64,10 +67,11 @@ type
 
     procedure InsertChild(pMaster, pChild: TObject; ChildDefs: TChildDaoDefs = nil);
     function UpdateChild(pMaster, pChild: TObject; ChildDefs: TChildDaoDefs = nil): Boolean;
-    procedure DeleteChild(pMaster, pChild: TObject; ChildDefs: TChildDaoDefs = nil);
+    function DeleteChild(pMaster, pChild: TObject; ChildDefs: TChildDaoDefs = nil): Integer;
 
     property ModeloBD: TModeloBD read GetModeloBD;
     property QueryBuilder: TQueryBuilderBase read GetQueryBuilder;
+    property NewObjectFunction: TFunNewObject read GetNewObjectFunction write SetNewObjectFunction;
   end;
 
   IDaoGeneric<T: Class> = interface(IDaoBase)
@@ -107,6 +111,8 @@ type
     procedure PopulateWhere(pList: TObjectList; const pWhere: String);
     function DeleteMissingChilds(pMasterInstance: TObject; ChildDefs: TChildDaoDefs): Integer;
     function SqlWhereChild(Instance: TObject; pChildDefs: TChildDaoDefs): String;
+    function GetNewObjectFunction: TFunNewObject;
+    procedure SetNewObjectFunction(const Value: TFunNewObject);
   protected
     function GetQueryBuilder: TQueryBuilderBase;
     function GetModeloBD: TModeloBD; virtual;
@@ -114,6 +120,7 @@ type
   public
     property QueryBuilder: TQueryBuilderBase read GetQueryBuilder write fQueryBuilder;
     property ModeloBD: TModeloBD read fModeloBD write SetModeloBD;
+    property NewObjectFunction: TFunNewObject read GetNewObjectFunction write SetNewObjectFunction;
 
     constructor Create; overload;
     constructor Create(pModeloBD: TModeloBD; pOwnsModelo: Boolean = true); overload;
@@ -122,6 +129,7 @@ type
 
     function SelectKey(FChave: Integer): TObject;
 
+    function ObjectExists(pObject: TObject): Boolean; // Check if object exists on database
     function KeyExists(ID: Integer): Boolean; virtual; // Check if object with ID exists on database
 
     procedure Insert(pObject: TObject); virtual;
@@ -139,8 +147,8 @@ type
 
     procedure InsertChild(pMaster, pChild: TObject; ChildDefs: TChildDaoDefs = nil); virtual;
     function UpdateChild(pMaster, pChild: TObject; ChildDefs: TChildDaoDefs = nil): Boolean; virtual;
-    procedure DeleteChild(pMaster, pChild: TObject; ChildDefs: TChildDaoDefs = nil); overload; virtual;
-    procedure DeleteChild(pMasterInstance: TObject; ChildDefs: TChildDaoDefs); overload; virtual;
+    function DeleteChild(pMaster, pChild: TObject; ChildDefs: TChildDaoDefs = nil): Integer; overload; virtual;
+    function DeleteChild(pMasterInstance: TObject; ChildDefs: TChildDaoDefs): Integer; overload; virtual;
     procedure SaveChild(pMasterInstance: TObject; ChildDefs: TChildDaoDefs); virtual;
 
     function SelectOne(const pWhere: String): TObject; overload;
@@ -337,6 +345,11 @@ begin
   Result:= fModeloBD;
 end;
 
+function TDaoBase.GetNewObjectFunction: TFunNewObject;
+begin
+  Result:= ModeloBD.NewObjectFunction;
+end;
+
 function TDaoBase.GetQueryBuilder: TQueryBuilderBase;
 begin
   Result := fQueryBuilder;
@@ -411,7 +424,6 @@ begin
   Result:=
     function (const pPropName: String; pCurrentValue: TValue; Instance: TObject): TValue
     var
-
       FCurrentObject: TObject;
       FWhere: String;
 
@@ -470,7 +482,7 @@ begin
       begin
         Result:= TValue.From<TObjectList>(SelectObjectList(TObjectList(FCurrentObject), FWhere));
       end
-      else if TType.GetType(FCurrentObject.ClassType).IsGenericTypeOf('TObjectList<>') then //  Is a generic TObjectList<>
+      else if TType.GetType(pChildDefs.PropertyClass).IsGenericTypeOf('TObjectList<>') then //  Is a generic TObjectList<>
         Result:= TValue.From<TObjectList<TObject>>(SelectGenericObjectList(TObjectList<TObject>(FCurrentObject), FWhere))
       else
          RaiseInvalidPropertyError;
@@ -496,7 +508,6 @@ var
   FMasterFieldMapping, FChieldFieldMapping: TFieldMapping;
   FFieldType: TFieldType;
   FProp: TRttiProperty;
-  F: TFunGetPropValue;
 
   procedure CheckPropType(pProp: TRttiProperty);
   var
@@ -524,6 +535,10 @@ var
 
 begin
   FProp:= ModeloBD.GetPropByName(pPropertyName);
+
+  if not Assigned(FProp) then
+    raise Exception.Create(Format('TDaoBase.AddChildDao: Property %s not found on master class %s!', [pPropertyName, ModeloBD.ItemClass.ClassName]));
+
 
   CheckPropType(FProp);
 
@@ -558,7 +573,7 @@ function TDaoBase.Delete(pObject: TObject): Integer;
 var
   FChildDaoDef: TChildDaoDefs;
 begin
-  Result:= DaoUtils.ExecuteNoResult(QueryBuilder.Delete(ModeloBD.GetKeyValue(pObject)));
+  Result:= DaoUtils.ExecuteNoResult(QueryBuilder.Delete(pObject));
 //  DaoUtils.ExecutaProcedure(QueryBuilder.Delete(ModeloBD.GetKeyValue(pObject)));
 
   for FChildDaoDef in fChildDaoList do
@@ -578,7 +593,7 @@ begin
   Result:= TFrwServiceLocator.Context.DaoUtils;
 end;
 
-procedure TDaoBase.DeleteChild(pMasterInstance: TObject; ChildDefs: TChildDaoDefs);
+function TDaoBase.DeleteChild(pMasterInstance: TObject; ChildDefs: TChildDaoDefs): Integer;
 var
   FObject: TObject;
 begin
@@ -590,15 +605,14 @@ begin
       Exit;
 
     if ChildDefs.PropIsObjectList then
-      ChildDefs.Dao.DeleteList(TObjectList(FObject))
+      Result:= ChildDefs.Dao.DeleteList(TObjectList(FObject))
     else if ChildDefs.PropIsGenericObjectList then
-      ChildDefs.Dao.DeleteList(TObjectList<TObject>(FObject))
+      Result:= ChildDefs.Dao.DeleteList(TObjectList<TObject>(FObject))
     else
-      ChildDefs.Dao.Delete(FObject);
+      Result:= ChildDefs.Dao.Delete(FObject);
   finally
     ChildDefs.CurrentMaster:= nil;
   end;
-
 end;
 
 function TDaoBase.DeleteList(pObjectList: TObjectList): Integer;
@@ -657,6 +671,8 @@ var
   FObject: TObject;
   FSqlKeys: String;
   FDeleteWhere: String;
+  FChildList: TObjectList;
+  I: Integer;
 begin
   ChildDefs.CurrentMaster:= pMasterInstance;
   try
@@ -675,21 +691,25 @@ begin
     if FSqlKeys <> '' then
       FDeleteWhere := FDeleteWhere + Format(' AND %s NOT IN (%s) ', [ChildDefs.Dao.ModeloBD.NomeCampoChave, FSqlKeys]);
 
-    Result:= DaoUtils.ExecuteNoResult(Format('DELETE FROM %s WHERE %s', [ChildDefs.ModeloBD.NomeTabela, FDeleteWhere]));
+    Result:= 0;
+    FChildList:= ChildDefs.Dao.SelectWhere(FDeleteWhere);
+    for I := 0 to FChildList.Count - 1 do
+      Result:= Result+DeleteChild(pMasterInstance, FChildList[I], ChildDefs);
+
   finally
     ChildDefs.CurrentMaster:= nil;
   end;
 
 end;
 
-procedure TDaoBase.DeleteChild(pMaster, pChild: TObject; ChildDefs: TChildDaoDefs = nil);
+function TDaoBase.DeleteChild(pMaster, pChild: TObject; ChildDefs: TChildDaoDefs = nil): Integer;
 begin
   if not Assigned(ChildDefs) then
     ChildDefs:= FindChildDefsByClassName(pChild.ClassName);
 
   ChildDefs.CurrentMaster:= pMaster;
   try
-    ChildDefs.Dao.Delete(pChild);
+    Result:= ChildDefs.Dao.Delete(pChild);
   finally
     ChildDefs.CurrentMaster:= nil;
   end;
@@ -719,7 +739,9 @@ begin
 
   for FChildDaoDef in fChildDaoList do
   begin
-    DeleteMissingChilds(pObject, FChildDaoDef); // Delete the Childs that do not belong to this object anymore
+    if TUpdateOption.DeleteMissingChilds in ModeloBD.UpdateOptions then
+      DeleteMissingChilds(pObject, FChildDaoDef); // Delete the Childs that do not belong to this object anymore
+
     SaveChild(pObject, FChildDaoDef); // Insert or update the Childs that are assigned
   end;
 end;
@@ -744,6 +766,11 @@ begin
   Result:= DaoUtils.SelectInt(QueryBuilder.KeyExists(ID)) > 0;
 end;
 
+function TDaoBase.ObjectExists(pObject: TObject): Boolean;
+begin
+  Result:= DaoUtils.SelectInt(QueryBuilder.ObjectExists(pObject)) > 0;
+end;
+
 procedure TDaoBase.PopulateWhere(pList: TObjectList; const pWhere: String);
 begin
   ModeloBD.PopulaObjectListFromSql(pList, QueryBuilder.SelectWhere(pWhere));
@@ -764,7 +791,7 @@ end;
 
 procedure TDaoBase.Save(pObject: TObject);
 begin
-  if KeyExists(ModeloBD.GetKeyValue(pObject)) then
+  if ObjectExists(pObject) then
     Update(pObject)
   else
     Insert(pObject);
@@ -813,6 +840,11 @@ procedure TDaoBase.SetModeloBD(const Value: TModeloBD);
 begin
   fModeloBD := Value;
   QueryBuilder.ModeloBD:= fModeloBD;
+end;
+
+procedure TDaoBase.SetNewObjectFunction(const Value: TFunNewObject);
+begin
+  ModeloBD.NewObjectFunction:= Value;
 end;
 
 procedure TDaoBase.SelectWhere(pObjectList: TObjectList<TObject>; const pWhere: String);

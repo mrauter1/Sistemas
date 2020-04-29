@@ -80,13 +80,13 @@ end;
 
 constructor TProcessoDao.Create(pItemClass: TClass);
 begin
-  inherited Create('Processo', 'ID', pItemClass);
+  inherited Create('ladder.Processos', 'ID', pItemClass);
   ModeloBD.MapField('ExecutorClass', ftString, GetExecutorClass);
   ModeloBD.MapField('ClassName', ftString, GetClassName);
-  FInputDao:= TParameterDao.Create('ProcessoInput');
+  FInputDao:= TParameterDao.Create('ladder.ProcessoInput');
   AddChildDao('Inputs', 'ID', 'IDProcesso', FInputDao);
-  FOutputDao:= TOutputParameterDao.Create('ProcessoOutput');
-  AddChildDao('Ouputs', 'ID', 'IDProce\sso', FOutputDao);
+  FOutputDao:= TOutputParameterDao.Create('ladder.ProcessoOutput');
+  AddChildDao('Outputs', 'ID', 'IDProcesso', FOutputDao);
 end;
 
 function TProcessoDao.NewProcesso(pDBRows: ISqlDBRows): TObject;
@@ -102,7 +102,7 @@ end;
 constructor TOutputParameterDao.Create(pNomeTabela: String);
 begin
   inherited Create(pNomeTabela, 'ID');
-  FInputDao:= TParameterDao.Create('ProcessoOutputParameter');
+  FInputDao:= TParameterDao.Create('ladder.ProcessoOutputParameter');
   AddChildDao('Parametros', 'ID', 'IDOutput', FInputDao);
 end;
 
@@ -112,7 +112,7 @@ constructor TAtividadeDao.Create;
 begin
   inherited Create(TActivity);
   FProcessoDao:= TProcessoDao.Create;
-  AddChildDao('Processos', 'ID', 'IDAtividade', FProcessoDao);
+  AddChildDao('Processos', 'ID', 'IDActivity', FProcessoDao);
 end;
 
 function TAtividadeDao.NewProcesso(pDBRows: ISqlDBRows): TObject;

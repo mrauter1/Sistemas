@@ -169,7 +169,7 @@ procedure TFrwRepository<T>.Save(Value: T);
 begin
   if Contains(Value) then
     Update(Value)
-  else if Dao.KeyExists(GetKeyValue(Value)) then
+  else if Dao.ObjectExists(Value) then
     Update(Value)
   else
     Insert(Value);

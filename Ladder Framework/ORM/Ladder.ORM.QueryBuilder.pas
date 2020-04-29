@@ -26,8 +26,10 @@ type
 
     function Insert(pObject: TObject; pOutputID: Boolean = False): String; virtual; abstract;
     function Update(pObject: TObject): String; virtual; abstract;
-    function Delete(pKeyValue: Integer): String; virtual; abstract;
+    function Delete(pObject: TObject): String; overload; virtual; abstract;
+    function Delete(pKeyValue: Integer): String; overload; virtual; abstract;
 
+    function ObjectExists(pObject: TObject): String; virtual; abstract;
     function KeyExists(pValorChave: Integer): String; virtual; abstract;
     function SelectValorUltimaChave: String; virtual; abstract;
   end;
@@ -36,6 +38,7 @@ type
   private
     function DateTimeSqlServer(pData: TDateTime; withQuotes: Boolean = true): String;
     function DateSqlServer(pData: TDateTime; withQuotes: Boolean = true): String;
+    function GetUpdateDeleteWhere(pObject: TObject): String;
   public
 //    function PropToSqlValue(pProp: TRttiProperty; pObject: TObject): string;
     function FieldToSqlValue(pFieldName: String; pObject: TObject): String; override;
@@ -46,7 +49,10 @@ type
 
     function Insert(pObject: TObject; pOutputID: Boolean = False): String; override;
     function Update(pObject: TObject): String; override;
-    function Delete(pValorChave: Integer): String; override;
+    function Delete(pObject: TObject): String; overload; override;
+    function Delete(pKeyValue: Integer): String; overload; override;
+
+    function ObjectExists(pObject: TObject): String; override;
     function KeyExists(pValorChave: Integer): String; override;
 
     function SelectValorUltimaChave: String; override;
@@ -81,6 +87,22 @@ begin
     raise Exception.Create(Format('TSqlServerQueryBuilder.FieldToSqlValue: Field %s not mapped for class %s.', [pFieldName, ModeloBD.ItemClass.ClassName]));
 
   Result:= MapToSqlValue(FFieldMapping, pObject);
+end;
+
+function TSqlServerQueryBuilder.GetUpdateDeleteWhere(pObject: TObject): String;
+var
+  FFIeld: String;
+  FFieldMapping: TFieldMapping;
+begin
+  Result:= '';
+  for FFIeld in ModeloBD.FieldsInUpdateDeleteWhere do
+  begin
+    if Result <> '' then
+      Result:= Result+ 'AND ';
+
+    FFieldMapping:= ModeloBD.FieldMappingByFieldName(FField);
+    Result:= Result+Format('%s = %s', [FFieldMapping.FieldName, MapToSqlValue(FFieldMapping, pObject)]);
+  end;
 end;
 
 function TSqlServerQueryBuilder.DateTimeSqlServer(pData: TDateTime; withQuotes: Boolean = true): String;
@@ -175,9 +197,15 @@ begin
   Result:= SelectWhere(Format('%s = %d', [ModeloBD.NomeCampoChave, FValor]));
 end;
 
-function TSqlServerQueryBuilder.Delete(pValorChave: Integer): String;
+
+function TSqlServerQueryBuilder.Delete(pObject: TObject): String;
 begin
-  Result:= Format('DELETE FROM %s WHERE %s = %d', [ModeloBD.NomeTabela, ModeloBD.NomeCampoChave, pValorChave]);
+  Result:= Format('DELETE FROM %s WHERE %s', [ModeloBD.NomeTabela, GetUpdateDeleteWhere(pObject)]);
+end;
+
+function TSqlServerQueryBuilder.Delete(pKeyValue: Integer): String;
+begin
+  Result:= Format('DELETE FROM %s WHERE %s = %d', [ModeloBD.NomeTabela, ModeloBD.NomeCampoChave, pKeyValue]);
 end;
 
 function TSqlServerQueryBuilder.Insert(pObject: TObject; pOutputID: Boolean = False): String;
@@ -281,13 +309,18 @@ begin
     fPrimeiroCampo:= True;
     ModeloBD.FazMapeamentoDaClasse(fCallBack, True);
 
-    fSql.AppendFormat('WHERE %s = %d ', [ModeloBD.NomeCampoChave, ModeloBD.GetKeyValue(pObject)]);
+    fSql.AppendFormat('WHERE %s ', [GetUpdateDeleteWhere(pObject)]);
 
     Result:= fSql.ToString;
 
   finally
     fSql.Free;
   end;
+end;
+
+function TSqlServerQueryBuilder.ObjectExists(pObject: TObject): String;
+begin
+  Result:= Format('SELECT COUNT(*) FROM %s WHERE %s', [ModeloBD.NomeTabela, GetUpdateDeleteWhere(pObject)]);
 end;
 
 function TSqlServerQueryBuilder.KeyExists(pValorChave: Integer): String;

@@ -19,10 +19,9 @@ type
 
   TProcessoDao = class(TDaoGeneric<TProcessoBase>)
   private
-    FInputDao: TParameterDao;
-    FOutputDao: TOutputParameterDao;
     function GetExecutorClass(const pFieldName: String; Instance: TObject): Variant; virtual;
     function GetClassName(const pFieldName: String; Instance: TObject): Variant; virtual;
+    function GetExecutor(const pPropName: String; pCurrentValue: TValue; Instance: TObject; pDBRows: ISqlDBRows): TValue;
   public
     constructor Create; overload;
     constructor Create(pItemClass: TClass); overload;
@@ -73,19 +72,36 @@ begin
   Result:= ModeloBD.ItemClass.ClassName;
 end;
 
+function TProcessoDao.GetExecutor(const pPropName: String; pCurrentValue: TValue; Instance: TObject; pDBRows: ISqlDBRows): TValue;
+var
+  FExecutorClass: String;
+begin
+  FExecutorClass:= pDBRows['ExecutorClass'];
+  if FExecutorClass <> '' then
+    Result:= TValue.From<IExecutorBase>(ActivityManager.GetExecutor(FExecutorClass))
+  else
+    Result:= TValue.From<IExecutorBase>(nil);
+end;
+
 constructor TProcessoDao.Create;
 begin
   Create(TProcessoBase);
 end;
 
 constructor TProcessoDao.Create(pItemClass: TClass);
+var
+  FOutputDao: IDaoGeneric<TOutputParameter>;
 begin
   inherited Create('ladder.Processos', 'ID', pItemClass);
   ModeloBD.MapField('ExecutorClass', ftString, GetExecutorClass);
   ModeloBD.MapField('ClassName', ftString, GetClassName);
-  FInputDao:= TParameterDao.Create('ladder.ProcessoInput');
-  AddChildDao('Inputs', 'ID', 'IDProcesso', FInputDao);
-  FOutputDao:= TOutputParameterDao.Create('ladder.ProcessoOutput');
+  ModeloBD.MapProperty('Executor', GetExecutor);
+
+  AddChildDao('Inputs', 'ID', 'IDProcesso', TDaoGeneric<TParameter>.Create('ladder.ProcessoInput', 'ID'));
+
+  FOutputDao:= TDaoGeneric<TOutputParameter>.Create('ladder.ProcessoOutput', 'ID');
+  FOutputDao.AddChildDao('Parametros', 'ID', 'IDOutput', TDaoGeneric<TParameter>.Create('ladder.ProcessoOutputParameter', 'ID'));
+
   AddChildDao('Outputs', 'ID', 'IDProcesso', FOutputDao);
 end;
 

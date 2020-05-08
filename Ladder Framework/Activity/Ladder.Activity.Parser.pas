@@ -30,8 +30,8 @@ type
     function FunLiteralTranslation(const pValue: Variant): String;
     function GetValueAtIndex(const pList: Variant; var Index: Integer): Variant;
   protected
-    function ExtractTextDelimitedBy(var Index: Integer; const OpenDelimiter, CloseDelimiter: String): String; overload;
-    function ExtractTextDelimitedBy(var Index: Integer; const OpenDelimiter, CloseDelimiter: String; pDoInterpolation: Boolean; pFunTranslateValue: TFunTranslateValue): String; overload;
+    function ExtractTextDelimitedBy(var Index: Integer; const OpenDelimiter, CloseDelimiter: String; NeedCloseDelimiter: Boolean = True): String; overload;
+    function ExtractTextDelimitedBy(var Index: Integer; const OpenDelimiter, CloseDelimiter: String; pDoInterpolation: Boolean; pFunTranslateValue: TFunTranslateValue; NeedCloseDelimiter: Boolean = True): String; overload;
     function Ignore(var Index: Integer): Boolean; // Retorna verdadeiro se chegou no fim da string
     procedure IgnoreAndErrorIfEOL(var Index: Integer; const Msg: String);
     procedure ParseString(var Index: Integer; var Return: Variant);
@@ -104,7 +104,7 @@ begin
  else
    FDoInterpolation:= True;
 
-  FSql:= ExtractTextDelimitedBy(Index, '$', '$', FDoInterpolation, FunLiteralTranslation);
+  FSql:= ExtractTextDelimitedBy(Index, '$', '$', FDoInterpolation, FunLiteralTranslation, False);
 
   if FSql = '' then
     raise EParseException.Create('TActivityParser.ParseSQL: Empty Sql Expression!', FExpression, Index);
@@ -382,14 +382,14 @@ begin
 end;
 
 function TActivityParser.ExtractTextDelimitedBy(var Index: Integer;
-  const OpenDelimiter, CloseDelimiter: String): String;
+  const OpenDelimiter, CloseDelimiter: String; NeedCloseDelimiter: Boolean = True): String;
 begin
-  Result:= ExtractTextDelimitedBy(Index, OpenDelimiter, CloseDelimiter, False, nil);
+  Result:= ExtractTextDelimitedBy(Index, OpenDelimiter, CloseDelimiter, False, nil, NeedCloseDelimiter);
 end;
 
 function TActivityParser.ExtractTextDelimitedBy(var Index: Integer;
   const OpenDelimiter, CloseDelimiter: String; pDoInterpolation: Boolean;
-  pFunTranslateValue: TFunTranslateValue): String;
+  pFunTranslateValue: TFunTranslateValue; NeedCloseDelimiter: Boolean = True): String;
 
   function ReplaceInterpolation(var Index: Integer): String;
   var
@@ -443,10 +443,11 @@ begin
 
   Result:= Copy(FExpression, FStart, Index-FStart);
 
-  if Copy(FExpression, Index, Length(CloseDelimiter)) <> CloseDelimiter then
+  if (Copy(FExpression, Index, Length(CloseDelimiter)) <> CloseDelimiter) and NeedCloseDelimiter then
     raise EParseException.Create('GetStringDelimitedBy: Expecting closing delimiter "'+CloseDelimiter+'". End of statement reached.', FExpression, Index);
 
-  Inc(Index, Length(CloseDelimiter));
+  if (Index<=LenExpression) then // if it has reached the End of expression there is no need to increase the index
+    Inc(Index, Length(CloseDelimiter));
 end;
 
 end.

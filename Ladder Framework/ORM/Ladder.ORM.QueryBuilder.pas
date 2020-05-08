@@ -36,8 +36,6 @@ type
 
   TSqlServerQueryBuilder = class(TQueryBuilderBase)
   private
-    function DateTimeSqlServer(pData: TDateTime; withQuotes: Boolean = true): String;
-    function DateSqlServer(pData: TDateTime; withQuotes: Boolean = true): String;
     function GetUpdateDeleteWhere(pObject: TObject): String;
   public
 //    function PropToSqlValue(pProp: TRttiProperty; pObject: TObject): string;
@@ -56,6 +54,9 @@ type
     function KeyExists(pValorChave: Integer): String; override;
 
     function SelectValorUltimaChave: String; override;
+
+    class function DateSqlServer(pData: TDateTime; withQuotes: Boolean = true): String;
+    class function DateTimeSqlServer(pData: TDateTime; withQuotes: Boolean = true): String;
   end;
 
 implementation
@@ -105,7 +106,7 @@ begin
   end;
 end;
 
-function TSqlServerQueryBuilder.DateTimeSqlServer(pData: TDateTime; withQuotes: Boolean = true): String;
+class function TSqlServerQueryBuilder.DateTimeSqlServer(pData: TDateTime; withQuotes: Boolean = true): String;
 begin
   if withQuotes then
     Result:= QuotedStr(FormatDateTime('yyyymmdd hh:mm:ss', pData))
@@ -113,7 +114,7 @@ begin
     Result:= FormatDateTime('yyyymmdd hh:mm:ss', pData);
 end;
 
-function TSqlServerQueryBuilder.DateSqlServer(pData: TDateTime; withQuotes: Boolean = true): String;
+class function TSqlServerQueryBuilder.DateSqlServer(pData: TDateTime; withQuotes: Boolean = true): String;
 begin
   if withQuotes then
     Result:= QuotedStr(FormatDateTime('yyyymmdd', pData))
@@ -142,7 +143,7 @@ begin
     ftDateTime: Result:= DateTimeSqlServer(VarToDateTime(FVar));
     ftDate: Result:= DateSqlServer(VarToDateTime(FVar));
    else
-     raise Exception.Create(Format(cMsgErro,[pFieldMapping.Prop.Name, pFieldMapping.Prop.PropertyType.Name]));
+     raise Exception.Create(Format(cMsgErro,[pFieldMapping.Prop.Name, GetPropertyRttiType(pFieldMapping.Prop).Name]));
   end;
 end;
 

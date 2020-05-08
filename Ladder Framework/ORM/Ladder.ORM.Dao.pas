@@ -11,15 +11,15 @@ type
 
   TChildDaoDefs = class
   private
-    FProperty: TRttiProperty;
+    FProperty: TRttiMember;
     FChildFieldName: String;
     FMasterFieldName: String;
     FDao: IDaoBase;
     FCurrentMaster: TObject;
     function GetPropertyName: String;
   public
-    constructor Create(pMasterProperty: TRttiProperty; pMasterFieldName: String; pChildFieldName: String; pDao: IDaoBase);
-    property MasterProperty: TRttiProperty read FProperty;
+    constructor Create(pMasterProperty: TRttiMember; pMasterFieldName: String; pChildFieldName: String; pDao: IDaoBase);
+    property MasterProperty: TRttiMember read FProperty;
     property PropertyName: String read GetPropertyName;
     property MasterFieldName: String read FMasterFieldName write FMasterFieldName;
     property ChildFieldName: String read FChildFieldName write FChildFieldName;
@@ -68,6 +68,8 @@ type
     procedure InsertChild(pMaster, pChild: TObject; ChildDefs: TChildDaoDefs = nil);
     function UpdateChild(pMaster, pChild: TObject; ChildDefs: TChildDaoDefs = nil): Boolean;
     function DeleteChild(pMaster, pChild: TObject; ChildDefs: TChildDaoDefs = nil): Integer;
+
+    procedure AddChildDao(pPropertyName: String; pMasterFieldName: String; pChildFieldName: String; pDao: IDaoBase);
 
     property ModeloBD: TModeloBD read GetModeloBD;
     property QueryBuilder: TQueryBuilderBase read GetQueryBuilder;
@@ -235,7 +237,7 @@ uses
 
 { TDaoChildDefinitions }
 
-constructor TChildDaoDefs.Create(pMasterProperty: TRttiProperty; pMasterFieldName,
+constructor TChildDaoDefs.Create(pMasterProperty: TRttiMember; pMasterFieldName,
   pChildFieldName: String; pDao: IDaoBase);
 begin
   inherited Create;
@@ -262,7 +264,7 @@ end;
 
 function TChildDaoDefs.PropertyClass: TClass;
 begin
- Result:= TRttiInstanceType(FProperty.PropertyType.AsInstance).MetaclassType;
+ Result:= TRttiInstanceType(GetPropertyRttiType(FProperty).AsInstance).MetaclassType;
 end;
 
 function TChildDaoDefs.PropIsGenericObjectList: Boolean;
@@ -422,7 +424,7 @@ end;
 function TDaoBase.GetFunPropertyChild(pChildDefs: TChildDaoDefs): TFunGetPropValue;
 begin
   Result:=
-    function (const pPropName: String; pCurrentValue: TValue; Instance: TObject): TValue
+    function (const pPropName: String; pCurrentValue: TValue; Instance: TObject; pDBRows: ISqlDBRows): TValue
     var
       FCurrentObject: TObject;
       FWhere: String;
@@ -507,9 +509,9 @@ var
   FChildDefs: TChildDaoDefs;
   FMasterFieldMapping, FChieldFieldMapping: TFieldMapping;
   FFieldType: TFieldType;
-  FProp: TRttiProperty;
+  FProp: TRttiMember;
 
-  procedure CheckPropType(pProp: TRttiProperty);
+  procedure CheckPropType(pProp: TRttiMember);
   var
     FPropClass: TClass;
 
@@ -518,7 +520,7 @@ var
       raise Exception.Create(Format('Property %s must be TObjectList or %s.', [pPropertyName, pDao.ModeloBD.ItemClass.ClassName]));
     end;
   begin
-    FPropClass:= TRttiInstanceType(pProp.PropertyType.AsInstance).MetaclassType;
+    FPropClass:= TRttiInstanceType(GetPropertyRttiType(pProp).AsInstance).MetaclassType;
     if not Assigned(FProp) then
       raise Exception.Create(Format('TDaoBase.AddChildDao: Property %s not found!', [pPropertyName]));
 
@@ -538,7 +540,6 @@ begin
 
   if not Assigned(FProp) then
     raise Exception.Create(Format('TDaoBase.AddChildDao: Property %s not found on master class %s!', [pPropertyName, ModeloBD.ItemClass.ClassName]));
-
 
   CheckPropType(FProp);
 

@@ -7,14 +7,19 @@ uses
   Ladder.Messages, Ladder.ORM.Classes, SysUtils, Utils, Math, Ladder.ServiceLocator, SynDB,
   Ladder.ORM.Functions, Ladder.ORM.SQLDBRowsDataSet;
 
+  function PropertyToFieldType(pProperty: TRttiMember): TFieldType;
+  function GetPropertyRttiType(pRttiMember: TRttiMember): TRttiType;
+  function GetPropertyValue(pRttiMember: TRttiMember; Instance: Pointer): TValue;
+  procedure SetPropertyValue(pRttiMember: TRttiMember; Instance: Pointer; AValue: TValue);
+
 type
   TFunGetFieldValue = reference to function (const pFieldName: String; Instance: TObject): Variant;
-  TFunGetPropValue = reference to function (const pPropName: String; pCurrentValue: TValue; Instance: TObject): TValue;
+  TFunGetPropValue = reference to function (const pPropName: String; pCurrentValue: TValue; Instance: TObject; pDBRows: ISQLDBRows): TValue;
 
   TFieldMapping = class(TObject)
   private
     FItemClass: TClass;
-    FProp: TRttiProperty;
+    FProp: TRttiMember;
     procedure SetPropName(const Value: String);
     function GetPropName: String;
   public
@@ -24,7 +29,7 @@ type
     FunGetPropValue: TFunGetPropValue; //if this callback function is assigned the prop value will be the return value of this function
 
     property PropName: String read GetPropName write SetPropName; // Nome da propriedade do objeto;
-    property Prop: TRttiProperty read FProp;
+    property Prop: TRttiMember read FProp;
     constructor Create(pItemClass: TClass); overload;
     constructor Create(pItemClass: TClass; pPropName, pFieldName: String); overload;
 //    pSerialization: TSerialization;
@@ -34,7 +39,6 @@ type
   private
   public
     ItemClass: TClass;
-    function PropertyToFieldType(pProp: TRttiProperty): TFieldType;
     function GetFieldMappingByFieldName(const pNomeCampo: String): TFieldMapping;
     function GetFieldMappingByPropName(const pNomePropriedade: String): TFieldMapping;
     // Adiciona os mapeamentos na lista de campos mapeados
@@ -66,7 +70,6 @@ type
   private
     FNomeTabela: String;
     FNomePropChave: String;
-//    FPropChave: TRttiProperty;
 
     FChaveIncremental: Boolean;
     FItemClass: TClass;
@@ -82,8 +85,8 @@ type
     function FazMapeamentoECopiaValores(pObjeto: TObject; pDataSet: TDataSet;
       TipoMapeamento: TTipoMapeamento): Boolean; overload;
 
-    procedure SetPropValue(Instance: TObject; pField: Data.DB.TField; pFieldMapping: TFieldMapping);
-    procedure SetFieldValue(Instance: TObject; pField: Data.DB.TField; pFieldMapping: TFieldMapping);
+    procedure SetPropValue(Instance: TObject; pFieldMapping: TFieldMapping; pDataSet: TDataSet);
+    procedure SetFieldValue(Instance: TObject; pFieldMapping: TFieldMapping; pDataSet: TDataSet);
 
     procedure InicializaObjeto;
 
@@ -94,8 +97,8 @@ type
     procedure ObjectFromDBRows(pObject: TObject; pDBRows: ISqlDBRows); overload;
     function ObjectFromDBRows(pDBRows: ISqlDBRows): TObject; overload;
 
-    procedure ColumnParaProp(Instance: TObject; pFieldIndex: Integer; pRows: ISqlDBRows; pFieldMapping: TFieldMapping);
-    function GetPropChave: TRttiProperty;
+    procedure ColumnParaProp(Instance: TObject; pRows: ISqlDBRows; pFieldMapping: TFieldMapping);
+    function GetPropChave: TRttiMember;
     function GetNomeCampoChave: string;
     function CreateObject(pDBRows: ISqlDBRows): TObject;
     procedure SetItemClass(const Value: TClass);
@@ -105,7 +108,7 @@ type
     property NomeCampoChave: string read GetNomeCampoChave;
     property ItemClass: TClass read FItemClass write SetItemClass;
     property NewObjectFunction: TFunNewObject read fNewObjectFunction write fNewObjectFunction;
-    property PropChave: TRttiProperty read GetPropChave;
+    property PropChave: TRttiMember read GetPropChave;
     property MappedFieldList: TFieldMappingList read FMappedFieldList;
     property ChaveIncremental: Boolean read FChaveIncremental write FChaveIncremental;
     property FieldsInUpdateDeleteWhere: TList<String> read FFieldsInUpdateDeleteWhere;
@@ -118,9 +121,9 @@ type
     function Connection: TSQLDBConnectionProperties;
     function DaoUtils: TDaoUtils;
 
-    procedure MapPublishedFields;
+    procedure DoMapPublishedFields;
 
-    function GetPropByName(const pNomeProp: String): TRttiProperty;
+    function GetPropByName(const pNomeProp: String): TRttiMember;
 
     function GetFieldValue(const pFieldName: String; Instance: TObject): Variant; overload;
     function GetFieldValue(const pFieldMapping: TFieldMapping; Instance: TObject): Variant; overload;
@@ -168,6 +171,7 @@ type
   end;
 
 // Use Rtti to execute the Create constructor of the object, if there is not Create calls TClass.Create
+// Will not work if Constructor contains indexed Enumerators as parameter, since it RTTI will show it has no parameters
 function CreateObjectOfClass(pClass: TClass): TObject;
 
 implementation
@@ -178,34 +182,92 @@ uses
 var
   RttiContext: TRttiContext;
 
+function GetPropertyRttiType(pRttiMember: TRttiMember): TRttiType;
+begin
+  if pRttiMember is TRttiProperty then
+    Result:= TRttiProperty(pRttiMember).PropertyType
+  else if pRttiMember is TRttiField then
+    Result:= TRttiField(pRttiMember).FieldType
+  else
+    raise Exception.Create(Format('TFieldMappingList.GetMemberType: Member %s must be field or property', [pRttiMember.Name]));
+end;
+
+function PropertyToFieldType(pProperty: TRttiMember): TFieldType;
+var
+  pType: TRttiType;
+begin
+  Result:= ftUnknown;
+
+  pType:= GetPropertyRttiType(pProperty);
+
+  if SameText('TDateTime', pType.Name) then
+    Result:= ftDateTime
+  else if SameText('TDate', pType.Name) then
+    Result:= ftDate;
+
+  if Result <> ftUnknown then
+    Exit;
+
+  case pType.TypeKind of
+    tkString,tkLString,tkAnsiChar,tkWideString,tkUnicodeString: Result:= ftString;
+    tkFloat: Result:= ftFloat;
+    tkInteger, tkEnumeration: Result:= ftInteger;
+    tkInt64: Result:= ftLargeint;
+  end;
+end;
+
+function GetPropertyValue(pRttiMember: TRttiMember; Instance: Pointer): TValue;
+begin
+  if pRttiMember is TRttiProperty then
+    Result:= TRttiProperty(pRttiMember).GetValue(Instance)
+  else if pRttiMember is TRttiField then
+    Result:= TRttiField(pRttiMember).GetValue(Instance)
+  else
+    raise Exception.Create(Format('TFieldMappingList.GetMemberType: Member %s must be field or property', [pRttiMember.Name]));
+end;
+
+procedure SetPropertyValue(pRttiMember: TRttiMember; Instance: Pointer; AValue: TValue);
+begin
+  if pRttiMember is TRttiProperty then
+    TRttiProperty(pRttiMember).SetValue(Instance, AValue)
+  else if pRttiMember is TRttiField then
+    TRttiField(pRttiMember).SetValue(Instance, AValue)
+  else
+    raise Exception.Create(Format('TFieldMappingList.GetMemberType: Member %s must be field or property', [pRttiMember.Name]));
+end;
+
+// Will not work if Constructor contains indexed Enumerators as parameter
 function CreateObjectOfClass(pClass: TClass): TObject;
 var
+  rContext: TRttiContext;
   rType: TRttiType;
   FMethod: TRttiMethod;
-  sMethods: String;
-  FValue: TValue;
+  FMethods: TArray<TRttiMethod>;
+  FParameters: TArray<TRttiParameter>;
+  I: Integer;
 begin
-  sMethods:= '';
-  rType:= RttiContext.GetType(pClass);
-  for FMethod in rType.GetMethods do
-    if SameText('Create', FMethod.Name) then
-      if Length(FMethod.GetParameters) = 0 then
-          Break;
-{      begin
-        sMethods:= sMethods+Format(sLineBreak+'%s,%s,%s,%d',
-          [FMethod.Parent.AsInstance.MetaclassType.ClassName,
-           FMethod.Name, GetEnumName(TypeInfo(TMethodKind), Ord(FMethod.MethodKind)),
-          Length(FMethod.GetParameters)]);
-//        if FMethod.Parent.AsInstance.MetaclassType <> TObject then
-
+  FMethod:= nil;
+  rContext:= TRttiContext.Create;
+  rType:= rContext.GetType(pClass);
+  FMethods:= rType.GetMethods;
+  for I:= Low(FMethods) to High(FMethods) do
+  begin
+    if SameText('Create', FMethods[I].Name) then
+    begin
+      FPArameters:= FMethods[I].GetParameters;
+      if Length(FParameters) = 0 then
+      begin
+        FMethod:= FMethods[I];
+        Break;
       end;
-
-  raise Exception.Create(sMethods);}
+    end;
+  end;
 
   if Assigned(FMethod) then // Se não existir um constructor Create na class chama o constructor de TObject
     Result:= TObject(FMethod.Invoke(rType.AsInstance.MetaclassType,[]).AsObject)
   else
     Result:= pClass.Create;
+
 end;
 
 
@@ -239,6 +301,9 @@ var
 begin
   RttiType := RttiContext.GetType(FItemClass);
   FProp:= RttiType.GetProperty(Value);
+  if not Assigned(FProp) then
+    FProp:= RttiType.GetField(Value);
+
   if not Assigned(FProp) then
     raise Exception.Create(Format('TFieldMapping.SetPropName: Property %s does not exist on class %s', [Value, FItemClass.ClassName]));
 end;
@@ -283,26 +348,6 @@ begin
   end;
 
   Result:= nil;
-end;
-
-function TFieldMappingList.PropertyToFieldType(pProp: TRttiProperty): TFieldType;
-begin
-  Result:= ftUnknown;
-
-  if SameText('TDateTime', pProp.PropertyType.Name) then
-    Result:= ftDateTime
-  else if SameText('TDate', pProp.PropertyType.Name) then
-    Result:= ftDate;
-
-  if Result <> ftUnknown then
-    Exit;
-
-  case pProp.PropertyType.TypeKind of
-    tkString,tkLString,tkAnsiChar,tkWideString,tkUnicodeString: Result:= ftString;
-    tkFloat: Result:= ftFloat;
-    tkInteger, tkEnumeration: Result:= ftInteger;
-    tkInt64: Result:= ftLargeint;
-  end;
 end;
 
 function TFieldMappingList.Map(pProp, pField: String; pFieldType: TFieldType = ftUnknown): TFieldMappingList;
@@ -393,26 +438,35 @@ begin
   Result:= FazMapeamentoECopiaValores(pObjeto, pDataSet, tmObjectToDataSet);
 end;
 
-procedure TModeloBD.MapPublishedFields;
+procedure TModeloBD.DoMapPublishedFields;
 var
   RttiType: TRttiType;
   Prop: TRttiProperty;
+  Field: TRttiField;
+
+  procedure MapFieldOrProperty(pFieldOrProp: TRttiMember);
+  begin
+    if pFieldOrProp.Visibility <> TMemberVisibility.mvPublished then
+      Exit;
+
+    if PropertyToFieldType(pFieldOrProp) = ftUnknown then
+      Exit;
+
+    if Assigned(FMappedFieldList.GetFieldMappingByPropName(pFieldOrProp.Name)) then // Field already mapped
+      Exit;
+
+    Map(pFieldOrProp.Name, pFieldOrProp.Name); // Default Field Name is same as Prop Name
+  end;
+
 begin
   RttiType := RttiContext.GetType(ItemClass);
 
   for Prop in RttiType.GetProperties do
-  begin
-    if Prop.Visibility <> TMemberVisibility.mvPublished then
-      Continue;
+    MapFieldOrProperty(Prop);
 
-    if FMappedFieldList.PropertyToFieldType(Prop) = ftUnknown then
-      Continue;
+  for Field in RttiType.GetFields do
+    MapFieldOrProperty(Field);
 
-    if Assigned(FMappedFieldList.GetFieldMappingByPropName(Prop.Name)) then // Field already mapped
-      Continue;
-
-    Map(Prop.Name, Prop.Name); // Default Field Name is same as Prop Name
-  end;
 end;
 
 function TModeloBD.CreateObject(pDBRows: ISqlDBRows): TObject;
@@ -423,11 +477,12 @@ begin
     Exit;
   end;
 
-  if Assigned(rttiCreateMethod) then // Se não existir um constructor Create na class chama o constructor de TObject
+{  if Assigned(rttiCreateMethod) then // Se não existir um constructor Create na class chama o constructor de TObject
+   // Will throw an exception when class has a constructor with idexed enumerator as parameter
+   //https://stackoverflow.com/questions/61509397/trttimethod-getparameters-does-not-work-when-method-has-an-indexed-enumerator-as?noredirect=1#comment108807843_61509397
     Result:= TObject(rttiCreateMethod.Invoke(rttiType.AsInstance.MetaclassType,[]).AsObject)
-  else
-    Result:= ItemClass.Create;
-
+  else }
+  Result:= ItemClass.Create;
 end;
 
 procedure TModeloBD.ObjectFromDataSet(pObject: TObject; pDataSet: TDataSet);
@@ -479,7 +534,7 @@ begin
   InicializaObjeto;
 
   if pMapAllPublishedFields then
-    MapPublishedFields;
+    DoMapPublishedFields;
 end;
 
 function TModeloBD.Connection: TSQLDBConnectionProperties;
@@ -519,9 +574,10 @@ begin
   FFieldsInUpdateDeleteWhere.Add(pFieldName);
 end;
 
-procedure TModeloBD.ColumnParaProp(Instance: TObject; pFieldIndex: Integer; pRows: ISqlDBRows; pFieldMapping: TFieldMapping);
+procedure TModeloBD.ColumnParaProp(Instance: TObject; pRows: ISqlDBRows; pFieldMapping: TFieldMapping);
 var
-  FProp: TRttiProperty;
+  FProp: TRttiMember;
+  FFieldIndex: Integer;
 begin
   FProp:= pFieldMapping.Prop;
   if not Assigned(FProp) then
@@ -529,23 +585,27 @@ begin
 
   if Assigned(pFieldMapping.FunGetPropValue) then
   begin
-    FProp.SetValue(Instance, pFieldMapping.FunGetPropValue(FProp.Name, FProp.GetValue(Instance), Instance));
+    SetPropertyValue(FProp, Instance,
+                     pFieldMapping.FunGetPropValue(FProp.Name, GetPropertyValue(FProp, Instance), Instance, pRows)
+                    );
     Exit;
   end;
 
-  if pFieldIndex = -1 then
+  FFieldIndex:= pRows.ColumnIndex(pFieldMapping.FieldName);
+  if FFieldIndex = -1 then
     raise Exception.Create(Format('TModeloBD.ColumnParaProp: Field %s not found on Dataset for property %s', [pFieldMapping.FieldName, pFieldMapping.PropName]));
 
-  if FProp.PropertyType.TypeKind = tkEnumeration then
-    FProp.SetValue(Instance, TValue.FromOrdinal(FProp.PropertyType.Handle, pRows.ColumnInt(pFieldIndex)))
+  if GetPropertyRttiType(FProp).TypeKind = tkEnumeration then
+    SetPropertyValue(FProp, Instance, TValue.FromOrdinal(GetPropertyRttiType(FProp).Handle, pRows.ColumnInt(FFieldIndex)))
   else
-    FProp.SetValue(Instance, TValue.FromVariant(pRows.ColumnVariant(pFieldIndex)));
+    SetPropertyValue(FProp, Instance, TValue.FromVariant(pRows.ColumnVariant(FFieldIndex)));
 end;
 
-procedure TModeloBD.SetPropValue(Instance: TObject; pField: Data.DB.TField; pFieldMapping: TFieldMapping);
+procedure TModeloBD.SetPropValue(Instance: TObject; pFieldMapping: TFieldMapping; pDataSet: TDataSet);
 var
   FValue: Integer;
-  FProp: TRTTIProperty;
+  FProp: TRttiMember;
+  FField: Data.DB.TField;
 begin
   FProp:= pFieldMapping.Prop;
 
@@ -554,40 +614,45 @@ begin
 
   if Assigned(pFieldMapping.FunGetPropValue) then
   begin
-    FProp.SetValue(Instance, pFieldMapping.FunGetPropValue(FProp.Name, FProp.GetValue(Instance), Instance));
+    SetPropertyValue(FProp, Instance, pFieldMapping.FunGetPropValue(FProp.Name,
+                     GetPropertyValue(FProp, Instance), Instance, TSqlDBRowDataSet.Create(pDataSet)));
     Exit;
   end;
 
-  if not Assigned(pField) then
+  FField:= pDataSet.FindField(pFieldMapping.FieldName);
+  if not Assigned(FField) then
     raise Exception.Create(Format('TModeloBD.SetPropValue: Field %s not found. ', [pFieldMapping.FieldName]));
 
-  if FProp.PropertyType.TypeKind = tkEnumeration then
+  if GetPropertyRttiType(FProp).TypeKind = tkEnumeration then
   begin
-    if pField.ClassType = TBooleanField then
-      FValue:= ifThen(pField.AsBoolean, 1, 0)
+    if FField.ClassType = TBooleanField then
+      FValue:= ifThen(FField.AsBoolean, 1, 0)
     else
-      FValue:= pField.AsInteger;
+      FValue:= FField.AsInteger;
 
-    FProp.SetValue(Instance, TValue.FromOrdinal(FProp.PropertyType.Handle, FValue));
+    SetPropertyValue(FProp, Instance, TValue.FromOrdinal(GetPropertyRttiType(FPRop).Handle, FValue));
   end
-  else if FProp.PropertyType.TypeKind = tkFloat then
-    FProp.SetValue(Instance, TValue.FromVariant(pField.AsFloat))
+  else if GetPropertyRttiType(FPRop).TypeKind = tkFloat then
+    SetPropertyValue(FProp, Instance, TValue.FromVariant(FField.AsFloat))
   else
-    FProp.SetValue(Instance, TValue.FromVariant(pField.Value))
+    SetPropertyValue(FProp, Instance, TValue.FromVariant(FField.Value))
 end;
 
-procedure TModeloBD.SetFieldValue(Instance: TObject; pField: Data.DB.TField; pFieldMapping: TFieldMapping);
+procedure TModeloBD.SetFieldValue(Instance: TObject; pFieldMapping: TFieldMapping; pDataSet: TDataSet);
+var
+  FField: Data.DB.TField;
 begin
   if pFieldMapping.FieldName = '' then
     Exit;
 
-  if not Assigned(pField) then
+  FField:= pDataSet.FindField(pFieldMapping.FieldName);
+  if not Assigned(FField) then
     raise Exception.Create(Format('TModeloBD.SetFieldValue: Field %s not found. ', [pFieldMapping.FieldName]));
 
   if Assigned(pFieldMapping.FunGetFieldValue) then
-    pField.Value:= pFieldMapping.FunGetFieldValue(pField.Name, Instance)
+    FField.Value:= pFieldMapping.FunGetFieldValue(FField.Name, Instance)
   else if Assigned(pFieldMapping.Prop) then
-    pField.Value:= pFieldMapping.Prop.GetValue(Instance).AsVariant;
+    FField.Value:= GetPropertyValue(pFieldMapping.Prop,Instance).AsVariant;
 end;
 
 procedure TModeloBD.SetItemClass(const Value: TClass);
@@ -622,7 +687,7 @@ begin
   if Assigned(pFieldMapping.FunGetFieldValue) then
     Result:= pFieldMapping.FunGetFieldValue(pFieldMapping.FieldName, Instance)
   else
-    Result:= pFieldMapping.Prop.GetValue(Instance).AsVariant;
+    Result:= GetPropertyValue(pFieldMapping.Prop, Instance).AsVariant;
 
 end;
 
@@ -637,16 +702,19 @@ begin
     Result:= '';
 end;
 
-function TModeloBD.GetPropByName(const pNomeProp: String): TRttiProperty;
+function TModeloBD.GetPropByName(const pNomeProp: String): TRttiMember;
 var
   RttiType: TRttiType;
 begin
   RttiType := RttiContext.GetType(ItemClass);
 
   Result:= RttiType.GetProperty(pNomeProp);
+  if not Assigned(Result) then
+    Result:= RttiType.GetField(pNomeProp);
+
 end;
 
-function TModeloBD.GetPropChave: TRttiProperty;
+function TModeloBD.GetPropChave: TRttiMember;
 var
   FFieldMapping: TFieldMapping;
 begin
@@ -657,7 +725,7 @@ end;
 function TModeloBD.GetKeyValue(pObject: TObject): Integer;
 begin
   if Assigned(PropChave) then
-    Result:= PropChave.GetValue(pObject).AsInteger
+    Result:= GetPropertyValue(PropChave, pObject).AsInteger
  else
    raise Exception.Create(Format('TModeloBD.GetKeyValue: Property %s not found on object of class %s!', [PropChave, ItemClass.ClassName]));
 end;
@@ -665,7 +733,7 @@ end;
 procedure TModeloBD.SetKeyValue(pObject: TObject; fValor: Integer);
 begin
   if Assigned(PropChave) then
-    PropChave.SetValue(pObject, TValue.FromVariant(fValor))
+    SetPropertyValue(PropChave, pObject, TValue.FromVariant(fValor))
  else
    raise Exception.Create(Format('TModeloBD.SetKeyValue: Property %s not found on object of class %s!', [PropChave, ItemClass.ClassName]));
 end;
@@ -677,14 +745,10 @@ begin
   // *INICIO* Método anonimo de callback
   fCallback:=
     procedure (pClass: TClass; pFieldMapping: TFieldMapping)
-    var
-      FFieldIndex: Integer;
     begin
-      FFieldIndex:= pDbRows.ColumnIndex(pFieldMapping.FieldName);
-
       case TipoMapeamento of
         tmObjectToDataset: raise Exception.Create('TModeloBD.FazMapeamentoECopiaValores é read only!');
-        tmObjectFromDataset: ColumnParaProp(pObjeto, FFieldIndex, pDBRows, pFieldMapping);
+        tmObjectFromDataset: ColumnParaProp(pObjeto, pDBRows, pFieldMapping);
       end;
     end;
   // *FIM* Método anônimo de callback
@@ -708,8 +772,8 @@ begin
       FField:= pDataSet.FindField(pFieldMapping.FieldName);
 
       case TipoMapeamento of
-        tmObjectToDataSet: SetFieldValue(pObjeto, FField, pFieldMapping);
-        tmObjectFromDataset: SetPropValue(pObjeto, FField, pFieldMapping);
+        tmObjectToDataSet: SetFieldValue(pObjeto, pFieldMapping, pDataSet);
+        tmObjectFromDataset: SetPropValue(pObjeto, pFieldMapping, pDataSet);
       end;
     end;
   // *FIM* Método anônimo de callback

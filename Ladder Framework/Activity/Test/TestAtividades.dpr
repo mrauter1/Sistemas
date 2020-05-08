@@ -9,7 +9,7 @@ program TestAtividades;
   default.
 
 }
-
+{$DEFINE MAX_SQLFIELDS_256}
 {$IFDEF CONSOLE_TESTRUNNER}
 {$APPTYPE CONSOLE}
 {$ENDIF}
@@ -17,6 +17,7 @@ program TestAtividades;
 uses
   DUnitTestRunner,
   Forms,
+  Windows,
   Test.Classes in 'Test.Classes.pas',
   Ladder.Activity.Classes in '..\Ladder.Activity.Classes.pas',
   Test.Parser in 'Test.Parser.pas',
@@ -40,7 +41,9 @@ uses
   uDmConnection in '..\..\..\utils\uDmConnection.pas' {DmConnection: TDataModule},
   uDmGeradorConsultas in '..\..\..\utils\uDmGeradorConsultas.pas' {DmGeradorConsultas: TDataModule},
   uConSqlServer in '..\..\..\utils\uConSqlServer.pas' {ConSqlServer: TDataModule},
-  Test.Classes.Dao in 'Test.Classes.Dao.pas';
+  Test.Classes.Dao in 'Test.Classes.Dao.pas',
+  Ladder.Activity.LadderVarToSql in '..\Ladder.Activity.LadderVarToSql.pas',
+  Test.LadderVarToSql in 'Test.LadderVarToSql.pas';
 
 {$R *.RES}
 

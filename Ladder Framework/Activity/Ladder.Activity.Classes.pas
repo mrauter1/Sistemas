@@ -8,7 +8,8 @@ uses
 
 type
 //  TTipoProcesso = (tpConsultaPersonalizada = 1, tpEnvioEmail = 2, tpAtividade = 3);
-  TParameterType = (tbValue=1, tbList, tbData, tbAny);
+  // Must start at 0 to generate RTTI information, see: https://stackoverflow.com/questions/61509397/trttimethod-getparameters-does-not-work-when-method-has-an-indexed-enum-as-a-p
+  TParameterType = (tbUnknown=0, tbValue=1, tbList, tbData, tbAny);
 
   IActivityElement = interface
   ['{505A4C16-9ED0-4D9C-8020-204B98096EC8}']
@@ -69,6 +70,8 @@ type
   TOutputParameter = class(TParameter, IActivityElementContainer)
   private
     FParametros: TInputList;
+  protected
+    procedure AfterConstruction; override;
   public
     constructor Create(pName: String; pParameterType: TParameterType; pExpression: String);
     destructor Destroy; override;
@@ -123,15 +126,18 @@ type
     FID: Integer;
     FName: String;
     FDescription: String;
-    FExecutor: IExecutorBase;
     FDaoUtils: TDaoUtils;
     FParser: TActivityParser;
     FCurrentContainer: IActivityElementContainer;
+
+    Executor: IExecutorBase;
   protected
     procedure ValuateInputs(ValuateParameterExpression: TValuateParameterExpression);
     procedure OnValuateParameterExpression(pContainer: IActivityElementContainer; pParameter: TParameter);
     procedure OnElementEval(const pElement: String; var Return: Variant);
     procedure OnSqlEval(const pSql: String; var Return: Variant);
+
+    procedure AfterConstruction; override;
 
     property Parser: TActivityParser read FParser;
   public
@@ -156,6 +162,7 @@ type
     FProcessos: TObjectList<TProcessoBase>;
 //    function ExpressionEvaluator(pExpression: String): array of string;
   protected
+    procedure AfterConstruction; override;
   public
     constructor Create(pDaoUtils: TDaoUtils);
     destructor Destroy; override;
@@ -167,12 +174,17 @@ type
 
 
 function LadderVarIsList(const pValue: Variant): Boolean;
+function LadderVarIsIso8601(const pValue: Variant): Boolean;
 function LadderVarIsDateTime(const pValue: Variant): Boolean;
 function LadderVarToDateTime(const pValue: Variant): TDateTime;
+function LadderDateToStr(Date: TDateTime): String;
 
 function JoinList(const pValue: Variant; const pSeparator: String): String;
 
 implementation
+
+uses
+  Ladder.ServiceLocator;
 
 function JoinList(const pValue: Variant; const pSeparator: String): String;
 var
@@ -200,17 +212,31 @@ begin
   Result:= DocVariantType.IsOfType(pValue);
 end;
 
-function LadderVarIsDateTime(const pValue: Variant): Boolean;
+function LadderVarIsIso8601(const pValue: Variant): Boolean;
 var
   pAnsi: AnsiString;
 begin
+  Result:= False;
+  pAnsi:= VarToStrDef(pValue, '');
+
+  if length(pAnsi) >= 10 then
+    if (pAnsi[5] = '-') and (pAnsi[8] = '-') then
+      Result:= Iso8601ToDateTime(pAnsi) <> 0;
+end;
+
+function LadderVarIsDateTime(const pValue: Variant): Boolean;
+begin
+  Result:= False;
+
   if VarType(pValue) = varDate then
     Result:= True
  else
-  begin
-    pAnsi:= VarToStrDef(pValue, '');
-    Result:= Iso8601ToDateTime(pAnsi) <> 0;
-  end;
+   Result:= LadderVarIsIso8601(pValue);
+end;
+
+function LadderDateToStr(Date: TDateTime): String;
+begin
+  Result:= DateToIso8601(Date, True);
 end;
 
 function LadderVarToDateTime(const pValue: Variant): TDateTime;
@@ -252,19 +278,26 @@ end;
 
 { TProcessoBase }
 
-constructor TProcessoBase.Create(pExecutor: IExecutorBase; pDaoUtils: TDaoUtils);
+procedure TProcessoBase.AfterConstruction;
 begin
-  inherited Create;
+  inherited;
   FInputs:= TInputList.Create;
   FOutputs:= TOutputList.Create;
-
-  FExecutor:= pExecutor;
-
-  FDaoUtils:= pDaoUtils;
 
   FParser:= TActivityParser.Create;
   FParser.OnElementEval:= OnElementEval;
   FParser.OnSqlEval:= OnSqlEval;
+
+  if not Assigned(FDaoUtils) then
+    FDaoUtils:= TFrwServiceLocator.Context.DaoUtils;
+end;
+
+constructor TProcessoBase.Create(pExecutor: IExecutorBase; pDaoUtils: TDaoUtils);
+begin
+  inherited Create;
+  Executor:= pExecutor;
+
+  FDaoUtils:= pDaoUtils;
 end;
 
 destructor TProcessoBase.Destroy;
@@ -300,12 +333,12 @@ begin
   { First evaluate all parameters }
   ValuateInputs(ValuateParameterExpression);
 
-  if not Assigned(FExecutor) then
+  if not Assigned(Executor) then
     raise Exception.Create('TProcessoBase.Executar> Executor must be assigned!');
 
-  FExecutor.Inputs:= Inputs;
-  FExecutor.Outputs:= Outputs;
-  FExecutor.Executar;
+  Executor.Inputs:= Inputs;
+  Executor.Outputs:= Outputs;
+  Executor.Executar;
 
   for FOutput in Outputs do
     if VarIsNull(FOutput.Value) and (FOutput.Expression <> '') then
@@ -405,7 +438,7 @@ end;
 
 function TProcessoBase.GetExecutor: IExecutorBase;
 begin
-  Result:= FExecutor;
+  Result:= Executor;
 end;
 
 function TProcessoBase.GetName: String;
@@ -415,11 +448,15 @@ end;
 
 { TActivity }
 
+procedure TActivity.AfterConstruction;
+begin
+  inherited;
+  FProcessos:= TObjectList<TProcessoBase>.Create(True);
+end;
+
 constructor TActivity.Create(pDaoUtils: TDaoUtils);
 begin
   inherited Create(nil, pDaoUtils);
-
-  FProcessos:= TObjectList<TProcessoBase>.Create(True);
 end;
 
 destructor TActivity.Destroy;
@@ -515,10 +552,15 @@ end;
 
 { TOutputParameter }
 
+procedure TOutputParameter.AfterConstruction;
+begin
+  inherited;
+  FParametros:= TInputList.Create;
+end;
+
 constructor TOutputParameter.Create(pName: String; pParameterType: TParameterType; pExpression: String);
 begin
   inherited Create(pName, pParameterType, pExpression);
-  FParametros:= TInputList.Create;
 end;
 
 destructor TOutputParameter.Destroy;

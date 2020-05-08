@@ -65,7 +65,7 @@ end;
 
 function TDaoUtils.SelectAsJSon(const pSql: String): String;
 begin
-  Result:= Connection.Execute(pSql, []).FetchAllAsJSON(true);
+  Result:= Connection.Execute(pSql, []).FetchAllAsJSON(True);
 end;
 
 function TDaoUtils.SelectAsDataset(const pSql: String; AOwner: TComponent = nil): TDataSet;

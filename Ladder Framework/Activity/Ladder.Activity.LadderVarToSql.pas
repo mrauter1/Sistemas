@@ -3,11 +3,11 @@ unit Ladder.Activity.LadderVarToSql;
 interface
 
 uses
-  SysUtils, SynCommons, SynTable;
+  SysUtils, SynCommons, SynTable, Data.DB, System.Classes, mormotVCL, Mormot;
 
 type
   TLadderVarToSql = class
-    class procedure TableDocToInlineSql(pDocVariant: TDocVariantData; pTextWriter: TTextWriter; pNumberOfRows: Integer=0; pOffset: Integer=0); overload;
+    class procedure TableDocToInlineSql(pDocVariant: TDocVariantData; pTextWriter: SynCommons.TTextWriter; pNumberOfRows: Integer=0; pOffset: Integer=0); overload;
     class function TableDocToInlineSql(pDocVariant: TDocVariantData; pNumberOfRows: Integer=0; pOffset: Integer=0): String; overload;
     // DO NOT USE!! Use InsertDocVariantData, which uses FireDAC arrayDML and is much faster
     class procedure InsertDocVariantDataInline(pDocVariant: TDocVariantData; const pTableName: String);
@@ -18,18 +18,55 @@ type
     class function InsertSqlWithParams(pDocVariant: TDocVariantData; const pTableName: String): String; static;
     class procedure InsertDocVariantData(pDocVariant: TDocVariantData; const pTableName: String);
 
+    class function DocVariantToDataSet(AOwner: TComponent; pDocVariant: TDocVariantData): TSynSqlTableDataSet;
+
+    class function DataSetToDocVariant(pDataSet: TDataSet): TDocVariantData;
+
     // Checks the type of the variant to find the Field Type,
     // if pCurrentFieldType is not ftNull, keeps most compatible type between infered variant type and pCurrentFieldType.
     // Ex.: if VariantType is int and pCurrentFieldType is ftCurrency, keeps ftCurrency
     class procedure SetNewFieldType(pValue: PVAriant; var pFieldType: TSQLDBFieldType);
   private
+    class procedure SetNewSqlFieldType(pValue: PVAriant; var pFieldType: TSQLFieldType); static;
   end;
 
 implementation
 
 uses
-  Variants, Ladder.Activity.Classes, Ladder.ORM.QueryBuilder, Ladder.ORM.Functions, Ladder.ServiceLocator, System.Classes,
-  FireDAC.Comp.Client, Data.DB, FireDAC.Stan.Option;
+  Variants, Ladder.Activity.Classes, Ladder.ORM.QueryBuilder, Ladder.ORM.Functions, Ladder.ServiceLocator,
+  FireDAC.Comp.Client, FireDAC.Stan.Option, SynVirtualDataSet;
+
+function SqlDBFieldTypeToSqlFieldType(SqlDBFieldType: TSqlDBFieldType): TSqlFieldType;
+begin
+  case SqlDBFieldType of
+    TSQLDBFieldType.ftUnknown: Result:= TSQLFieldType.sftUnknown;
+    TSQLDBFieldType.ftNull: Result:= TSQLFieldType.sftUnknown;
+    TSQLDBFieldType.ftInt64: Result:= TSQLFieldType.sftInteger;
+    TSQLDBFieldType.ftDouble: Result:= TSQLFieldType.sftFloat;
+    TSQLDBFieldType.ftCurrency: Result:= TSQLFieldType.sftCurrency;
+    TSQLDBFieldType.ftDate: Result:= TSQLFieldType.sftDateTime;
+    TSQLDBFieldType.ftUTF8: Result:= TSQLFieldType.sftUTF8Text;
+    else Result:= TSQLFieldType.sftVariant;
+  end;
+end;
+
+function SqlFieldTypeToSqlDBFIeldType(SqlFieldType: TSqlFieldType): TSqlDBFieldType;
+begin
+  case SqlFieldType of
+    sftAnsiText, sftUTF8Text, sftUTF8Custom: Result:= SynTable.ftUTF8;
+    sftBoolean, sftInteger, sftEnumerate: Result:= SynTable.ftInt64;
+    sftFloat: Result:= SynTable.ftDouble;
+    sftCurrency: Result:= SynTable.ftCurrency;
+    sftDateTime, sftDateTimeMS: Result:= SynTable.ftDate;
+    else
+    Result:= SynTable.ftUnknown;
+  end;
+end;
+
+function VariantVTypeToSQLFieldType(VType: Cardinal): TSQLFIeldType;
+begin
+  Result:= SqlDBFieldTypeToSqlFieldType(VariantVTypeToSQLDBFieldType(VType));
+end;
 
 function LadderVarToStr(pVar: Variant): String;
 begin
@@ -109,6 +146,39 @@ begin
  end;
 end;
 
+class procedure TLadderVarToSql.SetNewSqlFieldType(pValue: PVAriant; var pFieldType: TSQLFieldType);
+var
+  FCurFieldType, FNewFieldType: TSQLDBFieldType;
+begin
+  FCurFieldType:= SqlFieldTypeToSqlDBFIeldType(pFieldType);
+  if FCurFieldType = ftUTF8 then Exit; // If it is a string it does not need to be changed
+
+  FNewFieldType:= VariantVTypeToSQLDBFieldType(VarType(pValue^));
+
+  if FNewFieldType <= ftNull then  // if current col FieldType is ftnull or ftUnknown does not need to change
+    Exit;
+
+  if FCurFieldType <= ftNull then
+  begin
+    if (FNewFieldType = SynTable.ftUTF8) and (LadderVarIsIso8601(pValue^)) then // Check special case when date is stored as string
+      pFieldType:= SqlDBFieldTypeToSqlFieldType(SynTable.ftDate)
+    else
+      pFieldType:= SqlDBFieldTypeToSqlFieldType(FNewFieldType);
+
+    Exit;
+  end;
+
+  if FNewFieldType = FCurFieldType then
+    Exit
+  else if ((FNewFieldType = SynTable.ftUTF8) and (LadderVarIsIso8601(pValue^))) then // Check special case when date is stored as string
+    pFieldType:= SqlDBFieldTypeToSqlFieldType(SynTable.ftDate)
+  else if Ord(FNewFieldType) > Ord(FCurFieldType) then
+    pFieldType:= SqlDBFieldTypeToSqlFieldType(FNewFieldType)
+  else // Ord(FFieldType) < Ord(FieldTypes[Col]
+    if FNewFieldType = SynTable.ftDate then // if current column fieldtype is int, double or currency and prior fieldtype was date, must change to string
+      pFieldType:= SqlDBFieldTypeToSqlFieldType(SynTable.ftUTF8);
+end;
+
 class procedure TLadderVarToSql.SetNewFieldType(pValue: PVAriant; var pFieldType: TSQLDBFieldType);
 var
   FNewFieldType: TSQLDBFieldType;
@@ -139,6 +209,34 @@ begin
       pFieldType:= SynTable.ftUTF8;
 end;
 
+
+class function TLadderVarToSql.DataSetToDocVariant(
+  pDataSet: TDataSet): TDocVariantData;
+begin
+  Result:= TDocVariantData(_JsonFast(DataSetToJson(pDataSet)));
+end;
+
+class function TLadderVarToSql.DocVariantToDataSet(AOwner: TComponent;
+  pDocVariant: TDocVariantData): TSynSqlTableDataSet;
+var
+  FFieldCount: Integer;
+  FFirstRow: PDocVariantData;
+  SqlFieldTypes: array of TSQLFieldType;
+  Col, Row: Integer;
+begin
+  FFirstRow:= @TDocVariantData(pDocVariant.Values[0]);
+  FFieldCount:= Length(FFirstRow^.Values);
+
+  SetLength(SqlFieldTypes, FFieldCount);
+  for Col := 0 to FFieldCount-1 do
+    SqlFieldTypes[Col]:= sftUnknown;
+
+  for Col := 0 to FFieldCount-1 do // Have to loop trough all the results to get the Field type beforehand
+    for Row := 0 to pDocVariant.Count-1 do
+      SetNewSqlFieldType(@pDocVariant._[Row].Values[Col], SqlFieldTypes[Col]);
+
+  Result:= JSONToDataSet(AOwner, pDocVariant.ToJSON(), SqlFieldTypes);
+end;
 
 class procedure TLadderVarToSql.InsertDocVariantData(
   pDocVariant: TDocVariantData; const pTableName: String);

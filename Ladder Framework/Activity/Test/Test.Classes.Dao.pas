@@ -20,25 +20,17 @@ type
   // Test methods for class TParameterDao
   TestTParameterDao = class(TTestCase)
   strict private
-    FParameterDao: TParameterDao;
+    FParameterDao: TParameterDao<TParameter>;
   public
 {    procedure SetUp; override;
     procedure TearDown; override;}
   end;
   // Test methods for class TOutputParameterDao
 
-  TestTOutputParameterDao = class(TTestCase)
-  strict private
-    FOutputParameterDao: TOutputParameterDao;
-  public
-{    procedure SetUp; override;
-    procedure TearDown; override; }
-  end;
   // Test methods for class TProcessoDao
-
   TestTProcessoDao = class(TTestCase)
   strict private
-    FProcessoDao: TProcessoDao;
+    FProcessoDao: IDaoGeneric<TProcessoBase>;
   public
     procedure SetUp; override;
     procedure TearDown; override;
@@ -51,7 +43,7 @@ type
   TestTAtividadeDao = class(TTestCase)
   strict private
     FAtividade: TActivity;
-    FAtividadeDao: TAtividadeDao;
+    FAtividadeDao: IDaoGeneric<TProcessoBase>;
   private
     procedure ConfigAtividade(pAtividade: TActivity);
   public
@@ -65,7 +57,7 @@ implementation
 
 uses
   Ladder.Executor.ConsultaPersonalizada, Ladder.Executor.Email, Ladder.ServiceLocator, DateUtils,
-  Ladder.ORM.ModeloBD;
+  Ladder.ORM.ModeloBD, Ladder.Utils;
 
 function NewProcesso(pExecutor: IExecutorBase): TProcessoBase;
 begin
@@ -83,12 +75,12 @@ begin
   Result.Inputs.Add(TParameter.Create('Titulo', tbValue, '@EnviaEmailMeta.Titulo'));
   Result.Inputs.Add(TParameter.Create('Body', tbValue, '@EnviaEmailMeta.Body'));
   Result.Inputs.Add(TParameter.Create('Destinatarios', tbValue, 'marcelo@rauter.com.br'));
-  Result.Inputs.Add(TParameter.Create('Anexos', tbList, '[@Consulta.Grafico, @Consulta.Tabela, @MetaEvolutivo.Grafico]'));
+  Result.Inputs.Add(TParameter.Create('Anexos', tbList, '[@Consulta.Export.Grafico, @Consulta.Export.Tabela, @MetaEvolutivo.Export.Grafico]'));
 end;
 
 function NewProcessoRelatororiosMeta: TProcessoBase;
 var
-  FOutput: TOutputParameter;
+  FTipoExport, FExport: TParameter;
   FInput: TParameter;
 begin
   Result:= NewProcesso(TExecutorConsultaPersonalizada.GetExecutor);
@@ -96,22 +88,26 @@ begin
   FInput:= TParameter.Create('NomeConsulta', tbValue, 'MetaVendedores');
   Result.Inputs.Add(FInput);
 
-  FOutput:= TOutputParameter.Create('Grafico', tbValue, '');
-  FOutput.Parametros.Add(TParameter.Create('Visualizacao', tbValue, 'Realizado e Meta da Venda e Margem'));
-  FOutput.Parametros.Add(TParameter.Create('NomeArquivo', tbValue, 'MetaVendedores.png'));
-  FOutput.Parametros.Add(TParameter.Create('TipoVisualizacao', tbValue, 'Grafico'));
-  Result.Outputs.Add(FOutput);
+  FExport:= TParameter.Create('Export', tbValue);
 
-  FOutput:= TOutputParameter.Create('Tabela', tbValue, '');
-  FOutput.Parametros.Add(TParameter.Create('Visualizacao', tbValue, 'Realizado e Meta da Venda e Margem'));
-  FOutput.Parametros.Add(TParameter.Create('NomeArquivo', tbValue, 'MetaVendedores.xls'));
-  FOutput.Parametros.Add(TParameter.Create('TipoVisualizacao', tbValue, 'Tabela'));
-  Result.Outputs.Add(FOutput);
+  FTipoExport:= TParameter.Create('Grafico', tbValue);
+  FTipoExport.Parameters.Add(TParameter.Create('Visualizacao', tbValue, 'Realizado e Meta da Venda e Margem'));
+  FTipoExport.Parameters.Add(TParameter.Create('NomeArquivo', tbValue, 'MetaVendedores.png'));
+  FTipoExport.Parameters.Add(TParameter.Create('TipoVisualizacao', tbValue, 'Grafico'));
+  FExport.Parameters.Add(FTipoExport);
+
+  FTipoExport:= TParameter.Create('Tabela', tbValue, '');
+  FTipoExport.Parameters.Add(TParameter.Create('Visualizacao', tbValue, 'Realizado e Meta da Venda e Margem'));
+  FTipoExport.Parameters.Add(TParameter.Create('NomeArquivo', tbValue, 'MetaVendedores.xls'));
+  FTipoExport.Parameters.Add(TParameter.Create('TipoVisualizacao', tbValue, 'Tabela'));
+  FExport.Parameters.Add(FTipoExport);
+
+  Result.Inputs.Add(FExport);
 end;
 
 function NewProcessoRelatororiosMetaEvolutivo: TProcessoBase;
 var
-  FOutput: TOutputParameter;
+  FTipoExport, FExport: TParameter;
   FInput: TParameter;
 begin
   Result:= NewProcesso(TExecutorConsultaPersonalizada.GetExecutor);
@@ -122,11 +118,16 @@ begin
   Result.Inputs.Add(TParameter.Create('geDataIni', tbValue, LadderDateToStr(StartOfTheMonth(Now)))); // select first day of the month
   Result.Inputs.Add(TParameter.Create('geDataFim', tbValue, LadderDateToStr(Now)));
 
-  FOutput:= TOutputParameter.Create('Grafico', tbValue, '');
-  FOutput.Parametros.Add(TParameter.Create('Visualizacao', tbValue, 'Venda e Margem Geral'));
-  FOutput.Parametros.Add(TParameter.Create('NomeArquivo', tbValue, 'MetaVendedoresEvolutivo.png'));
-  FOutput.Parametros.Add(TParameter.Create('TipoVisualizacao', tbValue, 'Grafico'));
-  Result.Outputs.Add(FOutput);
+
+  FTipoExport:= TParameter.Create('Grafico', tbValue);
+  FTipoExport.Parameters.Add(TParameter.Create('Visualizacao', tbValue, 'Venda e Margem Geral'));
+  FTipoExport.Parameters.Add(TParameter.Create('NomeArquivo', tbValue, 'MetaVendedoresEvolutivo.png'));
+  FTipoExport.Parameters.Add(TParameter.Create('TipoVisualizacao', tbValue, 'Grafico'));
+
+  FExport:= TParameter.Create('Export', tbValue);
+  FExport.Parameters.Add(FTipoExport);
+
+  Result.Inputs.Add(FExport);
 end;
 
 procedure TestTAtividadeDao.SetUp;
@@ -136,7 +137,6 @@ end;
 
 procedure TestTAtividadeDao.TearDown;
 begin
-  FAtividadeDao.Free;
   FAtividadeDao := nil;
 end;
 
@@ -190,7 +190,6 @@ end;
 
 procedure TestTProcessoDao.TearDown;
 begin
-  FProcessoDao.Free;
   FProcessoDao := nil;
 end;
 
@@ -215,31 +214,36 @@ procedure TestTProcessoDao.TestSaveProcesso;
 
   function NewProcessoRelatororiosMeta: TProcessoBase;
   var
-    FOutput: TOutputParameter;
-    FInput: TParameter;
+    FInput, FExportInput: TParameter;
   begin
     Result:= NewProcesso(TExecutorConsultaPersonalizada.GetExecutor);
     Result.Name:= 'Consulta';
     FInput:= TParameter.Create('NomeConsulta', tbValue, 'MetaVendedores');
     Result.Inputs.Add(FInput);
 
-    FOutput:= TOutputParameter.Create('Grafico', tbValue, '');
-    FOutput.Parametros.Add(TParameter.Create('Visualizacao', tbValue, 'Realizado e Meta da Venda e Margem'));
-    FOutput.Parametros.Add(TParameter.Create('NomeArquivo', tbValue, 'MetaVendedores.png'));
-    FOutput.Parametros.Add(TParameter.Create('TipoVisualizacao', tbValue, 'Grafico'));
-    Result.Outputs.Add(FOutput);
+    FExportInput:= TParameter.Create('Export', tbAny, '');
+    begin
+      FInput:= TParameter.Create('Grafico', tbValue, '');
+        FInput.Parameters.Add(TParameter.Create('Visualizacao', tbValue, 'Realizado e Meta da Venda e Margem'));
+        FInput.Parameters.Add(TParameter.Create('NomeArquivo', tbValue, 'MetaVendedores.png'));
+        FInput.Parameters.Add(TParameter.Create('TipoVisualizacao', tbValue, 'Grafico'));
+      FExportInput.Parameters.Add(FInput);
 
-    FOutput:= TOutputParameter.Create('Tabela', tbValue, '');
-    FOutput.Parametros.Add(TParameter.Create('Visualizacao', tbValue, 'Realizado e Meta da Venda e Margem'));
-    FOutput.Parametros.Add(TParameter.Create('NomeArquivo', tbValue, 'MetaVendedores.xls'));
-    FOutput.Parametros.Add(TParameter.Create('TipoVisualizacao', tbValue, 'Tabela'));
-    Result.Outputs.Add(FOutput);
+      FInput:= TParameter.Create('Tabela', tbValue, '');
+        FInput.Parameters.Add(TParameter.Create('Visualizacao', tbValue, 'Realizado e Meta da Venda e Margem'));
+        FInput.Parameters.Add(TParameter.Create('NomeArquivo', tbValue, 'MetaVendedores.xls'));
+        FInput.Parameters.Add(TParameter.Create('TipoVisualizacao', tbValue, 'Tabela'));
+      FExportInput.Parameters.Add(FInput);
+    end;
+    Result.Inputs.Add(FExportInput);
+
+    Result.Outputs.Add(TOutputParameter.Create('Grafico', tbValue, ''));
+    Result.Outputs.Add(TOutputParameter.Create('Tabela', tbValue, ''));
   end;
 
 var
   FProcesso: TProcessoBase;
   FID: Integer;
-
 begin
   FProcesso:= NewProcessoRelatororiosMeta;
   FProcessoDao.Save(FProcesso);
@@ -248,13 +252,15 @@ begin
 
   FProcesso:= FProcessoDao.SelectKey(FID);
   Check(Assigned(FProcesso));
-  CheckEquals(1, FProcesso.Inputs.Count);
+  CheckEquals(2, FProcesso.Inputs.Count);
   CheckEquals(2, FProcesso.Outputs.Count);
-  CheckEquals(3, FProcesso.Outputs[0].Parametros.Count);
-  CheckEquals('Grafico', FProcesso.Outputs[0].Name);
-  CheckEquals('Visualizacao', FProcesso.Outputs[0].Parametros[0].Name);
-  CheckEquals('Tabela', FProcesso.Outputs[1].Parametros[2].Expression);
-  CheckEquals(3, FProcesso.Outputs[1].Parametros.Count);
+  CheckEquals(2, FProcesso.Inputs[1].Parameters.Count);
+  CheckEquals(3, FProcesso.Inputs[1].Parameters[0].Parameters.Count);
+  CheckEquals('Grafico', FProcesso.Inputs[1].Parameters[0].Name);
+  CheckEquals('Visualizacao', FProcesso.Inputs[1].Parameters[0].Parameters[0].Name);
+  CheckEquals('Tabela', FProcesso.Inputs[1].Parameters[1].Parameters[2].Expression);
+
+  CheckEquals(3, FProcesso.Inputs[1].Parameters[1].Parameters.Count);
 
   Check(FProcesso.GetExecutor <> nil);
   CheckEquals(FProcesso.GetExecutor.ClassType.ClassName, 'TExecutorConsultaPersonalizada');

@@ -19,35 +19,34 @@ uses
 
 type
   // Test methods for class TDaoBase
+  TRecursiveObject = class
+  public
+    procedure AfterConstruction; override;
+    destructor Destroy; override;
+  public
+    FID: Integer;
+  published
+    Childs: TObjectList<TRecursiveObject>;
+    property ID: Integer read FID write FID;
+  end;
 
   TestTDaoBase = class(TTestCase)
   strict private
-    FDaoBase: TDaoBase;
+    FDaoBase: IDaoBase;
+  private
   public
     procedure SetUp; override;
     procedure TearDown; override;
-    procedure TestSelectKey;
-    procedure TestKeyExists;
-    procedure TestInsert;
-    procedure TestUpdate;
-    procedure TestDelete;
-    procedure TestDelete1;
-    procedure TestUpdateChild;
-    procedure TestDeleteChild;
-    procedure TestAddChildDao;
-    procedure TestSelectWhere;
-    procedure TestSelectWhere1;
-    procedure TestGetGenericListWhere;
-    procedure TestGetGenericListWhere1;
   published
     procedure TestInsertChild;
+    procedure TestRecursiveObject;
   end;
   // Test methods for class TDaoGeneric
 
   TestTDaoGeneric = class(TTestCase)
   strict private
-    FDaoGeneric: TDaoGeneric<TTeste>;
-    FDaoTestChild: TDaoGeneric<TTestChild>;
+    FDaoGeneric: IDaoGeneric<TTeste>;
+    FDaoTestChild: IDaoGeneric<TTestChild>;
   public
     procedure SetUp; override;
     procedure TearDown; override;
@@ -92,67 +91,45 @@ end;
 
 procedure TestTDaoBase.TearDown;
 begin
-  FDaoBase.Free;
   FDaoBase := nil;
   TFrwServiceLocator.Context.DaoUtils.ExecuteNoResult('DELETE FROM TESTE');
   TFrwServiceLocator.Context.DaoUtils.ExecuteNoResult('DELETE FROM TestChild');
 end;
 
-procedure TestTDaoBase.TestSelectKey;
+procedure TestTDaoBase.TestRecursiveObject;
 var
-  ReturnValue: TObject;
+  FDaoRecursive, FDaoChild: IDaoGeneric<TRecursiveObject>;
   FChave: Integer;
-begin
-  // TODO: Setup method call parameters
-  ReturnValue := FDaoBase.SelectKey(FChave);
-  // TODO: Validate method results
-end;
+  FObject, FChild: TRecursiveObject;
 
-procedure TestTDaoBase.TestKeyExists;
-var
-  ReturnValue: Boolean;
-  ID: Integer;
+  function AddNewObject(pObject: TRecursiveObject): TRecursiveObject;
+  begin
+    Result:= TRecursiveObject.Create;
+    pObject.Childs.Add(Result);
+  end;
 begin
-  // TODO: Setup method call parameters
-  ReturnValue := FDaoBase.KeyExists(ID);
-  // TODO: Validate method results
-end;
+  FDaoRecursive:= TDaoGeneric<TRecursiveObject>.Create('test.RecursiveObject', 'ID', TRecursiveObject);
+  FDaoRecursive.AddChildDao('Childs', 'ID', 'IDMaster', FDaoRecursive);
 
-procedure TestTDaoBase.TestInsert;
-var
-  pObjeto: TObject;
-begin
-  // TODO: Setup method call parameters
-  FDaoBase.Insert(pObjeto);
-  // TODO: Validate method results
-end;
+  FObject:= TRecursiveObject.Create;
+  FChild:= AddNewObject(AddNewObject(AddNewObject(FObject)));
+  FChild.Childs.Add(TRecursiveObject.Create);
+  FChild.Childs.Add(TRecursiveObject.Create);
 
-procedure TestTDaoBase.TestUpdate;
-var
-  ReturnValue: Boolean;
-  pObjeto: TObject;
-begin
-  // TODO: Setup method call parameters
-  ReturnValue := FDaoBase.Update(pObjeto);
-  // TODO: Validate method results
-end;
+  FDaoRecursive.Save(FObject);
+  FChave:= FObject.ID;
+  FObject.Free;
 
-procedure TestTDaoBase.TestDelete;
-var
-  pObjeto: TObject;
-begin
-  // TODO: Setup method call parameters
-  FDaoBase.Delete(pObjeto);
-  // TODO: Validate method results
-end;
-
-procedure TestTDaoBase.TestDelete1;
-var
-  ID: Integer;
-begin
-  // TODO: Setup method call parameters
-  FDaoBase.Delete(ID);
-  // TODO: Validate method results
+  FObject:= FDaoRecursive.SelectKey(FChave);
+  try
+    CheckEquals(1, FObject.Childs.Count);
+    CheckEquals(1, FObject.Childs[0].Childs.Count);
+    CheckEquals(1, FObject.Childs[0].Childs[0].Childs.Count);
+    CheckEquals(2, FObject.Childs[0].Childs[0].Childs[0].Childs.Count);
+    CheckEquals(0, FObject.Childs[0].Childs[0].Childs[0].Childs[0].Childs.Count);
+  finally
+    FObject.Free;
+  end;
 end;
 
 procedure TestTDaoBase.TestInsertChild;
@@ -162,6 +139,8 @@ var
   pMaster: TTeste;
   FID: Integer;
 begin
+//  Setup;
+
   pMaster:= TTeste.Create('TestInsertChild', now, 122.22);
   FDaoBase.Insert(pMaster);
   Check(pMaster.ID <> 0);
@@ -180,81 +159,6 @@ begin
   Check(pMaster.Childs[0].Num = 123);
 end;
 
-procedure TestTDaoBase.TestUpdateChild;
-var
-  ReturnValue: Boolean;
-  ChildDefs: TChildDaoDefs;
-  pChild: TObject;
-  pMaster: TObject;
-begin
-  // TODO: Setup method call parameters
-  ReturnValue := FDaoBase.UpdateChild(pMaster, pChild, ChildDefs);
-  // TODO: Validate method results
-end;
-
-procedure TestTDaoBase.TestDeleteChild;
-var
-  ChildDefs: TChildDaoDefs;
-  pChild: TObject;
-  pMaster: TObject;
-begin
-  // TODO: Setup method call parameters
-  FDaoBase.DeleteChild(pMaster, pChild, ChildDefs);
-  // TODO: Validate method results
-end;
-
-procedure TestTDaoBase.TestAddChildDao;
-var
-  pDao: IDaoBase;
-  pChildFieldName: string;
-  pMasterFieldName: string;
-  pPropertyName: string;
-begin
-  // TODO: Setup method call parameters
-  FDaoBase.AddChildDao(pPropertyName, pMasterFieldName, pChildFieldName, pDao);
-  // TODO: Validate method results
-end;
-
-procedure TestTDaoBase.TestSelectWhere;
-var
-  ReturnValue: TObjectList;
-  pWhere: string;
-begin
-  // TODO: Setup method call parameters
-  ReturnValue := FDaoBase.SelectWhere(pWhere);
-  // TODO: Validate method results
-end;
-
-procedure TestTDaoBase.TestSelectWhere1;
-var
-  pWhere: string;
-  pList: TObjectList;
-begin
-  // TODO: Setup method call parameters
-  FDaoBase.SelectWhere(pList, pWhere);
-  // TODO: Validate method results
-end;
-
-procedure TestTDaoBase.TestGetGenericListWhere;
-var
-  ReturnValue: TFrwObjectList<TTeste>;
-  pWhere: string;
-begin
-  // TODO: Setup method call parameters
-  ReturnValue := FDaoBase.SelectWhere<TTeste>(pWhere);
-  // TODO: Validate method results
-end;
-
-procedure TestTDaoBase.TestGetGenericListWhere1;
-var
-  pWhere: string;
-  pObjectList: TFrwObjectList<TTeste>;
-begin
-  // TODO: Setup method call parameters
-  FDaoBase.SelectWhere<TTeste>(pObjectList, pWhere);
-  // TODO: Validate method results
-end;
-
 procedure TestTDaoGeneric.SetUp;
 begin
   FDaoGeneric := TDaoGeneric<TTeste>.Create('Teste', 'ID');
@@ -266,7 +170,6 @@ end;
 
 procedure TestTDaoGeneric.TearDown;
 begin
-  FDaoGeneric.Free;
   FDaoGeneric := nil;
 end;
 
@@ -438,6 +341,20 @@ begin
   // TODO: Setup method call parameters
   ReturnValue := FDaoFactory.NewQueryBuilder(ModeloBD);
   // TODO: Validate method results
+end;
+
+{ TRecursiveObject }
+
+procedure TRecursiveObject.AfterConstruction;
+begin
+  inherited;
+  Childs:= TObjectList<TRecursiveObject>.Create;
+end;
+
+destructor TRecursiveObject.Destroy;
+begin
+  Childs.Free;
+  inherited;
 end;
 
 initialization

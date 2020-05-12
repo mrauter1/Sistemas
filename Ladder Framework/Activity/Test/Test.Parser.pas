@@ -13,7 +13,7 @@ interface
 
 uses
   TestFramework, Variants, System.SysUtils, Utils, Ladder.Activity.Parser, StrUtils, uConSqlServer,
-  Ladder.ServiceLocator, SynDB, SynCommons, Ladder.Activity.Classes;
+  Ladder.ServiceLocator, SynDB, SynCommons, Ladder.Utils;
 
 type
   THackActivityParser = class(TActivityParser); // Hack para acessar métodos protegidos

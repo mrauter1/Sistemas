@@ -20,8 +20,10 @@ object FrmRefreshData: TFrmRefreshData
     Height = 200
     Align = alLeft
     Lines.Strings = (
-      'SELECT CODCLIENTE, RAZAOSOCIAL FROM CLIENTE')
+      'SELECT * FROM MFOR')
     TabOrder = 0
+    ExplicitLeft = -6
+    ExplicitTop = -5
   end
   object Panel1: TPanel
     Left = 0
@@ -34,6 +36,14 @@ object FrmRefreshData: TFrmRefreshData
     DesignSize = (
       679
       211)
+    object Label1: TLabel
+      Left = 52
+      Top = 182
+      Width = 59
+      Height = 13
+      Alignment = taRightJustify
+      Caption = 'NomeTabela'
+    end
     object EditNomeTabela: TEdit
       Left = 120
       Top = 177
@@ -41,7 +51,7 @@ object FrmRefreshData: TFrmRefreshData
       Height = 21
       Anchors = [akLeft, akBottom]
       TabOrder = 0
-      Text = 'CLIENTE'
+      Text = '##MFORTESTE'
     end
     object Button1: TButton
       Left = 392
@@ -84,7 +94,7 @@ object FrmRefreshData: TFrmRefreshData
     Width = 342
     Height = 200
     Align = alClient
-    DataSource = DsFirebird
+    DataSource = DataSource
     TabOrder = 2
     TitleFont.Charset = DEFAULT_CHARSET
     TitleFont.Color = clWindowText
@@ -120,9 +130,9 @@ object FrmRefreshData: TFrmRefreshData
     end
   end
   object FDTable1: TFDTable
-    Connection = DataModule1.FDConPostgres
-    UpdateOptions.UpdateTableName = 'PRODUTO'
-    TableName = 'PRODUTO'
+    Connection = DataModule1.FDConSqlServer
+    UpdateOptions.UpdateTableName = '##MFORTESTE'
+    TableName = '##MFORTESTE'
     Left = 360
     Top = 80
   end
@@ -131,19 +141,22 @@ object FrmRefreshData: TFrmRefreshData
     Left = 280
     Top = 240
   end
-  object DsFirebird: TDataSource
-    DataSet = QryResultFb
+  object DataSource: TDataSource
+    DataSet = QrySqlServer
     Left = 88
     Top = 80
   end
   object FDBatchMove: TFDBatchMove
+    Options = []
     Mappings = <>
     LogFileName = 'Data.log'
+    CommitCount = 1000
+    StatisticsInterval = 0
     Left = 520
     Top = 64
   end
   object FDTableResult: TFDTable
-    Connection = DataModule1.FDConPostgres
+    Connection = DataModule1.FDConSqlServer
     UpdateOptions.UpdateTableName = 'cliente'
     TableName = 'cliente'
     Left = 376
@@ -186,6 +199,33 @@ object FrmRefreshData: TFrmRefreshData
       Size = 6
     end
     object QryResultFbOBSERVACAO: TMemoField
+      FieldName = 'OBSERVACAO'
+      Origin = 'OBSERVACAO'
+      BlobType = ftMemo
+    end
+  end
+  object QrySqlServer: TFDQuery
+    Connection = DataModule1.FDConSqlServer
+    FormatOptions.AssignedValues = [fvMapRules]
+    FormatOptions.OwnMapRules = True
+    FormatOptions.MapRules = <
+      item
+        SourceDataType = dtWideString
+        TargetDataType = dtAnsiString
+      end>
+    SQL.Strings = (
+      'SELECT codcliente, observacao FROM CLIENTE')
+    Left = 480
+    Top = 144
+    object StringField1: TStringField
+      FieldName = 'CODCLIENTE'
+      Origin = 'CODCLIENTE'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+      FixedChar = True
+      Size = 6
+    end
+    object MemoField1: TMemoField
       FieldName = 'OBSERVACAO'
       Origin = 'OBSERVACAO'
       BlobType = ftMemo

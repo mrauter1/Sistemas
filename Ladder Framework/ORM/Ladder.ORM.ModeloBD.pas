@@ -5,7 +5,7 @@ interface
 uses
   Data.DB, System.Contnrs, System.Classes, Generics.Collections, RTTI, Ladder.ORM.DaoUtils,
   Ladder.Messages, Ladder.ORM.Classes, SysUtils, Utils, Math, Ladder.ServiceLocator, SynDB,
-  Ladder.ORM.Functions, Ladder.ORM.SQLDBRowsDataSet;
+  Ladder.ORM.SQLDBRowsDataSet;
 
   function PropertyToFieldType(pProperty: TRttiMember): TFieldType;
   function GetPropertyRttiType(pRttiMember: TRttiMember): TRttiType;
@@ -13,7 +13,7 @@ uses
   procedure SetPropertyValue(pRttiMember: TRttiMember; Instance: Pointer; AValue: TValue);
 
 type
-  TFunGetFieldValue = reference to function (const pFieldName: String; Instance: TObject): Variant;
+  TFunGetFieldValue = reference to function (const pFieldName: String; Instance: TObject; MasterInstance: TObject = nil): Variant;
   TFunGetPropValue = reference to function (const pPropName: String; pCurrentValue: TValue; Instance: TObject; pDBRows: ISQLDBRows): TValue;
 
   TFieldMapping = class(TObject)
@@ -125,8 +125,8 @@ type
 
     function GetPropByName(const pNomeProp: String): TRttiMember;
 
-    function GetFieldValue(const pFieldName: String; Instance: TObject): Variant; overload;
-    function GetFieldValue(const pFieldMapping: TFieldMapping; Instance: TObject): Variant; overload;
+    function GetFieldValue(const pFieldName: String; Instance: TObject; MasterInstance: TObject = nil): Variant; overload;
+    function GetFieldValue(const pFieldMapping: TFieldMapping; Instance: TObject; MasterInstance: TObject = nil): Variant; overload;
 
     function FieldMappingByFieldName(pFieldName: String): TFieldMapping;
     function FieldMappingByPropName(pPropName: String): TFieldMapping;
@@ -671,7 +671,7 @@ begin
       end;
 end;
 
-function TModeloBD.GetFieldValue(const pFieldName: String; Instance: TObject): Variant;
+function TModeloBD.GetFieldValue(const pFieldName: String; Instance: TObject; MasterInstance: TObject = nil): Variant;
 var
   FFieldMapping: TFieldMapping;
 begin
@@ -679,13 +679,14 @@ begin
 
   Assert(Assigned(FFieldMapping), Format('TModeloBD.GetFieldValue: Field %s not found.', [pFieldName]));
 
-  Result:= GetFieldValue(FFieldMapping, Instance);
+  Result:= GetFieldValue(FFieldMapping, Instance, MasterInstance);
 end;
 
-function TModeloBD.GetFieldValue(const pFieldMapping: TFieldMapping; Instance: TObject): Variant;
+function TModeloBD.GetFieldValue(const pFieldMapping: TFieldMapping;
+  Instance: TObject; MasterInstance: TObject = nil): Variant;
 begin
   if Assigned(pFieldMapping.FunGetFieldValue) then
-    Result:= pFieldMapping.FunGetFieldValue(pFieldMapping.FieldName, Instance)
+    Result:= pFieldMapping.FunGetFieldValue(pFieldMapping.FieldName, Instance, MasterInstance)
   else
     Result:= GetPropertyValue(pFieldMapping.Prop, Instance).AsVariant;
 

@@ -22,6 +22,9 @@ type
 
 implementation
 
+uses
+  Ladder.Utils;
+
 { TExecutorConsultaPersonalizada }
 
 procedure TExecutorSendMail.CheckInputs;
@@ -48,16 +51,16 @@ var
   VarAnexos: Variant;
   FAnexos: Variant;
 begin
-  FTitulo:= Inputs.ParamValueByName('Titulo', '');
-  FBody:= Inputs.ParamValueByName('Body', '');
-  VarDestinatarios:= Inputs.ParamValueByName('Destinatarios', '');
+  FTitulo:= Inputs.ParamValue('Titulo', '');
+  FBody:= Inputs.ParamValue('Body', '');
+  VarDestinatarios:= Inputs.ParamValue('Destinatarios', '');
 
   if LadderVarIsList(VarDestinatarios) then
     FDestinatarios:= JoinList(VarDestinatarios, ';')
   else
     FDestinatarios:= VarToStrDef(VarDestinatarios, '');
 
-  VarAnexos:= Inputs.ParamValueByName('Anexos');
+  VarAnexos:= Inputs.ParamValue('Anexos');
   if LadderVarIsList(VarAnexos) then
     FAnexos:= JoinList(VarAnexos, ';')
   else

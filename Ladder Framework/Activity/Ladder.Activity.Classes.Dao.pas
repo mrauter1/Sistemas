@@ -6,21 +6,14 @@ uses
   Ladder.ORM.Dao, Ladder.Activity.Classes, SynDB, Ladder.Activity.Manager, System.Rtti;
 
 type
-  TParameterDao = class(TDaoGeneric<TParameter>)
-    constructor Create(pNomeTabela: String);
-  end;
-
-  TOutputParameterDao = class(TDaoGeneric<TOutputParameter>)
-  private
-    FInputDao: TParameterDao;
-  public
-    constructor Create(pNomeTabela: String);
+  TParameterDao<T: TParameter> = class(TDaoGeneric<T>)
+    constructor Create(pNomeTabela: String; pKeyField: String; pIsMasterParameter: Boolean); // Master Parameter is a direct child of a process
   end;
 
   TProcessoDao = class(TDaoGeneric<TProcessoBase>)
   private
-    function GetExecutorClass(const pFieldName: String; Instance: TObject): Variant; virtual;
-    function GetClassName(const pFieldName: String; Instance: TObject): Variant; virtual;
+    function GetExecutorClass(const pFieldName: String; Instance: TObject; MasterInstance: TObject=nil): Variant; virtual;
+    function GetClassName(const pFieldName: String; Instance: TObject; MasterInstance: TObject=nil): Variant; virtual;
     function GetExecutor(const pPropName: String; pCurrentValue: TValue; Instance: TObject; pDBRows: ISqlDBRows): TValue;
   public
     constructor Create; overload;
@@ -44,9 +37,13 @@ uses
 
 { TParameterDao }
 
-constructor TParameterDao.Create(pNomeTabela: String);
+constructor TParameterDao<T>.Create(pNomeTabela, pKeyField: String; pIsMasterParameter: Boolean);
 begin
-  inherited Create(pNomeTabela, 'ID');
+  inherited Create(pNomeTabela, pKeyFIeld, T);
+  if pIsMasterParameter then
+    Self.AddChildDao('Parameters', 'ID', 'IDMaster', TParameterDao<T>.Create(pNomeTabela, pKeyField, False))
+  else
+    Self.AddChildDao('Parameters', 'ID', 'IDMaster', Self); // Master of the parameter is another parameter
 end;
 
 { TProcessoDao }
@@ -56,7 +53,7 @@ begin
   Result:= TFrwServiceLocator.Context.ActivityManager;
 end;
 
-function TProcessoDao.GetExecutorClass(const pFieldName: String; Instance: TObject): Variant;
+function TProcessoDao.GetExecutorClass(const pFieldName: String; Instance: TObject; MasterInstance: TObject=nil): Variant;
 var
   FExecutor: IExecutorBase;
 begin
@@ -67,7 +64,7 @@ begin
     Result:= '';
 end;
 
-function TProcessoDao.GetClassName(const pFieldName: String; Instance: TObject): Variant;
+function TProcessoDao.GetClassName(const pFieldName: String; Instance: TObject; MasterInstance: TObject=nil): Variant;
 begin
   Result:= ModeloBD.ItemClass.ClassName;
 end;
@@ -91,17 +88,17 @@ end;
 constructor TProcessoDao.Create(pItemClass: TClass);
 var
   FOutputDao: IDaoGeneric<TOutputParameter>;
+  FInputDao: IDaoGeneric<TParameter>;
 begin
   inherited Create('ladder.Processos', 'ID', pItemClass);
   ModeloBD.MapField('ExecutorClass', ftString, GetExecutorClass);
   ModeloBD.MapField('ClassName', ftString, GetClassName);
   ModeloBD.MapProperty('Executor', GetExecutor);
 
-  AddChildDao('Inputs', 'ID', 'IDProcesso', TDaoGeneric<TParameter>.Create('ladder.ProcessoInput', 'ID'));
+  FInputDao:= TParameterDao<TParameter>.Create('ladder.ProcessoInput', 'ID', True);
+  AddChildDao('Inputs', 'ID', 'IDProcesso', FInputDao);
 
-  FOutputDao:= TDaoGeneric<TOutputParameter>.Create('ladder.ProcessoOutput', 'ID');
-  FOutputDao.AddChildDao('Parametros', 'ID', 'IDOutput', TDaoGeneric<TParameter>.Create('ladder.ProcessoOutputParameter', 'ID'));
-
+  FOutputDao:= TParameterDao<TOutputParameter>.Create('ladder.ProcessoOutput', 'ID', True);
   AddChildDao('Outputs', 'ID', 'IDProcesso', FOutputDao);
 end;
 
@@ -111,15 +108,6 @@ var
 begin
   FExecutor:= ActivityManager.GetExecutor(pDBRows.ColumnString('ExecutorClass'));
   Result:= TProcessoBase.Create(FExecutor, ModeloBD.DaoUtils);
-end;
-
-{ TOutputParameterDao }
-
-constructor TOutputParameterDao.Create(pNomeTabela: String);
-begin
-  inherited Create(pNomeTabela, 'ID');
-  FInputDao:= TParameterDao.Create('ladder.ProcessoOutputParameter');
-  AddChildDao('Parametros', 'ID', 'IDOutput', FInputDao);
 end;
 
 { TAtividadeDao }

@@ -27,38 +27,47 @@ type
   end;
 
   TProcessoBase = class;
+  TParameterList = class;
 
-  TParameter = class(TSingletonImplementation, IActivityElement, IActivityValue)
+  TParameter = class(TSingletonImplementation, IActivityElement, IActivityValue, IActivityElementContainer)
   private
     FID: integer;
     FParameterType: TParameterType;
     FName: String;
     FExpression: String;
     FValue: variant;
+    FParameters: TParameterList;
   public
+    procedure AfterConstruction; override;
     function GetName: String;
     procedure SetValue(const Value: variant);
-    constructor Create(pName: String; pParameterType: TParameterType; pExpression: String);
+    constructor Create(pName: String; pParameterType: TParameterType; pExpression: String); overload;
+    constructor Create(pName: String; pParameterType: TParameterType); overload;
     constructor CreateWithValue(pName: String; pParameterType: TParameterType; pValue: Variant);
+    destructor Destroy; override;
     function GetValue: Variant;
+    function FindElementByName(pElementName: String): IActivityElement;
+    function Param(const ParamName: String): TParameter;
     property Value: variant read GetValue write SetValue;
   published
     property ID: integer read FID write FID;
     property Name: String read GetName write FName;
     property ParameterType: TParameterType read FParameterType write FParameterType;
     property Expression: String read FExpression write FExpression;
+    property Parameters: TParameterList read FParameters write FParameters; // Nested Parameters
   end;
 
   TGenericParameterList<T: TParameter> = class(TObjectList<T>)
   public
     constructor Create;
-    function ParamValueByName(pName: String): variant; overload;
-    function ParamValueByName(pName: String; pDefault: Variant): variant; overload;
+    function ParamValue(const ParamName: String): variant; overload;
+    function ParamValue(const ParamName: String; pDefault: Variant): variant; overload;
+    function Param(const ParamName: String): T;
 //    procedure Add(pInput: TParameter); overload;
 //    procedure Remove(pInput: TParameter); overload;
   end;
 
-  TInputList = TGenericParameterList<TParameter>;
+  TParameterList = class(TGenericParameterList<TParameter>);
 
   TValuateParameterExpression = procedure (pContainer: IActivityElementContainer; pParameter: TParameter) of object; // Returns a single item for value and an array for lists
 
@@ -69,48 +78,43 @@ type
 
   TOutputParameter = class(TParameter, IActivityElementContainer)
   private
-    FParametros: TInputList;
   protected
-    procedure AfterConstruction; override;
   public
     constructor Create(pName: String; pParameterType: TParameterType; pExpression: String);
-    destructor Destroy; override;
-    function FindElementByName(pElementName: String): IActivityElement;
   published
-    property Parametros: TInputList read FParametros write FParametros;
   end;
 
   TOutputList = TGenericParameterList<TOutputParameter>;
 
   IExecutorBase = interface
   ['{D3DB8B1D-A306-447C-A0EF-CE19B5D035A5}']
-    function GetInputs: TInputList;
+    function GetInputs: TParameterList;
     function GetOutputs: TOutputList;
-    procedure SetInputs(const Value: TInputList);
+    procedure SetInputs(const Value: TParameterList);
     procedure SetOutputs(const Value: TOutputList);
 
-    function Executar(pInputs: TInputList; pOutputs: TOutputList): TOutputList; overload;
+    function Executar(pInputs: TParameterList; pOutputs: TOutputList): TOutputList; overload;
     function Executar: TOutputList; overload;
-    property Inputs: TInputList read GetInputs write SetInputs;
+    property Inputs: TParameterList read GetInputs write SetInputs;
     property Outputs: TOutputList read GetOutputs write SetOutputs;
     function ClassType: TClass;
   end;
 
   TExecutorBase = class(TInterfacedObject, IExecutorBase)
   private
-    FInputs: TInputList;
+    FInputs: TParameterList;
     FOutputs: TOutputList;
-    function GetInputs: TInputList;
+    function GetInputs: TParameterList;
     function GetOutputs: TOutputList;
-    procedure SetInputs(const Value: TInputList);
+    procedure SetInputs(const Value: TParameterList);
     procedure SetOutputs(const Value: TOutputList);
   public
     constructor Create; overload;
-    constructor Create(pInputs: TInputList; pOutputs: TOutputList); overload;
-    property Inputs: TInputList read GetInputs write SetInputs;
+    constructor Create(pInputs: TParameterList; pOutputs: TOutputList); overload;
+    property Inputs: TParameterList read GetInputs write SetInputs;
     property Outputs: TOutputList read GetOutputs write SetOutputs;
 
-    function Executar(pInputs: TInputList; pOutputs: TOutputList): TOutputList; overload;
+    function Executar(pInputs: TParameterList; pOutputs: TOutputList): TOutputList; overload;
     function Executar: TOutputList; overload; virtual;
 
     class function Description: String; virtual; abstract;
@@ -121,7 +125,7 @@ type
   // A process is a self contained execution, but it might belong to an activity
   TProcessoBase = class(TSingletonImplementation, IActivityElement, IActivityElementContainer)
   private
-    FInputs: TInputList;
+    FInputs: TParameterList;
     FOutputs: TOutputList;
     FID: Integer;
     FName: String;
@@ -144,7 +148,12 @@ type
     constructor Create(pExecutor: IExecutorBase; pDaoUtils: TDaoUtils);
     destructor Destroy; override;
     function GetName: String;
+
     function FindElementByName(pElementName: String): IActivityElement; virtual;
+    // Finds an element or child of element.
+    // Example: pExpression Might be 'ProcessName.ParamName' will return Param of 'ProcessName' named 'ParamName'
+    function FindElement(pElementPath: String): IActivityElement; virtual;
+
     function GetExecutor: IExecutorBase;
 
     function Executar: TOutputList; overload; virtual;
@@ -153,7 +162,7 @@ type
     property ID: Integer read FID write FID;
     property Name: String read GetName write FName;
     property Description: String read FDescription write FDescription;
-    property Inputs: TInputList read FInputs write FInputs;
+    property Inputs: TParameterList read FInputs write FInputs;
     property Outputs: TOutputList read FOutputs write FOutputs;
   end;
 
@@ -172,82 +181,10 @@ type
     property Processos: TObjectList<TProcessoBase> read FProcessos write FProcessos;
   end;
 
-
-function LadderVarIsList(const pValue: Variant): Boolean;
-function LadderVarIsIso8601(const pValue: Variant): Boolean;
-function LadderVarIsDateTime(const pValue: Variant): Boolean;
-function LadderVarToDateTime(const pValue: Variant): TDateTime;
-function LadderDateToStr(Date: TDateTime): String;
-
-function JoinList(const pValue: Variant; const pSeparator: String): String;
-
 implementation
 
 uses
-  Ladder.ServiceLocator;
-
-function JoinList(const pValue: Variant; const pSeparator: String): String;
-var
-  I: Integer;
-
-  procedure DoJoin(const pText: String);
-  begin
-    if Result = '' then
-      Result:= pText
-    else
-      Result:= Result+pSeparator+pText;
-  end;
-begin
-  Result:= '';
-  if not LadderVarIsList(pValue) then
-    Exit;
-
-  for I := 0 to pValue._Count-1 do
-    DoJoin(pValue._(I));
-
-end;
-
-function LadderVarIsList(const pValue: Variant): Boolean;
-begin
-  Result:= DocVariantType.IsOfType(pValue);
-end;
-
-function LadderVarIsIso8601(const pValue: Variant): Boolean;
-var
-  pAnsi: AnsiString;
-begin
-  Result:= False;
-  pAnsi:= VarToStrDef(pValue, '');
-
-  if length(pAnsi) >= 10 then
-    if (pAnsi[5] = '-') and (pAnsi[8] = '-') then
-      Result:= Iso8601ToDateTime(pAnsi) <> 0;
-end;
-
-function LadderVarIsDateTime(const pValue: Variant): Boolean;
-begin
-  Result:= False;
-
-  if VarType(pValue) = varDate then
-    Result:= True
- else
-   Result:= LadderVarIsIso8601(pValue);
-end;
-
-function LadderDateToStr(Date: TDateTime): String;
-begin
-  Result:= DateToIso8601(Date, True);
-end;
-
-function LadderVarToDateTime(const pValue: Variant): TDateTime;
-var
-  pAnsi: AnsiString;
-begin
-  pAnsi:= VarToStrDef(pValue, '');
-  Result:= Iso8601ToDateTime(pAnsi);
-  if Result = 0 then
-    Result:= VarToDateTime(pValue);
-end;
+  Ladder.ServiceLocator, Ladder.Utils;
 
 { TGenericParameterList }
 
@@ -257,23 +194,36 @@ begin
   inherited Create(True); // Inputs are TInterfacedObjects
 end;
 
-function TGenericParameterList<T>.ParamValueByName(pName: String; pDefault: Variant): variant;
+function TGenericParameterList<T>.Param(const ParamName: String): T;
+var
+  FInput: T;
+begin
+  for FInput in Self do
+    if CompareText(ParamName, FInput.Name) = 0 then
+    begin
+      Result:= FInput;
+      Exit;
+    end;
+  Result:= nil;
+end;
+
+function TGenericParameterList<T>.ParamValue(const ParamName: String; pDefault: Variant): variant;
 var
   FInput: TParameter;
 begin
-  for FInput in Self do
-    if CompareText(pName, FInput.Name) = 0 then
-    begin
-      Result:= FInput.Value;
-      Exit;
-    end;
+  FInput:= Param(ParamName);
+  if Assigned(FInput) then
+    Result:= FInput.Value
+  else
+    Result:= pDefault;
 
-  Result:= pDefault;
+  if VarIsNull(Result) then
+    Result:= pDefault;
 end;
 
-function TGenericParameterList<T>.ParamValueByName(pName: String): variant;
+function TGenericParameterList<T>.ParamValue(const ParamName: String): variant;
 begin
-  Result:= ParamValueByName(pName, null);
+  Result:= ParamValue(ParamName, null);
 end;
 
 { TProcessoBase }
@@ -281,7 +231,7 @@ end;
 procedure TProcessoBase.AfterConstruction;
 begin
   inherited;
-  FInputs:= TInputList.Create;
+  FInputs:= TParameterList.Create;
   FOutputs:= TOutputList.Create;
 
   FParser:= TActivityParser.Create;
@@ -302,23 +252,27 @@ end;
 
 destructor TProcessoBase.Destroy;
 begin
-  FInputs.Free;
-  FOutputs.Free;
   FParser.Free;
   inherited Destroy;
 end;
 
 procedure TProcessoBase.ValuateInputs(ValuateParameterExpression: TValuateParameterExpression);
 var
-  fInput: TParameter;
-  FOutput: TOutputParameter;
-begin
-  for fInput in Inputs do
-    ValuateParameterExpression(Self, fInput);
+  FParameter: TParameter;
+//  FOutput: TOutputParameter;
+  procedure ValuateInput(pInput: TParameter);
+  var
+    FParameter: TParameter;
+  begin
+    ValuateParameterExpression(Self, pInput);
+    for FParameter in pInput.Parameters do
+      ValuateInput(FParameter);
+  end;
 
-  for FOutput in Outputs do
-    for fInput in FOutput.Parametros do
-      ValuateParameterExpression(fOutput, fInput);
+begin
+  for FParameter in Inputs do
+    ValuateInput(FParameter);
+
 end;
 
 function TProcessoBase.Executar: TOutputList;
@@ -329,6 +283,17 @@ end;
 function TProcessoBase.Executar(ValuateParameterExpression: TValuateParameterExpression): TOutputList;
 var
   FOutput: TOutputParameter;
+
+  procedure ValuateOutput(Output: TParameter);
+  var
+    FParam: TParameter;
+  begin
+    if Output.Expression <> '' then
+      ValuateParameterExpression(Self, FOutput);
+
+    for FParam in Output.Parameters do
+      ValuateOutput(FParam);
+  end;
 begin
   { First evaluate all parameters }
   ValuateInputs(ValuateParameterExpression);
@@ -341,8 +306,7 @@ begin
   Executor.Executar;
 
   for FOutput in Outputs do
-    if VarIsNull(FOutput.Value) and (FOutput.Expression <> '') then
-      ValuateParameterExpression(Self, FOutput);
+    ValuateOutput(FOutput);
 
   Result:= Outputs;
 end;
@@ -367,6 +331,46 @@ begin
     end;
 
   Result:= nil;
+end;
+
+// Finds an element or child of element. Example: pExpression Might be 'ProcessName.ParamName'
+function TProcessoBase.FindElement(pElementPath: String): IActivityElement;
+var
+  FNames: TArray<String>;
+  FElement: IActivityElement;
+
+  function FindSingleElement(pCurrentElement: IActivityElement; pNames: TArray<String>; pIndex: Integer): IActivityElement;
+  begin
+    if pIndex > High(pNames) then
+    begin
+      Result:= (pCurrentElement as IActivityValue);
+      Exit;
+    end;
+
+    if not Supports(pCurrentElement, IActivityElementContainer) then
+      raise Exception.Create('TProcessoBase.OnElementEval: Element '+pCurrentElement.GetName+' is not an element container!');
+
+    FElement:= (pCurrentElement as IActivityElementContainer).FindElementByName(pNames[pIndex]);
+
+    if not Assigned(FElement) then
+      raise Exception.Create('TProcessoBase.OnElementEval: Element '+pNames[pIndex]+' not found!');
+
+    Result:= FindSingleElement(FElement, FNames, pIndex+1);
+  end;
+
+begin
+  Result:= nil;
+  FNames:= pElementPath.Split(['.']);
+  if Length(FNames) <= 0 then
+    Exit;
+
+  if FNames[0] = Self.Name then
+    Result:= FindSingleElement(Self, FNames, 1)
+  else if Assigned(FCurrentContainer.FindElementByName(FNames[0])) then
+    Result:= FindSingleElement(FCurrentContainer.FindElementByName(FNames[0]), FNames, 1)
+  else
+    Result:= FindSingleElement(Self, FNames, 0);
+
 end;
 
 procedure TProcessoBase.OnSqlEval(const pSql: String; var Return: Variant);
@@ -397,43 +401,17 @@ end;
 
 procedure TProcessoBase.OnElementEval(const pElement: String; var Return: Variant);
 var
-  FNames: TArray<String>;
   FElement: IActivityElement;
-
-  function FindElementValue(pCurrentElement: IActivityElement; pNames: TArray<String>; pIndex: Integer): Variant;
-  begin
-    if pIndex > High(pNames) then
-    begin
-      if not Supports(pCurrentElement, IActivityValue) then
-        raise Exception.Create('TProcessoBase.OnElementEval: Element '+pCurrentElement.GetName+' is not a value!');
-
-      Result:= (pCurrentElement as IActivityValue).GetValue;
-      Exit;
-    end;
-
-    if not Supports(pCurrentElement, IActivityElementContainer) then
-      raise Exception.Create('TProcessoBase.OnElementEval: Element '+pCurrentElement.GetName+' is not a container!');
-
-    FElement:= (pCurrentElement as IActivityElementContainer).FindElementByName(pNames[pIndex]);
-
-    if not Assigned(FElement) then
-      raise Exception.Create('TProcessoBase.OnElementEval: Element '+pNames[pIndex]+' not found!');
-
-    Result:= FindElementValue(FElement, FNames, pIndex+1);
-  end;
-
 begin
-  FNames:= pElement.Split(['.']);
-  if Length(FNames) <= 0 then
-    Exit;
+  FElement:= FindElement(pElement);
 
-  if FNames[0] = Self.Name then
-    Return:= FindElementValue(Self, FNames, 1)
-  else if Assigned(FCurrentContainer.FindElementByName(FNames[0])) then
-    Return:= FindElementValue(FCurrentContainer.FindElementByName(FNames[0]), FNames, 1)
-  else
-    Return:= FindElementValue(Self, FNames, 0);
+  if not Assigned(FElement) then
+    raise Exception.Create(Format('TProcessoBase.OnElementEval: Element %s not found on Activity/Process %s.', [pElement, Self.Name]));
 
+  if not Supports(FElement, IActivityValue) then
+    raise Exception.Create('TProcessoBase.OnElementEval: Element '+FElement.GetName+' is not a value!');
+
+  Return:= (FElement as IActivityValue).GetValue;
 end;
 
 function TProcessoBase.GetExecutor: IExecutorBase;
@@ -503,14 +481,14 @@ end;
 
 { TExecutorBase }
 
-constructor TExecutorBase.Create(pInputs: TInputList; pOutputs: TOutputList);
+constructor TExecutorBase.Create(pInputs: TParameterList; pOutputs: TOutputList);
 begin
   inherited Create;
   Inputs:= pInputs;
   Outputs:= pOutputs;
 end;
 
-function TExecutorBase.Executar(pInputs: TInputList;
+function TExecutorBase.Executar(pInputs: TParameterList;
   pOutputs: TOutputList): TOutputList;
 begin
   Inputs:= pInputs;
@@ -530,7 +508,7 @@ begin
   { Implementar na subclass }
 end;
 
-function TExecutorBase.GetInputs: TInputList;
+function TExecutorBase.GetInputs: TParameterList;
 begin
   Result:= FInputs;
 end;
@@ -540,7 +518,7 @@ begin
   Result:= FOutputs;
 end;
 
-procedure TExecutorBase.SetInputs(const Value: TInputList);
+procedure TExecutorBase.SetInputs(const Value: TParameterList);
 begin
   FInputs:= Value;
 end;
@@ -552,37 +530,24 @@ end;
 
 { TOutputParameter }
 
-procedure TOutputParameter.AfterConstruction;
-begin
-  inherited;
-  FParametros:= TInputList.Create;
-end;
-
 constructor TOutputParameter.Create(pName: String; pParameterType: TParameterType; pExpression: String);
 begin
   inherited Create(pName, pParameterType, pExpression);
 end;
 
-destructor TOutputParameter.Destroy;
-begin
-  FParametros.Free;
-end;
-
-function TOutputParameter.FindElementByName(pElementName: String): IActivityElement;
-var
-  FParametro: TParameter;
-begin
-  for FParametro in FParametros do
-    if CompareText(FParametro.Name, pElementName) = 0 then
-    begin
-      Result:= FParametro;
-      Exit;
-    end;
-
-  Result:= nil;
-end;
-
 { TParameter }
+
+procedure TParameter.AfterConstruction;
+begin
+  inherited;
+  FParameters:= TParameterList.Create;
+end;
+
+destructor TParameter.Destroy;
+begin
+  FParameters.Free;
+  inherited;
+end;
 
 constructor TParameter.Create(pName: String; pParameterType: TParameterType;
   pExpression: String);
@@ -594,11 +559,21 @@ begin
   Value:= Null;
 end;
 
+constructor TParameter.Create(pName: String; pParameterType: TParameterType);
+begin
+  Create(pName, pParameterType, '');
+end;
+
 constructor TParameter.CreateWithValue(pName: String;
   pParameterType: TParameterType; pValue: Variant);
 begin
   Create(pName, pParameterType, '');
   Value:= pValue;
+end;
+
+function TParameter.FindElementByName(pElementName: String): IActivityElement;
+begin
+  Result:= Param(pElementName);
 end;
 
 function TParameter.GetName: String;
@@ -609,6 +584,11 @@ end;
 function TParameter.GetValue: Variant;
 begin
   Result:= FValue;
+end;
+
+function TParameter.Param(const ParamName: String): TParameter;
+begin
+  Result:= Parameters.Param(ParamName);
 end;
 
 procedure TParameter.SetValue(const Value: variant);

@@ -109,7 +109,7 @@ implementation
 {$R *.dfm}
 
 uses
-  uFormAvisoConsulta, Form.SelecionaConsulta;
+  Form.CadastroProcesso, Form.SelecionaConsulta;
 
 { TuFormCadastrarAvisosAutomaticos }
 
@@ -167,7 +167,7 @@ end;
 
 procedure TFormCadastroAviso.ConfigurarConsultaAtual;
 begin
-  TFormAvisoConsulta.AbrirConfigRelatorio(QryProcessosIDAviso.AsInteger, QryProcessosIDConsulta.AsInteger);
+  TFormCadastroProcesso.AbrirConfigRelatorio(QryProcessosIDAviso.AsInteger, QryProcessosIDConsulta.AsInteger);
   QryProcessos.Refresh;
 end;
 

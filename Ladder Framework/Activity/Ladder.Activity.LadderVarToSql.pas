@@ -16,7 +16,7 @@ type
     class function LadderDocVariantToSql(pDocVariant: TDocVariantData): String;
 
     class function InsertSqlWithParams(pDocVariant: TDocVariantData; const pTableName: String): String; static;
-    class procedure InsertDocVariantData(pDocVariant: TDocVariantData; const pTableName: String);
+    class procedure InsertDocVariantData(pDocVariant: TDocVariantData; const pTableName: String; CreateTable: Boolean=False; ResetTable: Boolean=False);
 
     class function DocVariantToDataSet(AOwner: TComponent; pDocVariant: TDocVariantData): TSynSqlTableDataSet;
 
@@ -33,7 +33,7 @@ type
 implementation
 
 uses
-  Variants, Ladder.Activity.Classes, Ladder.ORM.QueryBuilder, Ladder.ORM.Functions, Ladder.ServiceLocator,
+  Variants, Ladder.Utils, Ladder.ORM.QueryBuilder, Ladder.ServiceLocator,
   FireDAC.Comp.Client, FireDAC.Stan.Option, SynVirtualDataSet;
 
 function SqlDBFieldTypeToSqlFieldType(SqlDBFieldType: TSqlDBFieldType): TSqlFieldType;
@@ -77,7 +77,7 @@ begin
   else if VarIsStr(pVar) then
     Result:=Format('''%s''', [StringReplace(VarToStr(pVar),'''', '''''', [rfReplaceAll])])
   else if VarIsFloat(pVar) then
-    Result:= FloatToSqlStr(pVar)
+    Result:= TSqlServerQueryBuilder.FloatToSqlStr(pVar)
   else
     Result:= VarToStr(pVar);
 end;
@@ -239,7 +239,7 @@ begin
 end;
 
 class procedure TLadderVarToSql.InsertDocVariantData(
-  pDocVariant: TDocVariantData; const pTableName: String);
+  pDocVariant: TDocVariantData; const pTableName: String; CreateTable: Boolean=False; ResetTable: Boolean=False);
 var
   FieldNames: TRawUTF8DynArray;
   FieldTypes: TSQLDBFieldTypeDynArray;

@@ -10,7 +10,7 @@ type
   private
     function ConfiguraConsulta: TFrmConsultaPersonalizada;
     procedure CheckInputs;
-    procedure ProcessaOutput(pConsulta: TFrmConsultaPersonalizada; pOutput: TOutputParameter);
+    procedure ProcessaOutput(pConsulta: TFrmConsultaPersonalizada; pExportParameter: TParameter);
   public
     function Executar: TOutputList; override;
 
@@ -24,29 +24,39 @@ implementation
 { TExecutorConsultaPersonalizada }
 
 uses
-  Variants;
+  Variants, SynCommons;
 
 procedure TExecutorConsultaPersonalizada.CheckInputs;
+var
+  FOutput: TOutputParameter;
 begin
-
+  FOutput:= Outputs.Param('Files');
+  if not Assigned(FOutput) then
+  begin
+    FOutput:= TOutputParameter.Create('Files', tbList, '');
+    Outputs.Add(FOutput);
+  end;
 end;
 
-procedure TExecutorConsultaPersonalizada.ProcessaOutput(pConsulta: TFrmConsultaPersonalizada; pOutput: TOutputParameter);
+procedure TExecutorConsultaPersonalizada.ProcessaOutput(pConsulta: TFrmConsultaPersonalizada; pExportParameter: TParameter);
 var
   FVisualizacao: String;
   FTipoVisualizacao: String;
   FNameArquivo: String;
+  FDados: String;
+  FOutput: TOutputParameter;
+  FResult: Variant;
 begin
-  FNameArquivo:= pOutput.Parametros.ParamValueByName('NomeArquivo', '');
+  FNameArquivo:= pExportParameter.Parameters.ParamValue('NomeArquivo', '');
   if FNameArquivo = '' then
     raise Exception.Create('TExecutorConsultaPersonalizada.ProcessaOutput: É necessário o parâmetro "NomeArquivo"!');
   FNameArquivo:= TFrwServiceLocator.GetTempPath+FNameArquivo;
 
-  FVisualizacao:= pOutput.Parametros.ParamValueByName('Visualizacao', '');
+  FVisualizacao:= pExportParameter.Parameters.ParamValue('Visualizacao', '');
   if FVisualizacao <> '' then  // Carrega Visualização
     pConsulta.CarregaVisualizacaoByName(FVisualizacao);
 
-  FTipoVisualizacao:= pOutput.Parametros.ParamValueByName('TipoVisualizacao', '');
+  FTipoVisualizacao:= pExportParameter.Parameters.ParamValue('TipoVisualizacao', '');
   FTipoVisualizacao:= AnsiUpperCase(Trim(FTipoVisualizacao));
 
   if FTipoVisualizacao = 'TABELA' then
@@ -58,7 +68,16 @@ begin
   else
     pConsulta.ExportaTabelaParaExcelInterno(FNameArquivo);
 
-  pOutput.Value:= FNameArquivo;
+  pExportParameter.Value:= FNameArquivo;
+
+  FOutput:= Outputs.Param('Files');
+  FResult:= FOutput.Value;
+  if VarIsNull(FResult) then
+    FResult:= _Arr([FNameArquivo])
+  else
+    TDocVariantData(FResult).AddItem(FNameArquivo);
+
+  FOutput.Value:= FResult;
 end;
 
 function TExecutorConsultaPersonalizada.ConfiguraConsulta: TFrmConsultaPersonalizada;
@@ -80,7 +99,7 @@ var
 begin
   CheckInputs;
 
-  NomeConsulta:= Inputs.ParamValueByName('NomeConsulta', '');
+  NomeConsulta:= Inputs.ParamValue('NomeConsulta', '');
 
   TFrwServiceLocator.Synchronize(
     procedure begin
@@ -103,14 +122,25 @@ end;
 
 function TExecutorConsultaPersonalizada.Executar: TOutputList;
 var
-  FOutput: TOutputParameter;
+  FExport: TParameter;
+  FExportParam: TParameter;
+  FDataParam: TOutputParameter;
   FConsulta: TFrmConsultaPersonalizada;
+  FData: Variant;
 begin
   FConsulta:= ConfiguraConsulta;
   try
     FConsulta.ExecutaConsulta;
-    for FOutput in Outputs do
-      ProcessaOutput(FConsulta, FOutput);
+
+    FDataParam:= Outputs.Param('Data');
+    if Assigned(FDataParam) then
+      FDataParam.Value:= FConsulta.ResultAsDocVariant;
+
+    FExport:= Inputs.Param('Export'); // Export result to file
+    if Assigned(FExport) then
+      for FExportParam in FExport.Parameters do
+        ProcessaOutput(FConsulta, FExportParam);
+
   finally
     TFrwServiceLocator.Synchronize(
       procedure begin

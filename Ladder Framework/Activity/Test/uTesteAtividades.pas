@@ -27,7 +27,7 @@ type
 implementation
 
 uses
-  SysUtils, DateUtils;
+  SysUtils, DateUtils, SynCommons, Ladder.Utils;
 
 { TTesteAtividades }
 
@@ -47,50 +47,65 @@ begin
   Result.Inputs.Add(TParameter.Create('Titulo', tbValue, '@EnviaEmailMeta.Titulo'));
   Result.Inputs.Add(TParameter.Create('Body', tbValue, '@EnviaEmailMeta.Body'));
   Result.Inputs.Add(TParameter.Create('Destinatarios', tbValue, 'marcelo@rauter.com.br'));
-  Result.Inputs.Add(TParameter.Create('Anexos', tbList, '[@Consulta.Grafico, @Consulta.Tabela, @MetaEvolutivo.Grafico]'));
+  Result.Inputs.Add(TParameter.Create('Anexos', tbList, '[@Consulta.Files[0], @Consulta.Files[1], @MetaEvolutivo.Export.Grafico]'));
 end;
 
 function TTesteAtividades.NewProcessoRelatororiosMeta: TProcessoBase;
 var
-  FOutput: TOutputParameter;
+//  FOutput: TOutputParameter;
   FInput: TParameter;
+  FExport: TParameter;
+  FTipoExport: TParameter;
 begin
   Result:= NewProcesso(TExecutorConsultaPersonalizada.GetExecutor);
   Result.Name:= 'Consulta';
   FInput:= TParameter.Create('NomeConsulta', tbValue, 'MetaVendedores');
   Result.Inputs.Add(FInput);
 
-  FOutput:= TOutputParameter.Create('Grafico', tbValue, '');
-  FOutput.Parametros.Add(TParameter.Create('Visualizacao', tbValue, 'Realizado e Meta da Venda e Margem'));
-  FOutput.Parametros.Add(TParameter.Create('NomeArquivo', tbValue, 'MetaVendedores.png'));
-  FOutput.Parametros.Add(TParameter.Create('TipoVisualizacao', tbValue, 'Grafico'));
-  Result.Outputs.Add(FOutput);
+  FExport:= TParameter.Create('Export', tbValue);
 
-  FOutput:= TOutputParameter.Create('Tabela', tbValue, '');
-  FOutput.Parametros.Add(TParameter.Create('Visualizacao', tbValue, 'Realizado e Meta da Venda e Margem'));
-  FOutput.Parametros.Add(TParameter.Create('NomeArquivo', tbValue, 'MetaVendedores.xls'));
-  FOutput.Parametros.Add(TParameter.Create('TipoVisualizacao', tbValue, 'Tabela'));
-  Result.Outputs.Add(FOutput);
+  FTipoExport:= TParameter.Create('Grafico', tbValue);
+  FTipoExport.Parameters.Add(TParameter.Create('Visualizacao', tbValue, 'Realizado e Meta da Venda e Margem'));
+  FTipoExport.Parameters.Add(TParameter.Create('NomeArquivo', tbValue, 'MetaVendedores.png'));
+  FTipoExport.Parameters.Add(TParameter.Create('TipoVisualizacao', tbValue, 'Grafico'));
+  FExport.Parameters.Add(FTipoExport);
+
+  FTipoExport:= TParameter.Create('Tabela', tbValue, '');
+  FTipoExport.Parameters.Add(TParameter.Create('Visualizacao', tbValue, 'Realizado e Meta da Venda e Margem'));
+  FTipoExport.Parameters.Add(TParameter.Create('NomeArquivo', tbValue, 'MetaVendedores.xls'));
+  FTipoExport.Parameters.Add(TParameter.Create('TipoVisualizacao', tbValue, 'Tabela'));
+  FExport.Parameters.Add(FTipoExport);
+
+  Result.Inputs.Add(FExport);
 end;
 
 function TTesteAtividades.NewProcessoRelatororiosMetaEvolutivo: TProcessoBase;
 var
-  FOutput: TOutputParameter;
+//  FOutput: TOutputParameter;
   FInput: TParameter;
+  FExport: TParameter;
+  FTipoExport: TParameter;
 begin
   Result:= NewProcesso(TExecutorConsultaPersonalizada.GetExecutor);
   Result.Name:= 'MetaEvolutivo';
   FInput:= TParameter.Create('NomeConsulta', tbValue, 'MetaVendaEvolutivo');
   Result.Inputs.Add(FInput);
 
-  Result.Inputs.Add(TParameter.CreateWithValue('geDataIni', tbValue, StartOfTheMonth(Now)));
-  Result.Inputs.Add(TParameter.CreateWithValue('geDataFim', tbValue, Now));
+  Result.Inputs.Add(TParameter.CreateWithValue('geDataIni', tbValue,
+                        StartOfTheMonth(LadderVarToDateTime('2020/04/01'))
+                    ));
+  Result.Inputs.Add(TParameter.CreateWithValue('geDataFim', tbValue, EndOfTheMonth(LadderVarToDateTime('2020/04/01'))));
 
-  FOutput:= TOutputParameter.Create('Grafico', tbValue, '');
-  FOutput.Parametros.Add(TParameter.Create('Visualizacao', tbValue, 'Venda e Margem Geral'));
-  FOutput.Parametros.Add(TParameter.Create('NomeArquivo', tbValue, 'MetaVendedoresEvolutivo.png'));
-  FOutput.Parametros.Add(TParameter.Create('TipoVisualizacao', tbValue, 'Grafico'));
-  Result.Outputs.Add(FOutput);
+  FExport:= TParameter.Create('Export', tbValue);
+    FTipoExport:= TParameter.Create('Grafico', tbValue);
+      FTipoExport.Parameters.Add(TParameter.Create('Visualizacao', tbValue, 'Venda e Margem Geral'));
+      FTipoExport.Parameters.Add(TParameter.Create('NomeArquivo', tbValue, 'MetaVendedoresEvolutivo.png'));
+      FTipoExport.Parameters.Add(TParameter.Create('TipoVisualizacao', tbValue, 'Grafico'));
+
+  FExport.Parameters.Add(FTipoExport);
+  Result.Inputs.Add(FExport);
+
+  Result.Outputs.Add(TOutputParameter.Create('Data', tbAny, ''));
 end;
 
 procedure TTesteAtividades.Setup;
@@ -119,8 +134,13 @@ begin
 end;
 
 procedure TTesteAtividades.TestaAtividadeEmail;
+var
+  FData: TDocVariantData;
 begin
   FAtividade.Executar;
+  Check( Pos('.png', TParameter(FAtividade.FindElement('MetaEvolutivo.Export.Grafico')).Value) > 0);
+  FData:= TDocVariantData(TParameter(FAtividade.FindElement('MetaEvolutivo.Data')).Value);
+  Check(FData.Count > 0);
 end;
 
 initialization

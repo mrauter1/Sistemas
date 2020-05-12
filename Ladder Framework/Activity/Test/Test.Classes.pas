@@ -96,11 +96,11 @@ begin
   FProcessoBase.Outputs.Add(TOutputParameter.Create('OutTeste', tbValue, ''));
   ReturnValue := FProcessoBase.Executar;  // Executar must evaluate the parameters
 
-  CheckEquals('teste1', FProcessoBase.Inputs.ParamValueByName('input1'));
-  CheckEquals('teste1', FProcessoBase.Inputs.ParamValueByName('tres')._(0));
-  CheckEquals('valordois', FProcessoBase.Inputs.ParamValueByName('tres')._(1));
+  CheckEquals('teste1', FProcessoBase.Inputs.ParamValue('input1'));
+  CheckEquals('teste1', FProcessoBase.Inputs.ParamValue('tres')._(0));
+  CheckEquals('valordois', FProcessoBase.Inputs.ParamValue('tres')._(1));
 
-  CheckEquals('OutTeste', FProcessoBase.Outputs.ParamValueByName('OutTeste')); // MockExecutor makes the parameter value be equals name
+  CheckEquals('OutTeste', FProcessoBase.Outputs.ParamValue('OutTeste')); // MockExecutor makes the parameter value be equals name
 end;
 
 procedure TestTProcessoBase.TestFindElementByName;
@@ -158,13 +158,13 @@ begin
 
   ReturnValue := FActivity.Executar;
 
-  CheckEquals('res1', FActivity.Outputs.ParamValueByName('Out1'));
+  CheckEquals('res1', FActivity.Outputs.ParamValue('Out1'));
 
-  CheckEquals(2, FActivity.Outputs.ParamValueByName('Out2')._Count);
-  CheckEquals('res1', FActivity.Outputs.ParamValueByName('Out2')._(0));
-  CheckEquals('res2', FActivity.Outputs.ParamValueByName('Out2')._(1));
+  CheckEquals(2, FActivity.Outputs.ParamValue('Out2')._Count);
+  CheckEquals('res1', FActivity.Outputs.ParamValue('Out2')._(0));
+  CheckEquals('res2', FActivity.Outputs.ParamValue('Out2')._(1));
 
-  CheckEquals('Out2', FActivity.Outputs.ParamValueByName('Out3'));
+  CheckEquals('Out2', FActivity.Outputs.ParamValue('Out3'));
 end;
 
 procedure TestTActivity.TestFindElementByName;
@@ -181,8 +181,8 @@ begin
   FActivity.Processos.Add(FProcesso1);
   FProcesso1.ValuateInputs(FActivity.OnValuateParameterExpression);
 
-  CheckEquals('res1', FProcesso1.Inputs.ParamValueByName('p1'));
-  CheckEquals('res2', FProcesso1.Inputs.ParamValueByName('p2'));
+  CheckEquals('res1', FProcesso1.Inputs.ParamValue('p1'));
+  CheckEquals('res2', FProcesso1.Inputs.ParamValue('p2'));
 
   FProcesso2:= CreateMockProcess;
   FProcesso2.Name:= 'Processo2';
@@ -194,11 +194,11 @@ begin
 
   FProcesso2.ValuateInputs(FActivity.OnValuateParameterExpression);
 
-  CheckEquals('res1', FProcesso2.Inputs.ParamValueByName('Par1'));
-  CheckEquals('res2', FProcesso2.Inputs.ParamValueByName('Par2'));
-  CheckEquals(2, FProcesso2.Inputs.ParamValueByName('Par3')._Count);
-  CheckEquals('res1', FProcesso2.Inputs.ParamValueByName('Par3')._(0));
-  CheckEquals('res2', FProcesso2.Inputs.ParamValueByName('Par3')._(1));
+  CheckEquals('res1', FProcesso2.Inputs.ParamValue('Par1'));
+  CheckEquals('res2', FProcesso2.Inputs.ParamValue('Par2'));
+  CheckEquals(2, FProcesso2.Inputs.ParamValue('Par3')._Count);
+  CheckEquals('res1', FProcesso2.Inputs.ParamValue('Par3')._(0));
+  CheckEquals('res2', FProcesso2.Inputs.ParamValue('Par3')._(1));
 end;
 
 { TMockExecutor }

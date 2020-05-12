@@ -142,7 +142,7 @@
         <DCCReference Include="Forms\Form.CadastroAtividade.pas">
             <Form>FormCadastroAviso</Form>
         </DCCReference>
-        <DCCReference Include="Forms\From.CadastroProcesso.pas">
+        <DCCReference Include="Forms\Form.CadastroProcesso.pas">
             <Form>FormCadastroProcesso</Form>
         </DCCReference>
         <DCCReference Include="uFormPesquisaAviso.pas">
@@ -158,8 +158,8 @@
         </DCCReference>
         <DCCReference Include="Forms\Form.NovoProcesso.pas">
             <Form>FormNovoProcesso</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="..\Ladder Framework\Activity\Ladder.Activity.ViewClasses.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

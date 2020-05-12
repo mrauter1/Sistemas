@@ -751,3 +751,11 @@
 15042020-19:33:50 -> Criando TMonitorMain
 15042020-19:33:50 -> Criando TDmSqlUtils
 15042020-19:33:50 -> Inicializando message loop
+06052020-11:00:26 -> Iniciando monitor...
+06052020-11:00:26 -> Criando TConSqlServer
+06052020-11:00:26 -> Criando TConFirebird
+06052020-11:00:27 -> Criando TMonitorMain
+06052020-11:00:27 -> Criando TDmSqlUtils
+06052020-11:00:27 -> Criando TCon
+06052020-11:00:27 -> Carregando Gatihlos.xml
+06052020-11:04:04 -> Enviando email consulta: MetaVendedores, para os emails: marcelo@rauter.com.br; alessandra@rauter.com.br; ricardo@rauter.com.br

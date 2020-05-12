@@ -7,12 +7,13 @@ uses
   FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf,
   FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys,
   FireDAC.Phys.FB, FireDAC.Phys.FBDef, FireDAC.VCLUI.Wait, Data.DB,
-  FireDAC.Comp.Client, Forms, FireDAC.Phys.PG, FireDAC.Phys.PGDef;
+  FireDAC.Comp.Client, Forms, FireDAC.Phys.PG, FireDAC.Phys.PGDef,
+  FireDAC.Phys.MSSQL, FireDAC.Phys.MSSQLDef;
 
 type
   TDataModule1 = class(TDataModule)
     FDConFirebird: TFDConnection;
-    FDConPostgres: TFDConnection;
+    FDConSqlServer: TFDConnection;
     procedure DataModuleCreate(Sender: TObject);
   private
     procedure ParseConnectionString(pConnectionStr: String; out pServer, pPort,

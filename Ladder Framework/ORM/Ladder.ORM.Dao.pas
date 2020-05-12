@@ -14,17 +14,28 @@ type
     FProperty: TRttiMember;
     FChildFieldName: String;
     FMasterFieldName: String;
+
     FDao: IDaoBase;
-    FCurrentMaster: TObject;
+    [unsafe]
+    FDaoWeakRef: IDaoBase;
+
+    [weak]
+    FMasterDao: IDaoBase;
+
     function GetPropertyName: String;
+    function GetDao: IDaoBase;
+    function GetMasterDao: IDaoBase;
+    procedure SetMasterDao(const Value: IDaoBase);
   public
-    constructor Create(pMasterProperty: TRttiMember; pMasterFieldName: String; pChildFieldName: String; pDao: IDaoBase);
+    // if Dao is self referencing (IE.: is Child of itself) WeakReference must be set to true to avoid memory leak
+    constructor Create(pMasterProperty: TRttiMember; pMasterFieldName: String; pChildFieldName: String; pDao: IDaoBase; pWeakReference: Boolean = False);
+    destructor Destroy; override;
     property MasterProperty: TRttiMember read FProperty;
     property PropertyName: String read GetPropertyName;
     property MasterFieldName: String read FMasterFieldName write FMasterFieldName;
     property ChildFieldName: String read FChildFieldName write FChildFieldName;
-    property Dao: IDaoBase read FDao write FDao;
-    property CurrentMaster: TObject read FCurrentMaster write FCurrentMaster;
+    property Dao: IDaoBase read GetDao;
+    property MasterDao: IDaoBase read GetMasterDao write SetMasterDao;
 
     function PropertyClass: TClass;
     function ItemClass: TClass;
@@ -33,6 +44,7 @@ type
     function PropIsSingleObject: Boolean;
     function PropIsObjectList: Boolean;
     function PropIsGenericObjectList: Boolean;
+    function GetMasterFieldValue(const pFieldName: String; Instance: TObject; MasterInstance: TObject = nil): Variant;
   end;
 
   IDaoBase = interface(IInvokable)
@@ -46,17 +58,17 @@ type
     function ObjectExists(pObject: TObject): Boolean; // Check if object exists on database
     function KeyExists(ID: Integer): Boolean; // Check if object with ID exists on database
 
-    procedure Insert(pObject: TObject);
-    function Update(pObject: TObject): Boolean;
-    procedure Save(pObject: TObject);
-    procedure SaveList(pObjectList: TObjectList); overload;
-    procedure SaveList(pObjectList: TObjectList<TObject>); overload;
+    procedure Insert(pObject: TObject; pMasterInstance: TObject = nil);
+    function Update(pObject: TObject; pMasterInstance: TObject = nil): Boolean;
+    procedure Save(pObject: TObject; pMasterInstance: TObject = nil);
+    procedure SaveList(pObjectList: TObjectList; pMasterInstance: TObject = nil); overload;
+    procedure SaveList(pObjectList: TObjectList<TObject>; pMasterInstance: TObject = nil); overload;
 
-    function Delete(pObject: TObject): Integer; overload; // Return the number of deleted rows
+    function Delete(pObject: TObject; pMasterInstance: TObject = nil): Integer; overload; // Return the number of deleted rows
     function Delete(ID: Integer): Integer; overload; // Return the number of deleted rows
 
-    function DeleteList(pObjectList: TObjectList): Integer; overload; // Return the number of deleted rows
-    function DeleteList(pObjectList: TObjectList<TObject>): Integer; overload;
+    function DeleteList(pObjectList: TObjectList; pMasterInstance: TObject = nil): Integer; overload; // Return the number of deleted rows
+    function DeleteList(pObjectList: TObjectList<TObject>; pMasterInstance: TObject = nil): Integer; overload;
 
     function SelectOne(const pWhere: String): TObject; overload;
     procedure SelectOne(pObject: TObject; const pWhere: String); overload;
@@ -82,10 +94,10 @@ type
 
     function KeyExists(ID: Integer): Boolean; // Check if object with ID exists on database
 
-    procedure Insert(pObject: T);
-    function Update(pObject: T): Boolean;
+    procedure Insert(pObject: T; pMasterInstance: TObject = nil);
+    function Update(pObject: T; pMasterInstance: TObject = nil): Boolean;
 
-    function Delete(pObject: T): Integer; overload;
+    function Delete(pObject: T; pMasterInstance: TObject=nil): Integer; overload;
     function Delete(ID: Integer): Integer; overload;
 
     function SelectOne(const pWhere: String): T; overload;
@@ -109,7 +121,7 @@ type
     function GetFunPropertyChild(pChildDefs: TChildDaoDefs): TFunGetPropValue;
     function FindChildDefsByPropName(const pPropName: String): TChildDaoDefs;
     function FindChildDefsByClassName(const pClassName: String): TChildDaoDefs;
-    function GetFunChildField(pChildDefs: TChildDaoDefs): TFunGetFieldValue;
+//    function GetFunChildField(pChildDefs: TChildDaoDefs): TFunGetFieldValue;
     procedure PopulateWhere(pList: TObjectList; const pWhere: String);
     function DeleteMissingChilds(pMasterInstance: TObject; ChildDefs: TChildDaoDefs): Integer;
     function SqlWhereChild(Instance: TObject; pChildDefs: TChildDaoDefs): String;
@@ -134,18 +146,18 @@ type
     function ObjectExists(pObject: TObject): Boolean; // Check if object exists on database
     function KeyExists(ID: Integer): Boolean; virtual; // Check if object with ID exists on database
 
-    procedure Insert(pObject: TObject); virtual;
-    function Update(pObject: TObject): Boolean; virtual;
+    procedure Insert(pObject: TObject; pMasterInstance: TObject = nil); virtual;
+    function Update(pObject: TObject; pMasterInstance: TObject = nil): Boolean; virtual;
 
-    procedure Save(pObject: TObject); virtual;
-    procedure SaveList(pObjectList: TObjectList); overload; virtual;
-    procedure SaveList(pObjectList: TObjectList<TObject>); overload; virtual;
+    procedure Save(pObject: TObject; pMasterInstance: TObject = nil); virtual;
+    procedure SaveList(pObjectList: TObjectList; pMasterInstance: TObject = nil); overload; virtual;
+    procedure SaveList(pObjectList: TObjectList<TObject>; pMasterInstance: TObject = nil); overload; virtual;
 
-    function Delete(pObject: TObject): Integer; overload; virtual;
+    function Delete(pObject: TObject; pMasterInstance: TObject = nil): Integer; overload; virtual;
     function Delete(ID: Integer): Integer; overload; virtual;
 
-    function DeleteList(pObjectList: TObjectList): Integer; overload; virtual;
-    function DeleteList(pObjectList: TObjectList<TObject>): Integer; overload; virtual;
+    function DeleteList(pObjectList: TObjectList; pMasterInstance: TObject = nil): Integer; overload; virtual;
+    function DeleteList(pObjectList: TObjectList<TObject>; pMasterInstance: TObject = nil): Integer; overload; virtual;
 
     procedure InsertChild(pMaster, pChild: TObject; ChildDefs: TChildDaoDefs = nil); virtual;
     function UpdateChild(pMaster, pChild: TObject; ChildDefs: TChildDaoDefs = nil): Boolean; virtual;
@@ -179,10 +191,10 @@ type
 
     function KeyExists(ID: Integer): Boolean; reintroduce; virtual; // Check if object with ID exists on database
 
-    procedure Insert(pObject: T); reintroduce; virtual;
-    function Update(pObject: T): Boolean; reintroduce; virtual;
+    procedure Insert(pObject: T; pMasterInstance: TObject = nil); reintroduce; virtual;
+    function Update(pObject: T; pMasterInstance: TObject = nil): Boolean; reintroduce; virtual;
 
-    function Delete(pObject: T): Integer; reintroduce; overload; virtual;
+    function Delete(pObject: T; pMasterInstance: TObject=nil): Integer; reintroduce; overload; virtual;
 
     function SelectOne(const pWhere: String): T; reintroduce; overload; virtual;
     procedure SelectOne(pObject: T; const pWhere: String); reintroduce; overload; virtual;
@@ -193,7 +205,7 @@ type
 
   // Classe Dao sem nenhuma ação, não persiste ou busca informações,
   // Null Object Pattern: https://en.wikipedia.org/wiki/Null_Object_pattern
-  TNullDao<T: Class> = class(TDaoGeneric<T>, IDaoGeneric<T>)
+{  TNullDao<T: Class> = class(TDaoGeneric<T>, IDaoGeneric<T>)
   private
     class var fModeloBDNulo: TModeloBD;
   public
@@ -202,13 +214,13 @@ type
     function KeyExists(ID: Integer): Boolean; reintroduce; virtual; // Check if object with ID exists on database
     procedure Insert(pObject: T); override;
     function Update(pObject: T): Boolean; override;
-    function Delete(pObject: T): Integer; overload; override;
-    function Delete(ID: Integer): Integer; overload; override;
+    function Delete(pObject: T; pMasterInstance: TObject = nil): Integer; overload; override;
+    function Delete(ID: Integer; pMasterInstance: TObject = nil): Integer; overload; override;
     function SelectWhere(const pWhere: String): TFrwObjectList<T>; overload; override;
     procedure SelectWhere(pObjectList: TObjectList<T>; const pWhere: String); overload; override;
 
     property ModeloBD: TModeloBD read GetModeloBD;
-  end;
+  end;}
 
 
 {  IDaoFactory = interface
@@ -226,6 +238,8 @@ type
     function NewQueryBuilder(ModeloBD: TModeloBD): TQueryBuilderBase;
   end;
 
+function InheritFromGenericOfType(classType: TRttiType; const genericType: string): Boolean;
+
 var
  // Singleton
   DaoFactory: TDaoFactory;
@@ -233,18 +247,73 @@ var
 implementation
 
 uses
-  SysUtils, Classes, TypInfo, Controls;
+  SysUtils, Classes, TypInfo, Controls, StrUtils, Variants;
 
 { TDaoChildDefinitions }
 
+function InheritFromGenericOfType(classType: TRttiType; const genericType: string): Boolean;
+var
+  baseType: TRttiType;
+
+  function GetGenericTypeDefinition(classType: TRttiType): String;
+  begin
+    if not classType.IsGenericType then
+      Result:= ''
+    else
+      Result := Copy(classType.Name, 0, Pos('<', classType.Name)) + DupeString(',', High(classType.GetGenericArguments)) + '>';
+  end;
+
+begin
+  if SameText(GetGenericTypeDefinition(ClassType), genericType)  then
+    Result := True
+  else
+  begin
+    baseType := classType.BaseType;
+    Result := Assigned(baseType) and InheritFromGenericOfType(baseType, genericType);
+  end;
+end;
+
 constructor TChildDaoDefs.Create(pMasterProperty: TRttiMember; pMasterFieldName,
-  pChildFieldName: String; pDao: IDaoBase);
+  pChildFieldName: String; pDao: IDaoBase; pWeakReference: Boolean = False);
 begin
   inherited Create;
   FProperty:= pMasterProperty;
   fMasterFieldName:= pMasterFieldName;
   FChildFieldName:= pChildFieldName;
-  Dao:= pDao;
+  if pWeakReference then
+    FDaoWeakRef:= pDao
+  else
+    FDao:= pDao;
+end;
+
+destructor TChildDaoDefs.Destroy;
+begin
+
+  inherited;
+end;
+
+function TChildDaoDefs.GetDao: IDaoBase;
+begin
+  if Assigned(FDaoWeakRef) then
+    Result:= FDaoWeakRef
+  else
+    Result:= FDao;
+end;
+
+function TChildDaoDefs.GetMasterDao: IDaoBase;
+begin
+  Result:= FMasterDao;
+end;
+
+function TChildDaoDefs.GetMasterFieldValue(const pFieldName: String;
+  Instance: TObject; MasterInstance: TObject = nil): Variant;
+begin
+  Assert(Assigned(MasterDao), 'TChildDaoDefs.GetMasterFieldValue: pChildDefs.MasterDao must be assigned.');
+//    Assert(Assigned(pChildDefs.CurrentMaster), 'TDaoBase.GetFunPropertyChild: pChildDefs.CurrentMaster must be assigned.');
+  if not Assigned(MasterInstance) then
+    Result:= null
+  else
+    Result:= MasterDao.ModeloBD.GetFieldValue(MasterFieldName, MasterInstance);
 end;
 
 function TChildDaoDefs.GetPropertyName: String;
@@ -269,7 +338,7 @@ end;
 
 function TChildDaoDefs.PropIsGenericObjectList: Boolean;
 begin
-  Result:= TType.GetType(PropertyClass).IsGenericTypeOf('TObjectList<>');
+  Result:= InheritFromGenericOfType(TType.GetType(PropertyClass), 'TObjectList<>');
 end;
 
 function TChildDaoDefs.PropIsObjectList: Boolean;
@@ -282,12 +351,17 @@ begin
   Result:= (PropertyClass = Dao.ModeloBD.ItemClass) or (Dao.ModeloBD.ItemClass.InheritsFrom(PropertyClass));
 end;
 
+procedure TChildDaoDefs.SetMasterDao(const Value: IDaoBase);
+begin
+  FMasterDao:= Value;
+end;
+
 { TDaoBase }
 
 procedure TDaoBase.InicializaObjeto;
 begin
   fOwnsModelo:= False;
-  fChildDaoList:= TObjectList<TChildDaoDefs>.Create(True);
+  fChildDaoList:= TObjectList<TChildDaoDefs>.Create(False); // DaoChilds must be checked to see if it is not recursive before freeing
 
   fQueryBuilder:= DaoFactory.NewQueryBuilder(nil);
 end;
@@ -320,12 +394,18 @@ begin
 end;
 
 destructor TDaoBase.Destroy;
+var
+  fChildDao: TChildDaoDefs;
 begin
   if fOwnsModelo then
     if assigned(fModeloBD) then
       fModeloBD.Free;
 
   fQueryBuilder.Free;
+
+  for fChildDao in fChildDaoList do
+    if TObject(fChildDao.Dao) <> Self then  // do not free if child is self
+      fChildDao.Free;
 
   fChildDaoList.Free;
 
@@ -484,24 +564,26 @@ begin
       begin
         Result:= TValue.From<TObjectList>(SelectObjectList(TObjectList(FCurrentObject), FWhere));
       end
-      else if TType.GetType(pChildDefs.PropertyClass).IsGenericTypeOf('TObjectList<>') then //  Is a generic TObjectList<>
+      else if InheritFromGenericOfType(TType.GetType(pChildDefs.PropertyClass), 'TObjectList<>') then //  Is a generic TObjectList<>
         Result:= TValue.From<TObjectList<TObject>>(SelectGenericObjectList(TObjectList<TObject>(FCurrentObject), FWhere))
       else
          RaiseInvalidPropertyError;
 
     end;
 end;
-
+                 {
 function TDaoBase.GetFunChildField(pChildDefs: TChildDaoDefs): TFunGetFieldValue;
 begin
   Result:=
     function (const pFieldName: String; Instance: TObject): Variant
     begin
-      Assert(Assigned(pChildDefs.CurrentMaster), 'TDaoBase.GetFunPropertyChild: pChildDefs.CurrentMaster must be assigned.');
-
-      Result:= ModeloBD.GetFieldValue(pChildDefs.MasterFieldName, pChildDefs.CurrentMaster);
+//      Assert(Assigned(pChildDefs.CurrentMaster), 'TDaoBase.GetFunPropertyChild: pChildDefs.CurrentMaster must be assigned.');
+      if not Assigned(pChildDefs.CurrentMaster) then
+        Result:= null
+      else
+        Result:= ModeloBD.GetFieldValue(pChildDefs.MasterFieldName, pChildDefs.CurrentMaster);
     end;
-end;
+end;            }
 
 procedure TDaoBase.AddChildDao(pPropertyName, pMasterFieldName,
   pChildFieldName: String;  pDao: IDaoBase);
@@ -517,19 +599,19 @@ var
 
     procedure RaiseInvalidPropertyError;
     begin
-      raise Exception.Create(Format('Property %s must be TObjectList or %s.', [pPropertyName, pDao.ModeloBD.ItemClass.ClassName]));
+      raise Exception.Create(Format('Property %s.%s must be TObjectList or %s.', [ModeloBD.Itemclass.ClassName, pPropertyName, pDao.ModeloBD.ItemClass.ClassName]));
     end;
   begin
     FPropClass:= TRttiInstanceType(GetPropertyRttiType(pProp).AsInstance).MetaclassType;
     if not Assigned(FProp) then
-      raise Exception.Create(Format('TDaoBase.AddChildDao: Property %s not found!', [pPropertyName]));
+      raise Exception.Create(Format('TDaoBase.AddChildDao: Property %s.%s not found!', [ModeloBD.Itemclass.ClassName, pPropertyName]));
 
     // Child Property class must be of the same class of the ItemClass of the Child Dao or be a parent class to Item Class or...
     if (FPropClass = pDao.ModeloBD.ItemClass) or (pDao.ModeloBD.ItemClass.InheritsFrom(FPropClass)) then
       Exit //or it must be an TObjectList or TObjectList descendant or ...
     else if (FPropClass = TObjectList) or FPropClass.InheritsFrom(TObjectList) then
       Exit // or it must be a generic TObjectList<> or generic TObjectList<> descendant
-    else if TType.GetType(FPropClass).IsGenericTypeOf('TObjectList<>') then
+    else if InheritFromGenericOfType(TType.GetType(FPropClass), 'TObjectList<>') then
       Exit
     else
       RaiseInvalidPropertyError;
@@ -539,13 +621,13 @@ begin
   FProp:= ModeloBD.GetPropByName(pPropertyName);
 
   if not Assigned(FProp) then
-    raise Exception.Create(Format('TDaoBase.AddChildDao: Property %s not found on master class %s!', [pPropertyName, ModeloBD.ItemClass.ClassName]));
+    raise Exception.Create(Format('TDaoBase.AddChildDao: Property %s.%s not found!', [ModeloBD.ItemClass.ClassName, pPropertyName]));
 
   CheckPropType(FProp);
 
   FMasterFieldMapping:= ModeloBD.FieldMappingByFieldName(pMasterFieldName);
   if not Assigned(FMasterFieldMapping) then
-    raise Exception.Create(Format('TDaoBase.AddChildDao: Field %s not mapped for master class %s!', [pMasterFieldName, ModeloBD.ItemClass.ClassName]));
+    raise Exception.Create(Format('TDaoBase.AddChildDao: Field %s must be a mapped field for class %s!', [pMasterFieldName, ModeloBD.ItemClass.ClassName]));
 
   FChieldFieldMapping:= ModeloBD.FieldMappingByFieldName(pChildFieldName);
 
@@ -554,12 +636,12 @@ begin
   else
     FFieldType:= FMasterFieldMapping.FieldType;
 
-  FChildDefs:= TChildDaoDefs.Create(FProp, pMasterFieldName, pChildFieldName, pDao);
-
+  FChildDefs:= TChildDaoDefs.Create(FProp, pMasterFieldName, pChildFieldName, pDao, TObject(pDao) = Self);
   fChildDaoList.Add(FChildDefs);
+  FChildDefs.MasterDao:= Self;
 
   ModeloBD.MapProperty(pPropertyName, GetFunPropertyChild(FChildDefs));
-  pDao.ModeloBD.MapField(pChildFieldName, FFieldType, GetFunChildField(FChildDefs));
+  pDao.ModeloBD.MapField(pChildFieldName, FFieldType, FChildDefs.GetMasterFieldValue);
 end;
 
 procedure TDaoBase.AtualizaValorChave(pObject: TObject);
@@ -570,11 +652,11 @@ begin
   ModeloBD.SetKeyValue(pObject, fValChave);
 end;
 
-function TDaoBase.Delete(pObject: TObject): Integer;
+function TDaoBase.Delete(pObject: TObject; pMasterInstance: TObject = nil): Integer;
 var
   FChildDaoDef: TChildDaoDefs;
 begin
-  Result:= DaoUtils.ExecuteNoResult(QueryBuilder.Delete(pObject));
+  Result:= DaoUtils.ExecuteNoResult(QueryBuilder.Delete(pObject, pMasterInstance));
 //  DaoUtils.ExecutaProcedure(QueryBuilder.Delete(ModeloBD.GetKeyValue(pObject)));
 
   for FChildDaoDef in fChildDaoList do
@@ -598,25 +680,20 @@ function TDaoBase.DeleteChild(pMasterInstance: TObject; ChildDefs: TChildDaoDefs
 var
   FObject: TObject;
 begin
-  ChildDefs.CurrentMaster:= pMasterInstance;
-  try
-    FObject:= ChildDefs.MasterProperty.GetValue(pMasterInstance).AsObject;
+  FObject:= ChildDefs.MasterProperty.GetValue(pMasterInstance).AsObject;
 
-    if not Assigned(FObject) then
-      Exit;
+  if not Assigned(FObject) then
+    Exit;
 
-    if ChildDefs.PropIsObjectList then
-      Result:= ChildDefs.Dao.DeleteList(TObjectList(FObject))
-    else if ChildDefs.PropIsGenericObjectList then
-      Result:= ChildDefs.Dao.DeleteList(TObjectList<TObject>(FObject))
-    else
-      Result:= ChildDefs.Dao.Delete(FObject);
-  finally
-    ChildDefs.CurrentMaster:= nil;
-  end;
+  if ChildDefs.PropIsObjectList then
+    Result:= ChildDefs.Dao.DeleteList(TObjectList(FObject))
+  else if ChildDefs.PropIsGenericObjectList then
+    Result:= ChildDefs.Dao.DeleteList(TObjectList<TObject>(FObject))
+  else
+    Result:= ChildDefs.Dao.Delete(FObject);
 end;
 
-function TDaoBase.DeleteList(pObjectList: TObjectList): Integer;
+function TDaoBase.DeleteList(pObjectList: TObjectList; pMasterInstance: TObject = nil): Integer;
 var
   I: Integer;
 begin
@@ -625,13 +702,13 @@ begin
     Result:= Result+Delete(pObjectList[I]);
 end;
 
-function TDaoBase.DeleteList(pObjectList: TObjectList<TObject>): Integer;
+function TDaoBase.DeleteList(pObjectList: TObjectList<TObject>; pMasterInstance: TObject = nil): Integer;
 var
   FObject: TObject;
 begin
   Result:= 0;
   for FObject in pObjectList do
-    Result:= Result+Delete(FObject);
+    Result:= Result+Delete(FObject, pMasterInstance);
 end;
 
 function TDaoBase.DeleteMissingChilds(pMasterInstance: TObject; ChildDefs: TChildDaoDefs): Integer;
@@ -675,31 +752,25 @@ var
   FChildList: TObjectList;
   I: Integer;
 begin
-  ChildDefs.CurrentMaster:= pMasterInstance;
-  try
-    FObject:= ChildDefs.MasterProperty.GetValue(pMasterInstance).AsObject;
+  FObject:= ChildDefs.MasterProperty.GetValue(pMasterInstance).AsObject;
 
-    if not Assigned(FObject) then
-      FSqlKeys:= ''
-    else if ChildDefs.PropIsObjectList then
-      FSqlKeys:= GetKeyList(TObjectList(FObject))
-    else if ChildDefs.PropIsGenericObjectList then
-      FSqlKeys:= GetGenericKeyList(TObjectList<TObject>(FObject))
-    else
-      FSqlKeys:= GetObjectKeyList(FObject);
+  if not Assigned(FObject) then
+    FSqlKeys:= ''
+  else if ChildDefs.PropIsObjectList then
+    FSqlKeys:= GetKeyList(TObjectList(FObject))
+  else if ChildDefs.PropIsGenericObjectList then
+    FSqlKeys:= GetGenericKeyList(TObjectList<TObject>(FObject))
+  else
+    FSqlKeys:= GetObjectKeyList(FObject);
 
-    FDeleteWhere:= SqlWhereChild(pMasterInstance, ChildDefs);
-    if FSqlKeys <> '' then
-      FDeleteWhere := FDeleteWhere + Format(' AND %s NOT IN (%s) ', [ChildDefs.Dao.ModeloBD.NomeCampoChave, FSqlKeys]);
+  FDeleteWhere:= SqlWhereChild(pMasterInstance, ChildDefs);
+  if FSqlKeys <> '' then
+    FDeleteWhere := FDeleteWhere + Format(' AND %s NOT IN (%s) ', [ChildDefs.Dao.ModeloBD.NomeCampoChave, FSqlKeys]);
 
-    Result:= 0;
-    FChildList:= ChildDefs.Dao.SelectWhere(FDeleteWhere);
-    for I := 0 to FChildList.Count - 1 do
-      Result:= Result+DeleteChild(pMasterInstance, FChildList[I], ChildDefs);
-
-  finally
-    ChildDefs.CurrentMaster:= nil;
-  end;
+  Result:= 0;
+  FChildList:= ChildDefs.Dao.SelectWhere(FDeleteWhere);
+  for I := 0 to FChildList.Count - 1 do
+    Result:= Result+DeleteChild(pMasterInstance, FChildList[I], ChildDefs);
 
 end;
 
@@ -708,20 +779,15 @@ begin
   if not Assigned(ChildDefs) then
     ChildDefs:= FindChildDefsByClassName(pChild.ClassName);
 
-  ChildDefs.CurrentMaster:= pMaster;
-  try
-    Result:= ChildDefs.Dao.Delete(pChild);
-  finally
-    ChildDefs.CurrentMaster:= nil;
-  end;
+  Result:= ChildDefs.Dao.Delete(pChild, pMaster);
 end;
 
-procedure TDaoBase.Insert(pObject: TObject);
+procedure TDaoBase.Insert(pObject: TObject; pMasterInstance: TObject = nil);
 var
   FValChave: Integer;
   FChildDaoDef: TChildDaoDefs;
 begin
-  FValChave:= DaoUtils.SelectInt(QueryBuilder.Insert(pObject, True));
+  FValChave:= DaoUtils.SelectInt(QueryBuilder.Insert(pObject, pMasterInstance, True));
 
   if ModeloBD.ChaveIncremental then
     ModeloBD.SetKeyValue(pObject, FValChave);
@@ -732,11 +798,11 @@ begin
   //  AtualizaValorChave(pObject);
 end;
 
-function TDaoBase.Update(pObject: TObject): Boolean;
+function TDaoBase.Update(pObject: TObject; pMasterInstance: TObject = nil): Boolean;
 var
   FChildDaoDef: TChildDaoDefs;
 begin
-  Result:= DaoUtils.ExecuteNoResult(QueryBuilder.Update(pObject)) > 0;
+  Result:= DaoUtils.ExecuteNoResult(QueryBuilder.Update(pObject, pMasterInstance)) > 0;
 
   for FChildDaoDef in fChildDaoList do
   begin
@@ -754,12 +820,7 @@ begin
 
   Assert(Assigned(ChildDefs), Format('TDaoBase.InsertChild: ChildDefs of class %s not found for class %s.', [pChild.ClassName, pMaster.ClassName]));
 
-  ChildDefs.CurrentMaster:= pMaster;
-  try
-    ChildDefs.Dao.Insert(pChild);
-  finally
-    ChildDefs.CurrentMaster:= nil;
-  end;
+  ChildDefs.Dao.Insert(pChild, pMaster);
 end;
 
 function TDaoBase.KeyExists(ID: Integer): Boolean;
@@ -782,20 +843,15 @@ begin
   if not Assigned(ChildDefs) then
     ChildDefs:= FindChildDefsByClassName(pChild.ClassName);
 
-  ChildDefs.CurrentMaster:= pMaster;
-  try
-    Result:= ChildDefs.Dao.Update(pChild);
-  finally
-    ChildDefs.CurrentMaster:= nil;
-  end;
+  Result:= ChildDefs.Dao.Update(pChild, pMaster);
 end;
 
-procedure TDaoBase.Save(pObject: TObject);
+procedure TDaoBase.Save(pObject: TObject; pMasterInstance: TObject = nil);
 begin
   if ObjectExists(pObject) then
-    Update(pObject)
+    Update(pObject, pMasterInstance)
   else
-    Insert(pObject);
+    Insert(pObject, pMasterInstance);
 end;
 
 procedure TDaoBase.SaveChild(pMasterInstance: TObject;
@@ -803,38 +859,35 @@ procedure TDaoBase.SaveChild(pMasterInstance: TObject;
 var
   FObject: TObject;
 begin
-  ChildDefs.CurrentMaster:= pMasterInstance;
-  try
-    FObject:= ChildDefs.MasterProperty.GetValue(pMasterInstance).AsObject;
+  FObject:= ChildDefs.MasterProperty.GetValue(pMasterInstance).AsObject;
 
-    if not Assigned(FObject) then
-      Exit;
+  if not Assigned(FObject) then
+    Exit;
 
-    if ChildDefs.PropIsObjectList then
-      ChildDefs.Dao.SaveList(TObjectList(FObject))
-    else if ChildDefs.PropIsGenericObjectList then
-      ChildDefs.Dao.SaveList(TObjectList<TObject>(FObject))
-    else
-      ChildDefs.Dao.Save(FObject);
-  finally
-    ChildDefs.CurrentMaster:= nil;
-  end;
+  if ChildDefs.PropIsObjectList then
+    ChildDefs.Dao.SaveList(TObjectList(FObject), pMasterInstance)
+  else if ChildDefs.PropIsGenericObjectList then
+    ChildDefs.Dao.SaveList(TObjectList<TObject>(FObject), pMasterInstance)
+  else
+    ChildDefs.Dao.Save(FObject, pMasterInstance);
 end;
 
-procedure TDaoBase.SaveList(pObjectList: TObjectList);
+procedure TDaoBase.SaveList(pObjectList: TObjectList; pMasterInstance: TObject = nil);
 var
   I: Integer;
+  FMaster: TObject;
 begin
   for I := 0 to pObjectList.Count-1 do
-    Save(pObjectList[I]);
+    Save(pObjectList[I], pMasterInstance);
 end;
 
-procedure TDaoBase.SaveList(pObjectList: TObjectList<TObject>);
+procedure TDaoBase.SaveList(pObjectList: TObjectList<TObject>; pMasterInstance: TObject = nil);
 var
   FObject: TObject;
+  FMaster: TObject;
 begin
   for FObject in pObjectList do
-    Save(FObject);
+    Save(FObject, pMasterInstance);
 end;
 
 procedure TDaoBase.SetModeloBD(const Value: TModeloBD);
@@ -931,15 +984,15 @@ begin
   inherited SelectOne(pObject, pWhere);
 end;
 
-function TDaoGeneric<T>.Delete(pObject: T): Integer;
+function TDaoGeneric<T>.Delete(pObject: T; pMasterInstance: TObject=nil): Integer;
 begin
-  Result:= inherited Delete(pObject);
+  Result:= inherited Delete(pObject, pMasterInstance);
 end;
 
-procedure TDaoGeneric<T>.Insert(pObject: T);
+procedure TDaoGeneric<T>.Insert(pObject: T; pMasterInstance: TObject=nil);
 begin
 //  Result:= fDaoBase.Insert(pObject);
-  inherited Insert(pObject);
+  inherited Insert(pObject, pMasterInstance);
 end;
 
 function TDaoGeneric<T>.KeyExists(ID: Integer): Boolean;
@@ -947,14 +1000,14 @@ begin
   Result:= inherited KeyExists(ID);
 end;
 
-function TDaoGeneric<T>.Update(pObject: T): Boolean;
+function TDaoGeneric<T>.Update(pObject: T; pMasterInstance: TObject=nil): Boolean;
 begin
 //  Result:= fDaoBase.Update(pObject);
-  Result:= inherited Update(pObject);
+  Result:= inherited Update(pObject, pMasterInstance);
 end;
 
 { TNullDao<T> }
-
+{
 function TNullDao<T>.Delete(ID: Integer): Integer;
 begin
   // Não faz nada;
@@ -1002,7 +1055,7 @@ end;
 procedure TNullDao<T>.SelectWhere(pObjectList: TObjectList<T>; const pWhere: String);
 begin
   // Não faz nada
-end;
+end;}
 
 initialization
   DaoFactory:= TDaoFactory.Create;

@@ -3,8 +3,7 @@ unit Ladder.ORM.QueryBuilder;
 interface
 
 uses
-  Ladder.ORM.ModeloBD, System.Classes, SysUtils, System.Rtti, Ladder.ORM.Functions,
-  Ladder.Messages, Data.DB;
+  Ladder.ORM.ModeloBD, System.Classes, SysUtils, System.Rtti, Ladder.Messages, Data.DB;
 
 type
 //  TMappingType = (mtInteiro, mtFloat,
@@ -20,34 +19,36 @@ type
 
     function FieldToSqlValue(pFieldName: String; pObject: TObject): String; virtual; abstract;
 
-    function MapToSqlValue(pFieldMapping: TFieldMapping; pObject: TObject): String; virtual; abstract;
+    function MapToSqlValue(pFieldMapping: TFieldMapping; pObject: TObject; pMasterInstance: TObject=nil): String; virtual; abstract;
     function SelectWhereChave(FValor: Integer): String; virtual; abstract;
     function SelectWhere(const pWhere: String; pSelectOptions: TSelectOptions = []): String; virtual; abstract;
 
-    function Insert(pObject: TObject; pOutputID: Boolean = False): String; virtual; abstract;
-    function Update(pObject: TObject): String; virtual; abstract;
-    function Delete(pObject: TObject): String; overload; virtual; abstract;
+    function Insert(pObject: TObject; pMasterInstance: TObject=nil; pOutputID: Boolean = False): String; virtual; abstract;
+    function Update(pObject: TObject; pMasterInstance: TObject=nil): String; virtual; abstract;
+    function Delete(pObject: TObject; pMasterInstance: TObject=nil): String; overload; virtual; abstract;
     function Delete(pKeyValue: Integer): String; overload; virtual; abstract;
 
     function ObjectExists(pObject: TObject): String; virtual; abstract;
     function KeyExists(pValorChave: Integer): String; virtual; abstract;
     function SelectValorUltimaChave: String; virtual; abstract;
+
+    class function FloatToSqlStr(pValor: Extended): String; virtual;
   end;
 
   TSqlServerQueryBuilder = class(TQueryBuilderBase)
   private
-    function GetUpdateDeleteWhere(pObject: TObject): String;
+    function GetUpdateDeleteWhere(pObject: TObject; pMasterInstance: TObject=nil): String;
   public
 //    function PropToSqlValue(pProp: TRttiProperty; pObject: TObject): string;
     function FieldToSqlValue(pFieldName: String; pObject: TObject): String; override;
-    function MapToSqlValue(pFieldMapping: TFieldMapping; Instance: TObject): String; override;
+    function MapToSqlValue(pFieldMapping: TFieldMapping; Instance: TObject; pMasterInstance: TObject=nil): String; override;
 
     function SelectWhereChave(FValor: Integer): String; override;
     function SelectWhere(const pWhere: String; pSelectOptions: TSelectOptions = []): String; override;
 
-    function Insert(pObject: TObject; pOutputID: Boolean = False): String; override;
-    function Update(pObject: TObject): String; override;
-    function Delete(pObject: TObject): String; overload; override;
+    function Insert(pObject: TObject; pMasterInstance: TObject=nil; pOutputID: Boolean = False): String; override;
+    function Update(pObject: TObject; pMasterInstance: TObject=nil): String; override;
+    function Delete(pObject: TObject; pMasterInstance: TObject=nil): String; overload; override;
     function Delete(pKeyValue: Integer): String; overload; override;
 
     function ObjectExists(pObject: TObject): String; override;
@@ -71,6 +72,11 @@ begin
   FModeloBD:= ModeloBD;
 end;
 
+class function TQueryBuilderBase.FloatToSqlStr(pValor: Extended): String;
+begin
+  Result:= StringReplace(FloatToStr(pValor), ',', '.', []);
+end;
+
 function TQueryBuilderBase.MappedFieldList: TFieldMappingList;
 begin
   Result:= ModeloBD.MappedFieldList;
@@ -90,7 +96,7 @@ begin
   Result:= MapToSqlValue(FFieldMapping, pObject);
 end;
 
-function TSqlServerQueryBuilder.GetUpdateDeleteWhere(pObject: TObject): String;
+function TSqlServerQueryBuilder.GetUpdateDeleteWhere(pObject: TObject; pMasterInstance: TObject=nil): String;
 var
   FFIeld: String;
   FFieldMapping: TFieldMapping;
@@ -123,13 +129,13 @@ begin
 end;
 
 
-function TSqlServerQueryBuilder.MapToSqlValue(pFieldMapping: TFieldMapping; Instance: TObject): String;
+function TSqlServerQueryBuilder.MapToSqlValue(pFieldMapping: TFieldMapping; Instance: TObject; pMasterInstance: TObject=nil): String;
 const
   cMsgErro = 'Propriedade %s do tipo %s não foi possível ser mapeada!';
 var
   FVar: Variant;
 begin
-  FVar:= ModeloBD.GetFieldValue(pFieldMapping.FieldName, Instance);
+  FVar:= ModeloBD.GetFieldValue(pFieldMapping.FieldName, Instance, pMasterInstance);
   if VarIsNull(FVar) then
   begin
     Result:= 'NULL';
@@ -199,7 +205,7 @@ begin
 end;
 
 
-function TSqlServerQueryBuilder.Delete(pObject: TObject): String;
+function TSqlServerQueryBuilder.Delete(pObject: TObject; pMasterInstance: TObject=nil): String;
 begin
   Result:= Format('DELETE FROM %s WHERE %s', [ModeloBD.NomeTabela, GetUpdateDeleteWhere(pObject)]);
 end;
@@ -209,7 +215,7 @@ begin
   Result:= Format('DELETE FROM %s WHERE %s = %d', [ModeloBD.NomeTabela, ModeloBD.NomeCampoChave, pKeyValue]);
 end;
 
-function TSqlServerQueryBuilder.Insert(pObject: TObject; pOutputID: Boolean = False): String;
+function TSqlServerQueryBuilder.Insert(pObject: TObject; pMasterInstance: TObject=nil; pOutputID: Boolean = False): String;
 var
   fSql: TStringBuilder;
   fPrimeiroCampo: Boolean;
@@ -250,7 +256,7 @@ begin
         if not fMapeandoValores then
           fSql.Append('  ').Append(pFieldMapping.FieldName)
         else
-          fSql.Append('  ').Append(MapToSqlValue(pFieldMapping, pObject));
+          fSql.Append('  ').Append(MapToSqlValue(pFieldMapping, pObject, pMasterInstance));
 
         if fPrimeiroCampo then
           fPrimeiroCampo:= False;
@@ -278,7 +284,7 @@ begin
   end;
 end;
 
-function TSqlServerQueryBuilder.Update(pObject: TObject): String;
+function TSqlServerQueryBuilder.Update(pObject: TObject; pMasterInstance: TObject=nil): String;
 var
   fSql: TStringBuilder;
   fPrimeiroCampo: Boolean;
@@ -295,7 +301,7 @@ begin
 
       fSql.Append('  ').Append(pFieldMapping.FieldName);
 
-      fSql.Append(' = ').AppendLine(MapToSqlValue(pFieldMapping, pObject));
+      fSql.Append(' = ').AppendLine(MapToSqlValue(pFieldMapping, pObject, pMasterInstance));
 
       if fPrimeiroCampo then
         fPrimeiroCampo:= False;

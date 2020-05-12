@@ -45,10 +45,10 @@ type
     FParametros: TParametros;
     procedure SetParametrosConsulta(pConsultaID: Integer);
   public
-    ResultClass: TExecutorClass;
+    ResultClass: String;
     { Public declarations }
-    class function SelecionaProcesso(out pParametros: TParametros): TExecutorClass; overload;
-    class function SelecionaProcesso: TExecutorClass; overload;
+    class function SelecionaProcesso(out pParametros: TParametros): String; overload;
+    class function SelecionaProcesso: String; overload;
   end;
 
 implementation
@@ -57,15 +57,6 @@ implementation
 
 uses
   Form.SelecionaConsulta;
-
-class function TFormNovoProcesso.SelecionaProcesso: TExecutorClass;
-var
-  FParametros: TParametros;
-begin
-  Result:= SelecionaProcesso(FParametros);
-  if Assigned(FParametros) then
-    FParametros.Free;
-end;
 
 procedure TFormNovoProcesso.SetParametrosConsulta(pConsultaID: Integer);
 var
@@ -99,7 +90,7 @@ end;
 
 procedure TFormNovoProcesso.BtnOKClick(Sender: TObject);
 var
-  FClass: TExecutorClass;
+  FExecutorClass: string;
   FConsultaID: Integer;
 begin
   if CbxExecutors.Text = '' then
@@ -108,16 +99,14 @@ begin
     Exit;
   end;
 
-  FClass:= nil;
-
-  for FClass in FActivityManager.ExecutorDictionary.Keys do
-     if CbxExecutors.Text = FClass.Description then
+  for FExecutorClass in FActivityManager.ExecutorDictionary.Keys do
+     if CbxExecutors.Text = FExecutorClass then
      begin
-       ResultClass:= FClass;
+       ResultClass:= FExecutorClass;
        Break;
      end;
 
-  if ResultClass.ClassName = 'TExecutorConsultaPersonalizada' then
+  if ResultClass = 'TExecutorConsultaPersonalizada' then
   begin
     FConsultaID:= TFormSelecionaConsulta.SelecionaConsulta;
     SetParametrosConsulta(FConsultaID);
@@ -128,18 +117,18 @@ end;
 
 procedure TFormNovoProcesso.FormCreate(Sender: TObject);
 var
-  FClass: TExecutorClass;
+  FClass: String;
 begin
-  ResultClass:= nil;
+  ResultClass:= '';
 
   FActivityManager:= TFrwServiceLocator.Context.ActivityManager;
 
   for FClass in FActivityManager.ExecutorDictionary.Keys do
-     CbxExecutors.Items.Add(FClass.Description);
+     CbxExecutors.Items.Add(FClass);
 end;
 
 class function TFormNovoProcesso.SelecionaProcesso(
-  out pParametros: TParametros): TExecutorClass;
+  out pParametros: TParametros): String;
 var
   FForm: TFormNovoProcesso;
 begin
@@ -151,6 +140,15 @@ begin
   finally
     FForm.Free;
   end;
+end;
+
+class function TFormNovoProcesso.SelecionaProcesso: String;
+var
+  FParametros: TParametros;
+begin
+  Result:= SelecionaProcesso(FParametros);
+  if Assigned(FParametros) then
+    FParametros.Free;
 end;
 
 end.

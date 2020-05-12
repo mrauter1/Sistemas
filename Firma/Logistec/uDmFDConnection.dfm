@@ -17,15 +17,15 @@ object DataModule1: TDataModule1
     Left = 104
     Top = 72
   end
-  object FDConPostgres: TFDConnection
+  object FDConSqlServer: TFDConnection
     Params.Strings = (
-      'DriverID=PG'
-      'Password=28021990'
+      'DriverID=MSSQL'
       'Server=127.0.0.1'
       'Protocol=TCPIP'
-      'Port=5432'
-      'User_Name=postgres'
-      'Database=Logitec')
+      'Port=1433'
+      'User_Name=user'
+      'Password=28021990'
+      'Database=Logistec')
     FormatOptions.AssignedValues = [fvMapRules]
     FormatOptions.OwnMapRules = True
     FormatOptions.MapRules = <
@@ -37,7 +37,6 @@ object DataModule1: TDataModule1
         SourceDataType = dtMemo
         TargetDataType = dtWideString
       end>
-    Connected = True
     LoginPrompt = False
     Left = 284
     Top = 72

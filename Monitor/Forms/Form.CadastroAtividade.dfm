@@ -20,6 +20,7 @@ object FormCadastroAviso: TFormCadastroAviso
     Height = 78
     Align = alTop
     TabOrder = 0
+    ExplicitTop = -5
     DesignSize = (
       599
       78)
@@ -93,7 +94,6 @@ object FormCadastroAviso: TFormCadastroAviso
       Align = alClient
       Caption = 'Processos'
       TabOrder = 0
-      ExplicitHeight = 255
       object PanelControles: TPanel
         Left = 2
         Top = 163
@@ -101,7 +101,6 @@ object FormCadastroAviso: TFormCadastroAviso
         Height = 41
         Align = alBottom
         TabOrder = 0
-        ExplicitTop = 212
         DesignSize = (
           593
           41)
@@ -182,7 +181,6 @@ object FormCadastroAviso: TFormCadastroAviso
       Align = alBottom
       Caption = 'Inputs'
       TabOrder = 1
-      ExplicitTop = 152
       object cxGridParametros: TcxGrid
         Left = 2
         Top = 15
@@ -190,8 +188,6 @@ object FormCadastroAviso: TFormCadastroAviso
         Height = 80
         Align = alClient
         TabOrder = 0
-        ExplicitLeft = 1
-        ExplicitTop = 11
         object cxGridParametrosDBTableView1: TcxGridDBTableView
           Navigator.Buttons.CustomButtons = <>
           DataController.Summary.DefaultGroupSummaryItems = <>
@@ -232,8 +228,6 @@ object FormCadastroAviso: TFormCadastroAviso
         Height = 88
         Align = alClient
         TabOrder = 0
-        ExplicitTop = 56
-        ExplicitHeight = 102
         object cxGridDBTableView1: TcxGridDBTableView
           Navigator.Buttons.CustomButtons = <>
           DataController.Summary.DefaultGroupSummaryItems = <>
@@ -267,8 +261,6 @@ object FormCadastroAviso: TFormCadastroAviso
     Height = 44
     Align = alBottom
     TabOrder = 2
-    ExplicitLeft = 1
-    ExplicitTop = 491
     object BtnSalvar: TBitBtn
       Left = 12
       Top = 5

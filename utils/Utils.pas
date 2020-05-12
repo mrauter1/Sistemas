@@ -322,12 +322,12 @@ end;
 
 function Func_Date_SqlServer(parData: TDate): String;
 begin
-  Result:= QuotedStr(FormatDateTime('yyyy/mm/dd', parData));
+  Result:= QuotedStr(FormatDateTime('yyyymmdd', parData));
 end;
 
 function Func_DateTime_SqlServer(parData: TDateTime): String;
 begin
-  Result:= QuotedStr(FormatDateTime('yyyy/mm/dd hh:nn:ss', parData));
+  Result:= QuotedStr(FormatDateTime('yyyymmdd hh:nn:ss', parData));
 end;
 
 function Func_DataTime_Firebird(parData: TDateTime): String;

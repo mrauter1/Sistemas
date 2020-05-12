@@ -194,6 +194,7 @@ begin
     fParam.Nome:= QryParametrosNome.AsString;
     fParam.Descricao:= QryParametrosDescricao.AsString;
     fParam.Sql:= QryParametrosSql.AsString;
+    fParam.Tipo:= TTipoParametro(QryParametrosTipo.AsInteger);
     fParam.Valor:= null;
 
     if not QryParametrosValorPadrao.IsNull then

@@ -482,7 +482,7 @@ var
 begin
   FQry:= CriaFDQuery(pSql);
   try
-    FQry.ExecSQL(pSql, pParams);
+    Result:= FQry.ExecSQL(pSql, pParams);
   finally
     FQry.Free;
   end;
@@ -490,7 +490,7 @@ end;
 
 function TDmConnection.ExecutaComando(pSql: String): LongInt;
 begin
-  ExecSql(pSql, []);
+  Result:= ExecSql(pSql, []);
 end;
 
 function TDmConnection.RetornaFDQuery(AOwner: TComponent; Sql: String; pAbrirDataSet: Boolean = True): TFDQuery;

@@ -34,7 +34,7 @@ uses
   FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf,
   FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet,
   FireDAC.Comp.Client, uConFirebird, System.Generics.Collections, Vcl.Imaging.pngImage,
-  uConClasses, uDmConnection, Ladder.ServiceLocator;
+  uConClasses, uDmConnection, Ladder.ServiceLocator, SynCommons;
 
 type
   TPosicaoPanelDinamico = (cMinimizado, cMeio, cMaximizado);
@@ -172,6 +172,7 @@ type
     FDm: TDmGeradorConsultas;
     FPrimeiroShow: Boolean;
     FUltimaConfig: Integer;
+    FResultDocVariant: TDocVariantData;
     procedure PageControlAtiva(Pagina:Integer);
     function PopulaParametrosDM: Boolean;
     function Func_GetColorChartView(pAViewInfoDesc: string): Variant;
@@ -196,6 +197,7 @@ type
     procedure LoadParamsFromDic(Params: TDictionary<string, variant>);
     procedure PopulaComboBoxQry(pComboBox: TComboBox; pQry: TDataSet; ValorPadrao: variant);
     procedure PopulaCheckListBoxQry(pCheckListBox: TCheckListBox; pQry: TDataSet; ValorPadrao: variant);
+    function GetParams: TParametros;
     class function Conn: TDmConnection; static;
   public
     { Public declarations }
@@ -206,7 +208,10 @@ type
       pMostraDialog: Boolean = False; pUsarFormatoNativo: Boolean = False): Boolean;
     function ExportaTabelaDinamica(pNomeArquivo: String): Boolean;
     function ExportaGrafico(pNomeArquivo: String): Boolean;
+    function ResultAsDocVariant: Variant;
     procedure AbrirConsultaPersonalizada(Consulta :string; pExecutar: Boolean = True);
+
+    property Params: TParametros read GetParams;
 
     class function AbreConsultaPersonalizadaByName(NomeConsulta: String; pExecutar: Boolean = True; pWindowState: TWindowState = wsNormal): TFrmConsultaPersonalizada; static;
     class function AbreConsultaPersonalizada(pIDConsulta: Integer; pExecutar: Boolean = True): TFrmConsultaPersonalizada;
@@ -233,7 +238,7 @@ procedure ExportarCxGridParaImagem(cxGridView: TcxGridChartView; pFileName: Stri
 
 implementation
 
-uses Utils, System.UITypes, jpeg;
+uses Utils, System.UITypes, jpeg, Ladder.Activity.LadderVarToSql;
 
 {$R *.dfm}
 
@@ -527,6 +532,8 @@ begin
       LabelCount.Caption:='Total de Registros: '+InttoStr(QryConsulta.RecordCount);
       LbTime.Caption:=FormatDateTime('HH:MM:SS', TFim-TIni);
 
+      FResultDocVariant.Clear;
+
       Result:= True;
     end
   except
@@ -818,7 +825,7 @@ begin
       if (QryParametrosTipo.Value=3) then
         CriaDateTimePicker;
 
-      if not Trim(QryParametrosSql.AsString).IsEmpty then
+      if Trim(QryParametrosSql.AsString) <> '' then
         ParConfigComboSql;
 
       QryParametros.Next;
@@ -849,7 +856,6 @@ var
   I, Ret: Integer;
   FParametro: TParametroCon;
 begin
-
   Result:= False;
 
   for FParametro in FDm.Params.Values do
@@ -1160,6 +1166,11 @@ begin
       FontSizeStyle.Font.Style := [];
 end;
 
+function TFrmConsultaPersonalizada.GetParams: TParametros;
+begin
+  Result:= FDm.Params;
+end;
+
 procedure TFrmConsultaPersonalizada.BtnDeleteConfiguracaoClick(
   Sender: TObject);
 begin
@@ -1280,6 +1291,16 @@ begin
   cbxConfiguracoes.KeyValue:= QryVisualizacoesID.AsInteger;
 end;
 
+
+function TFrmConsultaPersonalizada.ResultAsDocVariant: Variant;
+begin
+  if VarIsEmptyOrNull(Variant(FResultDocVariant)) then
+    FResultDocVariant:= TLadderVarToSql.DataSetToDocVariant(QryConsulta)
+  else if FResultDocVariant.Count <> QryConsulta.RecordCount then
+    FResultDocVariant:= TLadderVarToSql.DataSetToDocVariant(QryConsulta);
+
+  Result:= Variant(FResultDocVariant);
+end;
 
 procedure TFrmConsultaPersonalizada.FormCreate(Sender: TObject);
 begin

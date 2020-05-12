@@ -20,9 +20,13 @@ type
     FDescricao: String;
     FSql: String;
     FValorPadrao: String;
+    procedure SetValor(const Value: Variant);
   public
     constructor Create(pNome: String; pValor: Variant; pTipo: TTipoParametro; pDescricao: String=''; pSql: String=''); overload;
-    property Valor: Variant read FValor write FValor;
+
+    function TipoFromInt(Valor: Integer): Boolean;
+
+    property Valor: Variant read FValor write SetValor;
   published
     property Codigo: integer read FCodigo write FCodigo;
     property Nome: String read FNome write FNome;
@@ -44,6 +48,8 @@ type
 
 implementation
 
+uses
+  Ladder.Utils, Variants;
 
 { TParametroCon }
 
@@ -56,6 +62,31 @@ begin
   Self.Tipo:= pTipo;
   Self.Descricao:= pDescricao;
   Self.Sql:= pSql;
+end;
+
+procedure TParametroCon.SetValor(const Value: Variant);
+begin
+  if VarIsNull(Value) then
+  begin
+    FValor:= null;
+    Exit;
+  end;
+
+  if Self.Tipo = TTipoParametro.ptDateTime then
+    FValor:= LadderVarToDateTime(Value)
+  else
+    FValor:= Value;
+
+end;
+
+function TParametroCon.TipoFromInt(Valor: Integer): Boolean;
+begin
+  Result:= True;
+
+  if (Valor >= Ord(Low(Tipo))) and (Valor <= Ord(High(Tipo))) then
+    Tipo:= TTipoParametro(Valor)
+  else
+    Result:= False;
 end;
 
 { TParametros }

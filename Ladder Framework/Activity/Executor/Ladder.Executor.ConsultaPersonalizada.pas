@@ -83,6 +83,7 @@ end;
 function TExecutorConsultaPersonalizada.ConfiguraConsulta: TFrmConsultaPersonalizada;
 var
   NomeConsulta: String;
+  IDConsulta: Integer;
   FConsultaPersonalizada: TFrmConsultaPersonalizada;
 
   procedure SetaParametros;
@@ -99,11 +100,18 @@ var
 begin
   CheckInputs;
 
+  IDConsulta:= Inputs.ParamValue('IDConsulta', 0);
   NomeConsulta:= Inputs.ParamValue('NomeConsulta', '');
+
+  if (IDConsulta=0) and (NomeConsulta='') then
+    raise Exception.Create('TExecutorConsultaPersonalizada.ConfiguraConsulta: Parameter IDConsulta or NomeConsulta must be set.');
 
   TFrwServiceLocator.Synchronize(
     procedure begin
-      FConsultaPersonalizada:= TFrmConsultaPersonalizada.AbreConsultaPersonalizadaByName(NomeConsulta, False);
+      if IDConsulta <> 0 then
+        FConsultaPersonalizada:= TFrmConsultaPersonalizada.AbreConsultaPersonalizada(IDConsulta, False)
+      else
+        FConsultaPersonalizada:= TFrmConsultaPersonalizada.AbreConsultaPersonalizadaByName(NomeConsulta, False);
     end
   );
 

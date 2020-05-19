@@ -3,38 +3,53 @@ unit Ladder.Activity.LadderVarToSql;
 interface
 
 uses
-  SysUtils, SynCommons, SynTable, Data.DB, System.Classes, mormotVCL, Mormot;
+  SysUtils, SynCommons, SynTable, Data.DB, System.Classes, mormotVCL, Mormot, Ladder.ConnectionPropertiesHelper,
+  SynDB, FireDAC.Comp.Client, Ladder.ORM.DaoUtils;
 
 type
+  TSqlFieldTypeDynArray = array of TSqlFIeldType;
+
   TLadderVarToSql = class
+  private
+    class function FDConnection: TFDConnection; static;
+    class function DaoUtils: TDaoUtils; static;
+    class procedure SetSqlDBFieldTypes(pDocVariant: TDocVariantData; var pFieldTypes: TSQLDBFieldTypeDynArray); static;
+    class procedure SetFieldTypes(pDocVariant: TDocVariantData; var pFieldTypes: TSqlFieldTypeDynArray); static;
+    class function SqlDBConnection: TSqlDBConnectionProperties; static;
+    class function TableExists(const pTableName: String): Boolean; static;
+    class procedure TruncateTable(const pTableName: String); static;
+  public
     class procedure TableDocToInlineSql(pDocVariant: TDocVariantData; pTextWriter: SynCommons.TTextWriter; pNumberOfRows: Integer=0; pOffset: Integer=0); overload;
     class function TableDocToInlineSql(pDocVariant: TDocVariantData; pNumberOfRows: Integer=0; pOffset: Integer=0): String; overload;
     // DO NOT USE!! Use InsertDocVariantData, which uses FireDAC arrayDML and is much faster
+    class function InsertSqlWithParams(const pDocVariant: TDocVariantData; const pTableName: String): String; static;
     class procedure InsertDocVariantDataInline(pDocVariant: TDocVariantData; const pTableName: String);
-
     class function ValuesDocToSql(pDocVariant: TDocVariantData): String;
     class function LadderDocVariantToSql(pDocVariant: TDocVariantData): String;
-
-    class function InsertSqlWithParams(pDocVariant: TDocVariantData; const pTableName: String): String; static;
-    class procedure InsertDocVariantData(pDocVariant: TDocVariantData; const pTableName: String; CreateTable: Boolean=False; ResetTable: Boolean=False);
-
     class function DocVariantToDataSet(AOwner: TComponent; pDocVariant: TDocVariantData): TSynSqlTableDataSet;
-
     class function DataSetToDocVariant(pDataSet: TDataSet): TDocVariantData;
+    class procedure CreateTableFromDocVariant(const pDocVariant: TDocVariantData; const pTableName: String); overload;
+    class procedure CreateTableFromDocVariant(const pDocVariant: TDocVariantData; const pTableName: String; const pFieldTypes: TSqlDBFieldTypeDynArray); overload;
 
     // Checks the type of the variant to find the Field Type,
     // if pCurrentFieldType is not ftNull, keeps most compatible type between infered variant type and pCurrentFieldType.
     // Ex.: if VariantType is int and pCurrentFieldType is ftCurrency, keeps ftCurrency
     class procedure SetNewFieldType(pValue: PVAriant; var pFieldType: TSQLDBFieldType);
-  private
     class procedure SetNewSqlFieldType(pValue: PVAriant; var pFieldType: TSQLFieldType); static;
+
+    class procedure InsertDocVariantData(const pDocVariant: TDocVariantData; const pTableName: String; CreateTable: Boolean=True; ResetTable: Boolean=False);
   end;
 
 implementation
 
 uses
   Variants, Ladder.Utils, Ladder.ORM.QueryBuilder, Ladder.ServiceLocator,
-  FireDAC.Comp.Client, FireDAC.Stan.Option, SynVirtualDataSet;
+  FireDAC.Stan.Option, SynVirtualDataSet, Dialogs, DateUtils;
+
+class function TLadderVarToSql.FDConnection: TFDConnection;
+begin
+  Result:= TFrwServiceLocator.Context.DmConnection.FDConnection;
+end;
 
 function SqlDBFieldTypeToSqlFieldType(SqlDBFieldType: TSqlDBFieldType): TSqlFieldType;
 begin
@@ -148,35 +163,11 @@ end;
 
 class procedure TLadderVarToSql.SetNewSqlFieldType(pValue: PVAriant; var pFieldType: TSQLFieldType);
 var
-  FCurFieldType, FNewFieldType: TSQLDBFieldType;
+  FCurFieldType: TSQLDBFieldType;
 begin
   FCurFieldType:= SqlFieldTypeToSqlDBFIeldType(pFieldType);
-  if FCurFieldType = ftUTF8 then Exit; // If it is a string it does not need to be changed
-
-  FNewFieldType:= VariantVTypeToSQLDBFieldType(VarType(pValue^));
-
-  if FNewFieldType <= ftNull then  // if current col FieldType is ftnull or ftUnknown does not need to change
-    Exit;
-
-  if FCurFieldType <= ftNull then
-  begin
-    if (FNewFieldType = SynTable.ftUTF8) and (LadderVarIsIso8601(pValue^)) then // Check special case when date is stored as string
-      pFieldType:= SqlDBFieldTypeToSqlFieldType(SynTable.ftDate)
-    else
-      pFieldType:= SqlDBFieldTypeToSqlFieldType(FNewFieldType);
-
-    Exit;
-  end;
-
-  if FNewFieldType = FCurFieldType then
-    Exit
-  else if ((FNewFieldType = SynTable.ftUTF8) and (LadderVarIsIso8601(pValue^))) then // Check special case when date is stored as string
-    pFieldType:= SqlDBFieldTypeToSqlFieldType(SynTable.ftDate)
-  else if Ord(FNewFieldType) > Ord(FCurFieldType) then
-    pFieldType:= SqlDBFieldTypeToSqlFieldType(FNewFieldType)
-  else // Ord(FFieldType) < Ord(FieldTypes[Col]
-    if FNewFieldType = SynTable.ftDate then // if current column fieldtype is int, double or currency and prior fieldtype was date, must change to string
-      pFieldType:= SqlDBFieldTypeToSqlFieldType(SynTable.ftUTF8);
+  SetNewFieldType(pValue, FCurFieldType);
+  pFieldType:= SqlDBFieldTypeToSqlFieldType(FCurFieldType);
 end;
 
 class procedure TLadderVarToSql.SetNewFieldType(pValue: PVAriant; var pFieldType: TSQLDBFieldType);
@@ -202,6 +193,8 @@ begin
 
   if FNewFieldType = pFieldType then
     Exit
+  else if ((FNewFieldType = SynTable.ftUTF8) and (LadderVarIsIso8601(pValue^))) then // Check special case when date is stored as string
+    pFieldType:= SynTable.ftDate
   else if Ord(FNewFieldType) > Ord(pFieldType) then
     pFieldType:= FNewFieldType
   else // Ord(FFieldType) < Ord(FieldTypes[Col]
@@ -209,6 +202,49 @@ begin
       pFieldType:= SynTable.ftUTF8;
 end;
 
+class function TLadderVarToSql.SqlDBConnection: TSqlDBConnectionProperties;
+begin
+  Result:= TFrwServiceLocator.Context.Connection;
+end;
+
+class procedure TLadderVarToSql.CreateTableFromDocVariant(
+  const pDocVariant: TDocVariantData; const pTableName: String);
+var
+  FFieldTypes: TSQLDBFieldTypeDynArray;
+begin
+  SetSqlDBFieldTypes(pDocVariant, FFieldTypes);
+  CreateTableFromDocVariant(pDocVariant, pTableName, FFieldTypes);
+end;
+
+class procedure TLadderVarToSql.CreateTableFromDocVariant(const pDocVariant: TDocVariantData; const pTableName: String;
+    const pFieldTypes: TSqlDBFieldTypeDynArray);
+var
+  FFieldCount: Integer;
+  FFirstRow: PDocVariantData;
+  FColumns: TSQLDBColumnCreateDynArray;
+  Col: Integer;
+  FSql: String;
+begin
+  FFirstRow:= @TDocVariantData(pDocVariant.Values[0]);
+  FFieldCount:= Length(FFirstRow^.Values);
+  SetLength(FColumns, FFieldCount);
+  for Col := 0 to FFieldCount-1 do
+  begin
+    FColumns[Col].DBType:= pFieldTypes[Col];
+    FColumns[Col].Name:= FFirstRow^.Names[Col];
+    FColumns[Col].Width:= 0;
+    FColumns[Col].Unique:= False;
+    FColumns[Col].NonNullable:= False;
+    FColumns[Col].PrimaryKey:= False;
+  end;
+  FSql:= SqlDBConnection.SQLCreate(pTableName, FColumns, False);
+  SqlDBConnection.ExecuteNoResult(FSql, []);
+end;
+
+class function TLadderVarToSql.DaoUtils: TDaoUtils;
+begin
+  Result:= TFrwServiceLocator.Context.DaoUtils;
+end;
 
 class function TLadderVarToSql.DataSetToDocVariant(
   pDataSet: TDataSet): TDocVariantData;
@@ -216,30 +252,63 @@ begin
   Result:= TDocVariantData(_JsonFast(DataSetToJson(pDataSet)));
 end;
 
-class function TLadderVarToSql.DocVariantToDataSet(AOwner: TComponent;
-  pDocVariant: TDocVariantData): TSynSqlTableDataSet;
+class procedure TLadderVarToSql.SetFieldTypes(pDocVariant: TDocVariantData; var pFieldTypes: TSqlFieldTypeDynArray);
 var
   FFieldCount: Integer;
   FFirstRow: PDocVariantData;
-  SqlFieldTypes: array of TSQLFieldType;
   Col, Row: Integer;
 begin
   FFirstRow:= @TDocVariantData(pDocVariant.Values[0]);
   FFieldCount:= Length(FFirstRow^.Values);
 
-  SetLength(SqlFieldTypes, FFieldCount);
+  SetLength(pFieldTypes, FFieldCount);
   for Col := 0 to FFieldCount-1 do
-    SqlFieldTypes[Col]:= sftUnknown;
+    pFieldTypes[Col]:= sftUnknown;
 
   for Col := 0 to FFieldCount-1 do // Have to loop trough all the results to get the Field type beforehand
     for Row := 0 to pDocVariant.Count-1 do
-      SetNewSqlFieldType(@pDocVariant._[Row].Values[Col], SqlFieldTypes[Col]);
+      SetNewSqlFieldType(@pDocVariant._[Row].Values[Col], pFieldTypes[Col]);
+end;
+
+class procedure TLadderVarToSql.SetSqlDBFieldTypes(pDocVariant: TDocVariantData; var pFieldTypes: TSQLDBFieldTypeDynArray);
+var
+  FFieldCount: Integer;
+  FFirstRow: PDocVariantData;
+  Col, Row: Integer;
+begin
+  FFirstRow:= @TDocVariantData(pDocVariant.Values[0]);
+  FFieldCount:= Length(FFirstRow^.Values);
+
+  SetLength(pFieldTypes, FFieldCount);
+  for Col := 0 to FFieldCount-1 do
+    pFieldTypes[Col]:= ftNull;
+
+  for Col := 0 to FFieldCount-1 do // Have to loop trough all the results to get the Field type beforehand
+    for Row := 0 to pDocVariant.Count-1 do
+      SetNewFieldType(@pDocVariant._[Row].Values[Col], pFieldTypes[Col]);
+end;
+
+class function TLadderVarToSql.DocVariantToDataSet(AOwner: TComponent;
+  pDocVariant: TDocVariantData): TSynSqlTableDataSet;
+var
+  SqlFieldTypes: TSqlFieldTypeDynArray;
+begin
+  SetFieldTypes(pDocVariant, SqlFieldTypes);
 
   Result:= JSONToDataSet(AOwner, pDocVariant.ToJSON(), SqlFieldTypes);
 end;
 
-class procedure TLadderVarToSql.InsertDocVariantData(
-  pDocVariant: TDocVariantData; const pTableName: String; CreateTable: Boolean=False; ResetTable: Boolean=False);
+class function TLadderVarToSql.TableExists(const pTableName: String): Boolean;
+begin
+  Result:= DaoUtils.SelectInt(TSqlServerQueryBuilder.TableExists(pTableName), 0) > 0;
+end;
+
+class procedure TLadderVarToSql.TruncateTable(const pTableName: String);
+begin
+  DaoUtils.ExecuteNoResult(TSqlServerQueryBuilder.TruncateTable(pTableName));
+end;
+
+class procedure TLadderVarToSql.InsertDocVariantData(const pDocVariant: TDocVariantData; const pTableName: String; CreateTable: Boolean=True; ResetTable: Boolean=False);
 var
   FieldNames: TRawUTF8DynArray;
   FieldTypes: TSQLDBFieldTypeDynArray;
@@ -257,7 +326,7 @@ var
       SynTable.ftInt64: FQry.Params[Col].DataType:= Data.DB.ftInteger;
       SynTable.ftDouble, SynTable.ftCurrency: FQry.Params[Col].DataType:= Data.DB.ftFloat;
     end;
-    FQry.Params[Col].ParamType:= ptInput;
+    FQry.Params[Col].ParamType:= Data.DB.ptInput;
   end;
 
   procedure SetParamValue(Row, Col: Integer; FVar: PVariant);
@@ -273,7 +342,12 @@ var
       case FieldTypes[Col] of
         SynTable.ftUnknown, SynTable.ftNull:  FQry.Params[Col].Values[Row]:= null;
         SynTable.ftUTF8: FQry.Params[Col].AsStrings[Row]:= VarToStr(FVar^);
-        SynTable.ftDate: FQry.Params[Col].AsDateTimes[Row]:= LadderVarToDateTime(FVar^);
+        SynTable.ftDate: begin
+           FQry.Params[Col].AsDateTimes[Row]:= LadderVarToDateTime(FVar^);
+           // Have to check for min and max values to avoid bugs on conversion to datetime on sql server
+//           if (FQry.Params[Col].AsDateTimes[Row] < MinDateTime) or (FQry.Params[Col].AsDateTimes[Row] > MaxDateTime) then
+//             FQry.Params[Col].Values[Row]:= null;
+        end;
         SynTable.ftInt64: FQry.Params[Col].AsIntegers[Row]:= FVar^;
         SynTable.ftDouble, SynTable.ftCurrency: FQry.Params[Col].AsFloats[Row]:= FVar^;
       else
@@ -281,18 +355,12 @@ var
       end;
   end;
 
-  function FDConnection: TFDConnection;
-  begin
-    Result:= TFrwServiceLocator.Context.DmConnection.FDConnection;
-  end;
-
 var
   Col, Row: Integer;
-  sStart, sFim: TDateTime;
   FCurOffset, FNumExecutions: Integer;
 
 const
-  cBatchSize = 500; // Optimum performance
+  cBatchSize = 1000; // Optimum performance
 begin
   if pDocVariant.Count=0 then
     Exit;
@@ -304,22 +372,27 @@ begin
     FFirstRow:= @TDocVariantData(pDocVariant.Values[0]);
     FFieldCount:= Length(FFirstRow^.Values);
 
-    SetLength(FieldTypes, FFieldCount);
     SetLength(FieldNames, FFieldCount);
     for Col := 0 to FFieldCount-1 do
-    begin
-      FieldTypes[Col]:= ftNull;
       FieldNames[Col]:= FFirstRow^.Names[Col];
-    end;
 
-    for Col := 0 to FFieldCount-1 do // Have to loop trough all the results to get the Field type beforehand
-      for Row := 0 to pDocVariant.Count-1 do
-        SetNewFieldType(@pDocVariant._[Row].Values[Col], FieldTypes[Col]);
+    SetSqlDBFieldTypes(pDocVariant, FieldTypes);
+
+    if TableExists(pTableName) then
+    begin
+      if ResetTable then
+        TruncateTable(pTableName)
+    end
+   else
+    if CreateTable then
+      CreateTableFromDocVariant(pDocVariant, pTableName, FieldTypes)
+    else
+      raise Exception.Create(Format('TLadderVarToSql.InsertDocVariantData: Table %s does not exists on database %s. Set parameter CreateTable to True to automatically create table in database.',
+            [pTableName, SqlDBConnection.DatabaseName]));
 
     for Col := 0 to FFieldCount-1 do
       SetQryParamType(Col, FieldTypes[Col]);
 
-    sStart:= now;
     FDConnection.TxOptions.Isolation := xiDirtyRead;
     FDConnection.TxOptions.AutoCommit:= False;
     FDConnection.StartTransaction;
@@ -344,9 +417,7 @@ begin
     //  MultipleValuesInsert(Self, '##MFORTESTE', FieldNames, FieldTypes, pDocVariant.Count, FieldValues);
     finally
       FDConnection.Commit;
-      sFim:= now;
     end;
-//    ShowMessage(IntToStr(MilliSecondsBetween(sStart, sFim)));
   //  Assert(False, IntToStr(MilliSecondsBetween(sStart, sFim)));
   finally
     FQry.Free;
@@ -360,38 +431,30 @@ var
   temp: TTextWriterStackBuffer;
   I: Integer;
   FCurOffset, FNumExecutions: Integer;
-  FStr: TStringList;
   FResult: String;
 const
   cBatchSize = 100;
 begin
- FStr:= TStringList.Create;
- try
-   FCurOffset:= 0;
-   while FCurOffset < pDocVariant.Count do
-   begin
-      FText:= SynCommons.TTextWriter.CreateOwnedStream(temp);
-     try
-       FText.AddString(Format('insert into %s select * from (', [pTableName]));
-       TLadderVarToSql.TableDocToInlineSql(pDocVariant, FText, cBatchSize, FCurOffset);
-       FText.AddShort(')X');
+ FCurOffset:= 0;
+ while FCurOffset < pDocVariant.Count do
+ begin
+    FText:= SynCommons.TTextWriter.CreateOwnedStream(temp);
+   try
+     FText.AddString(Format('insert into %s select * from (', [pTableName]));
+     TLadderVarToSql.TableDocToInlineSql(pDocVariant, FText, cBatchSize, FCurOffset);
+     FText.AddShort(')X');
 
-       FCurOffset:= FCurOffset+cBatchSize;
-       FResult:= FText.Text;
-       FStr.Text:= FResult;
-       FStr.SaveToFile('F:\Sistemas\Ladder Framework\Activity\Test\sql.sql');
-       TFrwServiceLocator.Context.Connection.ExecuteNoResult(FResult, []);
-     finally
-       FText.Free;
-     end;
-    //FText.Empty;
+     FCurOffset:= FCurOffset+cBatchSize;
+     FResult:= FText.Text;
+     TFrwServiceLocator.Context.Connection.ExecuteNoResult(FResult, []);
+   finally
+     FText.Free;
    end;
- finally
-   FStr.Free;
+  //FText.Empty;
  end;
 end;
 
-class function TLadderVarToSql.InsertSqlWithParams(pDocVariant: TDocVariantData; const pTableName: String): String;
+class function TLadderVarToSql.InsertSqlWithParams(const pDocVariant: TDocVariantData; const pTableName: String): String;
 var
   I: Integer;
   FRow: TDocVariantData;
@@ -429,7 +492,7 @@ begin
 
   FText:= SynCommons.TTextWriter.CreateOwnedStream(temp);
   try
-    FText.AddString(Format('insert into %s (', [pTableName]));
+    FText.AddString(Format('insert into %s WITH (TABLOCK) (', [pTableName]));
 
     FirstRow:= @TDocVariantData(pDocVariant.Values[0]);
 

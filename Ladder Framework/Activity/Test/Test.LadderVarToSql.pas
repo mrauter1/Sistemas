@@ -83,9 +83,9 @@ var
 begin
   DocVariant:= TDocVariantData(GetDaoUtils.SelectAsDocVariant('select * from MFOR'));
   sStart:= now;
-  TLadderVarToSql.InsertDocVariantData(DocVariant, '##MFORTESTE');
+  TLadderVarToSql.InsertDocVariantData(DocVariant, 'MFORTESTE', True, True);
   sFim:= now;
-  ShowMessage(FOrmat('Time %d ms; ', [MilliSecondsBetween(sStart, sFim)]));
+  Status(FOrmat('InsertDocVariantData time %d ms for %d rows; ', [MilliSecondsBetween(sStart, sFim), DocVariant.Count]));
 {
   TMySqlServerConnectionProperties(TFrwServiceLocator.Context.Connection).InsertDocVariantData('##MFORTESTE',
         TDocVariantData(GetDaoUtils.SelectAsDocVariant('select top 750 * from MFOR')));}
@@ -149,7 +149,7 @@ var
   ReturnValue: string;
   pDocVariant: TDocVariantData;
   sStart, sFim: TDateTime;
-  FStr: TStringList;
+//  FStr: TStringList;
 begin
   // Calls MultipleValuesInsert to insert to a temp table
 
@@ -161,19 +161,19 @@ begin
   sStart:= now;
   ReturnValue := FLadderVarToSql.LadderDocVariantToSql(pDocVariant);
   sFim:= now;
+  Status(FOrmat('GetDaoUtils.LadderDocVariantToSql time %d ms for %d rows; ', [MilliSecondsBetween(sStart, sFim), pDocVariant.Count]));
 
-  FStr:= TStringList.Create;
+{  FStr:= TStringList.Create;
   FStr.Text:= ReturnValue;
   FStr.SaveToFile('F:\Sistemas\Ladder Framework\Activity\Test\sql.sql');
-  FStr.Free;
+  FStr.Free;       }
 
   sStart:= now;
   pDocVariant:= TDocVariantData(GetDaoUtils.SelectAsDocVariant(ReturnValue));
   sFim:= now;
-  ShowMessage(FOrmat('Time %d ms; first chave %s', [MilliSecondsBetween(sStart, sFim), pDocvariant._[0].Values[0]]));
+  Status(FOrmat('GetDaoUtils.SelectAsDocVariant time %d ms for %d rows; ', [MilliSecondsBetween(sStart, sFim), pDocVariant.Count]));
 
-  CheckEquals(0, MilliSecondsBetween(sStart, sFim));
-  // TODO: Validate method results
+  CheckEquals(100, pDocVariant.Count);
 end;
 
 initialization

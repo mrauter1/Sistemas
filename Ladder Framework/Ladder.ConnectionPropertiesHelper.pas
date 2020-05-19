@@ -1,4 +1,4 @@
-unit Ladder.SqlServerConnection;
+unit Ladder.ConnectionPropertiesHelper;
 
 interface
 
@@ -6,11 +6,12 @@ uses
   SynTable, SynCommons, SynDB, SynOLEDB;
 
 type
-  TLadderSqlServerConnection = class(TOleDBMSSQL2012ConnectionProperties)
+  TSQLDBConnectionPropertiesHelper = class helper for TSQLDBConnectionProperties
   private
     // slower version, use Ladder.Activity,LadderVarToSql InsertDocVariantData
     procedure InsertDocVariantData(TableName: String; pDocVariant: TDocVariantData);
   public
+    procedure ResetFieldDefinitions;
   end;
 
 implementation
@@ -20,7 +21,7 @@ uses
 
 { TLadderSqlServerConnection }
 
-procedure TLadderSqlServerConnection.InsertDocVariantData(
+procedure TSQLDBConnectionPropertiesHelper.InsertDocVariantData(
   TableName: String; pDocVariant: TDocVariantData);
 var
   FieldNames: TRawUTF8DynArray;
@@ -38,8 +39,6 @@ var
       if FieldValues[Col, Row] <> 'null' then
         FieldValues[Col, Row]:= QuotedStr(FieldValues[Col, Row]);
     end;
-
-
   end;
 
   procedure SetType(Col, Row: Integer; pValue: PVAriant);
@@ -122,10 +121,16 @@ begin
   end;
 
   sStart:= now;
-  MultipleValuesInsert(Self, '##MFORTESTE', FieldNames, FieldTypes, pDocVariant.Count, FieldValues);
+  MultipleValuesInsert(Self, TableName, FieldNames, FieldTypes, pDocVariant.Count, FieldValues);
   sFim:= now;
   Assert(False, IntToStr(MilliSecondsBetween(sStart, sFim)));
 end;
 
+
+procedure TSQLDBConnectionPropertiesHelper.ResetFieldDefinitions;
+begin
+  fSQLCreateField[ftUtf8]:= ' VARCHAR(max)';
+  fSQLCreateField[ftDate]:= ' DATETIME2';
+end;
 
 end.

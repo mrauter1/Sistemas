@@ -1,15 +1,15 @@
 
-unit uDmConnection;
+unit udmSqlUtils;
 
 interface
 
 uses
   System.SysUtils, System.Classes, Data.DB, Data.SqlExpr, Data.DBXFirebird,
   Data.FMTBcd, Datasnap.DBClient, Datasnap.Provider, Inifiles, Forms, TypInfo,
-  Variants, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error,
-  FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
+  FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf,
+  FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
   FireDAC.Phys, FireDAC.Phys.FB, FireDAC.Phys.FBDef, FireDAC.ConsoleUI.Wait,
-  FireDAC.Comp.Client, Utils, System.Rtti, uAppConfig, Ladder.Activity.Parser;
+  FireDAC.Comp.Client;
 
 type
  cfMapField = record
@@ -17,49 +17,24 @@ type
    DestType: TFieldType;
  end;
 
-{  TConnectionParams = record
-    Server: String;
-    Protocol: String;
-    Port: Integer;
-    Database: String;
-  end;              }
-
 type
-  TOnReturnData = procedure (DataSet: TDataSet; var Return: Variant);
-
-  TDmConnection = class(TDataModule)
+  TDmSqlUtils = class(TDataModule)
     FDConnection: TFDConnection;
     procedure FDConnectionAfterCommit(Sender: TObject);
-    procedure DataModuleCreate(Sender: TObject);
   private
     FModoDesconectado: Boolean;
     procedure SetModoDesconectado(const Value: BOolean);
     { Private declarations }
   public
-    constructor Create(AOwner: TComponent); overload; override;
-    constructor Create(AOwner: TComponent; pConParams: TConnectionParams); overload;
+    constructor Create(AOwner: TComponent); override;
 
-    procedure LerConnectionParams(pConParams: TConnectionParams; pOpen: Boolean=True);
-
-    function CriaFDQuery(sql: String = ''; AParent: TComponent = nil): TFDQuery;
+    function CriaFDQuery(sql: String = ''): TFDQuery;
     function RetornaDataSet(sql: String; pAbrirDataSet: Boolean = True): TDataSet;
     function RetornaFDQuery(AOwner: TComponent; Sql: String; pAbrirDataSet: Boolean = True): TFDQuery;
 
-    function ExecutaComando(pSql: String): LongInt;
-    function ExecSql(pSql: String; const pParams: array of variant): LongInt;
+    procedure ExecutaComando(pSql: String);
 
-    function RetornaValor(Sql: String; ValDefault: Variant): Variant; overload;
-    function RetornaValor(Sql: String): Variant; overload;
-    function RetornaInteiro(Sql: String; pDefault: Integer = 0): Integer;
-    function RetornaDouble(const pSQL: String; pValorDef: Double = 0): Double;
-
-    function RetornaArray<T>(Sql: String; ValDefault: T): TArray<T>; // Retorna o primeiro campo de múltiplos registros
-    function RetornaVarArray(const Sql: String; ValDefault: Variant): Variant; // Retorna o primeiro campo de múltiplos registros
-    function RetornaValores(const pSql: String): Variant; //Retorna múltiplos campos de um memos registro
-
-    procedure DataSetToVarArray(const pSql: string; var Return: Variant; OnReturnData: TOnReturnData); overload;
-    //DataSetToVarArray: Retorna múltiplos campos de múltiplos registros, se AddFieldNames for True, adiciona os nomes dos campos no index -1
-    procedure DataSetToVarArray(const pSql: String; var Return: Variant; AddFieldNames: Boolean); overload;
+    function RetornaValor(Sql: String; ValDefault: Variant): Variant;
 
     // transforma um field do tipo fkCalculated em fkLookup
     procedure TransformaEmLookup(pField: TField; pSql: String);
@@ -83,13 +58,16 @@ procedure CopiarRecord(pSource, pDest: TDataSet);
 procedure CopiaDadosDataSet(pSource, pDest: TDataSet);
 procedure CopyFieldDefs(pSource, pDest: TDataSet);
 
+var
+  DmSqlUtils: TDmSqlUtils;
+
 implementation
 
 {%CLASSGROUP 'System.Classes.TPersistent'}
 
 {$R *.dfm}
 
-{ TDmConnection }
+{ TDmSqlUtils }
 
 procedure ReopenDataSet(pDataSet: TDataSet);
 begin
@@ -123,7 +101,7 @@ begin
   end;
 end;
 
-class procedure TDmConnection.CopyFieldDefs(Dest, Source: TDataSet; pMapedFields: array of cfMapField);
+class procedure TDmSqlUtils.CopyFieldDefs(Dest, Source: TDataSet; pMapedFields: array of cfMapField);
 var
   FFieldType: TFieldType;
   Field, NewField: TField;
@@ -173,9 +151,9 @@ begin
   end;
 end;
 
-class procedure TDmConnection.CopyFieldDefs(Dest, Source: TDataSet);
+class procedure TDmSqlUtils.CopyFieldDefs(Dest, Source: TDataSet);
 begin
-  TDmConnection.CopyFieldDefs(Dest, Source, []);
+  TDmSqlUtils.CopyFieldDefs(Dest, Source, []);
 end;
 
 function ComparaRecord(pDataSet1, pDataSet2: TDataSet; pCamposParaIgnorar: String = ''): TArray<String>;
@@ -240,30 +218,16 @@ begin
   end;
 end;
 
-constructor TDmConnection.Create(AOwner: TComponent);
+constructor TDmSqlUtils.Create(AOwner: TComponent);
 begin
-  ModoDesconectado:= False;
-
   inherited Create(AOwner);
+
+  ModoDesconectado:= False;
 end;
 
-constructor TDmConnection.Create(AOwner: TComponent;
-  pConParams: TConnectionParams);
+function TDmSqlUtils.CriaFDQuery(sql: String = ''): TFDQuery;
 begin
-  Create(AOwner);
-  LerConnectionParams(pConParams);
-end;
-
-function TDmConnection.CriaFDQuery(sql: String = ''; AParent: TComponent = nil): TFDQuery;
-var
-  FParent: TComponent;
-begin
-  if not Assigned(AParent) then
-    FParent:= Self
-  else
-    FParent:= AParent;
-
-  Result:= TFDQuery.Create(FParent);
+  Result:= TFDQuery.Create(Self);
   try
     Result.Connection:= FDConnection;
     Result.SQL.Text:= sql;
@@ -273,13 +237,7 @@ begin
   end;
 end;
 
-procedure TDmConnection.DataModuleCreate(Sender: TObject);
-begin
-  if ModoDesconectado then
-    FDConnection.Offline;
-end;
-
-function TDmConnection.RetornaDataSet(Sql: String; pAbrirDataSet: Boolean = True): TDataSet;
+function TDmSqlUtils.RetornaDataSet(Sql: String; pAbrirDataSet: Boolean = True): TDataSet;
 var
   fQuery: TFDQuery;
 begin
@@ -295,25 +253,11 @@ begin
   Result:= fQuery;
 end;
 
-function TDmConnection.RetornaValor(Sql: String; ValDefault: Variant): Variant;
+function TDmSqlUtils.RetornaValor(Sql: String; ValDefault: Variant): Variant;
 var
   FDataSet: TDataSet;
 begin
-  FDataSet:= RetornaDataSet(Sql);
-  try
-     Result:= FDataSet.Fields[0].AsVariant;
-     if VarIsNull(Result) then
-       Result:= ValDefault;
-  finally
-    FDataSet.Free;
-  end;
-end;
-
-
-function TDmConnection.RetornaValor(Sql: String): Variant;
-var
-  FDataSet: TDataSet;
-begin
+  Result:= ValDefault;
   FDataSet:= RetornaDataSet(Sql);
   try
      Result:= FDataSet.Fields[0].AsVariant;
@@ -322,153 +266,7 @@ begin
   end;
 end;
 
-function TDmConnection.RetornaArray<T>(Sql: String; ValDefault: T): TArray<T>;
-var
-  FDataSet: TDataSet;
-  I: Integer;
-begin
-  FDataSet:= RetornaDataSet(Sql);
-  try
-    SetLength(Result, FDataSet.RecordCount);
-    I:= 0;
-
-    FDataSet.First;
-    while not FDataSet.Eof do
-    begin
-      FDataSet.Fields[0].Value;
-      if VarIsNull(FDataSet.Fields[0].Value) then
-        Result[I]:= ValDefault
-      else
-        Result[I]:= TValue.FromVariant(FDataSet.Fields[0].Value).AsType<T>;
-
-      FDataSet.Next;
-      Inc(I);
-    end;
-
-  finally
-    FDataSet.Free;
-  end;
-end;
-
-function TDmConnection.RetornaValores(const pSql: String): Variant;
-var
-  vQuery: TFDQuery;
-  I: Integer;
-begin
-  vQuery:= CriaFDQuery(pSql);
-  try
-    vQuery.SQL.Text:= pSql;
-    vQuery.Active:= True;
-
-    if vQuery.Fields.Count = 0 then
-    begin
-      Result:= null;
-    end
-   else
-    begin
-      Result:= VarArrayCreate([0, vQuery.Fields.Count], varVariant);
-      for I:= 0 to vQuery.Fields.Count - 1 do
-        Result[I]:= vQuery.Fields[I].Value;
-    end;
-
-    vQuery.Close;
-  finally
-    vQuery.Free;
-  end;
-end;
-
-procedure TDmConnection.DataSetToVarArray(const pSql: string; var Return: Variant; OnReturnData: TOnReturnData);
-var
-  FDataSet: TFDQuery;
-begin
-  FDataSet:= RetornaFDQuery(nil, pSql, True);
-  try
-    FDataSet.FetchAll;
-    FDataSet.First;
-    OnReturnData(FDataSet, Return);
-  finally
-    FDataSet.Free;
-  end;
-end;
-
-procedure TDmConnection.DataSetToVarArray(const pSql: String; var Return: Variant; AddFieldNames: Boolean);
-var
-  FDataSet: TFDQuery;
-  I, F: Integer;
-  FNewRow: Variant;
-  FLowBound: Integer;
-
-  function NewRow(DataSet: TDataSet): Variant;
-  begin
-    Result:= VarArrayCreate([0, DataSet.FieldCount-1], varVariant);
-  end;
-
-begin
-  FDataSet:= RetornaFDQuery(nil, pSql, True);
-  try
-    FDataSet.FetchAll;
-    FDataSet.First;
-
-    if AddFieldNames then
-      FLowBound:= -1 // Store field name on index -1
-    else FLowBound:= 0;
-
-    Return:= VarArrayCreate([FLowBound, FDataSet.RecordCount-1], varVariant);
-
-    if AddFieldNames then
-    begin
-      FNewRow:= NewRow(FDataSet);
-      for F:= 0 to FDataSet.FieldCount-1 do
-        FNewRow[F]:= FDataSet.Fields[F].FieldName;
-
-      Return[-1]:= FNewRow;
-    end;
-
-    I:= 0;
-    while not FDataSet.Eof do
-    begin
-      FNewRow:= NewRow(FDataSet);
-      for F:= 0 to FDataSet.FieldCount-1 do
-          FNewRow[F]:= FDataSet.Fields[F].AsVariant;
-
-      Return[I]:= FNewRow;
-
-      FDataSet.Next;
-      Inc(I);
-    end;
-  finally
-    FDataSet.Free;
-  end;
-end;
-
-function TDmConnection.RetornaVarArray(const Sql: String; ValDefault: Variant): Variant;
-var
-  FDataSet: TDataSet;
-  FValues: Variant;
-  I: Integer;
-begin
-  FDataSet:= RetornaDataSet(Sql);
-  try
-    Result:= VarArrayCreate([0, FDataSet.RecordCount-1], varVariant);
-    I:= 0;
-
-    FDataSet.First;
-    while not FDataSet.Eof do
-    begin
-      Result[I]:= FDataSet.Fields[0].AsVariant;
-      if VarIsNull(Result[I]) then
-        Result[I]:= ValDefault;
-
-      FDataSet.Next;
-      Inc(I);
-    end;
-
-  finally
-    FDataSet.Free;
-  end;
-end;
-
-procedure TDmConnection.SetModoDesconectado(const Value: BOolean);
+procedure TDmSqlUtils.SetModoDesconectado(const Value: BOolean);
 begin
   FModoDesconectado := Value;
 
@@ -476,24 +274,19 @@ begin
     FDConnection.Offline;
 end;
 
-function TDmConnection.ExecSql(pSql: String; const pParams: array of variant): LongInt;
+procedure TDmSqlUtils.ExecutaComando(pSql: String);
 var
   FQry: TFDQuery;
 begin
   FQry:= CriaFDQuery(pSql);
   try
-    Result:= FQry.ExecSQL(pSql, pParams);
+    FQry.ExecSQL(True);
   finally
     FQry.Free;
   end;
 end;
 
-function TDmConnection.ExecutaComando(pSql: String): LongInt;
-begin
-  Result:= ExecSql(pSql, []);
-end;
-
-function TDmConnection.RetornaFDQuery(AOwner: TComponent; Sql: String; pAbrirDataSet: Boolean = True): TFDQuery;
+function TDmSqlUtils.RetornaFDQuery(AOwner: TComponent; Sql: String; pAbrirDataSet: Boolean = True): TFDQuery;
 var
   fQry: TFDQuery;
 begin
@@ -513,35 +306,13 @@ begin
   Result:= fQry;
 end;
 
-function TDmConnection.RetornaInteiro(Sql: String; pDefault: Integer): Integer;
-begin
-  Result:=  VarToIntDef(RetornaValor(Sql), pDefault);
-end;
-
-function TDmConnection.RetornaDouble(const pSQL: String; pValorDef: Double = 0): Double;
-begin
-  Result:= VarToFloatDef(RetornaValor(pSQL), pValorDef);
-end;
-
-procedure TDmConnection.FDConnectionAfterCommit(Sender: TObject);
+procedure TDmSqlUtils.FDConnectionAfterCommit(Sender: TObject);
 begin
   if ModoDesconectado then
     FDConnection.Offline;
 end;
 
-procedure TDmConnection.LerConnectionParams(pConParams: TConnectionParams; pOpen: Boolean=True);
-begin
-  FDConnection.Close;
-  FDConnection.Params.Values['Server'] := pConParams.Server;
-  FDConnection.Params.Values['Port'] := IntToStr(pConParams.Port);
-  FDConnection.Params.Values['Database'] := pConParams.Database;
-  FDConnection.Params.Values['Protocol'] := pConParams.Protocol;
-
-  if pOpen then
-    FDConnection.Open;
-end;
-
-procedure TDmConnection.CarregaConnectionInfo(pFile, pSection: String);
+procedure TDmSqlUtils.CarregaConnectionInfo(pFile, pSection: String);
 var
   ArqIni: TIniFile;
 begin
@@ -554,10 +325,6 @@ begin
             ArqIni.ReadString(pSection, 'Server', FDConnection.Params.Values['Server']);
         FDConnection.Params.Values['Database'] :=
             ArqIni.ReadString(pSection, 'Database', FDConnection.Params.Values['Database']);
-        FDConnection.Params.Values['Port'] :=
-            ArqIni.ReadString(pSection, 'Port', FDConnection.Params.Values['Port']);
-        FDConnection.Params.Values['Protocol'] :=
-            ArqIni.ReadString(pSection, 'Protocol', FDConnection.Params.Values['Protocol']);
       finally
         ArqIni.Free;
       end;
@@ -566,7 +333,7 @@ begin
   FDConnection.Open;
 end;
 
-procedure TDmConnection.TransformaEmLookup(pField: TField; pSql: String);
+procedure TDmSqlUtils.TransformaEmLookup(pField: TField; pSql: String);
 var
   fQry: TFDQuery;
 begin
@@ -588,7 +355,7 @@ begin
   pField.LookupResultField:= fQry.Fields[1].FieldName;
 end;
 
-function TDmConnection.OrdenaClientDataSet(parCds: TClientDataSet;
+function TDmSqlUtils.OrdenaClientDataSet(parCds: TClientDataSet;
       const FieldName: String; PIndexOptions: TIndexOptions = []): Boolean;
 const
   cIdx = 'idxx';
@@ -620,7 +387,7 @@ begin
   parCds.IndexDefs.Update;
 end;
 
-procedure TDmConnection.PopulaClientDataSet(pCds: TClientDataSet; pSql: String;
+procedure TDmSqlUtils.PopulaClientDataSet(pCds: TClientDataSet; pSql: String;
   pEmptyDataSet: Boolean = True);
 var
   FQry: TDataSet;
@@ -631,7 +398,7 @@ begin
   if pEmptyDataSet then
     pCds.EmptyDataSet;
 
-  FQry:= RetornaDataSet(pSql);
+  FQry:= DmSqlUtils.RetornaDataSet(pSql);
   try
     CopiaDadosDataSet(FQry, pCds);
   finally

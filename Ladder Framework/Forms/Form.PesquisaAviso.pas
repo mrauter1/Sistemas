@@ -1,4 +1,4 @@
-unit uFormPesquisaAviso;
+unit Form.PesquisaAviso;
 
 interface
 
@@ -25,7 +25,8 @@ uses
   cxGridCustomView, cxGridCustomTableView, cxGridTableView, cxGridDBTableView,
   cxGrid, uConSqlServer, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
   FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
-  FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet, FireDAC.Comp.Client;
+  FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet, FireDAC.Comp.Client,
+  Ladder.ORM.Dao, Ladder.Activity.Classes.Dao, Ladder.Activity.Classes;
 
 type
   TFormPesquisaAviso = class(TForm)
@@ -40,25 +41,29 @@ type
     cxGridAvisos: TcxGrid;
     QryAvisos: TFDQuery;
     QryAvisosID: TFDAutoIncField;
-    QryAvisosNome: TStringField;
     DsAvisos: TDataSource;
     cxGridAvisosDBTableView1ID: TcxGridDBColumn;
-    cxGridAvisosDBTableView1Nome: TcxGridDBColumn;
-    cxGridAvisosDBTableView1Ttulo: TcxGridDBColumn;
-    cxGridAvisosDBTableView1Mensagem: TcxGridDBColumn;
-    QryAvisosTitulo: TStringField;
-    QryAvisosMensagem: TMemoField;
+    QryAvisosIDActivity: TIntegerField;
+    QryAvisosName: TMemoField;
+    QryAvisosDescription: TMemoField;
+    QryAvisosClassName: TMemoField;
+    QryAvisosExecutorClass: TMemoField;
+    cxGridAvisosDBTableView1IDActivity: TcxGridDBColumn;
+    cxGridAvisosDBTableView1Name: TcxGridDBColumn;
+    cxGridAvisosDBTableView1Description: TcxGridDBColumn;
     procedure BtnRemoverAvisoClick(Sender: TObject);
     procedure BtnNovoAvisoClick(Sender: TObject);
     procedure BtnFecharClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure BtnSelecionarClick(Sender: TObject);
   private
+    FActivityDao: IDaoGeneric<TActivity>;
     procedure RemoveAviso;
     procedure AbrirConfigAviso;
     { Private declarations }
   public
     { Public declarations }
+    constructor Create(AOwner: TComponent); override;
     class procedure AbrirPesquisa;
   end;
 
@@ -74,7 +79,7 @@ uses
 
 procedure TFormPesquisaAviso.AbrirConfigAviso;
 begin
-  TFormCadastroAviso.AbrirConfigAviso(QryAvisosID.AsInteger);
+  TFormCadastroAtividade.AbrirConfigAviso(QryAvisosID.AsInteger);
   QryAvisos.Refresh;
 end;
 
@@ -103,7 +108,7 @@ begin
   if fInput = '' then Exit;
 
   QryAvisos.Append;
-  QryAvisosNome.AsString:= fInput;
+  QryAvisosName.AsString:= fInput;
   QryAvisos.Post;
   AbrirConfigAviso;
 end;
@@ -118,6 +123,12 @@ begin
   AbrirConfigAviso;
 end;
 
+constructor TFormPesquisaAviso.Create(AOwner: TComponent);
+begin
+  inherited;
+  FActivityDao:= TActivityDao<TActivity>.Create;
+end;
+
 procedure TFormPesquisaAviso.FormCreate(Sender: TObject);
 begin
   QryAvisos.Open;
@@ -128,10 +139,13 @@ procedure TFormPesquisaAviso.RemoveAviso;
   procedure RemoveAvisoDepencias(pIDAviso: Integer);
   var
     FSql: String;
+    FActivity: TActivity;
   begin
-    FSql:= 'DELETE FROM cons.AvisoRelatorio WHERE IDAviso = '+IntToStr(+pIDAviso)+'; '+
+    FActivity:= FActivityDao.SelectKey(pIDAviso);
+    FActivityDao.Delete(FActivity);
+{    FSql:= 'DELETE FROM cons.AvisoRelatorio WHERE IDAviso = '+IntToStr(+pIDAviso)+'; '+
            'DELETE FROM cons.AvisoRelatorioParametro WHERE IDAviso = '+IntToStr(pIDAviso);
-    ConSqlServer.ExecutaComando(FSql);
+    ConSqlServer.ExecutaComando(FSql);}
   end;
 
 begin
@@ -140,7 +154,7 @@ begin
     if Application.MessageBox('Você tem certeza que deseja excluir este aviso?', 'Atenção!',  MB_YESNO) = ID_YES  then
     begin
       RemoveAvisoDepencias(QryAvisosID.AsInteger);
-      QryAvisos.Delete;
+      QryAvisos.Refresh;
     end;
   end;
 end;

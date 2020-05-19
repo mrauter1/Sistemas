@@ -4,7 +4,7 @@ interface
 
 uses
   Spring.Services, Spring.Container.Common, System.SysUtils, System.Classes, Windows,
-  Forms, uSendMail, uAppConfig, SynDb,
+  Forms, uSendMail, uAppConfig, SynOLEDB, SynDb,
   Ladder.ORM.DaoUtils, Ladder.Activity.Manager, uDmConnection, uConSqlServer,
   Ladder.SqlServerConnection;
 
@@ -68,6 +68,9 @@ implementation
 
 { TMyServiceLocator }
 
+uses
+  Ladder.ConnectionPropertiesHelper;
+
 class function TFrwServiceLocator.GetContext: TFrwContext;
 begin
   if IsMainThread then
@@ -126,12 +129,9 @@ begin
   if AppConfig.ConSqlServer.Port <> 0 then
     FServerStr:= FServerStr+','+IntToStr(AppConfig.ConSqlServer.Port);
 
-//  Result:= TOleDBMSSQL2012ConnectionProperties.Create(FServerStr, AppConfig.ConSqlServer.Database,
-//                                                      'user', '28021990');
-
-  Result:= TLadderSqlServerConnection.Create(FServerStr, AppConfig.ConSqlServer.Database,
+  Result:= TOleDBMSSQL2012ConnectionProperties.Create(FServerStr, AppConfig.ConSqlServer.Database,
                                                       'user', '28021990');
-
+  Result.ResetFieldDefinitions;
 {
   FServerStr:= 'MSSQL?Server='+AppConfig.ConSqlServer.Server;
   if AppConfig.ConSqlServer.Port <> 0 then

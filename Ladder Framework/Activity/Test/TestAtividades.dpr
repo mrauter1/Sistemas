@@ -22,7 +22,6 @@ uses
   Ladder.Activity.Classes in '..\Ladder.Activity.Classes.pas',
   Test.Parser in 'Test.Parser.pas',
   Ladder.Activity.Parser in '..\Ladder.Activity.Parser.pas',
-  Ladder.Connection in '..\..\Ladder.Connection.pas',
   uTesteAtividades in 'uTesteAtividades.pas',
   Ladder.Activity.Manager in '..\Ladder.Activity.Manager.pas',
   Ladder.ServiceLocator in '..\..\Ladder.ServiceLocator.pas',
@@ -30,7 +29,6 @@ uses
   Ladder.Executor.ConsultaPersonalizada in '..\Executor\Ladder.Executor.ConsultaPersonalizada.pas',
   Test.ModeloBD in 'Test.ModeloBD.pas',
   Ladder.ORM.QueryBuilder in '..\..\ORM\Ladder.ORM.QueryBuilder.pas',
-  Ladder.Activity.DaoClasses in '..\Ladder.Activity.DaoClasses.pas',
   Test.Repository in 'Test.Repository.pas',
   Ladder.ORM.Repository in '..\..\ORM\Ladder.ORM.Repository.pas',
   Test.MockClasses in 'Test.MockClasses.pas',
@@ -43,7 +41,19 @@ uses
   uConSqlServer in '..\..\..\utils\uConSqlServer.pas' {ConSqlServer: TDataModule},
   Test.Classes.Dao in 'Test.Classes.Dao.pas',
   Ladder.Activity.LadderVarToSql in '..\Ladder.Activity.LadderVarToSql.pas',
-  Test.LadderVarToSql in 'Test.LadderVarToSql.pas';
+  Test.LadderVarToSql in 'Test.LadderVarToSql.pas',
+  Ladder.SqlServerConnection in '..\..\Ladder.SqlServerConnection.pas',
+  Ladder.Utils in '..\..\Ladder.Utils.pas',
+  Form.CadastroAtividade in '..\..\Forms\Form.CadastroAtividade.pas' {FormCadastroAtividade},
+  Form.CadastroProcesso in '..\..\Forms\Form.CadastroProcesso.pas' {FormCadastroProcesso},
+  Form.NovoProcesso in '..\..\Forms\Form.NovoProcesso.pas' {FormNovoProcesso},
+  Form.SelecionaConsulta in '..\..\Forms\Form.SelecionaConsulta.pas' {FormSelecionaConsulta},
+  Test.Forms in 'Test.Forms.pas',
+  Form.PesquisaAviso in '..\..\Forms\Form.PesquisaAviso.pas' {FormPesquisaAviso},
+  Form.CadastroProcessoConsulta in '..\..\Forms\Form.CadastroProcessoConsulta.pas' {FormCadastroProcessoConsulta},
+  Ladder.ORM.DataSetBinding in '..\..\ORM\Ladder.ORM.DataSetBinding.pas',
+  Ladder.ORM.ObjectDataSet in '..\..\ORM\Ladder.ORM.ObjectDataSet.pas',
+  uConClasses in '..\..\..\utils\uConClasses.pas';
 
 {$R *.RES}
 

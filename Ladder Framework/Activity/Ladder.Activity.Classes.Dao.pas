@@ -10,7 +10,7 @@ type
     constructor Create(pNomeTabela: String; pKeyField: String; pIsMasterParameter: Boolean); // Master Parameter is a direct child of a process
   end;
 
-  TProcessoDao = class(TDaoGeneric<TProcessoBase>)
+  TProcessoDao<T: TProcessoBase> = class(TDaoGeneric<T>)
   private
     function GetExecutorClass(const pFieldName: String; Instance: TObject; MasterInstance: TObject=nil): Variant; virtual;
     function GetClassName(const pFieldName: String; Instance: TObject; MasterInstance: TObject=nil): Variant; virtual;
@@ -18,16 +18,16 @@ type
   public
     constructor Create; overload;
     constructor Create(pItemClass: TClass); overload;
-    function NewProcesso(pDBRows: ISqlDBRows): TObject; virtual;
+    function NewProcesso(pDBRows: ISqlDBRows): TProcessoBase; virtual;
     function ActivityManager: TActivityManager;
   end;
 
-  TAtividadeDao = class(TProcessoDao)
+  TActivityDao<T: TActivity> = class(TProcessoDao<T>)
   private
-    FProcessoDao: TProcessoDao;
+    FProcessoDao: TProcessoDao<TProcessoBase>;
   public
     constructor Create;
-    function NewProcesso(pDBRows: ISqlDBRows): TObject; override;
+    function NewProcesso(pDBRows: ISqlDBRows): TProcessoBase; override;
   end;
 
 implementation
@@ -48,12 +48,12 @@ end;
 
 { TProcessoDao }
 
-function TProcessoDao.ActivityManager: TActivityManager;
+function TProcessoDao<T>.ActivityManager: TActivityManager;
 begin
   Result:= TFrwServiceLocator.Context.ActivityManager;
 end;
 
-function TProcessoDao.GetExecutorClass(const pFieldName: String; Instance: TObject; MasterInstance: TObject=nil): Variant;
+function TProcessoDao<T>.GetExecutorClass(const pFieldName: String; Instance: TObject; MasterInstance: TObject=nil): Variant;
 var
   FExecutor: IExecutorBase;
 begin
@@ -64,12 +64,12 @@ begin
     Result:= '';
 end;
 
-function TProcessoDao.GetClassName(const pFieldName: String; Instance: TObject; MasterInstance: TObject=nil): Variant;
+function TProcessoDao<T>.GetClassName(const pFieldName: String; Instance: TObject; MasterInstance: TObject=nil): Variant;
 begin
   Result:= ModeloBD.ItemClass.ClassName;
 end;
 
-function TProcessoDao.GetExecutor(const pPropName: String; pCurrentValue: TValue; Instance: TObject; pDBRows: ISqlDBRows): TValue;
+function TProcessoDao<T>.GetExecutor(const pPropName: String; pCurrentValue: TValue; Instance: TObject; pDBRows: ISqlDBRows): TValue;
 var
   FExecutorClass: String;
 begin
@@ -80,12 +80,12 @@ begin
     Result:= TValue.From<IExecutorBase>(nil);
 end;
 
-constructor TProcessoDao.Create;
+constructor TProcessoDao<T>.Create;
 begin
-  Create(TProcessoBase);
+  Create(T);
 end;
 
-constructor TProcessoDao.Create(pItemClass: TClass);
+constructor TProcessoDao<T>.Create(pItemClass: TClass);
 var
   FOutputDao: IDaoGeneric<TOutputParameter>;
   FInputDao: IDaoGeneric<TParameter>;
@@ -102,7 +102,7 @@ begin
   AddChildDao('Outputs', 'ID', 'IDProcesso', FOutputDao);
 end;
 
-function TProcessoDao.NewProcesso(pDBRows: ISqlDBRows): TObject;
+function TProcessoDao<T>.NewProcesso(pDBRows: ISqlDBRows): TProcessoBase;
 var
   FExecutor: IExecutorBase;
 begin
@@ -112,14 +112,14 @@ end;
 
 { TAtividadeDao }
 
-constructor TAtividadeDao.Create;
+constructor TActivityDao<T>.Create;
 begin
-  inherited Create(TActivity);
-  FProcessoDao:= TProcessoDao.Create;
+  inherited Create(T);
+  FProcessoDao:= TProcessoDao<TProcessoBase>.Create;
   AddChildDao('Processos', 'ID', 'IDActivity', FProcessoDao);
 end;
 
-function TAtividadeDao.NewProcesso(pDBRows: ISqlDBRows): TObject;
+function TActivityDao<T>.NewProcesso(pDBRows: ISqlDBRows): TProcessoBase;
 begin
   Result:= TActivity.Create(ModeloBD.DaoUtils);
 end;

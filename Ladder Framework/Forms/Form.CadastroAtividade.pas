@@ -27,10 +27,11 @@ uses
   cxGrid, Vcl.Grids, Vcl.DBGrids, Vcl.Buttons, FireDAC.Stan.Intf,
   FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS,
   FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
-  FireDAC.Comp.DataSet, FireDAC.Comp.Client, uConSqlServer, Ladder.Activity.Classes;
+  FireDAC.Comp.DataSet, FireDAC.Comp.Client, uConSqlServer, Ladder.Activity.Classes,
+  Ladder.ORM.Dao, Ladder.Activity.Classes.Dao, Ladder.ORM.DataSetBinding;
 
 type
-  TFormCadastroAviso = class(TForm)
+  TFormCadastroAtividade = class(TForm)
     PanelTop: TPanel;
     PanelCentro: TPanel;
     DBEditNomeAtividade: TDBEdit;
@@ -46,20 +47,9 @@ type
     BtnConfiguraProcesso: TBitBtn;
     PanelBot: TPanel;
     BtnSalvar: TBitBtn;
-    BtnCancelar: TBitBtn;
-    QryAtividade: TFDQuery;
     DsAtividade: TDataSource;
-    QryAtividadeID: TFDAutoIncField;
-    QryAtividadeNome: TStringField;
-    QryAtividadeMensagem: TMemoField;
-    QryAtividadeTitulo: TStringField;
     BtnFechar: TBitBtn;
-    QryProcessos: TFDQuery;
     DsProcessos: TDataSource;
-    QryProcessosIDAviso: TIntegerField;
-    QryProcessosIDConsulta: TIntegerField;
-    QryProcessosDescricao: TStringField;
-    QryProcessosVisualizacao: TStringField;
     DBEditDescricao: TDBEdit;
     Label3: TLabel;
     GroupBoxInputs: TGroupBox;
@@ -88,17 +78,40 @@ type
     IntegerField2: TIntegerField;
     IntegerField3: TIntegerField;
     MemoField1: TMemoField;
+    TblProcessos: TFDMemTable;
+    TblProcessosID: TIntegerField;
+    TblProcessosIDActivity: TIntegerField;
+    TblProcessosName: TMemoField;
+    TblProcessosDescription: TMemoField;
+    TblProcessosClassName: TMemoField;
+    TblProcessosExecutorClass: TMemoField;
+    TblActivity: TFDMemTable;
+    TblActivityIDActivity: TIntegerField;
+    TblActivityName: TMemoField;
+    TblActivityDescription: TMemoField;
+    TblActivityClassName: TMemoField;
+    TblActivityExecutorClass: TMemoField;
+    TblActivityID: TIntegerField;
     procedure BtnSalvarClick(Sender: TObject);
-    procedure BtnCancelarClick(Sender: TObject);
     procedure BtnFecharClick(Sender: TObject);
     procedure BtnAddProcessoClick(Sender: TObject);
     procedure BtnRemoveProcessoClick(Sender: TObject);
     procedure BtnConfiguraProcessoClick(Sender: TObject);
+    procedure FieldGetText(Sender: TField; var Text: string;
+      DisplayText: Boolean);
+    procedure FieldSetText(Sender: TField; const Text: string);
   private
-    procedure RemoverConsulta;
+    FActivity: TActivity;
+    FActivityDao: IDaoGeneric<TActivity>;
+    FActivityBinder: TDataSetBinder;
+    FProcessoBinder: TDataSetBinder;
+    procedure RemoverProcesso;
     procedure ConfigurarConsultaAtual;
+    function GetProcessoSelecionado: TProcessoBase;
+    function ProcessoDao: IDaoBase;
     { Private declarations }
   public
+    constructor Create(AOWner: TComponent); override;
     class procedure AbrirConfigAviso(pIDAviso: Integer);
     procedure AbrirConfig(pIDAviso: Integer);
     { Public declarations }
@@ -109,35 +122,32 @@ implementation
 {$R *.dfm}
 
 uses
-  Form.CadastroProcesso, Form.SelecionaConsulta;
+  Form.CadastroProcessoConsulta, Form.SelecionaConsulta;
 
 { TuFormCadastrarAvisosAutomaticos }
 
-procedure TFormCadastroAviso.AbrirConfig(pIDAviso: Integer);
+procedure TFormCadastroAtividade.AbrirConfig(pIDAviso: Integer);
 begin
-  QryAtividade.Close;
-  QryAtividade.ParamByName('ID').AsInteger:= pIDAviso;
-  QryAtividade.Open;
+  FActivity:= FActivityDao.SelectKey(pIDAviso);
 
-  if QryAtividade.IsEmpty then
+  if not Assigned(FActivity) then
   begin
-    ShowMessage('Aviso cod.: '+IntToStr(pIDAviso)+' não encontrado.');
+    ShowMessage('Aviso código '+IntToStr(pIDAviso)+' não encontrado.');
     Exit;
   end;
 
-  QryProcessos.Close;
-  QryProcessos.ParamByName('IDAviso').AsInteger:= pIDAviso;
-  QryProcessos.Open;
+  FActivityBinder.PullFromObject(FActivity);
+  FProcessoBinder.Pull<TProcessoBase>(FActivity.Processos);
 
   ShowModal;
 end;
 
-class procedure TFormCadastroAviso.AbrirConfigAviso(
+class procedure TFormCadastroAtividade.AbrirConfigAviso(
   pIDAviso: Integer);
 var
-  FFrm: TFormCadastroAviso;
+  FFrm: TFormCadastroAtividade;
 begin
-  FFrm:= TFormCadastroAviso.Create(Application);
+  FFrm:= TFormCadastroAtividade.Create(Application);
   try
     FFrm.AbrirConfig(pIDAviso);
   finally
@@ -145,76 +155,119 @@ begin
   end;
 end;
 
-procedure TFormCadastroAviso.BtnConfiguraProcessoClick(Sender: TObject);
+procedure TFormCadastroAtividade.BtnConfiguraProcessoClick(Sender: TObject);
 begin
   ConfigurarConsultaAtual;
 end;
 
-procedure TFormCadastroAviso.BtnAddProcessoClick(Sender: TObject);
+procedure TFormCadastroAtividade.BtnAddProcessoClick(Sender: TObject);
 var
   FIDConsulta: Integer;
+  FProcesso: TProcessoBase;
 begin
-  FIDConsulta:= TFormSelecionaConsulta.SelecionaConsulta;
-  if FIDConsulta = 0 then
-    Exit;
+  FProcesso:= TFormCadastroProcessoConsulta._NewProcess;
 
-  QryProcessos.Append;
-  QryProcessosIDAviso.AsInteger:= QryAtividadeID.AsInteger;
-  QryProcessosIDConsulta.AsInteger:= FIDConsulta;
-  QryProcessos.Post;
-  ConfigurarConsultaAtual;
+  if Assigned(FProcesso) then
+  begin
+    FActivity.Processos.Add(FProcesso);
+    FProcessoBinder.Pull<TProcessoBase>(FActivity.Processos);
+  end;
 end;
 
-procedure TFormCadastroAviso.ConfigurarConsultaAtual;
+function TFormCadastroAtividade.GetProcessoSelecionado: TProcessoBase;
+var
+  FProcesso: TProcessoBase;
 begin
-  TFormCadastroProcesso.AbrirConfigRelatorio(QryProcessosIDAviso.AsInteger, QryProcessosIDConsulta.AsInteger);
-  QryProcessos.Refresh;
-end;
-
-procedure TFormCadastroAviso.BtnCancelarClick(Sender: TObject);
-begin
-  QryAtividade.Cancel;
-end;
-
-procedure TFormCadastroAviso.BtnFecharClick(Sender: TObject);
-begin
-  if QryAtividade.Modified then
-    if Application.MessageBox('Existem modificações não salvas, deseja sair sem salvar?', 'Atenção!',  MB_YESNO) = ID_Yes then
+  Result:= nil;
+  for FProcesso in FActivity.Processos do
+    if FProcesso.ID = TblProcessosID.AsInteger then
     begin
-      QryAtividade.Cancel;
-      Close;
+      Result:= FProcesso;
+      break;
     end;
 end;
 
-procedure TFormCadastroAviso.RemoverConsulta;
-  procedure RemoveConsultaDepencias(pIDAviso, pIDConsulta: Integer);
-  var
-    FSql: String;
-  begin
-    FSql:= 'DELETE FROM cons.AvisoConsultaParametro WHERE IDAviso = '+IntToStr(pIDAviso)
-           +' and IDConsulta = '+IntToStr(pIDConsulta);
-    ConSqlServer.ExecutaComando(FSql);
-  end;
-
+procedure TFormCadastroAtividade.ConfigurarConsultaAtual;
+var
+  FProcesso: TProcessoBase;
 begin
-  if not QryProcessos.IsEmpty then
+  FProcesso:= GetProcessoSelecionado;
+  if Assigned(FProcesso) then
+    TFormCadastroProcessoConsulta._EditProcess(FProcesso);
+
+  FProcessoBinder.Pull<TProcessoBase>(FActivity.Processos);
+//  TFormCadastroProcesso.AbrirConfigRelatorio(QryProcessosIDAviso.AsInteger, QryProcessosIDConsulta.AsInteger);
+//  QryProcessos.Refresh;
+end;
+
+function TFormCadastroAtividade.ProcessoDao: IDaoBase;
+begin
+  Result:= FActivityDao.ChildDaoByPropName('Processos');
+end;
+
+constructor TFormCadastroAtividade.Create(AOWner: TComponent);
+begin
+  inherited;
+  FActivityDao:= TActivityDao<TActivity>.Create;
+  FActivityBinder:= TDataSetBinder.Create(TblActivity, FActivityDao.ModeloBD);
+  FProcessoBinder:= TDataSetBinder.Create(TblProcessos, ProcessoDao.ModeloBD);
+  TblProcessos.Active:= True;
+  DataSetMemoFieldsAsText(TblActivity);
+  DataSetMemoFieldsAsText(TblProcessos);
+end;
+
+procedure TFormCadastroAtividade.FieldGetText(Sender: TField;
+  var Text: string; DisplayText: Boolean);
+begin
+  Text:= Sender.AsString;
+end;
+
+procedure TFormCadastroAtividade.FieldSetText(Sender: TField;
+  const Text: string);
+begin
+  Sender.AsString:= Text;
+end;
+
+procedure TFormCadastroAtividade.BtnFecharClick(Sender: TObject);
+begin
+  if TblActivity.Modified then
+    if Application.MessageBox('Existem modificações não salvas, deseja sair sem salvar?', 'Atenção!',  MB_YESNO) = ID_Yes then
+      Close;
+
+end;
+
+procedure TFormCadastroAtividade.RemoverProcesso;
+var
+  FProcesso: TProcessoBase;
+begin
+  if not TblProcessos.IsEmpty then
   begin
     if Application.MessageBox('Você tem certeza que deseja excluir este consulta?', 'Atenção!',  MB_YESNO) = ID_YES  then
     begin
-      RemoveConsultaDepencias(QryProcessosIDAviso.AsInteger, QryProcessosIDConsulta.AsInteger);
-      QryProcessos.Delete;
+      FProcesso:= GetProcessoSelecionado;
+
+      if Assigned(FProcesso) then
+      begin
+        ProcessoDao.Delete(FProcesso, FActivity);
+        FProcessoBinder.Pull<TProcessoBase>(FActivity.Processos);
+      end;
     end;
   end;
 end;
 
-procedure TFormCadastroAviso.BtnRemoveProcessoClick(Sender: TObject);
+procedure TFormCadastroAtividade.BtnRemoveProcessoClick(Sender: TObject);
 begin
-  RemoverConsulta;
+  RemoverProcesso;
+  FActivityBinder.PushToObject(FActivity);
 end;
 
-procedure TFormCadastroAviso.BtnSalvarClick(Sender: TObject);
+procedure TFormCadastroAtividade.BtnSalvarClick(Sender: TObject);
 begin
-  QryAtividade.Post;
+  if TblActivity.State in ([dsEdit, dsInsert])  then
+    TblActivity.Post;
+
+  FActivityBinder.PushToObject(FActivity);
+  FActivityDao.Save(FActivity);
 end;
 
 end.

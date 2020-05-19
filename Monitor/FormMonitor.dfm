@@ -104,9 +104,5 @@ object MonitorMain: TMonitorMain
       Caption = 'Fechar'
       OnClick = Fechar1Click
     end
-    object AvisosAutomaticos1: TMenuItem
-      Caption = 'Avisos Autom'#225'ticos'
-      OnClick = AvisosAutomaticos1Click
-    end
   end
 end

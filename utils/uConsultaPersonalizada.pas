@@ -195,8 +195,8 @@ type
     function CarregaVisualizacaoAtual: Boolean;
     procedure AtualizaTitulo;
     procedure LoadParamsFromDic(Params: TDictionary<string, variant>);
-    procedure PopulaComboBoxQry(pComboBox: TComboBox; pQry: TDataSet; ValorPadrao: variant);
-    procedure PopulaCheckListBoxQry(pCheckListBox: TCheckListBox; pQry: TDataSet; ValorPadrao: variant);
+//    procedure PopulaComboBoxQry(pComboBox: TComboBox; pQry: TDataSet; ValorPadrao: variant);
+//    procedure PopulaCheckListBoxQry(pCheckListBox: TCheckListBox; pQry: TDataSet; ValorPadrao: variant);
     function GetParams: TParametros;
     class function Conn: TDmConnection; static;
   public
@@ -235,12 +235,94 @@ var
   vArResultado: TStringList;
 
 procedure ExportarCxGridParaImagem(cxGridView: TcxGridChartView; pFileName: String);
+procedure PopulaCheckListBoxQry(pCheckListBox: TCheckListBox; pSql: String; ValorPadrao: variant);
+procedure PopulaComboBoxQry(pComboBox: TComboBox; pSql: String; ValorPadrao: variant);
 
 implementation
 
-uses Utils, System.UITypes, jpeg, Ladder.Activity.LadderVarToSql;
+uses Utils, System.UITypes, jpeg, Ladder.Activity.LadderVarToSql, Ladder.ORM.DaoUtils;
 
 {$R *.dfm}
+
+function GetDaoUtils: TDaoUtils;
+begin
+  Result:= TFrwServiceLocator.Context.DaoUtils;
+end;
+
+procedure PopulaComboBoxQry(pComboBox: TComboBox; pSql: String; ValorPadrao: variant);
+var
+  FDados: TDocVariantData;
+  I: Integer;
+begin
+  pComboBox.Clear;
+  if pSql='' then
+    Exit;
+
+  FDados:= TDocVariantData(GetDaoUtils.SelectAsDocVariant(pSql));
+
+  for I:= 0 to FDados.Count-1 do
+  begin
+    if (FDados._[I].Values[0] <> null) and
+       (FDados._[I].Values[1] <> null) then
+         TValorChave.AdicionaComboBox(pComboBox,
+                                      FDados._[I].Values[0],
+                                      FDados._[I].Values[1]);
+
+    if not VarIsNull(ValorPadrao) then
+      if FDados._[I].Values[0] = ValorPadrao then
+        pComboBox.ItemIndex:= pComboBox.Items.Count-1;
+  end;
+end;
+
+procedure PopulaCheckListBoxQry(pCheckListBox: TCheckListBox; pSql: String; ValorPadrao: variant);
+var
+  FDados: TDocVariantData;
+  vParamPadrao: Variant;
+  I: Integer;
+
+  procedure MarcaValor(pValor: Variant);
+  var
+    X: Integer;
+  begin
+    for X := 0 to pCheckListBox.items.Count-1 do
+      if TValorChave.ObterValorPorIndex(pCheckListBox.items, X) = Trim(pValor) then
+      begin
+        pCheckListBox.Checked[X]:= True;
+        Break;
+      end;
+  end;
+begin
+  pCheckListBox.Clear;
+  if pSql='' then
+    Exit;
+
+  FDados:= TDocVariantData(GetDaoUtils.SelectAsDocVariant(pSql));
+
+  for I := 0 to FDados.Count-1 do
+  begin
+    if (FDados._[0].Values[0] <> null) and
+       (FDados._[0].Values[1] <> null) then
+          TValorChave.AdicionaCheckListBox(pCheckListBox,
+                                     FDados._[0].Values[0],
+                                     FDados._[0].Values[1]);
+
+    if not VarIsNull(vParamPadrao) then
+      if FDados._[0].Values[0] = vParamPadrao then
+        pCheckListBox.ItemIndex:= pCheckListBox.Items.Count-1;
+  end;
+
+  if not VarIsNull(ValorPadrao) then
+    if VarIsArray(ValorPadrao) then
+    begin
+      for I := VarArrayLowBound(ValorPadrao ,1)  to VarArrayHighBound(ValorPadrao ,1) do
+        MarcaValor(ValorPadrao[I])
+    end
+   else
+    begin
+      MarcaValor(ValorPadrao);
+    end;
+
+end;
 
 procedure ExportarCxGridParaImagem(cxGridView: TcxGridChartView; pFileName: String);
 var
@@ -558,75 +640,6 @@ begin
     end
 end;
 
-procedure TFrmConsultaPersonalizada.PopulaComboBoxQry(pComboBox: TComboBox; pQry: TDataSet; ValorPadrao: variant);
-begin
-  pComboBox.Clear;
-
-  pQry.First;
-  while not pQry.eof do
-  begin
-    if (pQry.Fields[0].Value <> null) and
-       (pQry.Fields[1].Value <> null) then
-         TValorChave.AdicionaComboBox(pComboBox,
-                                      pQry.Fields[0].Value,
-                                      pQry.Fields[1].Value);
-
-    if not VarIsNull(ValorPadrao) then
-      if pQry.Fields[0].Value = ValorPadrao then
-        pComboBox.ItemIndex:= pComboBox.Items.Count-1;
-
-    pQry.next;
-  end;
-end;                                  
-
-procedure TFrmConsultaPersonalizada.PopulaCheckListBoxQry(pCheckListBox: TCheckListBox; pQry: TDataSet; ValorPadrao: variant);
-var
-  vParamPadrao: Variant;
-  I: Integer;
-
-  procedure MarcaValor(pValor: Variant);
-  var
-    X: Integer;
-  begin
-    for X := 0 to pCheckListBox.items.Count-1 do
-      if TValorChave.ObterValorPorIndex(pCheckListBox.items, X) = Trim(pValor) then
-      begin
-        pCheckListBox.Checked[X]:= True;
-        Break;
-      end;
-  end;
-begin
-  pCheckListBox.Clear;
-
-  pQry.First;
-  while not pQry.eof do
-  begin
-    if (pQry.Fields[0].Value <> null) and
-       (pQry.Fields[1].Value <> null) then
-          TValorChave.AdicionaCheckListBox(pCheckListBox,
-                                     pQry.Fields[0].Value,
-                                     pQry.Fields[1].Value);
-
-    if not VarIsNull(vParamPadrao) then
-      if pQry.Fields[0].Value = vParamPadrao then
-        pCheckListBox.ItemIndex:= pCheckListBox.Items.Count-1;
-
-    pQry.next;
-  end;
-
-  if not VarIsNull(ValorPadrao) then
-    if VarIsArray(ValorPadrao) then
-    begin
-      for I := VarArrayLowBound(ValorPadrao ,1)  to VarArrayHighBound(ValorPadrao ,1) do
-        MarcaValor(ValorPadrao[I])
-    end
-   else
-    begin
-      MarcaValor(ValorPadrao);
-    end;
-
-end;
-
 //+++++++++++++++++++++++++++++++
 //    Gera Parâmtros
 //+++++++++++++++++++++++++++++++
@@ -747,32 +760,23 @@ var
   procedure ParConfigComboSql;
   var
     pComp: TComponent;
-    FQry: TDataSet;
   begin
-    FQry:= Conn.CriaFDQuery(FDm.QryParametrosSql.Value, ScrollBox);
-    try
-//      FDm.ProcSubstVarSistema(FSql);
-      FQry.Active:=True;
+    pComp:= ScrollBox.FindComponent('V'+IntToStr(FDm.QryParametrosID.Value));
 
-      pComp:= ScrollBox.FindComponent('V'+IntToStr(FDm.QryParametrosID.Value));
+    if FDm.QryParametrosTipo.Value=1 then
+    begin
+      if not (pComp is TComboBox) then
+        Exit;
 
-      if FDm.QryParametrosTipo.Value=1 then
-      begin
-        if not (pComp is TComboBox) then
-          Exit;
+      PopulaComboBoxQry(TComboBox(pComp), FDm.QryParametrosSql.AsString, FDm.QryParametrosValorPadrao.Value);
+    end
+   else
+    if FDm.QryParametrosTipo.Value=4 then
+    begin
+      if not (pComp is TCheckListBox) then
+        Exit;
 
-        PopulaComboBoxQry(TComboBox(pComp), FQry, FDm.QryParametrosValorPadrao.Value);
-      end
-     else
-      if FDm.QryParametrosTipo.Value=4 then
-      begin
-        if not (pComp is TCheckListBox) then
-          Exit;
-
-        PopulaCheckListBoxQry(TCheckListBox(pComp), FQry, FDm.GetParamValue(FDm.QryParametrosNome.Value));
-      end;
-    finally
-      FQry.Free;
+      PopulaCheckListBoxQry(TCheckListBox(pComp), FDm.QryParametrosSql.AsString, FDm.GetParamValue(FDm.QryParametrosNome.Value));
     end;
   end;
 

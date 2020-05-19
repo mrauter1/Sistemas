@@ -12,12 +12,10 @@ type
     ApplicationEvents1: TApplicationEvents;
     PopupMenu1: TPopupMenu;
     Fechar1: TMenuItem;
-    AvisosAutomaticos1: TMenuItem;
     procedure ApplicationEvents1Exception(Sender: TObject; E: Exception);
     procedure Fechar1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure ApplicationEvents1Minimize(Sender: TObject);
-    procedure AvisosAutomaticos1Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -32,7 +30,7 @@ implementation
 {$R *.dfm}
 
 uses
-  Utils, uFormPesquisaAviso, Form.NovoProcesso;
+  Utils;
 
 procedure TMonitorMain.ApplicationEvents1Exception(Sender: TObject; E: Exception);
 begin
@@ -49,11 +47,6 @@ begin
   TrayIcon1.Visible := True;
   TrayIcon1.Animate := True;
   TrayIcon1.ShowBalloonHint;
-end;
-
-procedure TMonitorMain.AvisosAutomaticos1Click(Sender: TObject);
-begin
-  TFormNovoProcesso.SelecionaProcesso;
 end;
 
 procedure TMonitorMain.Fechar1Click(Sender: TObject);

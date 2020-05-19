@@ -11,6 +11,18 @@ type
   TTipoVisualizacao = (tvTabela, tvTabelaDinamica, tvGrafico);
   TFormatacaoCampo = (fcTexto, fcMoeda, fcPorcentagem);
 
+  RConsulta = record
+    ID: Integer;
+    Nome: String;
+    Descricao: String;
+    Sql: String;
+    Tipo: TTipoConsulta;
+    ConfigPadrao: Integer;
+    VisualizacaoPadrao: Integer;
+    IDPai: Integer;
+    FonteDados: Integer;
+  end;
+
   TParametroCon = class(TObject)
   private
     FCodigo: Integer;

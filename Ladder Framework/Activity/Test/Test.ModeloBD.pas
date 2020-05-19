@@ -38,7 +38,7 @@ type
     procedure SetUp; override;
     procedure TearDown; override;
     procedure TestMap;
-    procedure TestMapObjectToDataSet;
+    procedure TestObjectToDataSet;
     procedure TestObjectFromDataSet;
     procedure TestObjectFromSql;
     procedure TestPopulaObjectListFromDataSet;
@@ -96,14 +96,14 @@ begin
   // TODO: Validate method results
 end;
 
-procedure TestTModeloBD.TestMapObjectToDataSet;
+procedure TestTModeloBD.TestObjectToDataSet;
 var
   ReturnValue: Boolean;
   pDataSet: TDataSet;
   pObjeto: TObject;
 begin
   // TODO: Setup method call parameters
-  ReturnValue := FModeloBD.MapObjectToDataSet(pObjeto, pDataSet);
+  ReturnValue := FModeloBD.ObjectToDataSet(pObjeto, pDataSet);
   // TODO: Validate method results
 end;
 

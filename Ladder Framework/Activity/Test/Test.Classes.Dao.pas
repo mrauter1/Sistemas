@@ -43,7 +43,7 @@ type
   TestTAtividadeDao = class(TTestCase)
   strict private
     FAtividade: TActivity;
-    FAtividadeDao: IDaoGeneric<TProcessoBase>;
+    FAtividadeDao: IDaoGeneric<TActivity>;
   private
     procedure ConfigAtividade(pAtividade: TActivity);
   public
@@ -132,7 +132,7 @@ end;
 
 procedure TestTAtividadeDao.SetUp;
 begin
-  FAtividadeDao := TAtividadeDao.Create;
+  FAtividadeDao := TActivityDao<TActivity>.Create;
 end;
 
 procedure TestTAtividadeDao.TearDown;
@@ -185,7 +185,7 @@ end;
 
 procedure TestTProcessoDao.SetUp;
 begin
-  FProcessoDao:= TProcessoDao.Create;
+  FProcessoDao:= TProcessoDao<TProcessoBase>.Create;
 end;
 
 procedure TestTProcessoDao.TearDown;

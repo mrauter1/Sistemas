@@ -17,14 +17,8 @@ uses
   uConSqlServer in 'uConSqlServer.pas' {ConSqlServer: TDataModule},
   uDmEnviaRelatorios in 'uDmEnviaRelatorios.pas' {Con: TDataModule},
   uConsultaPersonalizada in '..\utils\uConsultaPersonalizada.pas' {FrmConsultaPersonalizada},
-  Form.CadastroAtividade in 'Forms\Form.CadastroAtividade.pas' {FormCadastroAviso},
-  Form.CadastroProcesso in 'Forms\Form.CadastroProcesso.pas' {FormCadastroProcesso},
-  uFormPesquisaAviso in 'uFormPesquisaAviso.pas' {FormPesquisaAviso},
-  Form.SelecionaConsulta in 'Forms\Form.SelecionaConsulta.pas' {FormSelecionaConsulta},
   uAppConfig in '..\utils\uAppConfig.pas',
-  uDmGravaLista in '..\utils\uDmGravaLista.pas' {DmGravaLista: TDataModule},
-  Form.NovoProcesso in 'Forms\Form.NovoProcesso.pas' {FormNovoProcesso},
-  Ladder.Activity.ViewClasses in '..\Ladder Framework\Activity\Ladder.Activity.ViewClasses.pas';
+  uDmGravaLista in '..\utils\uDmGravaLista.pas' {DmGravaLista: TDataModule};
 
 {$R *.res}
 

@@ -1,4 +1,4 @@
-object FormCadastroAviso: TFormCadastroAviso
+object FormCadastroAtividade: TFormCadastroAtividade
   Left = 0
   Top = 0
   Caption = 'Configurar Atividades'
@@ -20,7 +20,6 @@ object FormCadastroAviso: TFormCadastroAviso
     Height = 78
     Align = alTop
     TabOrder = 0
-    ExplicitTop = -5
     DesignSize = (
       599
       78)
@@ -54,7 +53,7 @@ object FormCadastroAviso: TFormCadastroAviso
       Width = 313
       Height = 21
       Anchors = [akLeft, akTop, akRight]
-      DataField = 'Nome'
+      DataField = 'Name'
       DataSource = DsAtividade
       TabOrder = 0
     end
@@ -74,7 +73,7 @@ object FormCadastroAviso: TFormCadastroAviso
       Width = 521
       Height = 21
       Anchors = [akLeft, akTop, akRight]
-      DataField = 'Titulo'
+      DataField = 'Description'
       DataSource = DsAtividade
       TabOrder = 2
     end
@@ -157,18 +156,25 @@ object FormCadastroAviso: TFormCadastroAviso
         Columns = <
           item
             Expanded = False
-            FieldName = 'IDConsulta'
+            FieldName = 'ID'
             Visible = True
           end
           item
             Expanded = False
-            FieldName = 'Descricao'
+            FieldName = 'Name'
+            Width = 135
             Visible = True
           end
           item
             Expanded = False
-            FieldName = 'Visualizacao'
-            Width = 90
+            FieldName = 'Description'
+            Width = 200
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'ExecutorClass'
+            Width = 111
             Visible = True
           end>
       end
@@ -270,117 +276,24 @@ object FormCadastroAviso: TFormCadastroAviso
       TabOrder = 0
       OnClick = BtnSalvarClick
     end
-    object BtnCancelar: TBitBtn
-      Left = 142
-      Top = 5
-      Width = 108
-      Height = 25
-      Caption = 'Cancelar'
-      TabOrder = 1
-      OnClick = BtnCancelarClick
-    end
     object BtnFechar: TBitBtn
       Left = 477
       Top = 5
       Width = 108
       Height = 25
       Caption = 'Fechar'
-      TabOrder = 2
+      TabOrder = 1
       OnClick = BtnFecharClick
     end
   end
-  object QryAtividade: TFDQuery
-    Connection = ConSqlServer.FDConnection
-    SQL.Strings = (
-      'Select *'
-      'from cons.AvisoAutomatico'
-      'where ID = :ID')
-    Left = 433
-    Top = 34
-    ParamData = <
-      item
-        Name = 'ID'
-        DataType = ftInteger
-        FDDataType = dtInt32
-        ParamType = ptInput
-      end>
-    object QryAtividadeID: TFDAutoIncField
-      FieldName = 'ID'
-      Origin = 'ID'
-      ProviderFlags = [pfInWhere, pfInKey]
-      ReadOnly = True
-    end
-    object QryAtividadeNome: TStringField
-      FieldName = 'Nome'
-      Origin = 'Nome'
-      Size = 255
-    end
-    object QryAtividadeTitulo: TStringField
-      FieldName = 'Titulo'
-      Origin = 'Titulo'
-      Size = 511
-    end
-    object QryAtividadeMensagem: TMemoField
-      FieldName = 'Mensagem'
-      Origin = 'Mensagem'
-      BlobType = ftMemo
-      Size = 2147483647
-    end
-  end
   object DsAtividade: TDataSource
-    DataSet = QryAtividade
-    Left = 529
+    DataSet = TblActivity
+    Left = 385
     Top = 34
-  end
-  object QryProcessos: TFDQuery
-    Connection = ConSqlServer.FDConnection
-    SQL.Strings = (
-      'Select ac.IDAviso, IDConsulta, cc.Descricao, '
-      '  case when ac.TipoVisualizacao = 0 then '#39'Tabela'#39
-      '          when ac.TipoVisualizacao = 1 then '#39'Pivot'#39
-      '          when ac.TipoVisualizacao = 2 then '#39'Gr'#225'fico'#39
-      '   end as Visualizacao'
-      'from cons.AvisoConsulta ac'
-      'left join cons.Consultas cc on cc.ID = ac.IDConsulta'
-      'where IDAviso = :IDAviso')
-    Left = 185
-    Top = 146
-    ParamData = <
-      item
-        Name = 'IDAVISO'
-        DataType = ftInteger
-        FDDataType = dtInt32
-        ParamType = ptInput
-      end>
-    object QryProcessosIDAviso: TIntegerField
-      FieldName = 'IDAviso'
-      Origin = 'IDAviso'
-      Required = True
-    end
-    object QryProcessosIDConsulta: TIntegerField
-      DisplayLabel = 'ID Consulta'
-      FieldName = 'IDConsulta'
-      Origin = 'IDConsulta'
-      Required = True
-    end
-    object QryProcessosDescricao: TStringField
-      DisplayLabel = 'Descri'#231#227'o'
-      DisplayWidth = 50
-      FieldName = 'Descricao'
-      Origin = 'Descricao'
-      Size = 512
-    end
-    object QryProcessosVisualizacao: TStringField
-      DisplayLabel = 'Visualiza'#231#227'o'
-      FieldName = 'Visualizacao'
-      Origin = 'Visualizacao'
-      ReadOnly = True
-      Size = 7
-    end
   end
   object DsProcessos: TDataSource
     AutoEdit = False
-    DataSet = QryProcessos
+    DataSet = TblProcessos
     Left = 281
     Top = 146
   end
@@ -476,6 +389,98 @@ object FormCadastroAviso: TFormCadastroAviso
     object MemoField1: TMemoField
       FieldName = 'Valor'
       Origin = 'Valor'
+      BlobType = ftMemo
+      Size = 2147483647
+    end
+  end
+  object TblProcessos: TFDMemTable
+    FetchOptions.AssignedValues = [evMode]
+    FetchOptions.Mode = fmAll
+    ResourceOptions.AssignedValues = [rvSilentMode]
+    ResourceOptions.SilentMode = True
+    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
+    UpdateOptions.CheckRequired = False
+    UpdateOptions.AutoCommitUpdates = True
+    Left = 377
+    Top = 146
+    object TblProcessosID: TIntegerField
+      FieldName = 'ID'
+    end
+    object TblProcessosIDActivity: TIntegerField
+      FieldName = 'IDActivity'
+      Origin = 'IDActivity'
+    end
+    object TblProcessosName: TMemoField
+      FieldName = 'Name'
+      Origin = 'Name'
+      BlobType = ftMemo
+      Size = 2147483647
+    end
+    object TblProcessosDescription: TMemoField
+      FieldName = 'Description'
+      Origin = 'Description'
+      BlobType = ftMemo
+      Size = 2147483647
+    end
+    object TblProcessosClassName: TMemoField
+      FieldName = 'ClassName'
+      Origin = 'ClassName'
+      BlobType = ftMemo
+      Size = 2147483647
+    end
+    object TblProcessosExecutorClass: TMemoField
+      FieldName = 'ExecutorClass'
+      Origin = 'ExecutorClass'
+      BlobType = ftMemo
+      Size = 2147483647
+    end
+  end
+  object TblActivity: TFDMemTable
+    FetchOptions.AssignedValues = [evMode]
+    FetchOptions.Mode = fmAll
+    ResourceOptions.AssignedValues = [rvSilentMode]
+    ResourceOptions.SilentMode = True
+    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
+    UpdateOptions.CheckRequired = False
+    UpdateOptions.AutoCommitUpdates = True
+    Left = 305
+    Top = 34
+    object TblActivityID: TIntegerField
+      FieldName = 'ID'
+    end
+    object TblActivityIDActivity: TIntegerField
+      FieldName = 'IDActivity'
+      Origin = 'IDActivity'
+    end
+    object TblActivityName: TMemoField
+      FieldName = 'Name'
+      Origin = 'Name'
+      OnGetText = FieldGetText
+      OnSetText = FieldSetText
+      BlobType = ftMemo
+      Size = 2147483647
+    end
+    object TblActivityDescription: TMemoField
+      FieldName = 'Description'
+      Origin = 'Description'
+      OnGetText = FieldGetText
+      OnSetText = FieldSetText
+      BlobType = ftMemo
+      Size = 2147483647
+    end
+    object TblActivityClassName: TMemoField
+      FieldName = 'ClassName'
+      Origin = 'ClassName'
+      OnGetText = FieldGetText
+      OnSetText = FieldSetText
+      BlobType = ftMemo
+      Size = 2147483647
+    end
+    object TblActivityExecutorClass: TMemoField
+      FieldName = 'ExecutorClass'
+      Origin = 'ExecutorClass'
+      OnGetText = FieldGetText
+      OnSetText = FieldSetText
       BlobType = ftMemo
       Size = 2147483647
     end

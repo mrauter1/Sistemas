@@ -10,6 +10,9 @@ function LadderDateToStr(Date: TDateTime): String;
 
 function JoinList(const pValue: Variant; const pSeparator: String): String;
 
+function VarToIntDef(pVar: Variant; pDefault: Integer = 0): Integer;
+function VarToFloatDef(pVar: Variant; pDefault: Double = 0): Double;
+
 implementation
 
 uses
@@ -76,6 +79,30 @@ begin
   Result:= Iso8601ToDateTime(pAnsi);
   if Result = 0 then
     Result:= VarToDateTime(pValue);
+end;
+
+function VarToFloatDef(pVar: Variant; pDefault: Double = 0): Double;
+begin
+  if VarIsNull(pVar) then
+    Result:= pDefault
+  else
+  try
+    Result:= pVar;
+  except
+    Result:= pDefault;
+  end;
+end;
+
+function VarToIntDef(pVar: Variant; pDefault: Integer = 0): Integer;
+begin
+  if VarIsNull(pVar) then
+    Result:= pDefault
+  else
+  try
+    Result:= pVar;
+  except
+    Result:= pDefault;
+  end;
 end;
 
 end.

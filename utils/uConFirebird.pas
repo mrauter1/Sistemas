@@ -31,7 +31,7 @@ procedure TConFirebird.DataModuleCreate(Sender: TObject);
 begin
   try
     ModoDesconectado:= True;
-    LerConnectionParams(AppConfig.ConFirebird);
+    LerConnectionParams(AppConfig.ConFirebird, False);
 
     inherited;
   except on E: Exception do

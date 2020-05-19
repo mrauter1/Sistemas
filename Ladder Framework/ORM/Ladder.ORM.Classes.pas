@@ -3,7 +3,7 @@ unit Ladder.ORM.Classes;
 interface
 
 uses
-  SysUtils, Generics.Collections, {Spring.Collections, }System.Rtti,Data.DB, Contnrs, Ladder.ORM.Functions;
+  SysUtils, Generics.Collections, {Spring.Collections, }System.Rtti,Data.DB, Contnrs;
 
 type
   // Caso seja necessário trocar para um Int64 futuramente
@@ -89,6 +89,10 @@ type
   FrwUtils: TFrwUtils;}
 
 implementation
+
+uses
+  Ladder.ORM.DaoUtils;
+
 
 {
 constructor TFrwUtils.Create;
@@ -208,7 +212,7 @@ constructor TBOCollection<T>.Create(pNomePropChave: String);
 begin
   inherited Create;
 
-  FPropChave:= TFuncoes.RttiContext.GetType(T).GetProperty(pNomePropChave);
+  FPropChave:= TDaoUtils.RttiContext.GetType(T).GetProperty(pNomePropChave);
   FDictionary:= TDictionary<Integer,T>.Create;
 end;
 

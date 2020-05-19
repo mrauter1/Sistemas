@@ -81,6 +81,7 @@ type
     function UpdateChild(pMaster, pChild: TObject; ChildDefs: TChildDaoDefs = nil): Boolean;
     function DeleteChild(pMaster, pChild: TObject; ChildDefs: TChildDaoDefs = nil): Integer;
 
+    function ChildDaoByPropName(pPropertyName: String): IDaoBase;
     procedure AddChildDao(pPropertyName: String; pMasterFieldName: String; pChildFieldName: String; pDao: IDaoBase);
 
     property ModeloBD: TModeloBD read GetModeloBD;
@@ -175,6 +176,7 @@ type
     function SelectWhere<T: Class>(const pWhere: String): TFrwObjectList<T>; overload;
     procedure SelectWhere<T: Class>(pObjectList: TObjectList<T>; const pWhere: String); overload;
 
+    function ChildDaoByPropName(pPropertyName: String): IDaoBase;
     procedure AddChildDao(pPropertyName: String; pMasterFieldName: String; pChildFieldName: String; pDao: IDaoBase); virtual;
   end;
 
@@ -318,7 +320,7 @@ end;
 
 function TChildDaoDefs.GetPropertyName: String;
 begin
-  FProperty.Name;
+  Result:= FProperty.Name;
 end;
 
 function TChildDaoDefs.ItemClass: TClass;
@@ -381,6 +383,19 @@ begin
 
   ModeloBD:= pModeloBD;
   fOwnsModelo:= pOwnsModelo;
+end;
+
+function TDaoBase.ChildDaoByPropName(pPropertyName: String): IDaoBase;
+var
+  fChildDao: TChildDaoDefs;
+begin
+  for fChildDao in fChildDaoList do
+    if SameText(fChildDao.PropertyName, pPropertyName) then
+    begin
+      Result:= fChildDao.Dao;
+      exit;
+    end;
+  Result:= nil;
 end;
 
 constructor TDaoBase.Create(pNomeTabela, pCampoChave: string;

@@ -3,8 +3,8 @@ unit Ladder.ORM.DaoUtils;
 interface
 
 uses
-  AdoDB, Ladder.ORM.Functions, System.Contnrs, generics.collections, System.Classes, Data.DB, uDmConnection,
-  FireDAC.Comp.Client, System.SysUtils, SynDB;
+  AdoDB, System.Contnrs, generics.collections, System.Classes, Data.DB, uDmConnection,
+  FireDAC.Comp.Client, System.SysUtils, SynDB, System.Rtti;
 
 type
   TDaoUtils = class
@@ -12,6 +12,7 @@ type
     FConnection: TSQLDBConnectionProperties;
     property Connection: TSQLDBConnectionProperties read FConnection;
   public
+    class var RttiContext: TRttiContext;
     constructor Create(pConnection: TSQLDBConnectionProperties);
 
     function ExecuteNoResult(const pSQL: String): Integer;
@@ -42,7 +43,7 @@ type
 implementation
 
 uses
-  mORMot, MormotVCL, SynCommons, SynDBVCL;
+  mORMot, MormotVCL, SynCommons, SynDBVCL, Ladder.Utils;
 
 { TDaoUtils }
 
@@ -170,6 +171,9 @@ begin
 
   Result:= True;
 end;
+
+initialization
+  TDaoUtils.RttiContext:= TRttiContext.Create;
 
 end.
 

@@ -137,7 +137,7 @@ type
 
     procedure AddFieldInUpdateDeleteWhere(pFieldName: String);
 
-    function MapObjectToDataSet(pObjeto: TObject; pDataSet: TDataset): Boolean;
+    function ObjectToDataSet(pObjeto: TObject; pDataSet: TDataset): Boolean;
 
     procedure ObjectFromDataSet(pObject: TObject; pDataSet: TDataSet); overload;
     function ObjectFromDataSet(pDataSet: TDataSet): TObject; overload;
@@ -433,7 +433,7 @@ begin
   Result:= MappedFieldList.MapProperty(pPropName, pFunGetPropValue);
 end;
 
-function TModeloBD.MapObjectToDataSet(pObjeto: TObject; pDataSet: TDataset): Boolean;
+function TModeloBD.ObjectToDataSet(pObjeto: TObject; pDataSet: TDataset): Boolean;
 begin
   Result:= FazMapeamentoECopiaValores(pObjeto, pDataSet, tmObjectToDataSet);
 end;

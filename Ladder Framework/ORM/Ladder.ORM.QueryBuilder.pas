@@ -33,6 +33,8 @@ type
     function SelectValorUltimaChave: String; virtual; abstract;
 
     class function FloatToSqlStr(pValor: Extended): String; virtual;
+    class function TableExists(pTableName: String): String; virtual; abstract;
+    class function TruncateTable(const pTableName: String): String; virtual; abstract;
   end;
 
   TSqlServerQueryBuilder = class(TQueryBuilderBase)
@@ -58,6 +60,8 @@ type
 
     class function DateSqlServer(pData: TDateTime; withQuotes: Boolean = true): String;
     class function DateTimeSqlServer(pData: TDateTime; withQuotes: Boolean = true): String;
+    class function TableExists(pTableName: String): String; override;
+    class function TruncateTable(const pTableName: String): String; override;
   end;
 
 implementation
@@ -204,6 +208,19 @@ begin
   Result:= SelectWhere(Format('%s = %d', [ModeloBD.NomeCampoChave, FValor]));
 end;
 
+
+class function TSqlServerQueryBuilder.TableExists(pTableName: String): String;
+begin
+  if pTableName.StartsWith('#') then
+    Result:= Format('select OBJECT_ID(''tempdb..%s'', ''U'')', [pTableName])
+  else
+    Result:= Format('select OBJECT_ID(''%s'', ''U'')', [pTableName]);
+end;
+
+class function TSqlServerQueryBuilder.TruncateTable(const pTableName: String): String;
+begin
+  Result:= Format('TRUNCATE TABLE %s', [pTableName]);
+end;
 
 function TSqlServerQueryBuilder.Delete(pObject: TObject; pMasterInstance: TObject=nil): String;
 begin

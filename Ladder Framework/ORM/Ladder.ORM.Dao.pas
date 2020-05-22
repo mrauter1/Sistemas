@@ -240,8 +240,6 @@ type
     function NewQueryBuilder(ModeloBD: TModeloBD): TQueryBuilderBase;
   end;
 
-function InheritFromGenericOfType(classType: TRttiType; const genericType: string): Boolean;
-
 var
  // Singleton
   DaoFactory: TDaoFactory;
@@ -249,31 +247,9 @@ var
 implementation
 
 uses
-  SysUtils, Classes, TypInfo, Controls, StrUtils, Variants;
+  SysUtils, Classes, TypInfo, Controls, StrUtils, Variants, Ladder.Utils;
 
 { TDaoChildDefinitions }
-
-function InheritFromGenericOfType(classType: TRttiType; const genericType: string): Boolean;
-var
-  baseType: TRttiType;
-
-  function GetGenericTypeDefinition(classType: TRttiType): String;
-  begin
-    if not classType.IsGenericType then
-      Result:= ''
-    else
-      Result := Copy(classType.Name, 0, Pos('<', classType.Name)) + DupeString(',', High(classType.GetGenericArguments)) + '>';
-  end;
-
-begin
-  if SameText(GetGenericTypeDefinition(ClassType), genericType)  then
-    Result := True
-  else
-  begin
-    baseType := classType.BaseType;
-    Result := Assigned(baseType) and InheritFromGenericOfType(baseType, genericType);
-  end;
-end;
 
 constructor TChildDaoDefs.Create(pMasterProperty: TRttiMember; pMasterFieldName,
   pChildFieldName: String; pDao: IDaoBase; pWeakReference: Boolean = False);

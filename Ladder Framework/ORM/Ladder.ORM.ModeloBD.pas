@@ -49,7 +49,6 @@ type
     constructor Create(pItemClass: TClass);
   end;
 
-
   TOpcaoMapeamento = (ApenasExplicitos);
 
   TOpcoesMapeamento = set of TOpcaoMapeamento;
@@ -100,7 +99,6 @@ type
     procedure ColumnParaProp(Instance: TObject; pRows: ISqlDBRows; pFieldMapping: TFieldMapping);
     function GetPropChave: TRttiMember;
     function GetNomeCampoChave: string;
-    function CreateObject(pDBRows: ISqlDBRows): TObject;
     procedure SetItemClass(const Value: TClass);
   public
     property NomeTabela: String read FNomeTabela;
@@ -158,8 +156,6 @@ type
     function ObjectListFromSql(const pSql: String): TObjectList; overload;
     function ObjectListFromSql<T: class>(const pSql: String): TFrwObjectList<T>; overload;
 
-//    function ObjectListFromSqlMormot(const pSql: String): TObjectList;
-
     // Faz o mapeamento do Objeto e do DataSet. Ao encontrar a propriedade do objeto correspondente a um campo no dataset dispara MapeamentoCallback.
     // Caso existam campos mapeados na lista FMappedFieldList, utiliza a correspondencia setada,
     // caso contrario faz o mapeamento por propriedades que tenham o mesmo no de um campo do dataset.
@@ -168,6 +164,9 @@ type
 
     procedure SetKeyValue(pObject: TObject; fValor: Integer);
     function GetKeyValue(pObject: TObject): Integer;
+
+    function CreateObject(pDBRows: ISqlDBRows): TObject; overload;
+    function CreateObject(pDataSet: TDataSet): TObject; overload;
   end;
 
 // Use Rtti to execute the Create constructor of the object, if there is not Create calls TClass.Create
@@ -498,7 +497,7 @@ begin
   if pDataSet.IsEmpty then
     Exit;
 
-  Result:= CreateObject(TSqlDBRowDataSet.Create(pDataSet)); //ItemClass.Create;
+  Result:= CreateObject(pDataSet); //ItemClass.Create;
 
   ObjectFromDataSet(Result, pDataSet);
 end;
@@ -556,6 +555,11 @@ begin
   AddFieldInUpdateDeleteWhere(FNomePropChave);
 
 //  FPropChave:= GetPropByName(GetPropNameByFieldName(FNomePropChave));
+end;
+
+function TModeloBD.CreateObject(pDataSet: TDataSet): TObject;
+begin
+  Result:= CreateObject(TSqlDBRowDataSet.Create(pDataSet));
 end;
 
 destructor TModeloBD.Destroy;

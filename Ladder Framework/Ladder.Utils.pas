@@ -2,6 +2,9 @@ unit Ladder.Utils;
 
 interface
 
+uses
+  RTTI;
+
 function LadderVarIsList(const pValue: Variant): Boolean;
 function LadderVarIsIso8601(const pValue: Variant): Boolean;
 function LadderVarIsDateTime(const pValue: Variant): Boolean;
@@ -13,10 +16,12 @@ function JoinList(const pValue: Variant; const pSeparator: String): String;
 function VarToIntDef(pVar: Variant; pDefault: Integer = 0): Integer;
 function VarToFloatDef(pVar: Variant; pDefault: Double = 0): Double;
 
+function InheritFromGenericOfType(classType: TRttiType; const genericType: string): Boolean;
+
 implementation
 
 uses
-  Variants, SynCommons;
+  Variants, SynCommons, Spring.Reflection, StrUtils, SysUtils;
 
 function JoinList(const pValue: Variant; const pSeparator: String): String;
 var
@@ -102,6 +107,28 @@ begin
     Result:= pVar;
   except
     Result:= pDefault;
+  end;
+end;
+
+function InheritFromGenericOfType(classType: TRttiType; const genericType: string): Boolean;
+var
+  baseType: TRttiType;
+
+  function GetGenericTypeDefinition(classType: TRttiType): String;
+  begin
+    if not classType.IsGenericType then
+      Result:= ''
+    else
+      Result := Copy(classType.Name, 0, Pos('<', classType.Name)) + DupeString(',', High(classType.GetGenericArguments)) + '>';
+  end;
+
+begin
+  if SameText(GetGenericTypeDefinition(ClassType), genericType)  then
+    Result := True
+  else
+  begin
+    baseType := classType.BaseType;
+    Result := Assigned(baseType) and InheritFromGenericOfType(baseType, genericType);
   end;
 end;
 

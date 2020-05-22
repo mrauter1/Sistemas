@@ -242,7 +242,7 @@ var
 begin
   if not TblProcessos.IsEmpty then
   begin
-    if Application.MessageBox('Você tem certeza que deseja excluir este consulta?', 'Atenção!',  MB_YESNO) = ID_YES  then
+    if Application.MessageBox('Você tem certeza que deseja excluir este proesso?', 'Atenção!',  MB_YESNO) = ID_YES  then
     begin
       FProcesso:= GetProcessoSelecionado;
 

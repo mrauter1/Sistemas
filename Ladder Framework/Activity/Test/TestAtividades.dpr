@@ -53,7 +53,9 @@ uses
   Form.CadastroProcessoConsulta in '..\..\Forms\Form.CadastroProcessoConsulta.pas' {FormCadastroProcessoConsulta},
   Ladder.ORM.DataSetBinding in '..\..\ORM\Ladder.ORM.DataSetBinding.pas',
   Ladder.ORM.ObjectDataSet in '..\..\ORM\Ladder.ORM.ObjectDataSet.pas',
-  uConClasses in '..\..\..\utils\uConClasses.pas';
+  uConClasses in '..\..\..\utils\uConClasses.pas',
+  Spring.Data.ObjectDataSet in '..\..\ORM\Spring.Data.ObjectDataSet.pas',
+  Test.ObjectDataset in 'Test.ObjectDataset.pas';
 
 {$R *.RES}
 

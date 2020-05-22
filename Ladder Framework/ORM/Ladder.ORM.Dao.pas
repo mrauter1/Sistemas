@@ -104,7 +104,7 @@ type
     function SelectOne(const pWhere: String): T; overload;
     procedure SelectOne(pObject: T; const pWhere: String); overload;
 
-    function SelectWhere(const pWhere: String): TFrwObjectList<T>; overload;
+    function SelectWhereG(const pWhere: String): TObjectList<T>; overload;
     procedure SelectWhere(pObjectList: TObjectList<T>; const pWhere: String); overload;
 
     property ModeloBD: TModeloBD read GetModeloBD;
@@ -173,7 +173,7 @@ type
     procedure SelectWhere(pList: TObjectList; const pWhere: String); overload;
     procedure SelectWhere(pObjectList: TObjectList<TObject>; const pWhere: String); overload;
 
-    function SelectWhere<T: Class>(const pWhere: String): TFrwObjectList<T>; overload;
+    function SelectWhere<T: Class>(const pWhere: String): TObjectList<T>; overload;
     procedure SelectWhere<T: Class>(pObjectList: TObjectList<T>; const pWhere: String); overload;
 
     function ChildDaoByPropName(pPropertyName: String): IDaoBase;
@@ -201,7 +201,7 @@ type
     function SelectOne(const pWhere: String): T; reintroduce; overload; virtual;
     procedure SelectOne(pObject: T; const pWhere: String); reintroduce; overload; virtual;
 
-    function SelectWhere(const pWhere: String): TFrwObjectList<T>; overload; virtual;
+    function SelectWhereG(const pWhere: String): TObjectList<T>; overload; virtual;
     procedure SelectWhere(pObjectList: TObjectList<T>; const pWhere: String); overload; virtual;
   end;
 
@@ -433,7 +433,7 @@ begin
   ModeloBD.PopulaObjectListFromSql<T>(pObjectList, QueryBuilder.SelectWhere(pWhere));
 end;
 
-function TDaoBase.SelectWhere<T>(const pWhere: String): TFrwObjectList<T>;
+function TDaoBase.SelectWhere<T>(const pWhere: String): TObjectList<T>;
 begin
   Result:= ModeloBD.ObjectListFromSql<T>(QueryBuilder.SelectWhere(pWhere));
 end;
@@ -948,7 +948,7 @@ begin
   inherited;
 end;
 
-function TDaoGeneric<T>.SelectWhere(const pWhere: String): TFrwObjectList<T>;
+function TDaoGeneric<T>.SelectWhereG(const pWhere: String): TObjectList<T>;
 begin
 //  Result:= fDaoBase.GetGenericListWhere<T>(pWhere);
   Result:= inherited SelectWhere<T>(pWhere);

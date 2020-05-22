@@ -11,7 +11,6 @@ object FormPesquisaAviso: TFormPesquisaAviso
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
-  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   object Panel1: TPanel
@@ -110,57 +109,52 @@ object FormPesquisaAviso: TFormPesquisaAviso
       OnClick = BtnNovoAvisoClick
     end
   end
-  object QryAvisos: TFDQuery
-    Active = True
-    Connection = ConSqlServer.FDConnection
-    SQL.Strings = (
-      'Select * from '
-      'ladder.Processos'
-      'where ClassName = '#39'TActivity'#39)
-    Left = 120
+  object DsAvisos: TDataSource
+    AutoEdit = False
+    DataSet = TbAvisos
+    Left = 248
     Top = 104
-    object QryAvisosID: TFDAutoIncField
+  end
+  object TbAvisos: TFDMemTable
+    FetchOptions.AssignedValues = [evMode]
+    FetchOptions.Mode = fmAll
+    ResourceOptions.AssignedValues = [rvSilentMode]
+    ResourceOptions.SilentMode = True
+    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
+    UpdateOptions.CheckRequired = False
+    UpdateOptions.AutoCommitUpdates = True
+    Left = 385
+    Top = 106
+    object TbAvisosID: TIntegerField
       FieldName = 'ID'
-      Origin = 'ID'
-      ProviderFlags = [pfInWhere, pfInKey]
-      ReadOnly = True
     end
-    object QryAvisosIDActivity: TIntegerField
+    object TbAvisosIDActivity: TIntegerField
       FieldName = 'IDActivity'
       Origin = 'IDActivity'
-      Visible = False
     end
-    object QryAvisosName: TMemoField
+    object TbAvisosName: TMemoField
       FieldName = 'Name'
       Origin = 'Name'
       BlobType = ftMemo
       Size = 2147483647
     end
-    object QryAvisosDescription: TMemoField
+    object TbAvisosDescription: TMemoField
       FieldName = 'Description'
       Origin = 'Description'
       BlobType = ftMemo
       Size = 2147483647
     end
-    object QryAvisosClassName: TMemoField
+    object TbAvisosClassName: TMemoField
       FieldName = 'ClassName'
       Origin = 'ClassName'
-      Visible = False
       BlobType = ftMemo
       Size = 2147483647
     end
-    object QryAvisosExecutorClass: TMemoField
+    object TbAvisosExecutorClass: TMemoField
       FieldName = 'ExecutorClass'
       Origin = 'ExecutorClass'
-      Visible = False
       BlobType = ftMemo
       Size = 2147483647
     end
-  end
-  object DsAvisos: TDataSource
-    AutoEdit = False
-    DataSet = QryAvisos
-    Left = 248
-    Top = 104
   end
 end

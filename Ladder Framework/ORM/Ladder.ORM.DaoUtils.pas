@@ -40,13 +40,38 @@ type
     function SelectAsObjectList<T: class>(var ObjectList: TObjectList<T>; ItemClass: TClass; const pSql: String): Boolean; overload;
   end;
 
+procedure CopyFields(Source, Dest: TDataSet);
+
 implementation
 
 uses
-  mORMot, MormotVCL, SynCommons, SynDBVCL, Ladder.Utils;
+  mORMot, MormotVCL, SynCommons, SynDBVCL, Ladder.Utils, TypInfo;
 
 { TDaoUtils }
 
+procedure CopyFields(Source, Dest: TDataSet);
+var
+  Field, NewField: Data.DB.TField;
+  FieldDef: TFieldDef;
+begin
+  for Field in Source.Fields do
+  begin
+    FieldDef := Dest.FieldDefs.AddFieldDef;
+    FieldDef.DataType := Field.DataType;
+    FieldDef.Size := Field.Size;
+    FieldDef.Name := Field.FieldName;
+
+    NewField := FieldDef.CreateField(Dest);
+    NewField.Visible := Field.Visible;
+    NewField.DisplayLabel := Field.DisplayLabel;
+    NewField.DisplayWidth := Field.DisplayWidth;
+    NewField.EditMask := Field.EditMask;
+
+   if IsPublishedProp(Field, 'currency')  then
+     SetPropValue(NewField, 'currency', GetPropValue(Field, 'currency'));
+
+  end;
+end;
 {function TDaoUtils.GetUltimoID: Integer;
 begin
   Result:= SelectInt(' SELECT SCOPE_IDENTITY() ');

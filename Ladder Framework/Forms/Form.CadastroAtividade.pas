@@ -28,7 +28,8 @@ uses
   FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS,
   FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
   FireDAC.Comp.DataSet, FireDAC.Comp.Client, uConSqlServer, Ladder.Activity.Classes,
-  Ladder.ORM.Dao, Ladder.Activity.Classes.Dao, Ladder.ORM.DataSetBinding;
+  Ladder.ORM.Dao, Ladder.Activity.Classes.Dao, Ladder.ORM.DataSetBinding,
+  Ladder.ORM.ObjectDataSet;
 
 type
   TFormCadastroAtividade = class(TForm)
@@ -85,13 +86,13 @@ type
     TblProcessosDescription: TMemoField;
     TblProcessosClassName: TMemoField;
     TblProcessosExecutorClass: TMemoField;
-    TblActivity: TFDMemTable;
-    TblActivityIDActivity: TIntegerField;
-    TblActivityName: TMemoField;
-    TblActivityDescription: TMemoField;
-    TblActivityClassName: TMemoField;
-    TblActivityExecutorClass: TMemoField;
-    TblActivityID: TIntegerField;
+    TbActivity: TFDMemTable;
+    TbActivityIDActivity: TIntegerField;
+    TbActivityName: TMemoField;
+    TbActivityDescription: TMemoField;
+    TbActivityClassName: TMemoField;
+    TbActivityExecutorClass: TMemoField;
+    TbActivityID: TIntegerField;
     procedure BtnSalvarClick(Sender: TObject);
     procedure BtnFecharClick(Sender: TObject);
     procedure BtnAddProcessoClick(Sender: TObject);
@@ -103,17 +104,21 @@ type
   private
     FActivity: TActivity;
     FActivityDao: IDaoGeneric<TActivity>;
-    FActivityBinder: TDataSetBinder;
-    FProcessoBinder: TDataSetBinder;
+
+    FActivityDataSet: TObjectDataSet;
+    FProcessoDataSet: TObjectDataSet;
     procedure RemoverProcesso;
     procedure ConfigurarConsultaAtual;
     function GetProcessoSelecionado: TProcessoBase;
     function ProcessoDao: IDaoBase;
+    function NovaAtividade: TActivity;
     { Private declarations }
   public
     constructor Create(AOWner: TComponent); override;
-    class procedure AbrirConfigAviso(pIDAviso: Integer);
-    procedure AbrirConfig(pIDAviso: Integer);
+    procedure AbrirConfig(pAtividade: TActivity);
+
+    class procedure _AbrirConfigAviso(pAtividade: TActivity);
+    class function _NovaAtividade: TActivity;
     { Public declarations }
   end;
 
@@ -122,34 +127,49 @@ implementation
 {$R *.dfm}
 
 uses
-  Form.CadastroProcessoConsulta, Form.SelecionaConsulta;
+  Form.CadastroProcessoConsulta, Form.SelecionaConsulta, Ladder.ServiceLocator;
 
 { TuFormCadastrarAvisosAutomaticos }
 
-procedure TFormCadastroAtividade.AbrirConfig(pIDAviso: Integer);
+procedure TFormCadastroAtividade.AbrirConfig(pAtividade: TActivity);
 begin
-  FActivity:= FActivityDao.SelectKey(pIDAviso);
+  FActivity:= pAtividade;
 
-  if not Assigned(FActivity) then
-  begin
-    ShowMessage('Aviso código '+IntToStr(pIDAviso)+' não encontrado.');
-    Exit;
-  end;
-
-  FActivityBinder.PullFromObject(FActivity);
-  FProcessoBinder.Pull<TProcessoBase>(FActivity.Processos);
+  FActivityDataSet.SetObject(FActivity);
+  FProcessoDataSet.SetObjectList<TProcessoBase>(FActivity.Processos);
 
   ShowModal;
 end;
 
-class procedure TFormCadastroAtividade.AbrirConfigAviso(
-  pIDAviso: Integer);
+function TFormCadastroAtividade.NovaAtividade: TActivity;
+begin
+  FActivity:= TActivity.Create(TFrwServiceLocator.Context.DaoUtils);
+  FActivityDataSet.SetObject(FActivity);
+  FProcessoDataSet.SetObjectList<TProcessoBase>(FActivity.Processos);
+
+  ShowModal;
+end;
+
+class procedure TFormCadastroAtividade._AbrirConfigAviso(pAtividade: TActivity);
 var
   FFrm: TFormCadastroAtividade;
 begin
   FFrm:= TFormCadastroAtividade.Create(Application);
   try
-    FFrm.AbrirConfig(pIDAviso);
+    FFrm.AbrirConfig(pAtividade);
+  finally
+    FFrm.Free;
+  end;
+end;
+
+
+class function TFormCadastroAtividade._NovaAtividade: TActivity;
+var
+  FFrm: TFormCadastroAtividade;
+begin
+  FFrm:= TFormCadastroAtividade.Create(Application);
+  try
+    Result:= FFrm.NovaAtividade;
   finally
     FFrm.Free;
   end;
@@ -170,7 +190,7 @@ begin
   if Assigned(FProcesso) then
   begin
     FActivity.Processos.Add(FProcesso);
-    FProcessoBinder.Pull<TProcessoBase>(FActivity.Processos);
+    FProcessoDataSet.Synchronize;
   end;
 end;
 
@@ -195,9 +215,7 @@ begin
   if Assigned(FProcesso) then
     TFormCadastroProcessoConsulta._EditProcess(FProcesso);
 
-  FProcessoBinder.Pull<TProcessoBase>(FActivity.Processos);
-//  TFormCadastroProcesso.AbrirConfigRelatorio(QryProcessosIDAviso.AsInteger, QryProcessosIDConsulta.AsInteger);
-//  QryProcessos.Refresh;
+  FProcessoDataSet.Synchronize;
 end;
 
 function TFormCadastroAtividade.ProcessoDao: IDaoBase;
@@ -209,11 +227,14 @@ constructor TFormCadastroAtividade.Create(AOWner: TComponent);
 begin
   inherited;
   FActivityDao:= TActivityDao<TActivity>.Create;
-  FActivityBinder:= TDataSetBinder.Create(TblActivity, FActivityDao.ModeloBD);
-  FProcessoBinder:= TDataSetBinder.Create(TblProcessos, ProcessoDao.ModeloBD);
-  TblProcessos.Active:= True;
-  DataSetMemoFieldsAsText(TblActivity);
-  DataSetMemoFieldsAsText(TblProcessos);
+  FActivityDataSet:= TObjectDataSet.Create(Self, FActivityDao.ModeloBD);
+  FProcessoDataSet:= TObjectDataSet.Create(Self, ProcessoDao.ModeloBD);
+
+  DataSetMemoFieldsAsText(FActivityDataSet);
+  DataSetMemoFieldsAsText(FProcessoDataSet);
+
+  DsAtividade.DataSet:= FActivityDataSet;
+  DsProcessos.DataSet:= FProcessoDataSet;
 end;
 
 procedure TFormCadastroAtividade.FieldGetText(Sender: TField;
@@ -230,7 +251,7 @@ end;
 
 procedure TFormCadastroAtividade.BtnFecharClick(Sender: TObject);
 begin
-  if TblActivity.Modified then
+  if FActivityDataSet.Modified then
     if Application.MessageBox('Existem modificações não salvas, deseja sair sem salvar?', 'Atenção!',  MB_YESNO) = ID_Yes then
       Close;
 
@@ -249,7 +270,7 @@ begin
       if Assigned(FProcesso) then
       begin
         ProcessoDao.Delete(FProcesso, FActivity);
-        FProcessoBinder.Pull<TProcessoBase>(FActivity.Processos);
+        FProcessoDataSet.Synchronize;
       end;
     end;
   end;
@@ -258,15 +279,13 @@ end;
 procedure TFormCadastroAtividade.BtnRemoveProcessoClick(Sender: TObject);
 begin
   RemoverProcesso;
-  FActivityBinder.PushToObject(FActivity);
 end;
 
 procedure TFormCadastroAtividade.BtnSalvarClick(Sender: TObject);
 begin
-  if TblActivity.State in ([dsEdit, dsInsert])  then
-    TblActivity.Post;
+  if FActivityDataSet.State in ([dsEdit, dsInsert])  then
+    FActivityDataSet.Post;
 
-  FActivityBinder.PushToObject(FActivity);
   FActivityDao.Save(FActivity);
 end;
 

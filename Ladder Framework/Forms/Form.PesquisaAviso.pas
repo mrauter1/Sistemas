@@ -26,7 +26,8 @@ uses
   cxGrid, uConSqlServer, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
   FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
   FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet, FireDAC.Comp.Client,
-  Ladder.ORM.Dao, Ladder.Activity.Classes.Dao, Ladder.Activity.Classes;
+  Ladder.ORM.Dao, Ladder.Activity.Classes.Dao, Ladder.Activity.Classes,
+  Ladder.ORM.ObjectDataSet;
 
 type
   TFormPesquisaAviso = class(TForm)
@@ -39,27 +40,28 @@ type
     cxGridAvisosDBTableView1: TcxGridDBTableView;
     cxGridAvisosLevel1: TcxGridLevel;
     cxGridAvisos: TcxGrid;
-    QryAvisos: TFDQuery;
-    QryAvisosID: TFDAutoIncField;
     DsAvisos: TDataSource;
     cxGridAvisosDBTableView1ID: TcxGridDBColumn;
-    QryAvisosIDActivity: TIntegerField;
-    QryAvisosName: TMemoField;
-    QryAvisosDescription: TMemoField;
-    QryAvisosClassName: TMemoField;
-    QryAvisosExecutorClass: TMemoField;
     cxGridAvisosDBTableView1IDActivity: TcxGridDBColumn;
     cxGridAvisosDBTableView1Name: TcxGridDBColumn;
     cxGridAvisosDBTableView1Description: TcxGridDBColumn;
+    TbAvisos: TFDMemTable;
+    TbAvisosID: TIntegerField;
+    TbAvisosIDActivity: TIntegerField;
+    TbAvisosName: TMemoField;
+    TbAvisosDescription: TMemoField;
+    TbAvisosClassName: TMemoField;
+    TbAvisosExecutorClass: TMemoField;
     procedure BtnRemoverAvisoClick(Sender: TObject);
     procedure BtnNovoAvisoClick(Sender: TObject);
     procedure BtnFecharClick(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
     procedure BtnSelecionarClick(Sender: TObject);
   private
     FActivityDao: IDaoGeneric<TActivity>;
+    FActivityDataSet: TObjectDataSet;
     procedure RemoveAviso;
     procedure AbrirConfigAviso;
+    function AtividadeSelecionada: TActivity;
     { Private declarations }
   public
     { Public declarations }
@@ -77,10 +79,18 @@ implementation
 uses
   Form.CadastroAtividade;
 
+function TFormPesquisaAviso.AtividadeSelecionada: TActivity;
+begin
+  Result:= FActivityDataSet.GetCurrentModel<TActivity>;
+end;
+
 procedure TFormPesquisaAviso.AbrirConfigAviso;
 begin
-  TFormCadastroAtividade.AbrirConfigAviso(QryAvisosID.AsInteger);
-  QryAvisos.Refresh;
+  if (AtividadeSelecionada = nil) then
+    Exit;
+
+  TFormCadastroAtividade._AbrirConfigAviso(AtividadeSelecionada);
+  FActivityDataSet.Synchronize;
 end;
 
 class procedure TFormPesquisaAviso.AbrirPesquisa;
@@ -107,9 +117,6 @@ begin
   fInput:= InputBox('Avisos', 'Digite o nome do novo aviso:', '');
   if fInput = '' then Exit;
 
-  QryAvisos.Append;
-  QryAvisosName.AsString:= fInput;
-  QryAvisos.Post;
   AbrirConfigAviso;
 end;
 
@@ -127,36 +134,32 @@ constructor TFormPesquisaAviso.Create(AOwner: TComponent);
 begin
   inherited;
   FActivityDao:= TActivityDao<TActivity>.Create;
-end;
 
-procedure TFormPesquisaAviso.FormCreate(Sender: TObject);
-begin
-  QryAvisos.Open;
+  FActivityDataSet:= TObjectDataSet.Create(Self, FActivityDao.ModeloBD);
+  FActivityDataSet.OwnsObjectList:= True;
+  FActivityDataSet.ObjectList:= FActivityDao.SelectWhere('className = ''TActivity''');
+
+  DsAvisos.DataSet:= FActivityDataSet;
 end;
 
 procedure TFormPesquisaAviso.RemoveAviso;
 
-  procedure RemoveAvisoDepencias(pIDAviso: Integer);
+  procedure RemoveAvisoDepencias(pAtividade: TActivity);
   var
     FSql: String;
-    FActivity: TActivity;
   begin
-    FActivity:= FActivityDao.SelectKey(pIDAviso);
-    FActivityDao.Delete(FActivity);
-{    FSql:= 'DELETE FROM cons.AvisoRelatorio WHERE IDAviso = '+IntToStr(+pIDAviso)+'; '+
-           'DELETE FROM cons.AvisoRelatorioParametro WHERE IDAviso = '+IntToStr(pIDAviso);
-    ConSqlServer.ExecutaComando(FSql);}
+    if pAtividade.ID > 0 then
+      FActivityDao.Delete(pAtividade);
+
+    FActivityDataSet.RemoveItem(pAtividade);
+    FActivityDataSet.Synchronize;
   end;
 
 begin
-  if not QryAvisos.IsEmpty then
-  begin
+  if not FActivityDataSet.IsEmpty then
     if Application.MessageBox('Você tem certeza que deseja excluir este aviso?', 'Atenção!',  MB_YESNO) = ID_YES  then
-    begin
-      RemoveAvisoDepencias(QryAvisosID.AsInteger);
-      QryAvisos.Refresh;
-    end;
-  end;
+      RemoveAvisoDepencias(FActivityDataSet.GetCurrentModel<TActivity>);
+
 end;
 
 end.

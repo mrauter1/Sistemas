@@ -58,7 +58,6 @@ type
     fDataList: IObjectList;
 
     fObjectList: TObjectList;
-    fGenericObjectList: System.Generics.Collections.TObjectList<TObject>;
 
     fItemClass: TClass;
     fRebuildingDataList: Boolean;
@@ -80,6 +79,9 @@ type
 
     fMasterDataSource: TDataSource;
     fMasterPropertyName: String;
+    fGenericObjectList: System.Generics.Collections.TObjectList<TObject>;
+
+    FOwnsObjectList: Boolean;
 
     function GetSort: string;
     procedure SetSort(const value: string);
@@ -157,6 +159,7 @@ type
     procedure SetMaster(pMasterObjectDataSet: TObjectDataSet; pMasterPropertyName: String);
 
     procedure SetObjectList<T: class>(pObjectList: System.Generics.Collections.TObjectList<T>); overload;
+    procedure SetObject(pObject: TObject); virtual;
 
     /// <summary>
     ///   Returns the total count of filtered records.
@@ -184,6 +187,7 @@ type
 
     property ObjectList: TObjectList read fObjectList write SetObjectList;
     property GenericObjectList: System.Generics.Collections.TObjectList<TObject> read fGenericObjectList; // Use SetObjectList<>
+    property OwnsObjectList: Boolean read fOwnsObjectList write fOwnsObjectList;
    published
     /// <summary>
     ///   Default length for the string type field in the dataset.
@@ -228,6 +232,9 @@ type
     property AfterSort: TDataSetNotifyEvent read fAfterSort write fAfterSort;
   end;
 
+const
+  cStrSize = 2000;
+
 implementation
 
 uses
@@ -259,6 +266,8 @@ constructor TObjectDataSet.Create(AOwner: TComponent; pModeloBD: TModeloBD);
 begin
   inherited Create(AOwner);
 
+  FOwnsObjectList:= False;
+
   fRebuildingDataList:= False;
   fDisabledFields := TCollections.CreateSet<TField>;
   fFilterParser := TExprParser.Create;
@@ -284,6 +293,9 @@ end;
 
 destructor TObjectDataSet.Destroy;
 begin
+  if FOwnsObjectList and Assigned(FObjectList) then
+    fObjectList.Free;
+
   fFilterParser.Free;
   inherited Destroy;
 end;
@@ -770,8 +782,6 @@ procedure TObjectDataSet.LoadFieldDefsFromItemType;
 var
   fieldType: TFieldType;
   fieldDef: TFieldDef;
-  len, precision, scale: Integer;
-  required, readOnly: Boolean;
   FFieldMapping: TFieldMapping;
 begin
   for FFieldMapping in fModeloBD.MappedFieldList do
@@ -779,39 +789,19 @@ begin
     if FFieldMapping.FieldName = '' then
       Continue;
 
-    len := -2;
-    precision := -2;
-    scale := -2;
-    required := False;
-    readOnly := False;
-
-    if Assigned(FFieldMapping.Prop) then
-      if not FFieldMapping.Prop.IsWritable then
-        readOnly:= True;
-
-    fieldType := FFieldMapping.FieldType;
-
     fieldDef := FieldDefs.AddFieldDef;
     fieldDef.Name := FFieldMapping.FieldName;
 
-    fieldDef.DataType := fieldType;
-    if len <> -2 then
-      fieldDef.Size := len;
+    if Assigned(FFieldMapping.Prop) then
+      if not FFieldMapping.Prop.IsWritable then
+        fieldDef.Attributes := fieldDef.Attributes + [DB.faReadOnly];
 
-    fieldDef.Required := required;
+    fieldDef.DataType := FFieldMapping.FieldType;
 
-    if fieldType in [ftFMTBcd, ftBCD] then
-    begin
-      if precision <> -2 then
-        fieldDef.Precision := precision;
+    if FFieldMapping.FieldType = ftString then
+      fieldDef.Size:= cStrSize;
 
-      if scale <> -2 then
-        fieldDef.Size := scale;
-    end;
-
-    if readOnly then
-      fieldDef.Attributes := fieldDef.Attributes + [DB.faReadOnly];
-
+    fieldDef.Required:= False;
   end;
 end;
 
@@ -936,16 +926,32 @@ end;
 
 procedure TObjectDataSet.SetObjectList(const value: TObjectList);
 begin
+  if (FOwnsObjectList) and (Value <> fObjectList) and Assigned(FObjectList) then
+    FreeAndNil(fObjectList);
+
+  if not Assigned(Value) then
+    Exit;
+
   fGenericObjectList:= nil;
   fObjectList:= value;
   RebuildDataList;
+  Open;
 end;
 
 procedure TObjectDataSet.SetObjectList<T>(pObjectList: System.Generics.Collections.TObjectList<T>);
 begin
-  fObjectList:= nil;
+  ObjectList:= nil;
   fGenericObjectList:= System.Generics.Collections.TObjectList<TObject>(pObjectList);
   RebuildDataList;
+  Open;
+end;
+
+procedure TObjectDataSet.SetObject(pObject: TObject);
+begin
+  FOwnsObjectList:= True;
+  ObjectList:= TObjectList.Create(False);
+  ObjectList.Add(pObject);
+  Synchronize;
 end;
 
 procedure TObjectDataSet.SetSort(const value: string);

@@ -285,11 +285,11 @@ end;
 
 procedure TestTDaoGeneric.TestSelectWhere;
 var
-  ReturnValue: TFrwObjectList<TTeste>;
+  ReturnValue: TObjectList<TTeste>;
   pWhere: string;
 begin
   // TODO: Setup method call parameters
-  ReturnValue := FDaoGeneric.SelectWhere(pWhere);
+  ReturnValue := FDaoGeneric.SelectWhereG(pWhere);
   // TODO: Validate method results
 end;
 

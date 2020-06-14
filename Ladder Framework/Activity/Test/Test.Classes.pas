@@ -50,6 +50,7 @@ type
     procedure SetUp; override;
     procedure TearDown; override;
   published
+    procedure TestReorderProcesses;
     procedure TestExecutar;
     procedure TestFindElementByName;
   end;
@@ -156,6 +157,8 @@ begin
   FActivity.Outputs.Add(TOutputParameter.Create('Out2', tbAny, '@Processo2.Par3'));
   FActivity.Outputs.Add(TOutputParameter.Create('Out3', tbValue, '@Processo2.Out2'));
 
+  FActivity.ReorderProcesses;
+
   ReturnValue := FActivity.Executar;
 
   CheckEquals('res1', FActivity.Outputs.ParamValue('Out1'));
@@ -199,6 +202,66 @@ begin
   CheckEquals(2, FProcesso2.Inputs.ParamValue('Par3')._Count);
   CheckEquals('res1', FProcesso2.Inputs.ParamValue('Par3')._(0));
   CheckEquals('res2', FProcesso2.Inputs.ParamValue('Par3')._(1));
+end;
+
+procedure TestTActivity.TestReorderProcesses;
+var
+  FProcesso, FProcesso2, FProcesso3, FLast: TProcessoBase;
+begin
+  FActivity.Processos.Add(CreateMockProcess);
+  FActivity.Processos.Add(CreateMockProcess);
+  FActivity.Processos.Add(CreateMockProcess);
+
+  FProcesso:= CreateMockProcess;
+  FProcesso.ExecOrder:= 2;
+  FActivity.Processos.Add(FProcesso);
+  FActivity.ReorderProcesses;
+  Check(FProcesso.ExecOrder = 1);
+  Check(FActivity.Processos[0] = FProcesso);
+  Check(FActivity.Processos[1].ExecOrder = 2);
+
+  FLast:= FActivity.Processos.Last;
+  FProcesso:= CreateMockProcess;
+  FProcesso.ExecOrder:= 4;
+
+  FActivity.AddProcess(FProcesso);
+  Check(FProcesso.ExecOrder=4);
+  Check(FLast.ExecOrder=5);
+
+  FProcesso:= CreateMockProcess;
+  FProcesso.ExecOrder:= 6;
+  FActivity.AddProcess(FProcesso);
+  Check(FProcesso.ExecOrder=6);
+
+  FProcesso:= CreateMockProcess;
+  FProcesso.ExecOrder:= 10;
+  FActivity.AddProcess(FProcesso);
+  Check(FProcesso.ExecOrder=7);
+
+  FProcesso:= CreateMockProcess;
+  FActivity.AddProcess(FProcesso);
+  FProcesso2:= CreateMockProcess;
+  FActivity.AddProcess(FProcesso2);
+  FActivity.ReorderProcesses;
+  Check(FProcesso.ExecOrder=8);
+  Check(FProcesso2.ExecOrder=9);
+
+  FActivity.Processos.Clear;
+
+  FProcesso:= CreateMockProcess;
+  FActivity.Processos.Add(FProcesso);
+  FProcesso2:= CreateMockProcess;
+  FActivity.Processos.Add(FProcesso2);
+  FProcesso3:= CreateMockProcess;
+  FActivity.Processos.Add(FProcesso3);
+  FLast:= CreateMockProcess;
+  FActivity.Processos.Add(FLast);
+
+  FActivity.ReorderProcesses;
+  Check(FProcesso.ExecOrder=1);
+  Check(FProcesso2.ExecOrder=2);
+  Check(FProcesso3.ExecOrder=3);
+  Check(FLast.ExecOrder=4);
 end;
 
 { TMockExecutor }

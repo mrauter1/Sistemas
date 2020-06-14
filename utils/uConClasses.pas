@@ -11,41 +11,34 @@ type
   TTipoVisualizacao = (tvTabela, tvTabelaDinamica, tvGrafico);
   TFormatacaoCampo = (fcTexto, fcMoeda, fcPorcentagem);
 
-  RConsulta = record
-    ID: Integer;
-    Nome: String;
-    Descricao: String;
-    Sql: String;
-    Tipo: TTipoConsulta;
-    ConfigPadrao: Integer;
-    VisualizacaoPadrao: Integer;
-    IDPai: Integer;
-    FonteDados: Integer;
-  end;
-
   TParametroCon = class(TObject)
   private
-    FCodigo: Integer;
+    FID: Integer;
     FNome: String;
     FValor: Variant;
     FTipo: TTipoParametro;
     FDescricao: String;
     FSql: String;
     FValorPadrao: String;
+    FTamanho: Integer;
+    FObrigatorio: Boolean;
     procedure SetValor(const Value: Variant);
   public
     constructor Create(pNome: String; pValor: Variant; pTipo: TTipoParametro; pDescricao: String=''; pSql: String=''); overload;
+    constructor CreateCopy(ASource: TParametroCon; pCopyID: Boolean = False);
 
     function TipoFromInt(Valor: Integer): Boolean;
 
     property Valor: Variant read FValor write SetValor;
   published
-    property Codigo: integer read FCodigo write FCodigo;
+    property ID: integer read FID write FID;
     property Nome: String read FNome write FNome;
     property Tipo: TTipoParametro read FTipo write FTipo;
     property Descricao: String read FDescricao write FDescricao;
     property Sql: String read FSql write FSql;
     property ValorPadrao: String read FValorPadrao write FValorPadrao;
+    property Tamanho: Integer read FTamanho write FTamanho;
+    property Obrigatorio: Boolean read FObrigatorio write FObrigatorio;
   end;
 
   TParametros = class(TObjectDictionary<String, TParametroCon>)
@@ -56,12 +49,41 @@ type
     procedure Remove(pParametro: TParametroCon); overload;
   end;
 
+  TConsulta = class
+  private
+    FParametros: TObjectList<TParametroCon>;
+    FVisualizacaoPadrao: Integer;
+    FDescricao: String;
+    FID: Integer;
+    FIDPai: Integer;
+    FSql: String;
+    FNome: String;
+    FTipo: TTipoConsulta;
+    FFonteDados: Integer;
+    FConfigPadrao: Integer;
+  protected
+    procedure AfterConstruction; override;
+  public
+  published
+    destructor Destroy;
+    property ID: Integer read FID write FID;
+    property Nome: String read FNome write FNome;
+    property Descricao: String read FDescricao write FDescricao;
+    property Sql: String read FSql write FSql;
+    property Tipo: TTipoConsulta read FTipo write FTipo;
+    property ConfigPadrao: Integer read FConfigPadrao write FConfigPadrao;
+    property VisualizacaoPadrao: Integer read FVisualizacaoPadrao write FVIsualizacaoPadrao;
+    property IDPai: Integer read FIDPai write FIDPai;
+    property FonteDados: Integer read FFonteDados write FFonteDados;
+    property Parametros: TObjectList<TParametroCon> read FParametros write FParametros;
+  end;
+
   TFonteDados = (fdSqlServer=1, fdFirebird=2);
 
 implementation
 
 uses
-  Ladder.Utils, Variants;
+  Ladder.Utils, SysUtils, Variants, Ladder.ServiceLocator;
 
 { TParametroCon }
 
@@ -74,6 +96,11 @@ begin
   Self.Tipo:= pTipo;
   Self.Descricao:= pDescricao;
   Self.Sql:= pSql;
+end;
+
+constructor TParametroCon.CreateCopy(ASource: TParametroCon; pCopyID: Boolean);
+begin
+  Create(ASource.Nome, ASource.Valor, ASource.Tipo, ASource.Descricao, ASource.Sql);
 end;
 
 procedure TParametroCon.SetValor(const Value: Variant);
@@ -125,6 +152,19 @@ end;
 procedure TParametros.Remove(pParametro: TParametroCon);
 begin
   Remove(pParametro.Nome);
+end;
+
+{ TConsulta }
+
+procedure TConsulta.AfterConstruction;
+begin
+  inherited;
+  FParametros:= TObjectList<TParametroCon>.Create;
+end;
+
+destructor TConsulta.Destroy;
+begin
+  FParametros.Free;
 end;
 
 end.

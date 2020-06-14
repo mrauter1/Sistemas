@@ -123,7 +123,7 @@ begin
   FFrwRepository.Insert(TTeste.Create('t1', now, 2));
 
   FModeloBD.MapProperty('Childs',
-    function (const pPropName: String; pCurrentValue: TValue; Instance: TObject; pDBRows: ISqlDBRows): TValue
+    function (const pPropName: String; pCurrentValue: TValue; Instance: TObject; pDBRows: ISqlDBRows; Sender: TObject): TValue
     var
       FChilds: TObjectList<TTestChild>;
     begin

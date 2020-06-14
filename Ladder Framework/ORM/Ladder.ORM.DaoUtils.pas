@@ -4,7 +4,7 @@ interface
 
 uses
   AdoDB, System.Contnrs, generics.collections, System.Classes, Data.DB, uDmConnection,
-  FireDAC.Comp.Client, System.SysUtils, SynDB, System.Rtti;
+  FireDAC.Comp.Client, System.SysUtils, SynDB, System.Rtti, SynCommons;
 
 type
   TDaoUtils = class
@@ -45,7 +45,7 @@ procedure CopyFields(Source, Dest: TDataSet);
 implementation
 
 uses
-  mORMot, MormotVCL, SynCommons, SynDBVCL, Ladder.Utils, TypInfo;
+  mORMot, MormotVCL, SynDBVCL, Ladder.Utils, TypInfo;
 
 { TDaoUtils }
 
@@ -91,7 +91,7 @@ end;
 
 function TDaoUtils.SelectAsJSon(const pSql: String): String;
 begin
-  Result:= Connection.Execute(pSql, []).FetchAllAsJSON(True);
+  Result:= UTF8ToAnsi(Connection.Execute(pSql, []).FetchAllAsJSON(True));
 end;
 
 function TDaoUtils.SelectAsDataset(const pSql: String; AOwner: TComponent = nil): TDataSet;

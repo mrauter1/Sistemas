@@ -101,7 +101,7 @@ object FormPesquisaAviso: TFormPesquisaAviso
     end
     object BtnNovoAviso: TButton
       Left = 24
-      Top = 6
+      Top = 5
       Width = 89
       Height = 25
       Caption = 'Novo Aviso'

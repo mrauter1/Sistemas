@@ -117,7 +117,7 @@ function GetFieldDisplayFormat(pField: TField): String;
 
 implementation
 
-uses DateUtils;
+uses DateUtils, Ladder.Utils, SynCommons;
 
 {$R *.dfm}
 
@@ -190,7 +190,7 @@ begin
   while not QryParametros.Eof do
   begin
     fParam:= TParametroCon.Create;
-    fParam.Codigo:= QryParametrosID.AsInteger;
+    fParam.ID:= QryParametrosID.AsInteger;
     fParam.Nome:= QryParametrosNome.AsString;
     fParam.Descricao:= QryParametrosDescricao.AsString;
     fParam.Sql:= QryParametrosSql.AsString;
@@ -214,11 +214,11 @@ begin
         if StrToDateDef(QryParametrosValorPadrao.AsString, 0) <> 0 then
           fParam.Valor:= StrToDate(QryParametrosValorPadrao.AsString);
 
-        fParam.Tipo:= ptDateTime;
+        fParam.Tipo:= TTipoParametro.ptDateTime;
       end
       else if QryParametrosTipo.AsInteger = 4 {CheckListBox} then
       begin
-        fParam.Valor:= StringToVarArray(',', QryParametrosValorPadrao.AsString);
+        fParam.Valor:= StrToLadderArray(QryParametrosValorPadrao.AsString, ',');
         fParam.Tipo:= ptCheckListBox;
       end;
     end;
@@ -331,14 +331,14 @@ var
   I: Integer;
   pInStr: String;
 begin
-  if VarIsArray(pVar) then
+  if VarIsLadderArray(pVar) then
   begin
-    for I:= VarArrayLowBound(pVar, 1) to VarArrayHighBound(pVar, 1) do
+    for I:= 0 to TDocVariantData(pVar).Count-1 do
     begin
       if pInStr > '' then
         pInStr:= pInStr + ',';
 
-      pInStr:= pInStr+pVar[I];
+      pInStr:= pInStr+TDocVariantData(pVar).Values[I];
     end;
     Result:= pInStr;
   end
@@ -415,7 +415,7 @@ begin
     case FParam.Tipo of
       ptComboBox: QryParametrosValorPadrao.Value:= fParam.Valor;
       ptTexto: QryParametrosValorPadrao.Value:= fParam.Valor;
-      ptDateTime: QryParametrosValorPadrao.Value:= FormatDateTime('dd/mm/yyyy', fParam.Valor);
+      TTipoParametro.ptDateTime: QryParametrosValorPadrao.Value:= FormatDateTime('dd/mm/yyyy', fParam.Valor);
       ptCheckListBox: QryParametrosValorPadrao.Value:= VarArrayToSql(fParam.Valor);
     end;
 
@@ -442,7 +442,7 @@ begin
       case FParam.Tipo of
         ptComboBox: QryParametrosValorPadrao.Value:= fParam.Valor;
         ptTexto: QryParametrosValorPadrao.Value:= fParam.Valor;
-        ptDateTime: QryParametrosValorPadrao.Value:= FormatDateTime('dd/mm/yyyy', fParam.Valor);
+        TTipoParametro.ptDateTime: QryParametrosValorPadrao.Value:= FormatDateTime('dd/mm/yyyy', fParam.Valor);
         ptCheckListBox: QryParametrosValorPadrao.Value:= VarArrayToSql(fParam.Valor);
       end;
 
@@ -483,18 +483,18 @@ function TDmGeradorConsultas.SubstituiParametros(const FSql: String): String;
 
     if VarIsNull(pParam) then Exit;
 
-    if not VarIsArray(pParam) then
+    if not VarIsLadderArray(pParam) then
     begin
       pInStr:= pParam;
     end
    else
     begin
-      for I:= VarArrayLowBound(pParam, 1) to VarArrayHighBound(pParam, 1) do
+      for I:= 0 to TDocVariantData(pParam).Count-1 do
       begin
         if pInStr > '' then
           pInStr:= pInStr + ',';
 
-        pInStr:= pInStr+pParam[I]
+        pInStr:= pInStr+TDocVariantData(pParam).Values[I]
       end;
     end;
 

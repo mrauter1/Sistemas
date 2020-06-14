@@ -61,6 +61,7 @@ type
     FActivityDataSet: TObjectDataSet;
     procedure RemoveAviso;
     procedure AbrirConfigAviso;
+    procedure NovoAviso;
     function AtividadeSelecionada: TActivity;
     { Private declarations }
   public
@@ -114,10 +115,10 @@ procedure TFormPesquisaAviso.BtnNovoAvisoClick(Sender: TObject);
 var
   fInput: String;
 begin
-  fInput:= InputBox('Avisos', 'Digite o nome do novo aviso:', '');
-  if fInput = '' then Exit;
+{  fInput:= InputBox('Avisos', 'Digite o nome do novo aviso:', '');
+  if fInput = '' then Exit;    }
 
-  AbrirConfigAviso;
+  NovoAviso;
 end;
 
 procedure TFormPesquisaAviso.BtnRemoverAvisoClick(Sender: TObject);
@@ -140,6 +141,18 @@ begin
   FActivityDataSet.ObjectList:= FActivityDao.SelectWhere('className = ''TActivity''');
 
   DsAvisos.DataSet:= FActivityDataSet;
+end;
+
+procedure TFormPesquisaAviso.NovoAviso;
+var
+  FAtividade: TActivity;
+begin
+  FAtividade:= TFormCadastroAtividade._NovaAtividade;
+  if not Assigned(FAtividade) then
+    Exit;
+
+  FActivityDataSet.AddItem(FAtividade);
+  FActivityDataSet.Synchronize;
 end;
 
 procedure TFormPesquisaAviso.RemoveAviso;

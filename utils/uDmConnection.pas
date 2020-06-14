@@ -9,7 +9,8 @@ uses
   Variants, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error,
   FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
   FireDAC.Phys, FireDAC.Phys.FB, FireDAC.Phys.FBDef, FireDAC.ConsoleUI.Wait,
-  FireDAC.Comp.Client, Utils, System.Rtti, uAppConfig, Ladder.Activity.Parser;
+  FireDAC.Comp.Client, Utils, System.Rtti, uAppConfig, Ladder.Activity.Parser,
+  FireDAC.VCLUI.Wait;
 
 type
  cfMapField = record
@@ -81,9 +82,11 @@ procedure ReopenDataSet(pDataSet: TDataSet);
 function ComparaRecord(pDataSet1, pDataSet2: TDataSet; pCamposParaIgnorar: String = ''): TArray<String>;
 procedure CopiarRecord(pSource, pDest: TDataSet);
 procedure CopiaDadosDataSet(pSource, pDest: TDataSet);
-procedure CopyFieldDefs(pSource, pDest: TDataSet);
 
 implementation
+
+uses
+  Ladder.Orm.DaoUtils;
 
 {%CLASSGROUP 'System.Classes.TPersistent'}
 
@@ -97,30 +100,6 @@ begin
     pDataSet.Close;
 
   pDataSet.Open;
-end;
-
-procedure CopyFieldDefs(pSource, pDest: TDataSet);
-var
-  Field, NewField: TField;
-  FieldDef: TFieldDef;
-begin
-  for Field in pSource.Fields do
-  begin
-    FieldDef := pDest.FieldDefs.AddFieldDef;
-    FieldDef.DataType := Field.DataType;
-    FieldDef.Size := Field.Size;
-    FieldDef.Name := Field.FieldName;
-
-    NewField := FieldDef.CreateField(pDest);
-    NewField.Visible := Field.Visible;
-    NewField.DisplayLabel := Field.DisplayLabel;
-    NewField.DisplayWidth := Field.DisplayWidth;
-    NewField.EditMask := Field.EditMask;
-
-   if IsPublishedProp(Field, 'currency')  then
-     SetPropValue(NewField, 'currency', GetPropValue(Field, 'currency'));
-
-  end;
 end;
 
 class procedure TDmConnection.CopyFieldDefs(Dest, Source: TDataSet; pMapedFields: array of cfMapField);

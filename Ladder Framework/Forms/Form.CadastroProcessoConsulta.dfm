@@ -3,7 +3,7 @@ object FormCadastroProcessoConsulta: TFormCadastroProcessoConsulta
   Top = 0
   Caption = 'Cadastro Processo de Consulta Personalizada'
   ClientHeight = 546
-  ClientWidth = 629
+  ClientWidth = 628
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,12 +16,12 @@ object FormCadastroProcessoConsulta: TFormCadastroProcessoConsulta
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 629
+    Width = 628
     Height = 81
     Align = alTop
     TabOrder = 0
     DesignSize = (
-      629
+      628
       81)
     object Label2: TLabel
       Left = 61
@@ -32,12 +32,14 @@ object FormCadastroProcessoConsulta: TFormCadastroProcessoConsulta
       Caption = 'ID'
     end
     object Label3: TLabel
-      Left = 167
+      Left = 168
       Top = 16
       Width = 27
       Height = 13
       Alignment = taRightJustify
+      Anchors = [akTop, akRight]
       Caption = 'Nome'
+      ExplicitLeft = 167
     end
     object Label4: TLabel
       Left = 26
@@ -48,7 +50,7 @@ object FormCadastroProcessoConsulta: TFormCadastroProcessoConsulta
       Caption = 'Descri'#231#227'o'
     end
     object BtnOK: TBitBtn
-      Left = 505
+      Left = 504
       Top = 9
       Width = 108
       Height = 25
@@ -60,7 +62,7 @@ object FormCadastroProcessoConsulta: TFormCadastroProcessoConsulta
     object DBEditIDConsulta: TDBEdit
       Left = 81
       Top = 13
-      Width = 80
+      Width = 79
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       DataField = 'ID'
@@ -69,11 +71,11 @@ object FormCadastroProcessoConsulta: TFormCadastroProcessoConsulta
       TabOrder = 1
     end
     object DBEditNomeProcesso: TDBEdit
-      Left = 200
+      Left = 199
       Top = 13
       Width = 299
       Height = 21
-      Anchors = [akLeft, akTop, akRight]
+      Anchors = [akTop, akRight]
       DataField = 'Name'
       DataSource = DsProcesso
       TabOrder = 2
@@ -81,7 +83,7 @@ object FormCadastroProcessoConsulta: TFormCadastroProcessoConsulta
     object DBEditDescription: TDBEdit
       Left = 81
       Top = 40
-      Width = 532
+      Width = 531
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       DataField = 'Description'
@@ -92,14 +94,14 @@ object FormCadastroProcessoConsulta: TFormCadastroProcessoConsulta
   object Panel2: TPanel
     Left = 0
     Top = 81
-    Width = 629
+    Width = 628
     Height = 465
     Align = alClient
     TabOrder = 1
     object GroupBoxInputs: TGroupBox
       Left = 1
       Top = 1
-      Width = 627
+      Width = 626
       Height = 264
       Align = alClient
       Caption = 'Par'#226'metros da Consulta'
@@ -107,7 +109,7 @@ object FormCadastroProcessoConsulta: TFormCadastroProcessoConsulta
       object ScrollBoxParametros: TScrollBox
         Left = 2
         Top = 15
-        Width = 623
+        Width = 622
         Height = 247
         Align = alClient
         BevelEdges = []
@@ -117,10 +119,10 @@ object FormCadastroProcessoConsulta: TFormCadastroProcessoConsulta
         TabOrder = 0
       end
     end
-    object GroupBox1: TGroupBox
+    object GroupBoxOutputs: TGroupBox
       Left = 1
       Top = 352
-      Width = 627
+      Width = 626
       Height = 112
       Align = alBottom
       Caption = 'Outputs'
@@ -128,7 +130,7 @@ object FormCadastroProcessoConsulta: TFormCadastroProcessoConsulta
       object cxGrid1: TcxGrid
         Left = 2
         Top = 15
-        Width = 623
+        Width = 622
         Height = 95
         Align = alClient
         TabOrder = 0
@@ -161,7 +163,7 @@ object FormCadastroProcessoConsulta: TFormCadastroProcessoConsulta
     object GroupBox2: TGroupBox
       Left = 1
       Top = 265
-      Width = 627
+      Width = 626
       Height = 87
       Align = alBottom
       Caption = 'Arquivos para Exporta'#231#227'o'
@@ -169,7 +171,7 @@ object FormCadastroProcessoConsulta: TFormCadastroProcessoConsulta
       object GridArquivos: TcxGrid
         Left = 2
         Top = 15
-        Width = 623
+        Width = 622
         Height = 70
         Align = alClient
         TabOrder = 0
@@ -227,11 +229,11 @@ object FormCadastroProcessoConsulta: TFormCadastroProcessoConsulta
     end
   end
   object DsProcesso: TDataSource
-    DataSet = TblProcesso
+    DataSet = TbProcesso
     Left = 427
     Top = 18
   end
-  object QryParametros: TFDQuery
+  object QrParametros: TFDQuery
     Connection = ConSqlServer.FDConnection
     SQL.Strings = (
       'Select *'
@@ -247,49 +249,49 @@ object FormCadastroProcessoConsulta: TFormCadastroProcessoConsulta
         FDDataType = dtInt32
         ParamType = ptInput
       end>
-    object QryParametrosID: TFDAutoIncField
+    object QrParametrosID: TFDAutoIncField
       FieldName = 'ID'
       Origin = 'ID'
       ProviderFlags = [pfInWhere, pfInKey]
       ReadOnly = True
     end
-    object QryParametrosConsulta: TIntegerField
+    object QrParametrosConsulta: TIntegerField
       FieldName = 'Consulta'
       Origin = 'Consulta'
     end
-    object QryParametrosNome: TStringField
+    object QrParametrosNome: TStringField
       FieldName = 'Nome'
       Origin = 'Nome'
       Size = 255
     end
-    object QryParametrosDescricao: TStringField
+    object QrParametrosDescricao: TStringField
       FieldName = 'Descricao'
       Origin = 'Descricao'
       Size = 255
     end
-    object QryParametrosTipo: TIntegerField
+    object QrParametrosTipo: TIntegerField
       FieldName = 'Tipo'
       Origin = 'Tipo'
     end
-    object QryParametrosSql: TMemoField
+    object QrParametrosSql: TMemoField
       FieldName = 'Sql'
       Origin = 'Sql'
       BlobType = ftMemo
       Size = 2147483647
     end
-    object QryParametrosOrdem: TIntegerField
+    object QrParametrosOrdem: TIntegerField
       FieldName = 'Ordem'
       Origin = 'Ordem'
     end
-    object QryParametrosTamanho: TIntegerField
+    object QrParametrosTamanho: TIntegerField
       FieldName = 'Tamanho'
       Origin = 'Tamanho'
     end
-    object QryParametrosObrigatorio: TBooleanField
+    object QrParametrosObrigatorio: TBooleanField
       FieldName = 'Obrigatorio'
       Origin = 'Obrigatorio'
     end
-    object QryParametrosValorPadrao: TMemoField
+    object QrParametrosValorPadrao: TMemoField
       FieldName = 'ValorPadrao'
       Origin = 'ValorPadrao'
       BlobType = ftMemo
@@ -298,7 +300,7 @@ object FormCadastroProcessoConsulta: TFormCadastroProcessoConsulta
   end
   object DsParametros: TDataSource
     AutoEdit = False
-    DataSet = QryParametros
+    DataSet = QrParametros
     Left = 537
     Top = 285
   end
@@ -390,7 +392,7 @@ object FormCadastroProcessoConsulta: TFormCadastroProcessoConsulta
     Left = 187
     Top = 386
   end
-  object TblProcesso: TFDMemTable
+  object TbProcesso: TFDMemTable
     FetchOptions.AssignedValues = [evMode]
     FetchOptions.Mode = fmAll
     ResourceOptions.AssignedValues = [rvSilentMode]
@@ -400,32 +402,32 @@ object FormCadastroProcessoConsulta: TFormCadastroProcessoConsulta
     UpdateOptions.AutoCommitUpdates = True
     Left = 345
     Top = 18
-    object TblProcessoID: TIntegerField
+    object TbProcessoID: TIntegerField
       FieldName = 'ID'
     end
-    object TblProcessoIDActivity: TIntegerField
+    object TbProcessoIDActivity: TIntegerField
       FieldName = 'IDActivity'
       Origin = 'IDActivity'
     end
-    object TblProcessoName: TMemoField
+    object TbProcessoName: TMemoField
       FieldName = 'Name'
       Origin = 'Name'
       BlobType = ftMemo
       Size = 2147483647
     end
-    object TblProcessoDescription: TMemoField
+    object TbProcessoDescription: TMemoField
       FieldName = 'Description'
       Origin = 'Description'
       BlobType = ftMemo
       Size = 2147483647
     end
-    object TblProcessoClassName: TMemoField
+    object TbProcessoClassName: TMemoField
       FieldName = 'ClassName'
       Origin = 'ClassName'
       BlobType = ftMemo
       Size = 2147483647
     end
-    object TblProcessoExecutorClass: TMemoField
+    object TbProcessoExecutorClass: TMemoField
       FieldName = 'ExecutorClass'
       Origin = 'ExecutorClass'
       BlobType = ftMemo

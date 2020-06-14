@@ -35,7 +35,7 @@ uses
   cxControls, Winapi.Messages, Vcl.DBGrids, dxSkinOffice2007Blue,
   cxLookAndFeelPainters, Vcl.Dialogs, dxSkinLiquidSky, dxSkinOffice2010Blue,
   dxSkinOffice2007Silver, dxSkinWhiteprint, cxDBData, dxSkinOffice2010Black,
-  System.SysUtils, dxSkinOffice2016Dark, cxGridTableView, dxSkinVS2010, Form.CadastroProcesso,
+  System.SysUtils, dxSkinOffice2016Dark, cxGridTableView, dxSkinVS2010,
   Form.PesquisaAviso;
 
 type

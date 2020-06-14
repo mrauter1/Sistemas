@@ -140,7 +140,7 @@ type
     /// </summary>
     procedure Clone(const ASource: TObjectDataSet);
 
-    procedure Synchronize;
+    procedure Synchronize(ASelectedItem: TObject = nil);
 
     /// <summary>
     ///   Returns underlying model object from the current row.
@@ -151,6 +151,11 @@ type
     ///   Returns newly created list of data containing only filtered items.
     /// </summary>
     function GetFilteredDataList<T: class>: IList<T>;
+
+    /// <summary>
+    ///   Set the index to the row matching Item, -1 if it is not found on the list
+    /// </summary>
+    function Select(Item: TObject): Integer; virtual;
 
     function AddItem(Item: TObject): Integer; virtual;
     function ExtractItem(Item: TObject): TObject; virtual;
@@ -572,7 +577,8 @@ end;
 
 function TObjectDataSet.GetCurrentModel<T>: T;
 begin
-  Result := System.Default(T);
+//  Result := System.Default(T);
+  Result:= nil;
   if Active and (Index > -1) and (Index < RecordCount) then
     Result := T(IndexList.Items[Index]);
 end;
@@ -833,6 +839,13 @@ begin
   end;
 end;
 
+function TObjectDataSet.Select(Item: TObject): Integer;
+begin
+  CheckActive;
+  RecNo:= fDataList.IndexOf(Item)+1;
+  Result:= Index;
+end;
+
 procedure TObjectDataSet.SetFilterText(const Value: string);
 begin
   if Value = Filter then
@@ -878,6 +891,12 @@ begin
     Exit;
 
   FMasterInstance:= FMasterDataset.GetCurrentModel<TObject>;
+
+  if not Assigned(FMasterInstance) then
+  begin
+    Self.Close;
+    Exit;
+  end;
 
   FPropClass:= TRttiInstanceType(GetPropertyRttiType(FProp).AsInstance).MetaclassType;
   if (FPropClass = TObjectList) or FPropClass.InheritsFrom(TObjectList) then
@@ -965,19 +984,24 @@ begin
   Resync([]);
 end;
 
-procedure TObjectDataSet.Synchronize;
+procedure TObjectDataSet.Synchronize(ASelectedItem: TObject = nil);
+var
+  FCurrent: TObject;
 begin
   if not Active then
     Exit;
 
-//  if IndexList.IsChanging then
-//    Exit;
-
-//  IndexList.Rebuild;
+  if Assigned(ASelectedItem) then
+    FCurrent:= ASelectedItem
+  else
+    FCurrent:= GetCurrentModel<TObject>;
 
   DisableControls;
   try
     Refresh;
+    if Assigned(FCurrent) then
+      Select(FCurrent);
+
   finally
     EnableControls;
   end;

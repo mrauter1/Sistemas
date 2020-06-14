@@ -169,7 +169,7 @@ var
   fCallBack: TMapeamentoCallback;
 begin
   fCallBack:=
-    procedure (pClass: TClass; pFieldMapping: TFieldMapping)
+    procedure (pClass: TClass; pFieldMapping: TFieldMapping; Sender: TObject)
     begin
       if not fPrimeiroCampo then
         fSql.Append(' , ');
@@ -261,7 +261,7 @@ var
 
 begin
   fCallBack:=
-    procedure (pClass: TClass; pFieldMapping: TFieldMapping)
+    procedure (pClass: TClass; pFieldMapping: TFieldMapping; Sender: TObject)
     begin
       try
         if (fModeloBD.ChaveIncremental) and (pFieldMapping.Prop = fModeloBD.PropChave) then
@@ -308,7 +308,7 @@ var
   fCallBack: TMapeamentoCallback;
 begin
   fCallBack:=
-    procedure (pClass: TClass; pFieldMapping: TFieldMapping)
+    procedure (pClass: TClass; pFieldMapping: TFieldMapping; Sender: TObject)
     begin
       if (fModeloBD.ChaveIncremental) and (pFieldMapping.Prop = fModeloBD.PropChave) then
         Exit;

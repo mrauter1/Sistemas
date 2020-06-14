@@ -28,8 +28,8 @@ uses
   FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS,
   FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
   FireDAC.Comp.DataSet, FireDAC.Comp.Client, uConSqlServer, Ladder.Activity.Classes,
-  Ladder.ORM.Dao, Ladder.Activity.Classes.Dao, Ladder.ORM.DataSetBinding,
-  Ladder.ORM.ObjectDataSet;
+  Ladder.ORM.Dao, Ladder.Activity.Classes.Dao,
+  Ladder.ORM.ObjectDataSet, Ladder.Activity.Manager;
 
 type
   TFormCadastroAtividade = class(TForm)
@@ -56,36 +56,19 @@ type
     GroupBoxInputs: TGroupBox;
     cxGridParametros: TcxGrid;
     cxGridParametrosDBTableView1: TcxGridDBTableView;
-    cxGridParametrosDBTableView1IDParametro: TcxGridDBColumn;
-    cxGridParametrosDBTableView1Nome: TcxGridDBColumn;
-    cxGridParametrosDBTableView1Valor: TcxGridDBColumn;
     cxGridParametrosLevel1: TcxGridLevel;
     GroupBox1: TGroupBox;
     cxGrid1: TcxGrid;
     cxGridDBTableView1: TcxGridDBTableView;
-    cxGridDBColumn1: TcxGridDBColumn;
-    cxGridDBColumn2: TcxGridDBColumn;
-    cxGridDBColumn3: TcxGridDBColumn;
     cxGridLevel1: TcxGridLevel;
-    QryInputs: TFDQuery;
-    QryInputsIDAviso: TIntegerField;
-    QryInputsIDConsulta: TIntegerField;
-    QryInputsIDParametro: TIntegerField;
-    QryInputsValor: TMemoField;
-    DsInputs: TDataSource;
     DsOutputs: TDataSource;
-    QryOutputs: TFDQuery;
-    IntegerField1: TIntegerField;
-    IntegerField2: TIntegerField;
-    IntegerField3: TIntegerField;
-    MemoField1: TMemoField;
-    TblProcessos: TFDMemTable;
-    TblProcessosID: TIntegerField;
-    TblProcessosIDActivity: TIntegerField;
-    TblProcessosName: TMemoField;
-    TblProcessosDescription: TMemoField;
-    TblProcessosClassName: TMemoField;
-    TblProcessosExecutorClass: TMemoField;
+    TbProcessos: TFDMemTable;
+    TbProcessosID: TIntegerField;
+    TbProcessosIDActivity: TIntegerField;
+    TbProcessosName: TMemoField;
+    TbProcessosDescription: TMemoField;
+    TbProcessosClassName: TMemoField;
+    TbProcessosExecutorClass: TMemoField;
     TbActivity: TFDMemTable;
     TbActivityIDActivity: TIntegerField;
     TbActivityName: TMemoField;
@@ -93,6 +76,35 @@ type
     TbActivityClassName: TMemoField;
     TbActivityExecutorClass: TMemoField;
     TbActivityID: TIntegerField;
+    TBInputs: TFDMemTable;
+    DsInputs: TDataSource;
+    TBInputsID: TFDAutoIncField;
+    TBInputsIDProcesso: TIntegerField;
+    TBInputsName: TMemoField;
+    TBInputsParameterType: TIntegerField;
+    TBInputsExpression: TMemoField;
+    TBInputsIDMaster: TIntegerField;
+    cxGridParametrosDBTableView1ID: TcxGridDBColumn;
+    cxGridParametrosDBTableView1Name: TcxGridDBColumn;
+    cxGridParametrosDBTableView1ParameterType: TcxGridDBColumn;
+    cxGridParametrosDBTableView1Expression: TcxGridDBColumn;
+    TBOutputs: TFDMemTable;
+    TBOutputsID: TFDAutoIncField;
+    TBOutputsIDProcesso: TIntegerField;
+    TBOutputsName: TMemoField;
+    TBOutputsParameterType: TIntegerField;
+    TBOutputsExpression: TMemoField;
+    TBOutputsIDMaster: TIntegerField;
+    cxGridDBTableView1ID: TcxGridDBColumn;
+    cxGridDBTableView1Name: TcxGridDBColumn;
+    cxGridDBTableView1ParameterType: TcxGridDBColumn;
+    cxGridDBTableView1Expression: TcxGridDBColumn;
+    Splitter1: TSplitter;
+    Splitter2: TSplitter;
+    TbProcessosExecOrder: TIntegerField;
+    BtnMoveUp: TBitBtn;
+    BtnMoveDown: TBitBtn;
+    BtnExecutar: TBitBtn;
     procedure BtnSalvarClick(Sender: TObject);
     procedure BtnFecharClick(Sender: TObject);
     procedure BtnAddProcessoClick(Sender: TObject);
@@ -101,20 +113,30 @@ type
     procedure FieldGetText(Sender: TField; var Text: string;
       DisplayText: Boolean);
     procedure FieldSetText(Sender: TField; const Text: string);
+    procedure BtnMoveUpClick(Sender: TObject);
+    procedure BtnMoveDownClick(Sender: TObject);
+    procedure BtnExecutarClick(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
   private
     FActivity: TActivity;
     FActivityDao: IDaoGeneric<TActivity>;
 
     FActivityDataSet: TObjectDataSet;
     FProcessoDataSet: TObjectDataSet;
+    FInputDataSet: TObjectDataSet;
+    FOutputDataSet: TObjectDataSet;
     procedure RemoverProcesso;
-    procedure ConfigurarConsultaAtual;
-    function GetProcessoSelecionado: TProcessoBase;
+    procedure ConfigurarProcesso;
+    function ProcessoSelecionado: TProcessoBase;
     function ProcessoDao: IDaoBase;
+
     function NovaAtividade: TActivity;
+    function Manager: TActivityManager;
+    procedure ActivityBeforePost(DataSet: TDataSet);
     { Private declarations }
   public
     constructor Create(AOWner: TComponent); override;
+    destructor Destroy; override;
     procedure AbrirConfig(pAtividade: TActivity);
 
     class procedure _AbrirConfigAviso(pAtividade: TActivity);
@@ -127,7 +149,7 @@ implementation
 {$R *.dfm}
 
 uses
-  Form.CadastroProcessoConsulta, Form.SelecionaConsulta, Ladder.ServiceLocator;
+  Form.SelecionaConsulta, Ladder.ServiceLocator, Form.NovoProcesso;
 
 { TuFormCadastrarAvisosAutomaticos }
 
@@ -136,7 +158,9 @@ begin
   FActivity:= pAtividade;
 
   FActivityDataSet.SetObject(FActivity);
-  FProcessoDataSet.SetObjectList<TProcessoBase>(FActivity.Processos);
+
+  FActivity.ReorderProcesses; // If the processes have no explicit order already, give them based on their Index;
+//  FProcessoDataSet.SetObjectList<TProcessoBase>(FActivity.Processos);
 
   ShowModal;
 end;
@@ -145,9 +169,16 @@ function TFormCadastroAtividade.NovaAtividade: TActivity;
 begin
   FActivity:= TActivity.Create(TFrwServiceLocator.Context.DaoUtils);
   FActivityDataSet.SetObject(FActivity);
-  FProcessoDataSet.SetObjectList<TProcessoBase>(FActivity.Processos);
+//  FProcessoDataSet.SetObjectList<TProcessoBase>(FActivity.Processos);
 
   ShowModal;
+  if FActivity.ID = 0 then
+  begin
+    FActivity.Free;
+    Result:= nil
+  end
+ else
+    Result:= FActivity;
 end;
 
 class procedure TFormCadastroAtividade._AbrirConfigAviso(pAtividade: TActivity);
@@ -161,7 +192,6 @@ begin
     FFrm.Free;
   end;
 end;
-
 
 class function TFormCadastroAtividade._NovaAtividade: TActivity;
 var
@@ -177,43 +207,51 @@ end;
 
 procedure TFormCadastroAtividade.BtnConfiguraProcessoClick(Sender: TObject);
 begin
-  ConfigurarConsultaAtual;
+  ConfigurarProcesso;
+end;
+
+procedure TFormCadastroAtividade.BtnExecutarClick(Sender: TObject);
+begin
+  FActivity.Executar;
 end;
 
 procedure TFormCadastroAtividade.BtnAddProcessoClick(Sender: TObject);
 var
   FIDConsulta: Integer;
   FProcesso: TProcessoBase;
+  FExecutor: String;
 begin
-  FProcesso:= TFormCadastroProcessoConsulta._NewProcess;
+  FExecutor:= TFormNovoProcesso.SelecionaTipoProcesso;
+  if FExecutor = '' then
+    Exit;
+
+  FProcesso:= Manager.NewProcess(FExecutor);
 
   if Assigned(FProcesso) then
   begin
-    FActivity.Processos.Add(FProcesso);
+    FActivity.AddProcess(FProcesso);
     FProcessoDataSet.Synchronize;
   end;
 end;
 
-function TFormCadastroAtividade.GetProcessoSelecionado: TProcessoBase;
-var
-  FProcesso: TProcessoBase;
+function TFormCadastroAtividade.ProcessoSelecionado: TProcessoBase;
 begin
-  Result:= nil;
-  for FProcesso in FActivity.Processos do
-    if FProcesso.ID = TblProcessosID.AsInteger then
-    begin
-      Result:= FProcesso;
-      break;
-    end;
+  Result:= FProcessoDataSet.GetCurrentModel<TProcessoBase>;
 end;
 
-procedure TFormCadastroAtividade.ConfigurarConsultaAtual;
+function TFormCadastroAtividade.Manager: TActivityManager;
+begin
+  Result:= TFrwServiceLocator.Context.ActivityManager;
+end;
+
+procedure TFormCadastroAtividade.ConfigurarProcesso;
 var
   FProcesso: TProcessoBase;
 begin
-  FProcesso:= GetProcessoSelecionado;
-  if Assigned(FProcesso) then
-    TFormCadastroProcessoConsulta._EditProcess(FProcesso);
+  if ProcessoSelecionado = nil then
+    Exit;
+
+  Manager.EditProcess(ProcessoSelecionado);
 
   FProcessoDataSet.Synchronize;
 end;
@@ -228,13 +266,27 @@ begin
   inherited;
   FActivityDao:= TActivityDao<TActivity>.Create;
   FActivityDataSet:= TObjectDataSet.Create(Self, FActivityDao.ModeloBD);
-  FProcessoDataSet:= TObjectDataSet.Create(Self, ProcessoDao.ModeloBD);
+  FActivityDataSet.BeforePost:= ActivityBeforePost;
 
-  DataSetMemoFieldsAsText(FActivityDataSet);
-  DataSetMemoFieldsAsText(FProcessoDataSet);
+  FProcessoDataSet:= TObjectDataSet.Create(Self, ProcessoDao.ModeloBD);
+  FInputDataSet:= TObjectDataSet.Create(Self, FActivityDao.ChildDaoByPropName('Inputs').ModeloBD);
+  FOutputDataSet:= TObjectDataSet.Create(Self, FActivityDao.ChildDaoByPropName('Outputs').ModeloBD);
+
+  FProcessoDataSet.SetMaster(FActivityDataSet, 'Processos');
+  FInputDataSet.SetMaster(FActivityDataSet, 'Inputs');
+  FOutputDataSet.SetMaster(FActivityDataSet, 'Outputs');
 
   DsAtividade.DataSet:= FActivityDataSet;
   DsProcessos.DataSet:= FProcessoDataSet;
+  DsInputs.DataSet:= FInputDataSet;
+end;
+
+destructor TFormCadastroAtividade.Destroy;
+begin
+  DsAtividade.DataSet:= nil;
+  DsProcessos.DataSet:= nil;
+
+  inherited;
 end;
 
 procedure TFormCadastroAtividade.FieldGetText(Sender: TField;
@@ -249,30 +301,76 @@ begin
   Sender.AsString:= Text;
 end;
 
+procedure TFormCadastroAtividade.FormCloseQuery(Sender: TObject;
+  var CanClose: Boolean);
+begin
+  CanClose:= True;
+  if FActivityDataSet.Modified then
+    if Application.MessageBox('Existem modificações não salvas, deseja sair sem salvar?', 'Atenção!',  MB_YESNO) = ID_NO then
+      CanClose:= False;
+end;
+
 procedure TFormCadastroAtividade.BtnFecharClick(Sender: TObject);
 begin
-  if FActivityDataSet.Modified then
-    if Application.MessageBox('Existem modificações não salvas, deseja sair sem salvar?', 'Atenção!',  MB_YESNO) = ID_Yes then
-      Close;
+  Close;
+end;
 
+procedure TFormCadastroAtividade.BtnMoveDownClick(Sender: TObject);
+var
+  FCurIndex: Integer;
+begin
+  if ProcessoSelecionado=nil then
+    Exit;
+
+  FCurIndex:= FActivity.Processos.IndexOf(ProcessoSelecionado);
+  if (FCurIndex <= -1) or (FCurIndex >= FActivity.Processos.Count-1) then
+    Exit;
+
+  ProcessoSelecionado.ExecOrder:= FActivity.Processos[FCurIndex+1].ExecOrder;
+  FActivity.ReorderProcesses(ProcessoSelecionado);
+  FProcessoDataSet.Synchronize(ProcessoSelecionado);
+end;
+
+procedure TFormCadastroAtividade.BtnMoveUpClick(Sender: TObject);
+var
+  FCurIndex: Integer;
+begin
+  if ProcessoSelecionado=nil then
+    Exit;
+
+  FCurIndex:= FActivity.Processos.IndexOf(ProcessoSelecionado);
+  if FCurIndex <= 0 then
+    Exit;
+
+  ProcessoSelecionado.ExecOrder:= FActivity.Processos[FCurIndex-1].ExecOrder;
+  FActivity.ReorderProcesses(ProcessoSelecionado);
+  FProcessoDataSet.Synchronize(ProcessoSelecionado);
 end;
 
 procedure TFormCadastroAtividade.RemoverProcesso;
-var
-  FProcesso: TProcessoBase;
 begin
-  if not TblProcessos.IsEmpty then
-  begin
-    if Application.MessageBox('Você tem certeza que deseja excluir este proesso?', 'Atenção!',  MB_YESNO) = ID_YES  then
-    begin
-      FProcesso:= GetProcessoSelecionado;
+  if ProcessoSelecionado = nil then
+    Exit;
 
-      if Assigned(FProcesso) then
-      begin
-        ProcessoDao.Delete(FProcesso, FActivity);
-        FProcessoDataSet.Synchronize;
-      end;
-    end;
+  if Application.MessageBox('Você tem certeza que deseja excluir este proesso?', 'Atenção!',  MB_YESNO) = ID_YES  then
+  begin
+    if ProcessoSelecionado.ID > 0 then
+      FActivityDao.DeleteChild(FActivity, ProcessoSelecionado);
+
+    FActivity.Processos.Remove(ProcessoSelecionado);
+    FActivity.ReorderProcesses;
+    FProcessoDataSet.Synchronize;
+  end;
+end;
+
+procedure TFormCadastroAtividade.ActivityBeforePost(DataSet: TDataSet);
+const
+  cMsg = 'Atividade precisa ter um nome válido.';
+begin
+  if DataSet.FieldByName('Name').AsString = '' then
+  begin
+    ShowMessage(cMsg);
+    Abort;
   end;
 end;
 
@@ -283,10 +381,13 @@ end;
 
 procedure TFormCadastroAtividade.BtnSalvarClick(Sender: TObject);
 begin
-  if FActivityDataSet.State in ([dsEdit, dsInsert])  then
+  if FActivityDataSet.State in ([dsEdit, dsInsert]) then
     FActivityDataSet.Post;
 
+  FActivity.CheckValidity();
+
   FActivityDao.Save(FActivity);
+  FActivityDataSet.Synchronize;
 end;
 
 end.

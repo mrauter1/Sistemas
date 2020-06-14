@@ -2,8 +2,8 @@ object FormCadastroAtividade: TFormCadastroAtividade
   Left = 0
   Top = 0
   Caption = 'Configurar Atividades'
-  ClientHeight = 532
-  ClientWidth = 599
+  ClientHeight = 542
+  ClientWidth = 606
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -11,17 +11,19 @@ object FormCadastroAtividade: TFormCadastroAtividade
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  OnCloseQuery = FormCloseQuery
   PixelsPerInch = 96
   TextHeight = 13
   object PanelTop: TPanel
     Left = 0
     Top = 0
-    Width = 599
+    Width = 606
     Height = 78
     Align = alTop
     TabOrder = 0
+    ExplicitWidth = 599
     DesignSize = (
-      599
+      606
       78)
     object Label1: TLabel
       Left = 176
@@ -50,12 +52,13 @@ object FormCadastroAtividade: TFormCadastroAtividade
     object DBEditNomeAtividade: TDBEdit
       Left = 272
       Top = 15
-      Width = 313
+      Width = 320
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       DataField = 'Name'
       DataSource = DsAtividade
       TabOrder = 1
+      ExplicitWidth = 313
     end
     object DBEditID: TDBEdit
       Left = 64
@@ -70,50 +73,78 @@ object FormCadastroAtividade: TFormCadastroAtividade
     object DBEditDescricao: TDBEdit
       Left = 64
       Top = 42
-      Width = 521
+      Width = 528
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       DataField = 'Description'
       DataSource = DsAtividade
       TabOrder = 2
+      ExplicitWidth = 521
     end
   end
   object PanelCentro: TPanel
     Left = 0
     Top = 78
-    Width = 599
-    Height = 410
+    Width = 606
+    Height = 420
     Align = alClient
     TabOrder = 1
+    ExplicitWidth = 599
+    ExplicitHeight = 410
+    object Splitter1: TSplitter
+      Left = 1
+      Top = 308
+      Width = 604
+      Height = 3
+      Cursor = crVSplit
+      Align = alBottom
+      ExplicitLeft = 3
+      ExplicitTop = 319
+      ExplicitWidth = 597
+    end
+    object Splitter2: TSplitter
+      Left = 1
+      Top = 186
+      Width = 604
+      Height = 3
+      Cursor = crVSplit
+      Align = alBottom
+      ExplicitTop = 1
+      ExplicitWidth = 203
+    end
     object GroupBoxProcessos: TGroupBox
       Left = 1
       Top = 1
-      Width = 597
-      Height = 206
+      Width = 604
+      Height = 185
       Align = alClient
       Caption = 'Processos'
       TabOrder = 0
+      ExplicitWidth = 597
+      ExplicitHeight = 200
       object PanelControles: TPanel
         Left = 2
-        Top = 163
-        Width = 593
+        Top = 142
+        Width = 600
         Height = 41
         Align = alBottom
         TabOrder = 0
+        ExplicitLeft = 3
+        ExplicitTop = 141
         DesignSize = (
-          593
+          600
           41)
         object Panel1: TPanel
-          Left = 98
+          Left = 102
           Top = 0
           Width = 404
-          Height = 41
+          Height = 36
           Anchors = [akBottom]
           BevelOuter = bvNone
           TabOrder = 0
           object BtnAddProcesso: TBitBtn
-            Left = 12
-            Top = 9
+            Left = 13
+            Top = 8
             Width = 108
             Height = 25
             Caption = 'Adicionar Processo'
@@ -121,8 +152,8 @@ object FormCadastroAtividade: TFormCadastroAtividade
             OnClick = BtnAddProcessoClick
           end
           object BtnRemoveProcesso: TBitBtn
-            Left = 147
-            Top = 9
+            Left = 145
+            Top = 8
             Width = 108
             Height = 25
             Caption = 'Remover Processo'
@@ -130,8 +161,8 @@ object FormCadastroAtividade: TFormCadastroAtividade
             OnClick = BtnRemoveProcessoClick
           end
           object BtnConfiguraProcesso: TBitBtn
-            Left = 275
-            Top = 9
+            Left = 273
+            Top = 8
             Width = 108
             Height = 25
             Caption = 'Configurar Processo'
@@ -139,14 +170,146 @@ object FormCadastroAtividade: TFormCadastroAtividade
             OnClick = BtnConfiguraProcessoClick
           end
         end
+        object BtnMoveUp: TBitBtn
+          Left = 550
+          Top = 0
+          Width = 32
+          Height = 21
+          Glyph.Data = {
+            76060000424D7606000000000000360000002800000014000000140000000100
+            2000000000004006000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000810000
+            000F000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            00000000000F0000008100000094000000C10000000900000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            000000000000000000000000000000000009000000C100000093000000030000
+            00A8000000B10000000400000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000050000
+            00B2000000A8000000030000000000000006000000B9000000A0000000020000
+            0000000000000000000000000000000000000000000000000000000000000000
+            00000000000000000002000000A2000000B80000000600000000000000000000
+            00000000000C000000C80000008E000000010000000000000000000000000000
+            000000000000000000000000000000000000000000010000008F000000C70000
+            000B000000000000000000000000000000000000000000000012000000D50000
+            007B000000000000000000000000000000000000000000000000000000000000
+            00000000007C000000D400000012000000000000000000000000000000000000
+            000000000000000000000000001B000000E00000006800000000000000000000
+            000000000000000000000000000000000069000000DF0000001B000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0025000000E70000005700000000000000000000000000000000000000570000
+            00E6000000250000000000000000000000000000000000000000000000000000
+            00000000000000000000000000000000000000000031000000EB000000470000
+            00000000000000000047000000EB000000300000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000003F000000EC0000003900000039000000EC0000003E0000
+            0000000000000000000000000000000000000000000000000000000000000000
+            00000000000000000000000000000000000000000000000000000000004E0000
+            00ED000000ED0000004D00000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            00000000000000000000000000000000007D0000007D00000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000}
+          TabOrder = 1
+          OnClick = BtnMoveUpClick
+        end
+        object BtnMoveDown: TBitBtn
+          Left = 550
+          Top = 18
+          Width = 32
+          Height = 21
+          Glyph.Data = {
+            76060000424D7606000000000000360000002800000014000000140000000100
+            2000000000004006000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            007B0000007B0000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            000000000000000000000000004D000000ED000000EC0000004C000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            000000000000000000000000000000000000000000000000003D000000EB0000
+            003800000039000000EB0000003D000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            000000000030000000EA00000046000000000000000000000047000000EA0000
+            002F000000000000000000000000000000000000000000000000000000000000
+            000000000000000000000000000000000024000000E600000056000000000000
+            0000000000000000000000000057000000E50000002400000000000000000000
+            00000000000000000000000000000000000000000000000000000000001A0000
+            00DE000000670000000000000000000000000000000000000000000000000000
+            0068000000DE0000001A00000000000000000000000000000000000000000000
+            00000000000000000011000000D30000007A0000000000000000000000000000
+            0000000000000000000000000000000000000000007B000000D3000000110000
+            0000000000000000000000000000000000000000000A000000C60000008E0000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000008F000000C60000000A0000000000000000000000000000
+            0005000000B8000000A000000001000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000001000000A10000
+            00B7000000050000000000000002000000A7000000B100000003000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000004000000B2000000A600000001000000930000
+            00C0000000080000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0008000000C100000092000000800000000E0000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000E00000080000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000}
+          TabOrder = 2
+          OnClick = BtnMoveDownClick
+        end
+        object BtnExecutar: TBitBtn
+          Left = 9
+          Top = 8
+          Width = 67
+          Height = 25
+          Caption = 'Executar'
+          TabOrder = 3
+          OnClick = BtnExecutarClick
+        end
       end
       object DBGridRelatorios: TDBGrid
         Left = 2
         Top = 15
-        Width = 593
-        Height = 148
+        Width = 600
+        Height = 127
         Align = alClient
         DataSource = DsProcessos
+        Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
         TabOrder = 1
         TitleFont.Charset = DEFAULT_CHARSET
         TitleFont.Color = clWindowText
@@ -157,6 +320,13 @@ object FormCadastroAtividade: TFormCadastroAtividade
           item
             Expanded = False
             FieldName = 'ID'
+            Width = 53
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'ExecOrder'
+            Width = 35
             Visible = True
           end
           item
@@ -181,37 +351,60 @@ object FormCadastroAtividade: TFormCadastroAtividade
     end
     object GroupBoxInputs: TGroupBox
       Left = 1
-      Top = 207
-      Width = 597
-      Height = 97
+      Top = 189
+      Width = 604
+      Height = 119
       Align = alBottom
       Caption = 'Inputs'
       TabOrder = 1
+      ExplicitTop = 192
+      ExplicitWidth = 597
       object cxGridParametros: TcxGrid
         Left = 2
         Top = 15
-        Width = 593
-        Height = 80
+        Width = 600
+        Height = 102
         Align = alClient
         TabOrder = 0
+        ExplicitLeft = 1
+        ExplicitTop = 11
+        ExplicitWidth = 593
+        ExplicitHeight = 80
         object cxGridParametrosDBTableView1: TcxGridDBTableView
           Navigator.Buttons.CustomButtons = <>
+          Navigator.Buttons.First.Visible = False
+          Navigator.Buttons.PriorPage.Visible = False
+          Navigator.Buttons.Prior.Visible = False
+          Navigator.Buttons.Next.Visible = False
+          Navigator.Buttons.NextPage.Visible = False
+          Navigator.Buttons.Last.Visible = False
+          Navigator.Buttons.Append.Visible = False
+          Navigator.Buttons.Refresh.Visible = False
+          Navigator.Buttons.SaveBookmark.Visible = False
+          Navigator.Buttons.GotoBookmark.Visible = False
+          Navigator.Buttons.Filter.Visible = False
+          Navigator.Visible = True
+          DataController.DataSource = DsInputs
           DataController.Summary.DefaultGroupSummaryItems = <>
           DataController.Summary.FooterSummaryItems = <>
           DataController.Summary.SummaryGroups = <>
           OptionsView.GroupByBox = False
-          object cxGridParametrosDBTableView1IDParametro: TcxGridDBColumn
-            DataBinding.FieldName = 'IDParametro'
-            Width = 57
+          object cxGridParametrosDBTableView1ID: TcxGridDBColumn
+            DataBinding.FieldName = 'ID'
+            Options.Editing = False
+            Width = 42
           end
-          object cxGridParametrosDBTableView1Nome: TcxGridDBColumn
-            Caption = 'Nome'
-            DataBinding.FieldName = 'IDParametro'
-            Width = 187
+          object cxGridParametrosDBTableView1Name: TcxGridDBColumn
+            DataBinding.FieldName = 'Name'
+            Width = 128
           end
-          object cxGridParametrosDBTableView1Valor: TcxGridDBColumn
-            DataBinding.FieldName = 'Valor'
-            Width = 213
+          object cxGridParametrosDBTableView1ParameterType: TcxGridDBColumn
+            DataBinding.FieldName = 'ParameterType'
+            Width = 92
+          end
+          object cxGridParametrosDBTableView1Expression: TcxGridDBColumn
+            DataBinding.FieldName = 'Expression'
+            Width = 194
           end
         end
         object cxGridParametrosLevel1: TcxGridLevel
@@ -221,37 +414,59 @@ object FormCadastroAtividade: TFormCadastroAtividade
     end
     object GroupBox1: TGroupBox
       Left = 1
-      Top = 304
-      Width = 597
-      Height = 105
+      Top = 311
+      Width = 604
+      Height = 108
       Align = alBottom
       Caption = 'Outputs'
       TabOrder = 2
+      ExplicitWidth = 597
       object cxGrid1: TcxGrid
         Left = 2
         Top = 15
-        Width = 593
-        Height = 88
+        Width = 600
+        Height = 91
         Align = alClient
         TabOrder = 0
+        ExplicitLeft = 3
+        ExplicitTop = 17
+        ExplicitWidth = 593
+        ExplicitHeight = 88
         object cxGridDBTableView1: TcxGridDBTableView
           Navigator.Buttons.CustomButtons = <>
+          Navigator.Buttons.First.Visible = False
+          Navigator.Buttons.PriorPage.Visible = False
+          Navigator.Buttons.Prior.Visible = False
+          Navigator.Buttons.Next.Visible = False
+          Navigator.Buttons.NextPage.Visible = False
+          Navigator.Buttons.Last.Visible = False
+          Navigator.Buttons.Append.Visible = False
+          Navigator.Buttons.Refresh.Visible = False
+          Navigator.Buttons.SaveBookmark.Visible = False
+          Navigator.Buttons.GotoBookmark.Visible = False
+          Navigator.Buttons.Filter.Visible = False
+          Navigator.Visible = True
+          DataController.DataSource = DsOutputs
           DataController.Summary.DefaultGroupSummaryItems = <>
           DataController.Summary.FooterSummaryItems = <>
           DataController.Summary.SummaryGroups = <>
           OptionsView.GroupByBox = False
-          object cxGridDBColumn1: TcxGridDBColumn
-            DataBinding.FieldName = 'IDParametro'
-            Width = 57
+          object cxGridDBTableView1ID: TcxGridDBColumn
+            DataBinding.FieldName = 'ID'
+            Options.Editing = False
+            Width = 47
           end
-          object cxGridDBColumn2: TcxGridDBColumn
-            Caption = 'Nome'
-            DataBinding.FieldName = 'IDParametro'
-            Width = 187
+          object cxGridDBTableView1Name: TcxGridDBColumn
+            DataBinding.FieldName = 'Name'
+            Width = 121
           end
-          object cxGridDBColumn3: TcxGridDBColumn
-            DataBinding.FieldName = 'Valor'
-            Width = 213
+          object cxGridDBTableView1ParameterType: TcxGridDBColumn
+            DataBinding.FieldName = 'ParameterType'
+            Width = 86
+          end
+          object cxGridDBTableView1Expression: TcxGridDBColumn
+            DataBinding.FieldName = 'Expression'
+            Width = 217
           end
         end
         object cxGridLevel1: TcxGridLevel
@@ -262,11 +477,13 @@ object FormCadastroAtividade: TFormCadastroAtividade
   end
   object PanelBot: TPanel
     Left = 0
-    Top = 488
-    Width = 599
+    Top = 498
+    Width = 606
     Height = 44
     Align = alBottom
     TabOrder = 2
+    ExplicitTop = 488
+    ExplicitWidth = 599
     object BtnSalvar: TBitBtn
       Left = 12
       Top = 5
@@ -293,107 +510,16 @@ object FormCadastroAtividade: TFormCadastroAtividade
   end
   object DsProcessos: TDataSource
     AutoEdit = False
-    DataSet = TblProcessos
+    DataSet = TbProcessos
     Left = 281
     Top = 146
   end
-  object QryInputs: TFDQuery
-    Connection = ConSqlServer.FDConnection
-    SQL.Strings = (
-      'Select *'
-      'from cons.AvisoConsultaParametro'
-      'where IDConsulta = :IDConsulta and IDAviso =:IDAviso'
-      '')
-    Left = 233
-    Top = 314
-    ParamData = <
-      item
-        Name = 'IDCONSULTA'
-        DataType = ftInteger
-        FDDataType = dtInt32
-        ParamType = ptInput
-      end
-      item
-        Name = 'IDAVISO'
-        DataType = ftInteger
-        FDDataType = dtInt32
-        ParamType = ptInput
-      end>
-    object QryInputsIDAviso: TIntegerField
-      FieldName = 'IDAviso'
-      Origin = 'IDAviso'
-    end
-    object QryInputsIDConsulta: TIntegerField
-      FieldName = 'IDConsulta'
-      Origin = 'IDConsulta'
-    end
-    object QryInputsIDParametro: TIntegerField
-      DisplayLabel = 'ID'
-      FieldName = 'IDParametro'
-      Origin = 'IDParametro'
-    end
-    object QryInputsValor: TMemoField
-      FieldName = 'Valor'
-      Origin = 'Valor'
-      BlobType = ftMemo
-      Size = 2147483647
-    end
-  end
-  object DsInputs: TDataSource
-    AutoEdit = False
-    DataSet = QryInputs
-    Left = 345
-    Top = 314
-  end
   object DsOutputs: TDataSource
-    AutoEdit = False
-    DataSet = QryOutputs
-    Left = 337
-    Top = 450
+    DataSet = TBOutputs
+    Left = 297
+    Top = 442
   end
-  object QryOutputs: TFDQuery
-    Connection = ConSqlServer.FDConnection
-    SQL.Strings = (
-      'Select *'
-      'from cons.AvisoConsultaParametro'
-      'where IDConsulta = :IDConsulta and IDAviso =:IDAviso'
-      '')
-    Left = 225
-    Top = 450
-    ParamData = <
-      item
-        Name = 'IDCONSULTA'
-        DataType = ftInteger
-        FDDataType = dtInt32
-        ParamType = ptInput
-      end
-      item
-        Name = 'IDAVISO'
-        DataType = ftInteger
-        FDDataType = dtInt32
-        ParamType = ptInput
-      end>
-    object IntegerField1: TIntegerField
-      FieldName = 'IDAviso'
-      Origin = 'IDAviso'
-    end
-    object IntegerField2: TIntegerField
-      FieldName = 'IDConsulta'
-      Origin = 'IDConsulta'
-    end
-    object IntegerField3: TIntegerField
-      DisplayLabel = 'ID'
-      FieldName = 'IDParametro'
-      Origin = 'IDParametro'
-    end
-    object MemoField1: TMemoField
-      FieldName = 'Valor'
-      Origin = 'Valor'
-      BlobType = ftMemo
-      Size = 2147483647
-    end
-  end
-  object TblProcessos: TFDMemTable
+  object TbProcessos: TFDMemTable
     FetchOptions.AssignedValues = [evMode]
     FetchOptions.Mode = fmAll
     ResourceOptions.AssignedValues = [rvSilentMode]
@@ -403,32 +529,36 @@ object FormCadastroAtividade: TFormCadastroAtividade
     UpdateOptions.AutoCommitUpdates = True
     Left = 377
     Top = 146
-    object TblProcessosID: TIntegerField
+    object TbProcessosID: TIntegerField
       FieldName = 'ID'
     end
-    object TblProcessosIDActivity: TIntegerField
+    object TbProcessosExecOrder: TIntegerField
+      DisplayLabel = 'Order'
+      FieldName = 'ExecOrder'
+    end
+    object TbProcessosIDActivity: TIntegerField
       FieldName = 'IDActivity'
       Origin = 'IDActivity'
     end
-    object TblProcessosName: TMemoField
+    object TbProcessosName: TMemoField
       FieldName = 'Name'
       Origin = 'Name'
       BlobType = ftMemo
       Size = 2147483647
     end
-    object TblProcessosDescription: TMemoField
+    object TbProcessosDescription: TMemoField
       FieldName = 'Description'
       Origin = 'Description'
       BlobType = ftMemo
       Size = 2147483647
     end
-    object TblProcessosClassName: TMemoField
+    object TbProcessosClassName: TMemoField
       FieldName = 'ClassName'
       Origin = 'ClassName'
       BlobType = ftMemo
       Size = 2147483647
     end
-    object TblProcessosExecutorClass: TMemoField
+    object TbProcessosExecutorClass: TMemoField
       FieldName = 'ExecutorClass'
       Origin = 'ExecutorClass'
       BlobType = ftMemo
@@ -483,6 +613,96 @@ object FormCadastroAtividade: TFormCadastroAtividade
       OnSetText = FieldSetText
       BlobType = ftMemo
       Size = 2147483647
+    end
+  end
+  object TBInputs: TFDMemTable
+    FetchOptions.AssignedValues = [evMode]
+    FetchOptions.Mode = fmAll
+    ResourceOptions.AssignedValues = [rvSilentMode]
+    ResourceOptions.SilentMode = True
+    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
+    UpdateOptions.CheckRequired = False
+    UpdateOptions.AutoCommitUpdates = True
+    Left = 377
+    Top = 306
+    object TBInputsID: TFDAutoIncField
+      FieldName = 'ID'
+      Origin = 'ID'
+      ProviderFlags = [pfInWhere, pfInKey]
+      ReadOnly = True
+    end
+    object TBInputsIDProcesso: TIntegerField
+      FieldName = 'IDProcesso'
+      Origin = 'IDProcesso'
+      ReadOnly = True
+    end
+    object TBInputsName: TMemoField
+      FieldName = 'Name'
+      Origin = 'Name'
+      ReadOnly = True
+      BlobType = ftMemo
+      Size = 2147483647
+    end
+    object TBInputsParameterType: TIntegerField
+      FieldName = 'ParameterType'
+      Origin = 'ParameterType'
+    end
+    object TBInputsExpression: TMemoField
+      FieldName = 'Expression'
+      Origin = 'Expression'
+      BlobType = ftMemo
+      Size = 2147483647
+    end
+    object TBInputsIDMaster: TIntegerField
+      FieldName = 'IDMaster'
+      Origin = 'IDMaster'
+    end
+  end
+  object DsInputs: TDataSource
+    DataSet = TBInputs
+    Left = 297
+    Top = 306
+  end
+  object TBOutputs: TFDMemTable
+    FetchOptions.AssignedValues = [evMode]
+    FetchOptions.Mode = fmAll
+    ResourceOptions.AssignedValues = [rvSilentMode]
+    ResourceOptions.SilentMode = True
+    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
+    UpdateOptions.CheckRequired = False
+    UpdateOptions.AutoCommitUpdates = True
+    Left = 377
+    Top = 442
+    object TBOutputsID: TFDAutoIncField
+      FieldName = 'ID'
+      Origin = 'ID'
+      ProviderFlags = [pfInWhere, pfInKey]
+      ReadOnly = True
+    end
+    object TBOutputsIDProcesso: TIntegerField
+      FieldName = 'IDProcesso'
+      Origin = 'IDProcesso'
+      ReadOnly = True
+    end
+    object TBOutputsName: TMemoField
+      FieldName = 'Name'
+      Origin = 'Name'
+      BlobType = ftMemo
+      Size = 2147483647
+    end
+    object TBOutputsParameterType: TIntegerField
+      FieldName = 'ParameterType'
+      Origin = 'ParameterType'
+    end
+    object TBOutputsExpression: TMemoField
+      FieldName = 'Expression'
+      Origin = 'Expression'
+      BlobType = ftMemo
+      Size = 2147483647
+    end
+    object TBOutputsIDMaster: TIntegerField
+      FieldName = 'IDMaster'
+      Origin = 'IDMaster'
     end
   end
 end

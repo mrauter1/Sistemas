@@ -7,6 +7,10 @@ uses
   Ladder.ORM.Classes, Ladder.ServiceLocator, Ladder.ORM.QueryBuilder, Spring.Reflection, SynDB;
 
 type
+  // If this function returns false, the object and its childs will no be inserted/updated.
+  // If further operations should be aborted an exception should be thrown
+  TOnCheckObjectIsValid = reference to function (pObject: TObject; pMasterInstance: TObject): Boolean;
+
   IDaoBase = interface;
 
   TChildDaoDefs = class
@@ -116,6 +120,9 @@ type
     fOwnsModelo: Boolean;
     fModeloBD: TModeloBD;
     fChildDaoList: TObjectList<TChildDaoDefs>;
+    FLoadCount: Integer;
+    procedure IncLoadCount; // Number of loads needs to be counted to work on recursive Dao.
+    procedure DecLoadCount;
     procedure SetModeloBD(const Value: TModeloBD);
     procedure InicializaObjeto;
     procedure AtualizaValorChave(pObject: TObject);
@@ -123,11 +130,12 @@ type
     function FindChildDefsByPropName(const pPropName: String): TChildDaoDefs;
     function FindChildDefsByClassName(const pClassName: String): TChildDaoDefs;
 //    function GetFunChildField(pChildDefs: TChildDaoDefs): TFunGetFieldValue;
-    procedure PopulateWhere(pList: TObjectList; const pWhere: String);
+    // TODO: If a missing child has childs, those childs will not be deleted. Ideally childs of missing childs should be deleted aswell
     function DeleteMissingChilds(pMasterInstance: TObject; ChildDefs: TChildDaoDefs): Integer;
     function SqlWhereChild(Instance: TObject; pChildDefs: TChildDaoDefs): String;
     function GetNewObjectFunction: TFunNewObject;
     procedure SetNewObjectFunction(const Value: TFunNewObject);
+    function GetLoading: Boolean;
   protected
     function GetQueryBuilder: TQueryBuilderBase;
     function GetModeloBD: TModeloBD; virtual;
@@ -136,13 +144,12 @@ type
     property QueryBuilder: TQueryBuilderBase read GetQueryBuilder write fQueryBuilder;
     property ModeloBD: TModeloBD read fModeloBD write SetModeloBD;
     property NewObjectFunction: TFunNewObject read GetNewObjectFunction write SetNewObjectFunction;
+    property Loading: Boolean read GetLoading;
 
     constructor Create; overload;
     constructor Create(pModeloBD: TModeloBD; pOwnsModelo: Boolean = true); overload;
     constructor Create(pNomeTabela: String; pCampoChave: string; pItemClass: TClass); overload;
     destructor Destroy; override;
-
-    function SelectKey(FChave: Integer): TObject;
 
     function ObjectExists(pObject: TObject): Boolean; // Check if object exists on database
     function KeyExists(ID: Integer): Boolean; virtual; // Check if object with ID exists on database
@@ -166,6 +173,7 @@ type
     function DeleteChild(pMasterInstance: TObject; ChildDefs: TChildDaoDefs): Integer; overload; virtual;
     procedure SaveChild(pMasterInstance: TObject; ChildDefs: TChildDaoDefs); virtual;
 
+    function SelectKey(FChave: Integer): TObject;
     function SelectOne(const pWhere: String): TObject; overload;
     procedure SelectOne(pObject: TObject; const pWhere: String); overload;
 
@@ -336,6 +344,11 @@ end;
 
 { TDaoBase }
 
+procedure TDaoBase.IncLoadCount;
+begin
+  Inc(FLoadCount);
+end;
+
 procedure TDaoBase.InicializaObjeto;
 begin
   fOwnsModelo:= False;
@@ -347,6 +360,7 @@ end;
 constructor TDaoBase.Create;
 begin
   inherited;
+  FLoadCount:= 0;
 
   // raise error if DaoUtils is not assigned
 //  TDaoUtils.CheckAssigned;
@@ -403,16 +417,6 @@ begin
   inherited;
 end;
 
-function TDaoBase.SelectWhere(const pWhere: String): TObjectList;
-begin
-  Result:= ModeloBD.ObjectListFromSql(QueryBuilder.SelectWhere(pWhere));
-end;
-
-procedure TDaoBase.SelectWhere(pList: TObjectList; const pWhere: String);
-begin
-  ModeloBD.PopulaObjectListFromSql(pList, QueryBuilder.SelectWhere(pWhere));
-end;
-
 function TDaoBase.GetModeloBD: TModeloBD;
 begin
   Result:= fModeloBD;
@@ -428,29 +432,79 @@ begin
   Result := fQueryBuilder;
 end;
 
+function TDaoBase.SelectWhere(const pWhere: String): TObjectList;
+begin
+  IncLoadCount;
+  try
+    Result:= ModeloBD.ObjectListFromSql(QueryBuilder.SelectWhere(pWhere), Self);
+  finally
+    DecLoadCount;
+  end;
+end;
+
+procedure TDaoBase.SelectWhere(pList: TObjectList; const pWhere: String);
+begin
+  IncLoadCount;
+  try
+    ModeloBD.PopulaObjectListFromSql(pList, QueryBuilder.SelectWhere(pWhere), Self);
+  finally
+    DecLoadCount;
+  end;
+end;
+
+procedure TDaoBase.SelectWhere(pObjectList: TObjectList<TObject>; const pWhere: String);
+begin
+  SelectWhere<TObject>(pObjectList, pWhere);
+end;
+
 procedure TDaoBase.SelectWhere<T>(pObjectList: TObjectList<T>; const pWhere: String);
 begin
-  ModeloBD.PopulaObjectListFromSql<T>(pObjectList, QueryBuilder.SelectWhere(pWhere));
+  IncLoadCount;
+  try
+    ModeloBD.PopulaObjectListFromSql<T>(pObjectList, QueryBuilder.SelectWhere(pWhere), Self);
+  finally
+    DecLoadCount;
+  end;
 end;
 
 function TDaoBase.SelectWhere<T>(const pWhere: String): TObjectList<T>;
 begin
-  Result:= ModeloBD.ObjectListFromSql<T>(QueryBuilder.SelectWhere(pWhere));
+  IncLoadCount;
+  try
+    Result:= ModeloBD.ObjectListFromSql<T>(QueryBuilder.SelectWhere(pWhere), Self);
+  finally
+    DecLoadCount;
+  end;
 end;
 
 function TDaoBase.SelectKey(FChave: Integer): TObject;
 begin
-  Result:= ModeloBD.ObjectFromSql(QueryBuilder.SelectWhereChave(FChave));
+  IncLoadCount;
+  try
+    Result:= ModeloBD.ObjectFromSql(QueryBuilder.SelectWhereChave(FChave), Self);
+  finally
+    DecLoadCount;
+  end;
 end;
 
 function TDaoBase.SelectOne(const pWhere: String): TObject;
 begin
-  Result:= ModeloBD.ObjectFromSql(QueryBuilder.SelectWhere(pWhere));
+  IncLoadCount;
+  try
+    Result:= ModeloBD.ObjectFromSql(QueryBuilder.SelectWhere(pWhere), Self);
+  finally
+    DecLoadCount;
+  end;
 end;
 
 procedure TDaoBase.SelectOne(pObject: TObject; const pWhere: String);
 begin
-  ModeloBD.ObjectFromSql(pObject, QueryBuilder.SelectWhere(pWhere));
+  IncLoadCount;
+  try
+    ModeloBD.ObjectFromSql(pObject, QueryBuilder.SelectWhere(pWhere), Self);
+  finally
+    DecLoadCount;
+  end;
 end;
 
 function TDaoBase.FindChildDefsByClassName(const pClassName: String): TChildDaoDefs;
@@ -495,7 +549,7 @@ end;
 function TDaoBase.GetFunPropertyChild(pChildDefs: TChildDaoDefs): TFunGetPropValue;
 begin
   Result:=
-    function (const pPropName: String; pCurrentValue: TValue; Instance: TObject; pDBRows: ISqlDBRows): TValue
+    function (const pPropName: String; pCurrentValue: TValue; Instance: TObject; pDBRows: ISqlDBRows; Sender: TObject): TValue
     var
       FCurrentObject: TObject;
       FWhere: String;
@@ -519,6 +573,7 @@ begin
       begin
         if Assigned(pObjectList) then
         begin
+          pObjectList.Clear;
           pChildDefs.Dao.SelectWhere(pObjectList, pWhere);
           Result:= pObjectList;
         end
@@ -532,6 +587,7 @@ begin
       begin
         if Assigned(pObjectList) then
         begin
+          pObjectList.Clear;
           pChildDefs.Dao.SelectWhere(pObjectList, pWhere);
           Result:= pObjectList;
         end
@@ -542,6 +598,15 @@ begin
       end;
 
     begin
+      // The Child property should only be loaded from here if the object is being loaded
+      // from the DAO. If ModeloBD.ObjectToDataSet is called directly this should not be executed.
+      // Maybe an option could be added to control when to load the child objects
+      if Sender <> Self then
+      begin
+        Result:= pCurrentValue;
+        Exit;
+      end;
+
       FCurrentObject:= pCurrentValue.AsObject;
 
       FWhere:= SqlWhereChild(Instance, pChildDefs);
@@ -562,7 +627,13 @@ begin
 
     end;
 end;
-                 {
+
+function TDaoBase.GetLoading: Boolean;
+begin
+  Result:= FLoadCount > 0;
+end;
+
+{
 function TDaoBase.GetFunChildField(pChildDefs: TChildDaoDefs): TFunGetFieldValue;
 begin
   Result:=
@@ -657,6 +728,12 @@ begin
   end;
 end;
 
+procedure TDaoBase.DecLoadCount;
+begin
+  if FLoadCount>0 then
+    Dec(FLoadCount);
+end;
+
 function TDaoBase.Delete(ID: Integer): Integer;
 begin
   Result:= DaoUtils.ExecuteNoResult(QueryBuilder.Delete(ID));
@@ -702,6 +779,7 @@ begin
     Result:= Result+Delete(FObject, pMasterInstance);
 end;
 
+// TODO: If a missing child has childs, those childs will not be deleted. Ideally childs of missing childs should be deleted aswell
 function TDaoBase.DeleteMissingChilds(pMasterInstance: TObject; ChildDefs: TChildDaoDefs): Integer;
 
   procedure AddKey(pChildObject: TObject; var pSql: String);
@@ -824,11 +902,6 @@ begin
   Result:= DaoUtils.SelectInt(QueryBuilder.ObjectExists(pObject)) > 0;
 end;
 
-procedure TDaoBase.PopulateWhere(pList: TObjectList; const pWhere: String);
-begin
-  ModeloBD.PopulaObjectListFromSql(pList, QueryBuilder.SelectWhere(pWhere));
-end;
-
 function TDaoBase.UpdateChild(pMaster, pChild: TObject; ChildDefs: TChildDaoDefs = nil): Boolean;
 begin
   if not Assigned(ChildDefs) then
@@ -890,11 +963,6 @@ end;
 procedure TDaoBase.SetNewObjectFunction(const Value: TFunNewObject);
 begin
   ModeloBD.NewObjectFunction:= Value;
-end;
-
-procedure TDaoBase.SelectWhere(pObjectList: TObjectList<TObject>; const pWhere: String);
-begin
-  SelectWhere<TObject>(pObjectList, pWhere);
 end;
 
 { TDaoFactory }

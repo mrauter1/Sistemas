@@ -109,14 +109,16 @@ function NewProcessoRelatororiosMetaEvolutivo: TProcessoBase;
 var
   FTipoExport, FExport: TParameter;
   FInput: TParameter;
+  FDate: TDatetime;
 begin
   Result:= NewProcesso(TExecutorConsultaPersonalizada.GetExecutor);
   Result.Name:= 'MetaEvolutivo';
   FInput:= TParameter.Create('NomeConsulta', tbValue, 'MetaVendaEvolutivo');
   Result.Inputs.Add(FInput);
 
-  Result.Inputs.Add(TParameter.Create('geDataIni', tbValue, LadderDateToStr(StartOfTheMonth(Now)))); // select first day of the month
-  Result.Inputs.Add(TParameter.Create('geDataFim', tbValue, LadderDateToStr(Now)));
+  FDate:= LadderVarToDateTime('2020/04/01');
+  Result.Inputs.Add(TParameter.Create('geDataIni', tbValue, LadderDateToStr(StartOfTheMonth(FDate), True))); // select first day of the month
+  Result.Inputs.Add(TParameter.Create('geDataFim', tbValue, LadderDateToStr(EndOfTheMonth(FDate), True)));
 
 
   FTipoExport:= TParameter.Create('Grafico', tbValue);
@@ -256,6 +258,7 @@ begin
   CheckEquals(2, FProcesso.Outputs.Count);
   CheckEquals(2, FProcesso.Inputs[1].Parameters.Count);
   CheckEquals(3, FProcesso.Inputs[1].Parameters[0].Parameters.Count);
+  CheckEquals(3, FProcesso.Inputs[1].Parameters[1].Parameters.Count);
   CheckEquals('Grafico', FProcesso.Inputs[1].Parameters[0].Name);
   CheckEquals('Visualizacao', FProcesso.Inputs[1].Parameters[0].Parameters[0].Name);
   CheckEquals('Tabela', FProcesso.Inputs[1].Parameters[1].Parameters[2].Expression);

@@ -42,13 +42,10 @@ type
   private
     { Private declarations }
     FActivityManager: TActivityManager;
-    FParametros: TParametros;
-    procedure SetParametrosConsulta(pConsultaID: Integer);
   public
     ResultClass: String;
     { Public declarations }
-    class function SelecionaProcesso(out pParametros: TParametros): String; overload;
-    class function SelecionaProcesso: String; overload;
+    class function SelecionaTipoProcesso: String; overload;
   end;
 
 implementation
@@ -57,36 +54,6 @@ implementation
 
 uses
   Form.SelecionaConsulta;
-
-procedure TFormNovoProcesso.SetParametrosConsulta(pConsultaID: Integer);
-var
-  FParametro: TParametroCon;
-begin
-  if pConsultaID = 0 then
-    Exit;
-
-  QryConsulta.Close;
-  QryConsulta.ParamByName('ID').AsInteger:= pConsultaID;
-  QryConsulta.Open;
-
-  QryParametros.Close;
-  QryParametros.ParamByName('IDConsulta').AsInteger:= pConsultaID;
-  QryParametros.Open;
-
-  while not QryParametros.Eof do
-  begin
-    FParametro:= TParametroCon.Create(QryParametrosNome.AsString, null, TTipoParametro(QryParametrosTipo.AsInteger),
-                                      QryParametrosDescricao.AsString, QryParametrosSql.AsString);
-    FParametro.ValorPadrao:= QryParametrosValorPadrao.AsString;
-
-    if not Assigned(FParametros) then
-      FParametros:= TParametros.Create;
-
-    FParametros.Add(FParametro);
-
-    QryParametros.Next;
-  end;
-end;
 
 procedure TFormNovoProcesso.BtnOKClick(Sender: TObject);
 var
@@ -106,12 +73,6 @@ begin
        Break;
      end;
 
-  if ResultClass = 'TExecutorConsultaPersonalizada' then
-  begin
-    FConsultaID:= TFormSelecionaConsulta.SelecionaConsulta;
-    SetParametrosConsulta(FConsultaID);
-  end;
-
   Close;
 end;
 
@@ -127,28 +88,17 @@ begin
      CbxExecutors.Items.Add(FClass);
 end;
 
-class function TFormNovoProcesso.SelecionaProcesso(
-  out pParametros: TParametros): String;
+class function TFormNovoProcesso.SelecionaTipoProcesso: String;
 var
   FForm: TFormNovoProcesso;
 begin
   FForm:= TFormNovoProcesso.Create(nil);
   try
     FForm.ShowModal;
-    pParametros:= FForm.FParametros;
     Result:= FForm.ResultClass;
   finally
     FForm.Free;
   end;
-end;
-
-class function TFormNovoProcesso.SelecionaProcesso: String;
-var
-  FParametros: TParametros;
-begin
-  Result:= SelecionaProcesso(FParametros);
-  if Assigned(FParametros) then
-    FParametros.Free;
 end;
 
 end.

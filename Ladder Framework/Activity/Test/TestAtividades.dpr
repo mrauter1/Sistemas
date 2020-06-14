@@ -45,17 +45,20 @@ uses
   Ladder.SqlServerConnection in '..\..\Ladder.SqlServerConnection.pas',
   Ladder.Utils in '..\..\Ladder.Utils.pas',
   Form.CadastroAtividade in '..\..\Forms\Form.CadastroAtividade.pas' {FormCadastroAtividade},
-  Form.CadastroProcesso in '..\..\Forms\Form.CadastroProcesso.pas' {FormCadastroProcesso},
+  Form.ProcessEditor in '..\..\Forms\Form.ProcessEditor.pas' {FormProcessEditor},
   Form.NovoProcesso in '..\..\Forms\Form.NovoProcesso.pas' {FormNovoProcesso},
   Form.SelecionaConsulta in '..\..\Forms\Form.SelecionaConsulta.pas' {FormSelecionaConsulta},
   Test.Forms in 'Test.Forms.pas',
   Form.PesquisaAviso in '..\..\Forms\Form.PesquisaAviso.pas' {FormPesquisaAviso},
-  Form.CadastroProcessoConsulta in '..\..\Forms\Form.CadastroProcessoConsulta.pas' {FormCadastroProcessoConsulta},
-  Ladder.ORM.DataSetBinding in '..\..\ORM\Ladder.ORM.DataSetBinding.pas',
   Ladder.ORM.ObjectDataSet in '..\..\ORM\Ladder.ORM.ObjectDataSet.pas',
   uConClasses in '..\..\..\utils\uConClasses.pas',
-  Spring.Data.ObjectDataSet in '..\..\ORM\Spring.Data.ObjectDataSet.pas',
-  Test.ObjectDataset in 'Test.ObjectDataset.pas';
+  Test.ObjectDataset in 'Test.ObjectDataset.pas',
+  Ladder.ORM.Dao in '..\..\ORM\Ladder.ORM.Dao.pas',
+  Ladder.ORM.DaoUtils in '..\..\ORM\Ladder.ORM.DaoUtils.pas',
+  Test.DaoUtils in 'Test.DaoUtils.pas',
+  uConClasses.Dao in '..\..\..\utils\uConClasses.Dao.pas',
+  Form.ProcessEditorBase in '..\..\Forms\Form.ProcessEditorBase.pas' {FormProcessEditorBase},
+  Form.ConsultaEditor in 'Form.ConsultaEditor.pas' {FormConsultaEditor};
 
 {$R *.RES}
 

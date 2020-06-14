@@ -4,7 +4,11 @@ interface
 
 uses
   System.SysUtils, System.Classes, System.Generics.Collections, Data.DB,
-  Generics.Defaults, Variants, Ladder.Activity.Parser, Ladder.ORM.DaoUtils, SynCommons;
+  Generics.Defaults, Variants, Ladder.Activity.Parser, Ladder.ORM.DaoUtils, SynCommons,
+  Forms;
+
+// Check if str is a Valid element name. Names should start with a letter or underline and have only alphanumerical or underline chars.
+function IsValidName(const AName: String): Boolean;
 
 type
 //  TTipoProcesso = (tpConsultaPersonalizada = 1, tpEnvioEmail = 2, tpAtividade = 3);
@@ -26,8 +30,23 @@ type
     function FindElementByName(pElementName: String): IActivityElement;
   end;
 
+  EInvalidElementError = class(Exception)
+    FullElementName: String;
+    Msg: String;
+    Element: IActivityElement;
+    constructor Create(AElement: IActivityElement; AFullElementName: String; AMsg: String);
+  end;
+
   TProcessoBase = class;
   TParameterList = class;
+
+  IProcessEditor = interface(IInterface)
+  ['{9366E88A-4D9F-4705-9DB8-D8138498B0D1}']
+    function NewProcess: TProcessoBase;
+    procedure EditProcess(pProcesso: TProcessoBase);
+    function Form: TForm;
+    procedure Free;
+  end;
 
   TParameter = class(TSingletonImplementation, IActivityElement, IActivityValue, IActivityElementContainer)
   private
@@ -41,10 +60,13 @@ type
     procedure AfterConstruction; override;
     function GetName: String;
     procedure SetValue(const Value: variant);
-    constructor Create(pName: String; pParameterType: TParameterType; pExpression: String); overload;
-    constructor Create(pName: String; pParameterType: TParameterType); overload;
+    constructor Create(pName: String; pParameterType: TParameterType; pExpression: String); overload; virtual;
+    constructor Create(pName: String; pParameterType: TParameterType); overload; virtual;
     constructor CreateWithValue(pName: String; pParameterType: TParameterType; pValue: Variant);
     destructor Destroy; override;
+
+    constructor CreateCopy(ASource: TParameter; pCopyID: Boolean = False); virtual;
+
     function GetValue: Variant;
     function FindElementByName(pElementName: String): IActivityElement;
     function Param(const ParamName: String): TParameter;
@@ -62,6 +84,7 @@ type
     constructor Create;
     function ParamValue(const ParamName: String): variant; overload;
     function ParamValue(const ParamName: String; pDefault: Variant): variant; overload;
+    function ParamExpression(const ParamName: String): String;
     function Param(const ParamName: String): T;
 //    procedure Add(pInput: TParameter); overload;
 //    procedure Remove(pInput: TParameter); overload;
@@ -80,7 +103,7 @@ type
   private
   protected
   public
-    constructor Create(pName: String; pParameterType: TParameterType; pExpression: String);
+    constructor Create(pName: String; pParameterType: TParameterType; pExpression: String); override;
   published
   end;
 
@@ -128,6 +151,7 @@ type
     FInputs: TParameterList;
     FOutputs: TOutputList;
     FID: Integer;
+    FOrder: Integer;
     FName: String;
     FDescription: String;
     FDaoUtils: TDaoUtils;
@@ -158,8 +182,15 @@ type
 
     function Executar: TOutputList; overload; virtual;
     function Executar(ValuateParameterExpression: TValuateParameterExpression): TOutputList; overload; virtual;
+
+    // Check if parameter name is valid and its expression can be parsed
+    procedure CheckParameter(AMasterName: String; AParameter: TParameter);
+
+    // Check if all the elements of the process have valid names and their expression can be parsed
+    procedure CheckValidity(AMasterName: String = ''); virtual;
   published
     property ID: Integer read FID write FID;
+    property ExecOrder: Integer read FOrder write FOrder;
     property Name: String read GetName write FName;
     property Description: String read FDescription write FDescription;
     property Inputs: TParameterList read FInputs write FInputs;
@@ -169,6 +200,7 @@ type
   TActivity = class(TProcessoBase, IActivityElement, IActivityElementContainer)
   private
     FProcessos: TObjectList<TProcessoBase>;
+    function DoOrderProcess(const Left, Right: TProcessoBase): Integer;
 //    function ExpressionEvaluator(pExpression: String): array of string;
   protected
     procedure AfterConstruction; override;
@@ -177,6 +209,9 @@ type
     destructor Destroy; override;
     function Executar(ValuateParameterExpression: TValuateParameterExpression): TOutputList; overload; override;
     function FindElementByName(pElementName: String): IActivityElement; override;
+    procedure ReorderProcesses(FNewProcess: TProcessoBase = nil);
+    procedure AddProcess(AProcess: TProcessoBase); // Add the process and reorder the process list
+    procedure CheckValidity(AMasterName: String = ''); override;
   published
     property Processos: TObjectList<TProcessoBase> read FProcessos write FProcessos;
   end;
@@ -187,6 +222,31 @@ uses
   Ladder.ServiceLocator, Ladder.Utils;
 
 { TGenericParameterList }
+
+function IsValidName(const AName: String): Boolean;
+const
+  cStartChars = ['a'..'z', 'A'..'Z', '_'];
+  cValidChars =  ['0'..'9', 'a'..'z', 'A'..'Z', '_'];
+var
+  i: Integer;
+begin
+  Result:= False;
+  for i := 1 to Length(AName) do
+  begin
+    if i=1 then
+    begin
+      if not (AName[i] in cStartChars) then
+        Exit;
+    end
+   else
+    begin
+      if not (AName[i] in cValidChars) then
+        Exit;
+    end;
+  end;
+
+  Result:= True;
+end;
 
 constructor TGenericParameterList<T>.Create;
 begin
@@ -205,6 +265,17 @@ begin
       Exit;
     end;
   Result:= nil;
+end;
+
+function TGenericParameterList<T>.ParamExpression(const ParamName: String): String;
+var
+  FInput: TParameter;
+begin
+  FInput:= Param(ParamName);
+  if Assigned(FInput) then
+    Result:= FInput.Expression
+  else
+    Result:= '';
 end;
 
 function TGenericParameterList<T>.ParamValue(const ParamName: String; pDefault: Variant): variant;
@@ -240,6 +311,40 @@ begin
 
   if not Assigned(FDaoUtils) then
     FDaoUtils:= TFrwServiceLocator.Context.DaoUtils;
+end;
+
+procedure TProcessoBase.CheckParameter(AMasterName: String; AParameter: TParameter);
+var
+  fParameter: TParameter;
+  fFullName: String;
+begin
+  fFullName:= AMasterName+'.'+AParameter.Name;
+  if not IsValidName(AParameter.Name) then
+    raise EInvalidElementError.Create(self, fFullName, Format('Name %s is invalid.', [AParameter.Name]));
+
+  for fParameter in AParameter.Parameters do
+    CheckParameter(fFullName, fParameter);
+end;
+
+procedure TProcessoBase.CheckValidity(AMasterName: String = '');
+var
+  fParameter: TParameter;
+  fFullName: String;
+begin
+  if AMasterName <> '' then
+    fFullName:= AMasterName+'.'+Self.Name
+  else
+    fFullName:= Self.Name;
+
+  if not IsValidName(Name) then
+    raise EInvalidElementError.Create(self, fFullName, Format('Name %s is invalid.', [Self.Name]));
+
+  for fParameter in Inputs do
+    CheckParameter(fFullName, fParameter);
+
+  for fParameter in Outputs do
+    CheckParameter(fFullName, fParameter);
+
 end;
 
 constructor TProcessoBase.Create(pExecutor: IExecutorBase; pDaoUtils: TDaoUtils);
@@ -432,6 +537,22 @@ begin
   FProcessos:= TObjectList<TProcessoBase>.Create(True);
 end;
 
+procedure TActivity.CheckValidity(AMasterName: String = '');
+var
+  fProcesso: TProcessoBase;
+  fFullName: String;
+begin
+  inherited;
+
+  if AMasterName <> '' then
+    fFullName:= AMasterName+'.'+Self.Name
+  else
+    fFullName:= Self.Name;
+
+  for fProcesso in Processos do
+    fProcesso.CheckValidity(fFullName);
+end;
+
 constructor TActivity.Create(pDaoUtils: TDaoUtils);
 begin
   inherited Create(nil, pDaoUtils);
@@ -443,11 +564,57 @@ begin
   inherited Destroy;
 end;
 
+procedure TActivity.AddProcess(AProcess: TProcessoBase);
+begin
+  Processos.Add(AProcess);
+  ReorderProcesses(AProcess);
+end;
+
+function TActivity.DoOrderProcess(const Left, Right: TProcessoBase): Integer;
+begin
+  Result:= Left.ExecOrder - Right.ExecOrder;
+end;
+
+procedure TActivity.ReorderProcesses(FNewProcess: TProcessoBase = nil);
+var
+  I: Integer;
+  FUnordered: Boolean;
+begin
+  FUnordered:= False;
+  for I := 0 to Processos.Count-1 do
+  begin
+    if Processos[I].ExecOrder=I+1 then
+      Continue
+    else
+    begin
+      FUnordered:= True;
+      if Processos[I].ExecOrder=0 then // Send to end of list
+        FProcessos[I].ExecOrder:=Processos.Count+I;
+    end;
+  end;
+
+  if FUnordered then
+    Processos.Sort(TComparer<TProcessoBase>.Construct(DoOrderProcess));
+
+  if Assigned(FNewProcess) and (Processos.IndexOf(FNewProcess)>=0) then
+    if FNewProcess.ExecOrder <= Processos.Count then // Ensure New Process is in the correct index
+    begin
+      FUnordered:= True;
+      Processos.Move(Processos.IndexOf(FNewProcess), FNewProcess.ExecOrder-1);
+    end;
+
+  if FUnordered then // if process list was out of order reset order values
+    for I := 0 to Processos.Count -1 do
+      Processos[I].ExecOrder:= I+1;
+end;
+
 function TActivity.Executar(ValuateParameterExpression: TValuateParameterExpression): TOutputList;
 var
   FProcesso: TProcessoBase;
   FOutput: TOutputParameter;
 begin
+  ReorderProcesses;
+
   { First evaluate all parameters }
   ValuateInputs(ValuateParameterExpression);
 
@@ -564,6 +731,17 @@ begin
   Create(pName, pParameterType, '');
 end;
 
+constructor TParameter.CreateCopy(ASource: TParameter; pCopyID: Boolean);
+var
+  fParameter: TParameter;
+begin
+  TParameter.Create(ASource.Name, ASource.ParameterType, ASource.Expression);
+  if pCopyID then
+    Self.ID:= ASource.ID;
+  for fParameter in ASource.Parameters do
+    Self.Parameters.Add(TParameter.CreateCopy(fParameter, pCopyID));
+end;
+
 constructor TParameter.CreateWithValue(pName: String;
   pParameterType: TParameterType; pValue: Variant);
 begin
@@ -624,6 +802,17 @@ begin
     FValue:= null;
     raise;
   end;
+end;
+
+{ EInvalidElementError }
+
+constructor EInvalidElementError.Create(AElement: IActivityElement; AFullElementName: String; AMsg: String);
+begin
+  Element:= AElement;
+  FullElementName:= AFullElementName;
+  Msg:= AMsg;
+
+  inherited Create(Format('Element %s: %s', [AFullElementName, AMsg]));
 end;
 
 end.

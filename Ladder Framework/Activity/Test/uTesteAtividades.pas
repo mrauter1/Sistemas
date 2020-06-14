@@ -27,7 +27,7 @@ type
 implementation
 
 uses
-  SysUtils, DateUtils, SynCommons, Ladder.Utils;
+  SysUtils, DateUtils, SynCommons, Ladder.Utils, SynDB;
 
 { TTesteAtividades }
 

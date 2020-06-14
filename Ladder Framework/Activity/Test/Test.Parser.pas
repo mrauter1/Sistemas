@@ -32,6 +32,7 @@ type
     procedure TearDown; override;
   published
     procedure TestExtractTextDelimitedBy;
+    procedure TestParseNumber;
     procedure TestParseString;
     procedure TestStringInterpolations;
     procedure TestParseList;
@@ -47,6 +48,9 @@ type
   end;
 
 implementation
+
+uses
+  Math;
 
 function TestTActivityParser.ParseNewString(pExpression: String): variant;
 var
@@ -298,7 +302,7 @@ var
   FCopyVal: Variant;
 const
   sEmptyList = '[]';
-  sNumberList = '[123]';
+  sNumberList = '[123,11,"teste"]';
   sStringList = '["bla"]';
   sMultiList = '["co", "ro", "na"]';
   sInvalid = ',]';
@@ -329,6 +333,12 @@ begin
   CheckEquals('ro', ReturnValue._(1));
   CheckEquals('na', ReturnValue._(2));
 
+  ReturnValue:= ParseNewList(sNumberList);
+  Check(ReturnValue._Count=3, 'List should have three items.');
+  CheckEquals(123, ReturnValue._(0));
+  CheckEquals(11, ReturnValue._(1));
+  CheckEquals('teste', ReturnValue._(2));
+
 {  FCopyVal:= ReturnValue;
   FCopyVal[0]:= 'Changed';
   CheckEquals('co', ReturnValue[0]);
@@ -336,15 +346,6 @@ begin
   FCopyRef:= @ReturnValue;
   FCopyRef^[0]:= 'Changed';
   CheckEquals('Changed', ReturnValue[0]);}
-
-  try
-    ParseNewList(sNumberList);
-    Fail('Esperado erro de identificador desconhecido!');
-  except on E: Exception do
-    if E.ClassType <> EParseException then
-      raise;
-  end;
-
   try
     ParseNewList(sInvalid);
     Fail('Esperado erro de lista inválida!');
@@ -370,7 +371,8 @@ const
   sMultiList = '["co", "ro", "na"]';
   sString = '"string"';
   sNull = '  ';
-  sInvalid = '123';
+  sNumber = '123';
+  sInvalid = 'abcd';
 
   function NewParseNext(pExpression: String): Variant;
   begin
@@ -391,6 +393,9 @@ begin
   ReturnValue:= NewParseNext(sNull);
   Check(ReturnValue = null, 'Return should be null');
 
+  ReturnValue:= NewParseNext(sNumber);
+  CheckEquals(123, ReturnValue);
+
   try
     NewParseNext(sInvalid);
     Fail('Esperado erro de identificador inválido!');
@@ -398,6 +403,62 @@ begin
     if E.ClassType <> EParseException then
       raise;
   end;
+end;
+
+procedure TestTActivityParser.TestParseNumber;
+var
+  ReturnValue: variant;
+  Index: Integer;
+const
+  sInt = '1';
+  sInt2 = '22,';
+  sBigInt = '1235588 ';
+  sFloat = '3.14';
+  sFloat2 = '3.14[]';
+  sInvalidFloat = '3.14.22';
+  sInvalidInt = 'teste';
+
+  procedure ParseNewNumber(pExpression: String; var FReturn: Variant);
+  begin
+    FActivityParser.Expression:= pExpression;
+    Index:= 1;
+    FActivityParser.ParseNumber(Index, FReturn);
+  end;
+begin
+  ParseNewNumber(sInt, ReturnValue);
+  CheckEquals(1, ReturnValue);
+  Check(Index=2, 'Index should be 2.');
+
+  ParseNewNumber(sInt2, ReturnValue);
+  CheckEquals(22, ReturnValue);
+
+  ParseNewNumber(sBigInt, ReturnValue);
+  CheckEquals(1235588, ReturnValue);
+
+  ParseNewNumber(sFloat, ReturnValue);
+  Check(CompareValue(3.14, ReturnValue) = 0);
+
+  ParseNewNumber(sFloat2, ReturnValue);
+  Check(CompareValue(3.14, ReturnValue)= 0);
+
+
+  try
+    ParseNewNumber(sInvalidInt, ReturnValue);
+    Fail('Invalid number exception expected.');
+  except on E: Exception do
+    if E.ClassType <> EParseException then
+      raise;
+  end;
+
+  try
+    ParseNewNumber(sInvalidFloat, ReturnValue);
+    Fail('Invalid number exception expected.');
+  except on E: Exception do
+    if E.ClassType <> EParseException then
+      raise;
+  end;
+
+
 end;
 
 procedure TestTActivityParser.TestIgnoreAndErrorIfEOL;
@@ -499,7 +560,8 @@ const
   sMultiList = '["co", "ro", "na"]';
   sString = '"string"';
   sNull = '  ';
-  sInvalid = '123';
+  sNumber = '123';
+  sInvalid = 'abcd';
 begin
   // TODO: Setup method call parameters
   FActivityParser.DoParseExpression(sMultiList, ReturnValue);
@@ -512,6 +574,9 @@ begin
 
   FActivityParser.DoParseExpression(sNull, ReturnValue);
   Check(ReturnValue = null, 'Return should be null');
+
+  FActivityParser.DoParseExpression(sNumber, ReturnValue);
+  CheckEquals(123, ReturnValue);
 
   try
     FActivityParser.DoParseExpression(sInvalid, ReturnValue);

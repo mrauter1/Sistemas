@@ -14,7 +14,7 @@ uses
 
 type
   TFunGetFieldValue = reference to function (const pFieldName: String; Instance: TObject; MasterInstance: TObject = nil): Variant;
-  TFunGetPropValue = reference to function (const pPropName: String; pCurrentValue: TValue; Instance: TObject; pDBRows: ISQLDBRows): TValue;
+  TFunGetPropValue = reference to function (const pPropName: String; pCurrentValue: TValue; Instance: TObject; pDBRows: ISQLDBRows; Sender: TObject): TValue;
 
   TFieldMapping = class(TObject)
   private
@@ -61,7 +61,7 @@ type
 
   TTipoMapeamento = (tmObjectToDataset, tmObjectFromDataSet);
 
-  TMapeamentoCallback = reference to procedure (pClass: TClass; pFieldMapping: TFieldMapping);
+  TMapeamentoCallback = reference to procedure (pClass: TClass; pFieldMapping: TFieldMapping; Sender: TObject);
 
   TFunNewObject = reference to function (pDBRows: ISQLDBRows): TObject;
 
@@ -80,23 +80,23 @@ type
     FFieldsInUpdateDeleteWhere: TList<String>;
     FUpdateOptions: TUpdateOptions;
 
-    function FazMapeamentoECopiaValores(pObjeto: TObject; pDBRows: ISqlDBRows; TipoMapeamento: TTipoMapeamento): Boolean; overload;
+    function FazMapeamentoECopiaValores(pObjeto: TObject; pDBRows: ISqlDBRows; TipoMapeamento: TTipoMapeamento; Sender: TObject): Boolean; overload;
     function FazMapeamentoECopiaValores(pObjeto: TObject; pDataSet: TDataSet;
-      TipoMapeamento: TTipoMapeamento): Boolean; overload;
+      TipoMapeamento: TTipoMapeamento; Sender: TObject): Boolean; overload;
 
-    procedure SetPropValue(Instance: TObject; pFieldMapping: TFieldMapping; pDataSet: TDataSet);
+    procedure SetPropValue(Instance: TObject; pFieldMapping: TFieldMapping; pDataSet: TDataSet; Sender: TObject);
     procedure SetFieldValue(Instance: TObject; pFieldMapping: TFieldMapping; pDataSet: TDataSet);
 
     procedure InicializaObjeto;
 
-    function ObjectListFromDBRows(pRows: ISqlDBRows): TObjectList;
-    procedure PopulaObjectListFromDBRows(pObjectList: TObjectList; pRows: ISqlDBRows); overload;
-    procedure PopulaObjectListFromDBRows<T: Class>(pObjectList: TObjectList<T>; pRows: ISqlDBRows); overload;
+    function ObjectListFromDBRows(pRows: ISqlDBRows; Sender: TObject = nil): TObjectList;
+    procedure PopulaObjectListFromDBRows(pObjectList: TObjectList; pRows: ISqlDBRows; Sender: TObject = nil); overload;
+    procedure PopulaObjectListFromDBRows<T: Class>(pObjectList: TObjectList<T>; pRows: ISqlDBRows; Sender: TObject = nil); overload;
 
-    procedure ObjectFromDBRows(pObject: TObject; pDBRows: ISqlDBRows); overload;
-    function ObjectFromDBRows(pDBRows: ISqlDBRows): TObject; overload;
+    procedure ObjectFromDBRows(pObject: TObject; pDBRows: ISqlDBRows; Sender: TObject = nil); overload;
+    function ObjectFromDBRows(pDBRows: ISqlDBRows; Sender: TObject = nil): TObject; overload;
 
-    procedure ColumnParaProp(Instance: TObject; pRows: ISqlDBRows; pFieldMapping: TFieldMapping);
+    procedure ColumnParaProp(Instance: TObject; pRows: ISqlDBRows; pFieldMapping: TFieldMapping; Sender: TObject = nil);
     function GetPropChave: TRttiMember;
     function GetNomeCampoChave: string;
     procedure SetItemClass(const Value: TClass);
@@ -137,30 +137,30 @@ type
 
     function ObjectToDataSet(pObjeto: TObject; pDataSet: TDataset): Boolean;
 
-    procedure ObjectFromDataSet(pObject: TObject; pDataSet: TDataSet); overload;
-    function ObjectFromDataSet(pDataSet: TDataSet): TObject; overload;
+    procedure ObjectFromDataSet(pObject: TObject; pDataSet: TDataSet; Sender: TObject = nil); overload;
+    function ObjectFromDataSet(pDataSet: TDataSet; Sender: TObject = nil): TObject; overload;
 
-    procedure ObjectFromSql(pObject: TObject; const pSql: String); overload;
-    function ObjectFromSql(const pSql: String): TObject; overload;
+    procedure ObjectFromSql(pObject: TObject; const pSql: String; Sender: TObject = nil); overload;
+    function ObjectFromSql(const pSql: String; Sender: TObject = nil): TObject; overload;
 
     // Para cada linha do DataSet será criado um objeto do tipo ItemClass e adicionado à lista,
     // São copiados os valores das colunas que contêm o mesmo nome que uma propriedade published do objeto, ou que contenham mapeamento.
-    procedure PopulaObjectListFromDataSet(pObjectList: TObjectList; pDataSet: TDataSet); overload;
-    procedure PopulaObjectListFromDataSet<T: class>(pObjectList: TObjectList<T>; pDataSet: TDataSet); overload;
-    procedure PopulaObjectListFromSql(pObjectList: TObjectList; const pSql: String); overload;
-    procedure PopulaObjectListFromSql<T: class>(pObjectList: TObjectList<T>; const pSql: String); overload;
+    procedure PopulaObjectListFromDataSet(pObjectList: TObjectList; pDataSet: TDataSet; Sender: TObject = nil); overload;
+    procedure PopulaObjectListFromDataSet<T: class>(pObjectList: TObjectList<T>; pDataSet: TDataSet; Sender: TObject = nil); overload;
+    procedure PopulaObjectListFromSql(pObjectList: TObjectList; const pSql: String; Sender: TObject = nil); overload;
+    procedure PopulaObjectListFromSql<T: class>(pObjectList: TObjectList<T>; const pSql: String; Sender: TObject = nil); overload;
 
-    function ObjectListFromDataSet(pDataSet: TDataSet): TObjectList; overload;
-    function ObjectListFromDataSet<T: class>(pDataSet: TDataSet): TFrwObjectList<T>; overload;
+    function ObjectListFromDataSet(pDataSet: TDataSet; Sender: TObject = nil): TObjectList; overload;
+    function ObjectListFromDataSet<T: class>(pDataSet: TDataSet; Sender: TObject = nil): TFrwObjectList<T>; overload;
 
-    function ObjectListFromSql(const pSql: String): TObjectList; overload;
-    function ObjectListFromSql<T: class>(const pSql: String): TFrwObjectList<T>; overload;
+    function ObjectListFromSql(const pSql: String; Sender: TObject = nil): TObjectList; overload;
+    function ObjectListFromSql<T: class>(const pSql: String; Sender: TObject = nil): TFrwObjectList<T>; overload;
 
     // Faz o mapeamento do Objeto e do DataSet. Ao encontrar a propriedade do objeto correspondente a um campo no dataset dispara MapeamentoCallback.
     // Caso existam campos mapeados na lista FMappedFieldList, utiliza a correspondencia setada,
     // caso contrario faz o mapeamento por propriedades que tenham o mesmo no de um campo do dataset.
     // Se a opção 'ApenasExplicitos' estiver setada, apenas os campos na lista FMappedFieldList serão mapeados;
-    function FazMapeamentoDaClasse(MapeamentoCallback: TMapeamentoCallback; pOnlyValidFields: Boolean = False): Boolean;
+    function FazMapeamentoDaClasse(MapeamentoCallback: TMapeamentoCallback; pOnlyValidFields: Boolean = False; Sender: TObject = nil): Boolean;
 
     procedure SetKeyValue(pObject: TObject; fValor: Integer);
     function GetKeyValue(pObject: TObject): Integer;
@@ -434,7 +434,7 @@ end;
 
 function TModeloBD.ObjectToDataSet(pObjeto: TObject; pDataSet: TDataset): Boolean;
 begin
-  Result:= FazMapeamentoECopiaValores(pObjeto, pDataSet, tmObjectToDataSet);
+  Result:= FazMapeamentoECopiaValores(pObjeto, pDataSet, tmObjectToDataSet, nil);
 end;
 
 procedure TModeloBD.DoMapPublishedFields;
@@ -484,13 +484,13 @@ begin
   Result:= ItemClass.Create;
 end;
 
-procedure TModeloBD.ObjectFromDataSet(pObject: TObject; pDataSet: TDataSet);
+procedure TModeloBD.ObjectFromDataSet(pObject: TObject; pDataSet: TDataSet; Sender: TObject = nil);
 begin
-  FazMapeamentoECopiaValores(pObject, pDataSet, tmObjectFromDataSet);
+  FazMapeamentoECopiaValores(pObject, pDataSet, tmObjectFromDataSet, Sender);
 end;
 
 // Mapeia a linha corrente do DataSet para um objeto.
-function TModeloBD.ObjectFromDataSet(pDataSet: TDataSet): TObject;
+function TModeloBD.ObjectFromDataSet(pDataSet: TDataSet; Sender: TObject = nil): TObject;
 begin
 // Se dataset estiver vazio retorna nulo
   Result:= nil;
@@ -499,19 +499,19 @@ begin
 
   Result:= CreateObject(pDataSet); //ItemClass.Create;
 
-  ObjectFromDataSet(Result, pDataSet);
+  ObjectFromDataSet(Result, pDataSet, Sender);
 end;
 
-procedure TModeloBD.ObjectFromDBRows(pObject: TObject; pDBRows: ISqlDBRows);
+procedure TModeloBD.ObjectFromDBRows(pObject: TObject; pDBRows: ISqlDBRows; Sender: TObject = nil);
 begin
-  FazMapeamentoECopiaValores(pObject, pDBRows, tmObjectFromDataSet);
+  FazMapeamentoECopiaValores(pObject, pDBRows, tmObjectFromDataSet, Sender);
 end;
 
-function TModeloBD.ObjectFromDBRows(pDBRows: ISqlDBRows): TObject;
+function TModeloBD.ObjectFromDBRows(pDBRows: ISqlDBRows; Sender: TObject = nil): TObject;
 begin
   Result:=CreateObject(pDBRows);
 
-  FazMapeamentoECopiaValores(Result, pDBRows, tmObjectFromDataSet);
+  FazMapeamentoECopiaValores(Result, pDBRows, tmObjectFromDataSet, Sender);
 end;
 
 procedure TModeloBD.InicializaObjeto;
@@ -523,7 +523,7 @@ end;
 constructor TModeloBD.Create(pItemClass: TClass; pMapAllPublishedFields: Boolean = True);
 begin
   inherited Create;
-  FUpdateOptions:= [];
+  FUpdateOptions:= [DeleteMissingChilds]; // Delete missing childs by default
 
   ItemClass:= pItemClass;
 
@@ -578,7 +578,7 @@ begin
   FFieldsInUpdateDeleteWhere.Add(pFieldName);
 end;
 
-procedure TModeloBD.ColumnParaProp(Instance: TObject; pRows: ISqlDBRows; pFieldMapping: TFieldMapping);
+procedure TModeloBD.ColumnParaProp(Instance: TObject; pRows: ISqlDBRows; pFieldMapping: TFieldMapping; Sender: TObject = nil);
 var
   FProp: TRttiMember;
   FFieldIndex: Integer;
@@ -590,7 +590,7 @@ begin
   if Assigned(pFieldMapping.FunGetPropValue) then
   begin
     SetPropertyValue(FProp, Instance,
-                     pFieldMapping.FunGetPropValue(FProp.Name, GetPropertyValue(FProp, Instance), Instance, pRows)
+                     pFieldMapping.FunGetPropValue(FProp.Name, GetPropertyValue(FProp, Instance), Instance, pRows, Sender)
                     );
     Exit;
   end;
@@ -605,7 +605,7 @@ begin
     SetPropertyValue(FProp, Instance, TValue.FromVariant(pRows.ColumnVariant(FFieldIndex)));
 end;
 
-procedure TModeloBD.SetPropValue(Instance: TObject; pFieldMapping: TFieldMapping; pDataSet: TDataSet);
+procedure TModeloBD.SetPropValue(Instance: TObject; pFieldMapping: TFieldMapping; pDataSet: TDataSet; Sender: TObject);
 var
   FValue: Integer;
   FProp: TRttiMember;
@@ -619,7 +619,7 @@ begin
   if Assigned(pFieldMapping.FunGetPropValue) then
   begin
     SetPropertyValue(FProp, Instance, pFieldMapping.FunGetPropValue(FProp.Name,
-                     GetPropertyValue(FProp, Instance), Instance, TSqlDBRowDataSet.Create(pDataSet)));
+                     GetPropertyValue(FProp, Instance), Instance, TSqlDBRowDataSet.Create(pDataSet), Sender));
     Exit;
   end;
 
@@ -743,34 +743,34 @@ begin
    raise Exception.Create(Format('TModeloBD.SetKeyValue: Property %s not found on object of class %s!', [PropChave, ItemClass.ClassName]));
 end;
 
-function TModeloBD.FazMapeamentoECopiaValores(pObjeto: TObject; pDBRows: ISqlDBRows; TipoMapeamento: TTipoMapeamento): Boolean;
+function TModeloBD.FazMapeamentoECopiaValores(pObjeto: TObject; pDBRows: ISqlDBRows; TipoMapeamento: TTipoMapeamento; Sender: TObject): Boolean;
 var
   fCallback: TMapeamentoCallback;
 begin
   // *INICIO* Método anonimo de callback
   fCallback:=
-    procedure (pClass: TClass; pFieldMapping: TFieldMapping)
+    procedure (pClass: TClass; pFieldMapping: TFieldMapping; Sender: TObject)
     begin
       case TipoMapeamento of
         tmObjectToDataset: raise Exception.Create('TModeloBD.FazMapeamentoECopiaValores é read only!');
-        tmObjectFromDataset: ColumnParaProp(pObjeto, pDBRows, pFieldMapping);
+        tmObjectFromDataset: ColumnParaProp(pObjeto, pDBRows, pFieldMapping, Sender);
       end;
     end;
   // *FIM* Método anônimo de callback
 
-  FazMapeamentoDaClasse(fCallback);
+  FazMapeamentoDaClasse(fCallback, False, Sender);
 
   Result:= True;
 end;
 
-function TModeloBD.FazMapeamentoECopiaValores(pObjeto: TObject; pDataSet: TDataSet; TipoMapeamento: TTipoMapeamento): Boolean;
+function TModeloBD.FazMapeamentoECopiaValores(pObjeto: TObject; pDataSet: TDataSet; TipoMapeamento: TTipoMapeamento; Sender: TObject): Boolean;
 var
 // fCallback: TMapeamentoCallback;
   fCallback: TMapeamentoCallback;
 begin
   // *INICIO* Método anonimo de callback
   fCallback:=
-    procedure (pClass: TClass; pFieldMapping: TFieldMapping)
+    procedure (pClass: TClass; pFieldMapping: TFieldMapping; Sender: TObject)
     var
       FField: Data.DB.TField;
     begin
@@ -778,12 +778,12 @@ begin
 
       case TipoMapeamento of
         tmObjectToDataSet: SetFieldValue(pObjeto, pFieldMapping, pDataSet);
-        tmObjectFromDataset: SetPropValue(pObjeto, pFieldMapping, pDataSet);
+        tmObjectFromDataset: SetPropValue(pObjeto, pFieldMapping, pDataSet, Sender);
       end;
     end;
   // *FIM* Método anônimo de callback
 
-  FazMapeamentoDaClasse(fCallback);
+  FazMapeamentoDaClasse(fCallback, False, Sender);
 
   Result:= True;
 end;
@@ -798,7 +798,7 @@ begin
   Result:= MappedFieldList.GetFieldMappingByPropName(pPropName);
 end;
 
-function TModeloBD.FazMapeamentoDaClasse(MapeamentoCallback: TMapeamentoCallback; pOnlyValidFields: Boolean = False): Boolean;
+function TModeloBD.FazMapeamentoDaClasse(MapeamentoCallback: TMapeamentoCallback; pOnlyValidFields: Boolean = False; Sender: TObject = nil): Boolean;
 var
   fFieldMapping: TFieldMapping;
 begin
@@ -808,103 +808,103 @@ begin
       if fFieldMapping.FieldName = '' then
         Continue;
 
-    MapeamentoCallback(ItemClass, fFieldMapping);
+    MapeamentoCallback(ItemClass, fFieldMapping, Sender);
   end;
 
   Result:= True;
 end;
 
-procedure TModeloBD.PopulaObjectListFromDataSet(pObjectList: TObjectList; pDataSet: TDataSet);
+procedure TModeloBD.PopulaObjectListFromDataSet(pObjectList: TObjectList; pDataSet: TDataSet; Sender: TObject = nil);
 begin
   pDataSet.First;
   while not pDataSet.eof do
   begin
-    pObjectList.Add(ObjectFromDataSet(pDataset));
+    pObjectList.Add(ObjectFromDataSet(pDataset, Sender));
 
     pDataSet.Next;
   end;
 end;
 
-procedure TModeloBD.PopulaObjectListFromDataSet<T>(pObjectList: TObjectList<T>; pDataSet: TDataSet);
+procedure TModeloBD.PopulaObjectListFromDataSet<T>(pObjectList: TObjectList<T>; pDataSet: TDataSet; Sender: TObject = nil);
 begin
   pDataSet.First;
   while not pDataSet.eof do
   begin
-    pObjectList.Add(ObjectFromDataSet(pDataset));
+    pObjectList.Add(ObjectFromDataSet(pDataset, Sender));
 
     pDataSet.Next;
   end;
 end;
 
-procedure TModeloBD.PopulaObjectListFromSql<T>(pObjectList: TObjectList<T>; const pSql: String);
+procedure TModeloBD.PopulaObjectListFromSql<T>(pObjectList: TObjectList<T>; const pSql: String; Sender: TObject = nil);
 var
   FRows: ISqlDBRows;
 begin
   FRows := Connection.Execute(pSql, []);
   try
-    PopulaObjectListFromDBRows<T>(pObjectList, FRows);
+    PopulaObjectListFromDBRows<T>(pObjectList, FRows, Sender);
   finally
     FRows:= nil;
   end;
 end;
 
 procedure TModeloBD.PopulaObjectListFromSql(pObjectList: TObjectList;
-  const pSql: String);
+  const pSql: String; Sender: TObject = nil);
 var
   FRows: ISqlDBRows;
 begin
   FRows := Connection.Execute(pSql, []);
   try
-    PopulaObjectListFromDBRows(pObjectList, FRows);
+    PopulaObjectListFromDBRows(pObjectList, FRows, Sender);
   finally
     FRows:= nil;
   end;
 end;
 
-procedure TModeloBD.PopulaObjectListFromDBRows(pObjectList: TObjectList; pRows: ISqlDBRows);
+procedure TModeloBD.PopulaObjectListFromDBRows(pObjectList: TObjectList; pRows: ISqlDBRows; Sender: TObject = nil);
 begin
   while pRows.Step do
-    pObjectList.Add(ObjectFromDBRows(pRows));
+    pObjectList.Add(ObjectFromDBRows(pRows, Sender));
 end;
 
 procedure TModeloBD.PopulaObjectListFromDBRows<T>(pObjectList: TObjectList<T>;
-  pRows: ISqlDBRows);
+  pRows: ISqlDBRows; Sender: TObject = nil);
 begin
   while pRows.Step do
-    pObjectList.Add(ObjectFromDBRows(pRows));
+    pObjectList.Add(ObjectFromDBRows(pRows, Sender));
 end;
 
-function TModeloBD.ObjectListFromDBRows(pRows: ISqlDBRows): TObjectList;
+function TModeloBD.ObjectListFromDBRows(pRows: ISqlDBRows; Sender: TObject = nil): TObjectList;
 begin
   Result:= TObjectList.Create;
 
-  PopulaObjectListFromDBRows(Result, pRows);
+  PopulaObjectListFromDBRows(Result, pRows, Sender);
 end;
 
 // Para cada linha do DataSet será criado um objeto do tipo ItemClass e adicionado à lista,
 // São copiados os valores das colunas que contêm o mesmo nome que uma propriedade published do objeto, ou que contenham mapeamento.
-function TModeloBD.ObjectListFromDataSet(pDataSet: TDataSet): TObjectList;
+function TModeloBD.ObjectListFromDataSet(pDataSet: TDataSet; Sender: TObject = nil): TObjectList;
 begin
   Result:= TObjectList.Create;
 
-  PopulaObjectListFromDataSet(Result, pDataSet);
+  PopulaObjectListFromDataSet(Result, pDataSet, Sender);
 end;
 
-function TModeloBD.ObjectListFromDataSet<T>(pDataSet: TDataSet): TFrwObjectList<T>;
+function TModeloBD.ObjectListFromDataSet<T>(pDataSet: TDataSet; Sender: TObject = nil): TFrwObjectList<T>;
 begin
   Result:= TFrwObjectList<T>.Create;
 
-  PopulaObjectListFromDataSet<T>(Result, pDataSet);
+  PopulaObjectListFromDataSet<T>(Result, pDataSet, Sender);
 end;
 
-procedure TModeloBD.ObjectFromSql(pObject: TObject; const pSql: String);
+procedure TModeloBD.ObjectFromSql(pObject: TObject; const pSql: String; Sender: TObject = nil);
 var
   FRows: ISqlDBRows;
 begin
   FRows := Connection.Execute(pSql, []);
   try
     if FRows.Step then
-      ObjectFromDBRows(pObject, FRows);
+      ObjectFromDBRows(pObject, FRows, Sender);
 
   finally
     FRows:= nil;
@@ -912,14 +912,14 @@ begin
 
 end;
 
-function TModeloBD.ObjectFromSql(const pSql: String): TObject;
+function TModeloBD.ObjectFromSql(const pSql: String; Sender: TObject = nil): TObject;
 var
   FRows: ISqlDBRows;
 begin
   FRows := Connection.Execute(pSql, []);
   try
     if FRows.Step then
-      Result:= ObjectFromDBRows(FRows)
+      Result:= ObjectFromDBRows(FRows, Sender)
     else
       Result:= nil;
   finally
@@ -927,19 +927,19 @@ begin
   end;
 end;
 
-function TModeloBD.ObjectListFromSql(const pSql: String): TObjectList;
+function TModeloBD.ObjectListFromSql(const pSql: String; Sender: TObject = nil): TObjectList;
 var
   FRows: ISqlDBRows;
 begin
   FRows := Connection.Execute(pSql, []);
   try
-    Result:= ObjectListFromDBRows(FRows);
+    Result:= ObjectListFromDBRows(FRows, Sender);
   finally
     FRows:= nil;
   end;
 end;
 
-function TModeloBD.ObjectListFromSql<T>(const pSql: String): TFrwObjectList<T>;
+function TModeloBD.ObjectListFromSql<T>(const pSql: String; Sender: TObject = nil): TFrwObjectList<T>;
 var
   fDataSet: TDataSet;
 begin
@@ -947,7 +947,7 @@ begin
 
   fDataSet:= DaoUtils.SelectAsDataSet(pSql, nil);
   try
-    Result:= ObjectListFromDataSet<T>(fDataSet);
+    Result:= ObjectListFromDataSet<T>(fDataSet, Sender);
   finally
     fDataSet.Free;
   end;

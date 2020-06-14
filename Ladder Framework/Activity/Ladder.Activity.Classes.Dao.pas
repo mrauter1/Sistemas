@@ -14,7 +14,7 @@ type
   private
     function GetExecutorClass(const pFieldName: String; Instance: TObject; MasterInstance: TObject=nil): Variant; virtual;
     function GetClassName(const pFieldName: String; Instance: TObject; MasterInstance: TObject=nil): Variant; virtual;
-    function GetExecutor(const pPropName: String; pCurrentValue: TValue; Instance: TObject; pDBRows: ISqlDBRows): TValue;
+    function GetExecutor(const pPropName: String; pCurrentValue: TValue; Instance: TObject; pDBRows: ISqlDBRows; Sender: TObject): TValue;
   public
     constructor Create; overload;
     constructor Create(pItemClass: TClass); overload;
@@ -69,7 +69,7 @@ begin
   Result:= ModeloBD.ItemClass.ClassName;
 end;
 
-function TProcessoDao<T>.GetExecutor(const pPropName: String; pCurrentValue: TValue; Instance: TObject; pDBRows: ISqlDBRows): TValue;
+function TProcessoDao<T>.GetExecutor(const pPropName: String; pCurrentValue: TValue; Instance: TObject; pDBRows: ISqlDBRows; Sender: TObject): TValue;
 var
   FExecutorClass: String;
 begin

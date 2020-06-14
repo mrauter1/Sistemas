@@ -63,8 +63,6 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
         Align = alClient
         BorderStyle = bsNone
         TabOrder = 0
-        ExplicitLeft = 1
-        ExplicitTop = 73
         DesignSize = (
           816
           427)

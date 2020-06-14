@@ -235,12 +235,12 @@ var
   vArResultado: TStringList;
 
 procedure ExportarCxGridParaImagem(cxGridView: TcxGridChartView; pFileName: String);
-procedure PopulaCheckListBoxQry(pCheckListBox: TCheckListBox; pSql: String; ValorPadrao: variant);
+procedure PopulaCheckListBoxQry(pCheckListBox: TCheckListBox; pSql: String; pValor: variant);
 procedure PopulaComboBoxQry(pComboBox: TComboBox; pSql: String; ValorPadrao: variant);
 
 implementation
 
-uses Utils, System.UITypes, jpeg, Ladder.Activity.LadderVarToSql, Ladder.ORM.DaoUtils;
+uses Utils, System.UITypes, jpeg, Ladder.Activity.LadderVarToSql, Ladder.ORM.DaoUtils, Ladder.Activity.Parser, Ladder.Utils;
 
 {$R *.dfm}
 
@@ -269,16 +269,17 @@ begin
                                       FDados._[I].Values[1]);
 
     if not VarIsNull(ValorPadrao) then
-      if FDados._[I].Values[0] = ValorPadrao then
+      if VarToStrDef(FDados._[I].Values[0],'') = VarToStrDef(ValorPadrao,'@!@') then
         pComboBox.ItemIndex:= pComboBox.Items.Count-1;
   end;
 end;
 
-procedure PopulaCheckListBoxQry(pCheckListBox: TCheckListBox; pSql: String; ValorPadrao: variant);
+procedure PopulaCheckListBoxQry(pCheckListBox: TCheckListBox; pSql: String; pValor: variant);
 var
   FDados: TDocVariantData;
   vParamPadrao: Variant;
   I: Integer;
+  FID, FValor: Variant;
 
   procedure MarcaValor(pValor: Variant);
   var
@@ -291,6 +292,28 @@ var
         Break;
       end;
   end;
+
+  procedure SetaValoresPadrao;
+  var
+    FValorCalc: Variant;
+    I: Integer;
+  begin
+    if VarIsNull(pValor) then
+      Exit;
+
+ {   if not TActivityParser.TryParseExpression(VarToStrDef(pValor,''), FValorCalc, nil) then
+      Exit;               }
+
+    if DocVariantType.IsOfType(pValor) then
+    begin
+      for I := 0 to TDocVariantData(pValor).Count-1 do
+        MarcaValor(TDocVariantData(pValor).Values[I]);
+    end
+   else
+    if not VarIsNull(pValor) then
+      MarcaValor(pValor);
+  end;
+
 begin
   pCheckListBox.Clear;
   if pSql='' then
@@ -300,16 +323,19 @@ begin
 
   for I := 0 to FDados.Count-1 do
   begin
-    if (FDados._[0].Values[0] <> null) and
-       (FDados._[0].Values[1] <> null) then
-          TValorChave.AdicionaCheckListBox(pCheckListBox,
-                                     FDados._[0].Values[0],
-                                     FDados._[0].Values[1]);
+    FID:= FDados._[I].Values[0];
+    FValor:= FDados._[I].Values[1];
+    if (FID <> null) and (FValor <> null) then
+          TValorChave.AdicionaCheckListBox(pCheckListBox, FID, FValor);
 
     if not VarIsNull(vParamPadrao) then
-      if FDados._[0].Values[0] = vParamPadrao then
+      if FID = vParamPadrao then
         pCheckListBox.ItemIndex:= pCheckListBox.Items.Count-1;
   end;
+
+  SetaValoresPadrao;
+ {
+    Result:= TDocVariantData(pList).Values[FListIndex];
 
   if not VarIsNull(ValorPadrao) then
     if VarIsArray(ValorPadrao) then
@@ -320,7 +346,7 @@ begin
    else
     begin
       MarcaValor(ValorPadrao);
-    end;
+    end;}
 
 end;
 
@@ -866,7 +892,7 @@ begin
   begin
 //      FDm.QryPara.Locate('CopNome', FDm.GetParam(I).Nome, [loCaseInsensitive]);
 
-    pComp:= ScrollBox.FindComponent('V'+IntToStr(FParametro.Codigo));
+    pComp:= ScrollBox.FindComponent('V'+IntToStr(FParametro.ID));
 
     if not Assigned(pComp) then continue;
 
@@ -877,7 +903,7 @@ begin
    else
     if (pComp is TCheckListBox) then
     begin
-      FParametro.Valor:= StringToVarArray(',', TValorChave.ObterValoresSelecionados(TCheckListBox(pComp)));
+      FParametro.Valor:= StrToLadderArray(TValorChave.ObterValoresSelecionados(TCheckListBox(pComp)), ',');
     end
    else
     if (pComp is TMaskEdit) then

@@ -21,7 +21,7 @@ type
     class function ObterValorPorIndex(StringList: TStrings; Index: Integer): variant; static;
 
     class function ObterValor(pComboBox: TComboBox): Variant;
-    class function ObterValoresSelecionados(pCheckListBox: TCheckListBox; pSeparador: String=','): String;
+    class function ObterValoresSelecionados(pCheckListBox: TCheckListBox; pSeparador: String=','; pQuoteValues: Boolean = False): String;
   end;
 
 function ExecAndWait(const pFile, pParametros: String; const ShowCmd: Word; pTimeOut: Integer; WorkDir: String = ''): boolean;
@@ -361,7 +361,7 @@ begin
   Result:= TValorChave.ObterValorPorIndex(pComboBox.Items, pComboBox.ItemIndex);
 end;
 
-class function TValorChave.ObterValoresSelecionados(pCheckListBox: TCheckListBox; pSeparador: String=','): String;
+class function TValorChave.ObterValoresSelecionados(pCheckListBox: TCheckListBox; pSeparador: String=','; pQuoteValues: Boolean = False): String;
 var
   I: Integer;
 begin
@@ -373,7 +373,10 @@ begin
       if Result <> '' then
         Result:= Result + pSeparador;
 
-      Result:= Result+ObterValorPorIndex(pCheckListBox.Items, I);
+      if pQuoteValues then
+        Result:= Result+'"'+ObterValorPorIndex(pCheckListBox.Items, I)+'"'
+      else
+        Result:= Result+ObterValorPorIndex(pCheckListBox.Items, I);
     end;
   end;
 end;

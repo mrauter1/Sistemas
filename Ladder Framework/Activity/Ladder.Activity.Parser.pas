@@ -24,6 +24,7 @@ type
     FExpression: string;
     FOnElementEval: TFunElementEval;
     FOnSqlEval: TFunSqlEval;
+    FFormatSettings: TFormatSettings;
     procedure SetExpression(const Value: String);
     function LenExpression: Integer;
     procedure ParseOtherExpression(pNewExpression: String; var Return: Variant);
@@ -34,6 +35,7 @@ type
     function ExtractTextDelimitedBy(var Index: Integer; const OpenDelimiter, CloseDelimiter: String; pDoInterpolation: Boolean; pFunTranslateValue: TFunTranslateValue; NeedCloseDelimiter: Boolean = True): String; overload;
     function Ignore(var Index: Integer): Boolean; // Retorna verdadeiro se chegou no fim da string
     procedure IgnoreAndErrorIfEOL(var Index: Integer; const Msg: String);
+    procedure ParseNumber(var Index: Integer; var Return: Variant);
     procedure ParseString(var Index: Integer; var Return: Variant);
     procedure ParseList(var Index: Integer; var Return: Variant);
     procedure ParseElement(var Index: Integer; var Return: Variant);
@@ -44,6 +46,9 @@ type
     procedure DoParseExpression(pExpression: String; var Return: Variant);
 
     class procedure ParseExpression(pExpression: String; var Return: Variant; pOnElementEval: TFunElementEval);
+
+    class function TryParseExpression(pExpression: String; var Return: Variant; pOnElementEval: TFunElementEval): Boolean; overload;
+    class function TryParseExpression(pExpression: String; var Return: Variant; pDefaultValue: Variant; pOnElementEval: TFunElementEval): Boolean; overload;
 
     property Expression: String read FExpression write SetExpression;
     property OnElementEval: TFunElementEval read FOnElementEval write FOnElementEval;
@@ -164,6 +169,43 @@ begin
 
 end;
 
+procedure TActivityParser.ParseNumber(var Index: Integer; var Return: Variant);
+const
+  cStopChars = [' '];
+var
+  FHasDecimal: Boolean;
+  FStart: Integer;
+begin
+  FHasDecimal:= False;
+  FStart:= Index;
+  while (Index<=LenExpression) do
+  begin
+    if FExpression[Index] in ['0'..'9'] then
+    begin
+      Inc(Index);
+      Continue;
+    end
+    else if FExpression[Index] = '.' then
+    begin
+      if (Index = FStart) or FHasDecimal then
+        raise EParseException.Create('TActivityParser.ParseNumber: Invalid Number.', FExpression, Index);
+
+      Inc(Index);
+      FHasDecimal:= True;
+      Continue;
+    end
+   else if (FExpression[Index] in cStopChars) or (FExpression[Index] in KeyWords) then
+     Break
+   else
+     raise EParseException.Create('TActivityParser.ParseNumber: Invalid Number.', FExpression, Index);
+  end;
+
+  if FHasDecimal then
+    Return:= StrToFloat(Copy(FExpression, FStart, Index-FStart), FFormatSettings)
+  else
+    Return:= StrToInt(Copy(FExpression, FStart, Index-FStart));
+end;
+
 procedure TActivityParser.ParseString(var Index: Integer; var Return: Variant);
 var
   FDoInterpolation: Boolean;
@@ -182,6 +224,24 @@ procedure TActivityParser.SetExpression(const Value: String);
 begin
   FExpression := Value;
 //  FLenExpression:= Length(FExpression);
+end;
+
+class function TActivityParser.TryParseExpression(pExpression: String;
+  var Return: Variant; pDefaultValue: Variant; pOnElementEval: TFunElementEval): Boolean;
+begin
+  Result:= True;
+  try
+    TActivityParser.ParseExpression(pExpression, Return, pOnElementEval);
+  except
+    Return:= pDefaultValue;
+    Result:= False;
+  end;
+end;
+
+class function TActivityParser.TryParseExpression(pExpression: String;
+  var Return: Variant; pOnElementEval: TFunElementEval): Boolean;
+begin
+  Result:= TActivityParser.TryParseExpression(pExpression, Return, null, pOnElementEval);
 end;
 
 procedure TActivityParser.ParseList(var Index: Integer; var Return: Variant);
@@ -319,8 +379,10 @@ begin
               else
                 raise EParseException.Create('ParseNext: String or SQL expected after "!" symbol.', FExpression, Index);
               end;
-  else
-    raise EParseException.Create('ParseNext: Identificador desconhecido', FExpression, Index);
+    else if FExpression[Index] in (['0'..'9']) then
+      ParseNumber(Index, Return) // Number
+    else
+      raise EParseException.Create('ParseNext: Identificador desconhecido', FExpression, Index);
   end;
 
   while Index<=LenExpression do
@@ -344,6 +406,8 @@ end;
 constructor TActivityParser.Create;
 begin
   inherited Create;
+  FFormatSettings:= TFormatSettings.Create;
+  FFormatSettings.DecimalSeparator:= '.';
 end;
 
 

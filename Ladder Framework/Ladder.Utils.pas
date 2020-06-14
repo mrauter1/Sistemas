@@ -3,13 +3,13 @@ unit Ladder.Utils;
 interface
 
 uses
-  RTTI;
+  RTTI, SynCommons;
 
 function LadderVarIsList(const pValue: Variant): Boolean;
 function LadderVarIsIso8601(const pValue: Variant): Boolean;
 function LadderVarIsDateTime(const pValue: Variant): Boolean;
 function LadderVarToDateTime(const pValue: Variant): TDateTime;
-function LadderDateToStr(Date: TDateTime): String;
+function LadderDateToStr(pValue: Variant; pQuote: Boolean=False): String;
 
 function JoinList(const pValue: Variant; const pSeparator: String): String;
 
@@ -18,10 +18,47 @@ function VarToFloatDef(pVar: Variant; pDefault: Double = 0): Double;
 
 function InheritFromGenericOfType(classType: TRttiType; const genericType: string): Boolean;
 
+function UTF8ToAnsi(const UTF8: RawUTF8): RawByteString;
+function AnsiToUTF8(const AnsiText: RawByteString): RawUTF8;
+
+function StrToLadderArray(const AStr: String; ASeparator: String): Variant;
+function VarIsLadderArray(AVar: Variant): Boolean;
+function DoubleQuote(const AStr: String): String;
+
+var
+  SynAnsiConvert: TSynAnsiConvert;
+
 implementation
 
 uses
-  Variants, SynCommons, Spring.Reflection, StrUtils, SysUtils;
+  Variants, Spring.Reflection, StrUtils, SysUtils;
+
+function StrToLadderArray(const AStr: String; ASeparator: String): Variant;
+var
+  FArray: TArray<String>;
+  I: Integer;
+begin
+  FArray:= AStr.Split([ASeparator]);
+  Result:= _Arr([]);
+
+  for I := 0 to Length(FArray)-1 do
+    TDocVariantData(Result).AddItem(FArray[I]);
+end;
+
+function VarIsLadderArray(AVar: Variant): Boolean;
+begin
+  Result:= DocVariantType.IsOfType(AVar);
+end;
+
+function UTF8ToAnsi(const UTF8: RawUTF8): RawByteString;
+begin
+  Result:= SynAnsiConvert.UTF8ToAnsi(UTF8);
+end;
+
+function AnsiToUTF8(const AnsiText: RawByteString): RawUTF8;
+begin
+  Result:= SynAnsiConvert.AnsiToUTF8(AnsiText);
+end;
 
 function JoinList(const pValue: Variant; const pSeparator: String): String;
 var
@@ -71,9 +108,12 @@ begin
    Result:= LadderVarIsIso8601(pValue);
 end;
 
-function LadderDateToStr(Date: TDateTime): String;
+function LadderDateToStr(pValue: Variant; pQuote: Boolean=False): String;
 begin
-  Result:= DateToIso8601(Date, True);
+  if pQuote then
+    Result:= '"'+DateToIso8601(LadderVarToDateTime(pValue), True)+'"'
+  else
+    Result:= DateToIso8601(LadderVarToDateTime(pValue), True);
 end;
 
 function LadderVarToDateTime(const pValue: Variant): TDateTime;
@@ -131,5 +171,13 @@ begin
     Result := Assigned(baseType) and InheritFromGenericOfType(baseType, genericType);
   end;
 end;
+
+function DoubleQuote(const AStr: String): String;
+begin
+  Result:= '"'+AStr+'"';
+end;
+
+initialization
+  SynAnsiConvert:= TSynAnsiConvert.Engine(0); // Windows current code page;
 
 end.

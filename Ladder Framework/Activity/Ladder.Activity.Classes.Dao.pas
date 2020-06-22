@@ -18,7 +18,7 @@ type
   public
     constructor Create; overload;
     constructor Create(pItemClass: TClass); overload;
-    function NewProcesso(pDBRows: ISqlDBRows): TProcessoBase; virtual;
+    function NewProcesso(pDBRows: ISqlDBRows): TObject; virtual;
     function ActivityManager: TActivityManager;
   end;
 
@@ -27,7 +27,7 @@ type
     FProcessoDao: TProcessoDao<TProcessoBase>;
   public
     constructor Create;
-    function NewProcesso(pDBRows: ISqlDBRows): TProcessoBase; override;
+    function NewProcesso(pDBRows: ISqlDBRows): TObject; override;
   end;
 
 implementation
@@ -91,6 +91,7 @@ var
   FInputDao: IDaoGeneric<TParameter>;
 begin
   inherited Create('ladder.Processos', 'ID', pItemClass);
+  ModeloBD.NewObjectFunction:= NewProcesso;
   ModeloBD.MapField('ExecutorClass', ftString, GetExecutorClass);
   ModeloBD.MapField('ClassName', ftString, GetClassName);
   ModeloBD.MapProperty('Executor', GetExecutor);
@@ -102,12 +103,12 @@ begin
   AddChildDao('Outputs', 'ID', 'IDProcesso', FOutputDao);
 end;
 
-function TProcessoDao<T>.NewProcesso(pDBRows: ISqlDBRows): TProcessoBase;
+function TProcessoDao<T>.NewProcesso(pDBRows: ISqlDBRows): TObject;
 var
   FExecutor: IExecutorBase;
 begin
   FExecutor:= ActivityManager.GetExecutor(pDBRows.ColumnString('ExecutorClass'));
-  Result:= TProcessoBase.Create(FExecutor, ModeloBD.DaoUtils);
+  Result:= TProcessoBase.Create(FExecutor, TFrwServiceLocator.Factory.NewExpressionEvaluator(ModeloBD.DaoUtils));
 end;
 
 { TAtividadeDao }
@@ -119,9 +120,9 @@ begin
   AddChildDao('Processos', 'ID', 'IDActivity', FProcessoDao);
 end;
 
-function TActivityDao<T>.NewProcesso(pDBRows: ISqlDBRows): TProcessoBase;
+function TActivityDao<T>.NewProcesso(pDBRows: ISqlDBRows): TObject;
 begin
-  Result:= TActivity.Create(ModeloBD.DaoUtils);
+  Result:= TActivity.Create(TFrwServiceLocator.Factory.NewExpressionEvaluator(ModeloBD.DaoUtils));
 end;
 
 end.

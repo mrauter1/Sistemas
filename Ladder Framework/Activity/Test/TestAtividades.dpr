@@ -21,7 +21,6 @@ uses
   Test.Classes in 'Test.Classes.pas',
   Ladder.Activity.Classes in '..\Ladder.Activity.Classes.pas',
   Test.Parser in 'Test.Parser.pas',
-  Ladder.Activity.Parser in '..\Ladder.Activity.Parser.pas',
   uTesteAtividades in 'uTesteAtividades.pas',
   Ladder.Activity.Manager in '..\Ladder.Activity.Manager.pas',
   Ladder.ServiceLocator in '..\..\Ladder.ServiceLocator.pas',
@@ -58,7 +57,10 @@ uses
   Test.DaoUtils in 'Test.DaoUtils.pas',
   uConClasses.Dao in '..\..\..\utils\uConClasses.Dao.pas',
   Form.ProcessEditorBase in '..\..\Forms\Form.ProcessEditorBase.pas' {FormProcessEditorBase},
-  Form.ConsultaEditor in 'Form.ConsultaEditor.pas' {FormConsultaEditor};
+  Form.ConsultaEditor in 'Form.ConsultaEditor.pas' {FormConsultaEditor},
+  Ladder.Parser in '..\..\Ladder.Parser.pas',
+  Ladder.SyntaxChecker in '..\..\Ladder.SyntaxChecker.pas',
+  Ladder.ExpressionEvaluator in '..\..\Ladder.ExpressionEvaluator.pas';
 
 {$R *.RES}
 

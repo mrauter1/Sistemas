@@ -1,4 +1,4 @@
-unit Ladder.Activity.Parser;
+unit Ladder.Parser;
 
 interface
 
@@ -29,26 +29,30 @@ type
     function LenExpression: Integer;
     procedure ParseOtherExpression(pNewExpression: String; var Return: Variant);
     function FunLiteralTranslation(const pValue: Variant): String;
-    function GetValueAtIndex(const pList: Variant; var Index: Integer): Variant;
   protected
-    function ExtractTextDelimitedBy(var Index: Integer; const OpenDelimiter, CloseDelimiter: String; NeedCloseDelimiter: Boolean = True): String; overload;
-    function ExtractTextDelimitedBy(var Index: Integer; const OpenDelimiter, CloseDelimiter: String; pDoInterpolation: Boolean; pFunTranslateValue: TFunTranslateValue; NeedCloseDelimiter: Boolean = True): String; overload;
-    function Ignore(var Index: Integer): Boolean; // Retorna verdadeiro se chegou no fim da string
-    procedure IgnoreAndErrorIfEOL(var Index: Integer; const Msg: String);
-    procedure ParseNumber(var Index: Integer; var Return: Variant);
-    procedure ParseString(var Index: Integer; var Return: Variant);
-    procedure ParseList(var Index: Integer; var Return: Variant);
-    procedure ParseElement(var Index: Integer; var Return: Variant);
-    procedure ParseSQL(var Index: Integer; var Return: Variant);
-    procedure ParseNext(var Index: Integer; var Return: Variant);
+    function ExtractTextDelimitedBy(var Index: Integer; const OpenDelimiter, CloseDelimiter: String; NeedCloseDelimiter: Boolean = True): String; overload; virtual;
+    function ExtractTextDelimitedBy(var Index: Integer; const OpenDelimiter, CloseDelimiter: String; pDoInterpolation: Boolean; pFunTranslateValue: TFunTranslateValue; NeedCloseDelimiter: Boolean = True): String; overload; virtual;
+    function Ignore(var Index: Integer): Boolean; virtual; // Retorna verdadeiro se chegou no fim da string
+    procedure IgnoreAndErrorIfEOL(var Index: Integer; const Msg: String); virtual;
+    procedure ParseNumber(var Index: Integer; var Return: Variant); virtual;
+    procedure ParseString(var Index: Integer; var Return: Variant); virtual;
+    procedure ParseList(var Index: Integer; var Return: Variant); virtual;
+    procedure ParseElement(var Index: Integer; var Return: Variant); virtual;
+    procedure ParseSQL(var Index: Integer; var Return: Variant); virtual;
+    procedure ParseNext(var Index: Integer; var Return: Variant); virtual;
+    function GetValueAtIndex(const pList: Variant; var Index: Integer): Variant; virtual;
   public
     constructor Create;
     procedure DoParseExpression(pExpression: String; var Return: Variant);
 
     class procedure ParseExpression(pExpression: String; var Return: Variant; pOnElementEval: TFunElementEval);
 
+    // Try to parse an expression. If expression can't be parsed this function returns false and variable Return evaluate to null
+    // For syntax checking only use ladder.SyntaxChecker.TSyntaxChecker to not produce side-effects.
     class function TryParseExpression(pExpression: String; var Return: Variant; pOnElementEval: TFunElementEval): Boolean; overload;
+    // Try to parse an expression. If expression can't be parsed this function returns false and variable Return evaluate to pDefaultValue
     class function TryParseExpression(pExpression: String; var Return: Variant; pDefaultValue: Variant; pOnElementEval: TFunElementEval): Boolean; overload;
+
 
     property Expression: String read FExpression write SetExpression;
     property OnElementEval: TFunElementEval read FOnElementEval write FOnElementEval;
@@ -56,6 +60,39 @@ type
   const
     KeyWords = [',', '[', ']', '"', '@', '$', '!'];
   end;
+
+  // TSyntaxChecker will setup a parser that does the following:
+  // Any function that can cause side effects and/or has to connect to an external resource is not executed, but interpolations will be parsed (ex.: Sql).
+  // indexes of list will be treated as a list itself (will not check if value is a valid list or index exists).
+  // Elements will be checked to exist, but their values will evaluate to nil
+  // Returns true when expression can be parsed with no errors, false otherwise.
+  TSyntaxChecker = class(TObject)
+  private
+    FOnElementEval: TFunElementEval;
+    FOnSqlEval: TFunSqlEval;
+    FParser: TActivityParser;
+    type
+      TSyntaxCheckerParser = class(TActivityParser)
+      protected
+        // Since GetValueAtIndex expect a list as pList parameter and values from external resources won't evaluate correctly to lists when checking the syntax, it must be overriden.
+        // Will attempt to parse as a list instead.
+        function GetValueAtIndex(const pList: Variant; var Index: Integer): Variant; override;
+      end;
+
+    procedure InternalElementEval(const pElement: String; var Return: Variant);
+    procedure InternalSqlEval(const pSql: String; var Return: Variant);
+  public
+    // AParser will be cloned internally, none of its functions will be directly called
+    constructor Create(AParser: TActivityParser); overload;
+    constructor Create(AOnElementEval: TFunElementEval; AOnSqlEval: TFunSqlEval); overload;
+    Destructor Destroy; override;
+
+    function DoCheckSyntax(AExpression: String; out ErrorMessage: String): Boolean;
+
+    // Returns true when expression there are no syntax errors, false otherwise.
+    class function CheckSyntax(AParser: TActivityParser; AExpression: String; out ErrorMessage: string): Boolean;
+  end;
+
 
 implementation
 
@@ -111,20 +148,20 @@ begin
 
   FSql:= ExtractTextDelimitedBy(Index, '$', '$', FDoInterpolation, FunLiteralTranslation, False);
 
-  if FSql = '' then
-    raise EParseException.Create('TActivityParser.ParseSQL: Empty Sql Expression!', FExpression, Index);
+  if Trim(FSql) = '' then
+    raise EParseException.Create('ParseSQL: Empty Sql Expression.', FExpression, Index);
 
   FSingleValue:= FSql[1] = '@';
   if FSingleValue then
     Delete(FSql, 1, 1);
 
   if not Assigned(FOnSqlEval) then
-    raise Exception.Create('TActivityParser.ParseSQL: pOnSqlEval must be assgined!');
+    raise Exception.Create('ParseSQL: There is no Sql evaluator assigned.');
 
   FOnSqlEval(FSql, Return);
 
   if not DocVariantType.IsOfType(Return) then
-    raise Exception.Create('TActivityParser.ParseSQL: Return value of OnSqlEval must be TDocVariantData!');
+    raise Exception.Create(Format('ParseSQL: Return value of OnSqlEval must be TDocVariantData. Expression: "%s". Pos: %d', [FExpression, Index]));
 
   FData:= TDocVariantData(Return);
   if FSingleValue then
@@ -246,14 +283,14 @@ end;
 
 procedure TActivityParser.ParseList(var Index: Integer; var Return: Variant);
 const
-  sListaAberta = 'ParseList: Lista não fechada, esperado "[" encontrado fim da linha.';
+  sListaAberta = 'ParseList: Closing bracket "]" expected end of expression found.';
 var
   FItem: Variant;
 begin
-  IgnoreAndErrorIfEOL(Index, 'ParseList: Esperando lista, nada recebido.');
+  IgnoreAndErrorIfEOL(Index, 'ParseList: Expecting list, end of expression found.');
 
   if FExpression[Index] <> '[' then
-    raise EParseException.Create('ParseList: Deve iniciar com "[".', FExpression, Index);
+    raise EParseException.Create('ParseList: List must start with "[".', FExpression, Index);
 
   Inc(Index);
   Return:= _Arr([]); // Incializa Empty Array
@@ -287,10 +324,10 @@ var
 const
   cStopChar = [' ', ',', '[', ']', '"', '@'];
 begin
-  IgnoreAndErrorIfEOL(Index, 'ParseElement: Esperando elemento, nada recebido.');
+  IgnoreAndErrorIfEOL(Index, 'ParseElement: Element expected, end of expression found.');
 
   if FExpression[Index] <> '@' then
-    raise EParseException.Create('ParseElement: Esperado "@" encontrado "'+FExpression[Index]+'".', FExpression, Index);
+    raise EParseException.Create('ParseElement: Element must start with "@".', FExpression, Index);
 
   Inc(Index);
 
@@ -311,12 +348,12 @@ begin
   end;
 
   if FStart >= Index then
-    raise EParseException.Create('ParseElement: Nome do elemento inválido!', FExpression, FStart);
+    raise EParseException.Create('ParseElement: Invalid element.', FExpression, FStart);
 
   FElementName:= Copy(FExpression, FStart, Index-FStart);
 
   if not Assigned(FOnElementEval) then
-    raise EParseException.Create('TActivityParser.ParseElement: pFunElementEval precisa ser passado como parâmetro!', FExpression, FStart);
+    raise EParseException.Create('ParseElement: There is not element evaluator assigned.', FExpression, FStart);
 
   FOnElementEval(FElementName, Return);
 end;
@@ -362,15 +399,15 @@ end;
 
 procedure TActivityParser.ParseNext(var Index: Integer; var Return: variant);
 begin
-  if Ignore(Index) then // Ignore caracteres em branco
-  begin // se chegou no fim da string retorna nulo
+  if Ignore(Index) then // Ignore blank chars
+  begin // if has reached end of expression returns null
     Return:= null;
     Exit;
   end;
 
   Case Ord(FExpression[Index]) of
-    Ord('@'): ParseElement(Index, Return); //Pode ser um input, Output ou Processo
-    Ord('['): ParseList(Index, Return); //Lista
+    Ord('@'): ParseElement(Index, Return); //Might be an input or Output element from a Process/Activity
+    Ord('['): ParseList(Index, Return); //List
     Ord('"'): ParseString(Index, Return); // String
     Ord('$'): ParseSQL(Index, Return); // String
     Ord('!'): case Ord(FExpression[Index+1]) of // Symbol to String or Sql without doing interpolation
@@ -386,7 +423,7 @@ begin
   end;
 
   while Index<=LenExpression do
-    if FExpression[Index]='[' then
+    if FExpression[Index]='[' then // if there is an open bracket here, it must be an index
       Return:= GetValueAtIndex(Return, Index)
     else
       Break;
@@ -431,10 +468,24 @@ var
 begin
   Expression:= pExpression;
   Index:= 1;
+
+  if Expression.IsEmpty then
+  begin
+    Return:= null;
+    Exit;
+  end;
+
+  if ((FExpression[1] in KeyWords) or (FExpression[1] in (['0'..'9']))) = False then // If Expression does not start with a keyword or numerical, treat it as a single string
+  begin
+    Return:= Expression;
+    Exit;
+  end;
+
   try
     ParseNext(Index, Return);
+
     if not Ignore(Index) then
-      raise EParseException.Create('TActivityParser.DoParseExpression: Comando inválido! Final da expressão esperado.', FExpression, Index);
+      raise EParseException.Create('DoParseExpression: End of expression expected, but invalid command found.', FExpression, Index);
   except
     on E: EParseException do
       raise;
@@ -459,7 +510,7 @@ function TActivityParser.ExtractTextDelimitedBy(var Index: Integer;
   var
     FStart: Integer;
     FSubExpression: String;
-    FTranslation: String;
+    FTranslatedExpresion: String;
     FValue: variant;
   begin
     FStart:= Index;
@@ -469,10 +520,11 @@ function TActivityParser.ExtractTextDelimitedBy(var Index: Integer;
     ParseOtherExpression(FSubExpression, FValue);
 
     Assert(Assigned(pFunTranslateValue), 'TActivityParser.ExtractTextDelimitedBy: pFunTranslateValue must be assigned!');
-    FTranslation:= pFunTranslateValue(FValue);
+    // Try to translate the value returned by the subExpression to a valid expression inside macro expression
+    FTranslatedExpresion:= pFunTranslateValue(FValue);
 
-    Insert(FTranslation, FExpression, FStart);
-    Index:= FStart+Length(FTranslation);
+    Insert(FTranslatedExpresion, FExpression, FStart);
+    Index:= FStart+Length(FTranslatedExpresion);
   end;
 
 var
@@ -512,6 +564,84 @@ begin
 
   if (Index<=LenExpression) then // if it has reached the End of expression there is no need to increase the index
     Inc(Index, Length(CloseDelimiter));
+end;
+
+{ TSyntaxCheckerParser }
+
+function TSyntaxChecker.TSyntaxCheckerParser.GetValueAtIndex(const pList: Variant;
+  var Index: Integer): Variant;
+begin
+  ParseList(Index, Result);
+end;
+
+{ TSyntaxChecker }
+
+class function TSyntaxChecker.CheckSyntax(AParser: TActivityParser;
+  AExpression: String; out ErrorMessage: string): Boolean;
+var
+  FSyntaxChecker: TSyntaxChecker;
+begin
+  FSyntaxChecker:= TSyntaxChecker.Create(AParser);
+  try
+    Result:= FSyntaxChecker.DoCheckSyntax(AExpression, ErrorMessage);
+  finally
+    FSyntaxChecker.Free;
+  end;
+end;
+
+constructor TSyntaxChecker.Create(AParser: TActivityParser);
+begin
+  Create(AParser.OnElementEval, AParser.OnSqlEval);
+end;
+
+constructor TSyntaxChecker.Create(AOnElementEval: TFunElementEval; AOnSqlEval: TFunSqlEval);
+begin
+  inherited Create;
+  FOnElementEval:= AOnElementEval;
+  FOnSqlEval:= AOnSqlEval;
+
+  FParser:= TSyntaxCheckerParser.Create;
+  if Assigned(AOnElementEval) then
+    FParser.OnElementEval:= InternalElementEval;
+
+  if Assigned(AOnSqlEval) then
+    FParser.OnSqlEval:= InternalSqlEval;
+end;
+
+procedure TSyntaxChecker.InternalElementEval(const pElement: String; var Return: Variant);
+begin
+  Assert(Assigned(FOnElementEval), 'TSyntaxChecker.InternalElementEval: FOnElementEval must be Assigned');
+  FOnElementEval(pElement, Return);
+  Return:= null;
+end;
+
+procedure TSyntaxChecker.InternalSqlEval(const pSql: String; var Return: Variant);
+begin
+  Assert(Assigned(FOnSqlEval), 'TSyntaxChecker.InternalSqlEval: FOnSqlEval must be Assigned');
+//  FOnElementEval(pSql, Return); // Should not be executed
+  Return:= _Arr([]);
+end;
+
+destructor TSyntaxChecker.Destroy;
+begin
+  FParser.Free;
+end;
+
+function TSyntaxChecker.DoCheckSyntax(AExpression: String; out ErrorMessage: String): Boolean;
+var
+  FReturn: Variant;
+begin
+  Result:= True;
+  ErrorMessage:= '';
+  try
+    FParser.DoParseExpression(AExpression, FReturn);
+  except
+    on E: Exception do
+    begin
+      Result:= False;
+      ErrorMessage:= E.Message
+    end;
+  end;
 end;
 
 end.

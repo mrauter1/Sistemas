@@ -9,6 +9,7 @@ inherited FormConsultaEditor: TFormConsultaEditor
   inherited Panel1: TPanel
     Width = 607
     Height = 91
+    ExplicitWidth = 607
     ExplicitHeight = 91
     object LblConsulta: TLabel [3]
       Left = 43
@@ -20,18 +21,24 @@ inherited FormConsultaEditor: TFormConsultaEditor
     end
     inherited BtnOK: TBitBtn
       Left = 483
+      ExplicitLeft = 483
     end
     inherited DBEditNomeProcesso: TDBEdit
       Width = 277
+      ExplicitWidth = 277
     end
     inherited DBEdit1: TDBEdit
       Width = 494
+      ExplicitWidth = 494
     end
   end
   inherited Panel2: TPanel
     Top = 91
     Width = 607
     Height = 391
+    ExplicitTop = 91
+    ExplicitWidth = 607
+    ExplicitHeight = 391
     object Splitter1: TSplitter [0]
       Left = 1
       Top = 168
@@ -66,6 +73,8 @@ inherited FormConsultaEditor: TFormConsultaEditor
         Width = 601
         Height = 93
         ExplicitLeft = 1
+        ExplicitWidth = 601
+        ExplicitHeight = 93
       end
     end
     object cxGridExport: TcxGrid

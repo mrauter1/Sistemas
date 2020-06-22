@@ -4,9 +4,8 @@ interface
 
 uses
   Spring.Services, Spring.Container.Common, System.SysUtils, System.Classes, Windows,
-  Forms, uSendMail, uAppConfig, SynOLEDB, SynDb,
-  Ladder.ORM.DaoUtils, Ladder.Activity.Manager, uDmConnection, uConSqlServer,
-  Ladder.SqlServerConnection;
+  Forms, uSendMail, uAppConfig, SynOLEDB, SynDb, Ladder.ORM.DaoUtils, Ladder.Activity.Manager, uDmConnection, uConSqlServer,
+  Ladder.SqlServerConnection, Ladder.ExpressionEvaluator;
 
 type
   TFrwServiceLocator = class;
@@ -21,6 +20,7 @@ type
     function NewServiceLocator: TServiceLocator; virtual;
     function NewConnection: TSQLDBConnectionProperties; virtual;
     function NewActivityManager: TActivityManager; virtual;
+    function NewExpressionEvaluator(pDaoUtils: TDaoUtils = nil): TExpressionEvaluator; virtual;
   end;
 
   TFrwContext = class
@@ -54,13 +54,15 @@ type
     class procedure Inicializar(ServiceFactory: TFrwServiceFactory);
     // Execute method on Main Thread
     class procedure Synchronize(FMethod: TThreadProcedure);
-    // Use this function to get the global Service Location or the service locator
-    // linked to the current thread in a multi-threaded environment
 
     class function IsMainThread: Boolean;
     class function GetTempPath: string;
+
+    class function Factory: TFrwServiceFactory;
+
     class property ExeName: String read FExeName;
 
+    // Context will return the context that is tied to the Current Thread
     class property Context: TFrwContext read GetContext;
   end;
 
@@ -70,6 +72,11 @@ implementation
 
 uses
   Ladder.ConnectionPropertiesHelper;
+
+class function TFrwServiceLocator.Factory: TFrwServiceFactory;
+begin
+  Result:= Context.ServiceFactory;
+end;
 
 class function TFrwServiceLocator.GetContext: TFrwContext;
 begin
@@ -114,6 +121,14 @@ begin
                                    FResult:= TConSqlServer.Create(nil, AppConfig.ConSqlServer);
                                  end);
   Result:= FResult;
+end;
+
+function TFrwServiceFactory.NewExpressionEvaluator(pDaoUtils: TDaoUtils): TExpressionEvaluator;
+begin
+  if Assigned(pDaoUtils) then
+    Result:= TExpressionEvaluator.Create(pDaoUtils)
+  else
+    Result:= TExpressionEvaluator.Create(TFrwServiceLocator.GetContext.DaoUtils);
 end;
 
 function TFrwServiceFactory.NewActivityManager: TActivityManager;

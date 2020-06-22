@@ -103,6 +103,7 @@ type
     function GetRecordCount: Integer; override;
     procedure InitFilterParser;
     procedure UpdateFilter; override;
+    procedure RebuildPropertiesCache; override;
 
     procedure DoAfterFilter; virtual;
     procedure DoAfterSort; virtual;
@@ -701,6 +702,11 @@ begin
   finally
     fRebuildingDataList:= False;
   end;
+end;
+
+procedure TObjectDataSet.RebuildPropertiesCache;
+begin
+  // TODO: Implement, but why?
 end;
 
 procedure TObjectDataSet.InternalRefresh;

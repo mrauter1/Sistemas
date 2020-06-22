@@ -748,6 +748,8 @@ function TDaoBase.DeleteChild(pMasterInstance: TObject; ChildDefs: TChildDaoDefs
 var
   FObject: TObject;
 begin
+  Result:= 0;
+
   FObject:= ChildDefs.MasterProperty.GetValue(pMasterInstance).AsObject;
 
   if not Assigned(FObject) then

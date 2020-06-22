@@ -61,12 +61,12 @@ uses
 
 function NewProcesso(pExecutor: IExecutorBase): TProcessoBase;
 begin
-  Result:= TProcessoBase.Create(pExecutor, TFrwServiceLocator.Context.DaoUtils);
+  Result:= TProcessoBase.Create(pExecutor, TFrwServiceLocator.Factory.NewExpressionEvaluator);
 end;
 
 function NewAtividade: TActivity;
 begin
-  Result:= TActivity.Create(TFrwServiceLocator.Context.DaoUtils);
+  Result:= TActivity.Create(TFrwServiceLocator.Factory.NewExpressionEvaluator);
 end;
 
 function NewProcessoEnviaEmailMeta: TProcessoBase;

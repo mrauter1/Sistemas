@@ -12,7 +12,7 @@ unit Test.Parser;
 interface
 
 uses
-  TestFramework, Variants, System.SysUtils, Utils, Ladder.Activity.Parser, StrUtils, uConSqlServer,
+  TestFramework, Variants, System.SysUtils, Utils, Ladder.Parser, StrUtils, uConSqlServer,
   Ladder.ServiceLocator, SynDB, SynCommons, Ladder.Utils;
 
 type
@@ -559,9 +559,10 @@ var
 const
   sMultiList = '["co", "ro", "na"]';
   sString = '"string"';
-  sNull = '  ';
+  sNull = '';
   sNumber = '123';
-  sInvalid = 'abcd';
+  sAbcd = 'abcd';
+  sInvalid = '"string';
 begin
   // TODO: Setup method call parameters
   FActivityParser.DoParseExpression(sMultiList, ReturnValue);
@@ -577,6 +578,9 @@ begin
 
   FActivityParser.DoParseExpression(sNumber, ReturnValue);
   CheckEquals(123, ReturnValue);
+
+  FActivityParser.DoParseExpression(sAbcd, ReturnValue);
+  CheckEquals(sAbcd, ReturnValue);
 
   try
     FActivityParser.DoParseExpression(sInvalid, ReturnValue);

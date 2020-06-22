@@ -3,17 +3,12 @@ unit Ladder.Activity.Classes;
 interface
 
 uses
-  System.SysUtils, System.Classes, System.Generics.Collections, Data.DB,
-  Generics.Defaults, Variants, Ladder.Activity.Parser, Ladder.ORM.DaoUtils, SynCommons,
-  Forms;
-
-// Check if str is a Valid element name. Names should start with a letter or underline and have only alphanumerical or underline chars.
-function IsValidName(const AName: String): Boolean;
+  System.SysUtils, System.Classes, System.Generics.Collections, Generics.Defaults, Variants, SynCommons;
 
 type
 //  TTipoProcesso = (tpConsultaPersonalizada = 1, tpEnvioEmail = 2, tpAtividade = 3);
   // Must start at 0 to generate RTTI information, see: https://stackoverflow.com/questions/61509397/trttimethod-getparameters-does-not-work-when-method-has-an-indexed-enum-as-a-p
-  TParameterType = (tbUnknown=0, tbValue=1, tbList, tbData, tbAny);
+  TParameterType = (tbUnknown=0, tbValue=1, tbList, tbDate, tbAny);
 
   IActivityElement = interface
   ['{505A4C16-9ED0-4D9C-8020-204B98096EC8}']
@@ -28,6 +23,17 @@ type
   IActivityElementContainer = interface(IActivityElement)
   ['{5B1A1673-ADA5-428F-B8A8-06772A02A449}']
     function FindElementByName(pElementName: String): IActivityElement;
+    function FindElement(pElementPath: String; pCurrentContainer: IActivityElementContainer=nil): IActivityElement;
+  end;
+
+  IExpressionEvaluator = interface(IInterface)
+  ['{C8A928D0-A55D-489E-95E9-402D7F692254}']
+    procedure EvaluateExpression(AContainer: IActivityElementContainer; AExpression: String; var AResult: Variant);
+    function CheckExpressionSyntax(AContainer: IActivityElementContainer; AExpression: String; out AErrorMessage: String): Boolean;
+
+    procedure SetRootContainer(const AValue: IActivityElementContainer);
+    function GetRootContainer: IActivityElementContainer;
+    property RootContainer: IActivityElementContainer read GetRootContainer write SetRootContainer;
   end;
 
   EInvalidElementError = class(Exception)
@@ -39,14 +45,6 @@ type
 
   TProcessoBase = class;
   TParameterList = class;
-
-  IProcessEditor = interface(IInterface)
-  ['{9366E88A-4D9F-4705-9DB8-D8138498B0D1}']
-    function NewProcess: TProcessoBase;
-    procedure EditProcess(pProcesso: TProcessoBase);
-    function Form: TForm;
-    procedure Free;
-  end;
 
   TParameter = class(TSingletonImplementation, IActivityElement, IActivityValue, IActivityElementContainer)
   private
@@ -62,13 +60,15 @@ type
     procedure SetValue(const Value: variant);
     constructor Create(pName: String; pParameterType: TParameterType; pExpression: String); overload; virtual;
     constructor Create(pName: String; pParameterType: TParameterType); overload; virtual;
-    constructor CreateWithValue(pName: String; pParameterType: TParameterType; pValue: Variant);
     destructor Destroy; override;
 
     constructor CreateCopy(ASource: TParameter; pCopyID: Boolean = False); virtual;
 
     function GetValue: Variant;
+
     function FindElementByName(pElementName: String): IActivityElement;
+    function FindElement(pElementPath: String; pCurrentContainer: IActivityElementContainer=nil): IActivityElement;
+
     function Param(const ParamName: String): TParameter;
     property Value: variant read GetValue write SetValue;
   published
@@ -91,8 +91,6 @@ type
   end;
 
   TParameterList = class(TGenericParameterList<TParameter>);
-
-  TValuateParameterExpression = procedure (pContainer: IActivityElementContainer; pParameter: TParameter) of object; // Returns a single item for value and an array for lists
 
 {  TParserBase = class
     function EvaluateList(pString: String): array of string;
@@ -154,40 +152,40 @@ type
     FOrder: Integer;
     FName: String;
     FDescription: String;
-    FDaoUtils: TDaoUtils;
-    FParser: TActivityParser;
-    FCurrentContainer: IActivityElementContainer;
 
+    FExpressionEvaluator: IExpressionEvaluator;
     Executor: IExecutorBase;
+
+    function GetExpressionEvaluator: IExpressionEvaluator; virtual;
+    procedure SetExpressionEvaluator(const Value: IExpressionEvaluator);
   protected
-    procedure ValuateInputs(ValuateParameterExpression: TValuateParameterExpression);
-    procedure OnValuateParameterExpression(pContainer: IActivityElementContainer; pParameter: TParameter);
-    procedure OnElementEval(const pElement: String; var Return: Variant);
-    procedure OnSqlEval(const pSql: String; var Return: Variant);
+    procedure ValuateInputs(AEvaluator: IExpressionEvaluator); virtual;
+    procedure EvaluateParam(AEvaluator: IExpressionEvaluator; AParam: TParameter); virtual;
 
     procedure AfterConstruction; override;
-
-    property Parser: TActivityParser read FParser;
   public
-    constructor Create(pExecutor: IExecutorBase; pDaoUtils: TDaoUtils);
+    constructor Create(pExecutor: IExecutorBase); overload; virtual;
+
+    // if SelfAsRoot is true, then the RootContainer of AExpressionEvaluator will be set to self.
+    constructor Create(pExecutor: IExecutorBase; AExpressionEvaluator: IExpressionEvaluator; SelfAsRoot: Boolean = True); overload; virtual;
     destructor Destroy; override;
     function GetName: String;
 
     function FindElementByName(pElementName: String): IActivityElement; virtual;
-    // Finds an element or child of element.
-    // Example: pExpression Might be 'ProcessName.ParamName' will return Param of 'ProcessName' named 'ParamName'
-    function FindElement(pElementPath: String): IActivityElement; virtual;
+    function FindElement(pElementPath: String; pCurrentContainer: IActivityElementContainer=nil): IActivityElement;
 
     function GetExecutor: IExecutorBase;
 
     function Executar: TOutputList; overload; virtual;
-    function Executar(ValuateParameterExpression: TValuateParameterExpression): TOutputList; overload; virtual;
+    function Executar(AEvaluator: IExpressionEvaluator): TOutputList; overload; virtual;
 
     // Check if parameter name is valid and its expression can be parsed
     procedure CheckParameter(AMasterName: String; AParameter: TParameter);
 
     // Check if all the elements of the process have valid names and their expression can be parsed
     procedure CheckValidity(AMasterName: String = ''); virtual;
+
+    property ExpressionEvaluator: IExpressionEvaluator read GetExpressionEvaluator write SetExpressionEvaluator;
   published
     property ID: Integer read FID write FID;
     property ExecOrder: Integer read FOrder write FOrder;
@@ -205,28 +203,34 @@ type
   protected
     procedure AfterConstruction; override;
   public
-    constructor Create(pDaoUtils: TDaoUtils);
+    constructor Create(AExpressionEvaluator: IExpressionEvaluator); overload;
     destructor Destroy; override;
-    function Executar(ValuateParameterExpression: TValuateParameterExpression): TOutputList; overload; override;
+
+    function Executar(AEvaluator: IExpressionEvaluator): TOutputList; overload; override;
     function FindElementByName(pElementName: String): IActivityElement; override;
+    procedure CheckValidity(AMasterName: String = ''); override;
+
     procedure ReorderProcesses(FNewProcess: TProcessoBase = nil);
     procedure AddProcess(AProcess: TProcessoBase); // Add the process and reorder the process list
-    procedure CheckValidity(AMasterName: String = ''); override;
   published
     property Processos: TObjectList<TProcessoBase> read FProcessos write FProcessos;
   end;
 
+// Check if str is a Valid element name. Names should start with a letter or underline and have only alphanumerical or underline chars.
+function IsValidName(const AName: String): Boolean;
+
+// Finds an element or child of element. Example: pElementPath Might be 'ProcessName.ParamName'
+function FindElementByPath(pElementPath: String; pRootContainer, pCurrentContainer: IActivityElementContainer): IActivityElement;
+
 implementation
 
 uses
-  Ladder.ServiceLocator, Ladder.Utils;
-
-{ TGenericParameterList }
+  Ladder.Utils;
 
 function IsValidName(const AName: String): Boolean;
 const
   cStartChars = ['a'..'z', 'A'..'Z', '_'];
-  cValidChars =  ['0'..'9', 'a'..'z', 'A'..'Z', '_'];
+  cValidChars =  ['a'..'z', 'A'..'Z', '_', '0'..'9'];
 var
   i: Integer;
 begin
@@ -247,6 +251,48 @@ begin
 
   Result:= True;
 end;
+
+// Finds an element or child of element. Example: pElementPath Might be 'ProcessName.ParamName'
+function FindElementByPath(pElementPath: String; pRootContainer, pCurrentContainer: IActivityElementContainer): IActivityElement;
+var
+  FNames: TArray<String>;
+  FElement: IActivityElement;
+
+  function FindSingleElement(pCurrentElement: IActivityElement; pNames: TArray<String>; pIndex: Integer): IActivityElement;
+  begin
+    if pIndex > High(pNames) then
+    begin
+      Result:= (pCurrentElement as IActivityValue);
+      Exit;
+    end;
+
+    if not Supports(pCurrentElement, IActivityElementContainer) then
+      raise Exception.Create('TExpressionEvaluator.OnElementEval: Element '+pCurrentElement.GetName+' is not a container!');
+
+    FElement:= (pCurrentElement as IActivityElementContainer).FindElementByName(pNames[pIndex]);
+
+    if not Assigned(FElement) then
+      raise Exception.Create('TExpressionEvaluator.OnElementEval: Element '+pNames[pIndex]+' not found!');
+
+    Result:= FindSingleElement(FElement, FNames, pIndex+1);
+  end;
+
+begin
+  Result:= nil;
+  FNames:= pElementPath.Split(['.']);
+  if Length(FNames) <= 0 then
+    Exit;
+
+  if SameText(FNames[0], pRootContainer.GetName) then // ex.: Root.Child
+    Result:= FindSingleElement(pRootContainer, FNames, 1)
+  else if Assigned(pCurrentContainer.FindElementByName(FNames[0])) then  // ex: Param (in case CurrentContainer contain a child named param)
+    Result:= FindSingleElement(pCurrentContainer.FindElementByName(FNames[0]), FNames, 1)
+  else
+    Result:= FindSingleElement(pRootContainer, FNames, 0); // Child
+
+end;
+
+{ TGenericParameterList }
 
 constructor TGenericParameterList<T>.Create;
 begin
@@ -304,23 +350,21 @@ begin
   inherited;
   FInputs:= TParameterList.Create;
   FOutputs:= TOutputList.Create;
-
-  FParser:= TActivityParser.Create;
-  FParser.OnElementEval:= OnElementEval;
-  FParser.OnSqlEval:= OnSqlEval;
-
-  if not Assigned(FDaoUtils) then
-    FDaoUtils:= TFrwServiceLocator.Context.DaoUtils;
 end;
 
 procedure TProcessoBase.CheckParameter(AMasterName: String; AParameter: TParameter);
 var
   fParameter: TParameter;
   fFullName: String;
+  FErrorMsg: String;
 begin
   fFullName:= AMasterName+'.'+AParameter.Name;
+
   if not IsValidName(AParameter.Name) then
     raise EInvalidElementError.Create(self, fFullName, Format('Name %s is invalid.', [AParameter.Name]));
+
+  if FExpressionEvaluator.CheckExpressionSyntax(Self, AParameter.Expression, FErrorMsg) = False then
+    raise EInvalidElementError.Create(self, fFullName, Format('Invalid expression %s.', [AParameter.Expression]));
 
   for fParameter in AParameter.Parameters do
     CheckParameter(fFullName, fParameter);
@@ -347,45 +391,61 @@ begin
 
 end;
 
-constructor TProcessoBase.Create(pExecutor: IExecutorBase; pDaoUtils: TDaoUtils);
+constructor TProcessoBase.Create(pExecutor: IExecutorBase);
+begin
+  Create(pExecutor, nil);
+end;
+
+constructor TProcessoBase.Create(pExecutor: IExecutorBase; AExpressionEvaluator: IExpressionEvaluator; SelfAsRoot: Boolean = True);
 begin
   inherited Create;
   Executor:= pExecutor;
 
-  FDaoUtils:= pDaoUtils;
+  FExpressionEvaluator:= AExpressionEvaluator;
+
+  if SelfAsRoot and Assigned(FExpressionEvaluator) then
+    FExpressionEvaluator.RootContainer:= Self;
 end;
 
 destructor TProcessoBase.Destroy;
 begin
-  FParser.Free;
   inherited Destroy;
 end;
 
-procedure TProcessoBase.ValuateInputs(ValuateParameterExpression: TValuateParameterExpression);
+procedure TProcessoBase.ValuateInputs(AEvaluator: IExpressionEvaluator);
 var
   FParameter: TParameter;
-//  FOutput: TOutputParameter;
-  procedure ValuateInput(pInput: TParameter);
+  procedure ValuateInput(AEvaluator: IExpressionEvaluator; pInput: TParameter);
   var
     FParameter: TParameter;
   begin
-    ValuateParameterExpression(Self, pInput);
+    EvaluateParam(AEvaluator, pInput);
+
     for FParameter in pInput.Parameters do
-      ValuateInput(FParameter);
+      ValuateInput(AEvaluator, FParameter);
   end;
 
 begin
   for FParameter in Inputs do
-    ValuateInput(FParameter);
+    ValuateInput(AEvaluator, FParameter);
 
+end;
+
+procedure TProcessoBase.EvaluateParam(AEvaluator: IExpressionEvaluator; AParam: TParameter);
+var
+  FReturn: Variant;
+begin
+  Assert(Assigned(AEvaluator), 'TProcessoBase.EvaluateParam: AEvaluator must be assigned!');
+  AEvaluator.EvaluateExpression(Self, AParam.Expression, FReturn);
+  AParam.Value:= FReturn;
 end;
 
 function TProcessoBase.Executar: TOutputList;
 begin
-  Result:= Executar(OnValuateParameterExpression);
+  Result:= Executar(FExpressionEvaluator);
 end;
 
-function TProcessoBase.Executar(ValuateParameterExpression: TValuateParameterExpression): TOutputList;
+function TProcessoBase.Executar(AEvaluator: IExpressionEvaluator): TOutputList;
 var
   FOutput: TOutputParameter;
 
@@ -394,14 +454,16 @@ var
     FParam: TParameter;
   begin
     if Output.Expression <> '' then
-      ValuateParameterExpression(Self, FOutput);
+      EvaluateParam(AEvaluator, FOutput);
 
     for FParam in Output.Parameters do
       ValuateOutput(FParam);
   end;
 begin
+  Assert(Assigned(AEvaluator), 'TProcessoBase.Executar: AEvaluator must be assigned!');
+
   { First evaluate all parameters }
-  ValuateInputs(ValuateParameterExpression);
+  ValuateInputs(AEvaluator);
 
   if not Assigned(Executor) then
     raise Exception.Create('TProcessoBase.Executar> Executor must be assigned!');
@@ -414,6 +476,14 @@ begin
     ValuateOutput(FOutput);
 
   Result:= Outputs;
+end;
+
+function TProcessoBase.FindElement(pElementPath: String; pCurrentContainer: IActivityElementContainer=nil): IActivityElement;
+begin
+  if Assigned(pCurrentContainer) then
+    Result:= FindElementByPath(pElementPath, Self, pCurrentContainer)
+  else
+    Result:= FindElementByPath(pElementPath, Self, Self);
 end;
 
 function TProcessoBase.FindElementByName(pElementName: String): IActivityElement;
@@ -438,90 +508,19 @@ begin
   Result:= nil;
 end;
 
-// Finds an element or child of element. Example: pExpression Might be 'ProcessName.ParamName'
-function TProcessoBase.FindElement(pElementPath: String): IActivityElement;
-var
-  FNames: TArray<String>;
-  FElement: IActivityElement;
-
-  function FindSingleElement(pCurrentElement: IActivityElement; pNames: TArray<String>; pIndex: Integer): IActivityElement;
-  begin
-    if pIndex > High(pNames) then
-    begin
-      Result:= (pCurrentElement as IActivityValue);
-      Exit;
-    end;
-
-    if not Supports(pCurrentElement, IActivityElementContainer) then
-      raise Exception.Create('TProcessoBase.OnElementEval: Element '+pCurrentElement.GetName+' is not an element container!');
-
-    FElement:= (pCurrentElement as IActivityElementContainer).FindElementByName(pNames[pIndex]);
-
-    if not Assigned(FElement) then
-      raise Exception.Create('TProcessoBase.OnElementEval: Element '+pNames[pIndex]+' not found!');
-
-    Result:= FindSingleElement(FElement, FNames, pIndex+1);
-  end;
-
+procedure TProcessoBase.SetExpressionEvaluator(const Value: IExpressionEvaluator);
 begin
-  Result:= nil;
-  FNames:= pElementPath.Split(['.']);
-  if Length(FNames) <= 0 then
-    Exit;
-
-  if FNames[0] = Self.Name then
-    Result:= FindSingleElement(Self, FNames, 1)
-  else if Assigned(FCurrentContainer.FindElementByName(FNames[0])) then
-    Result:= FindSingleElement(FCurrentContainer.FindElementByName(FNames[0]), FNames, 1)
-  else
-    Result:= FindSingleElement(Self, FNames, 0);
-
-end;
-
-procedure TProcessoBase.OnSqlEval(const pSql: String; var Return: Variant);
-begin
-  Return:= FDaoUtils.SelectAsDocVariant(pSql);
-end;
-
-procedure TProcessoBase.OnValuateParameterExpression(pContainer: IActivityElementContainer; pParameter: TParameter);
-const
-  cKeyWords = ['@', '[', '$', '"'];
-var
-  FValue: Variant;
-begin
-  if pParameter.Expression = '' then
-    Exit;
-
-  // If expression does not start with keyword, treat as string
-  if not (pParameter.Expression[1] in cKeyWords) then
-  begin
-    pParameter.Value:= pParameter.Expression;
-    Exit;
-  end;
-
-  FCurrentContainer:= pContainer;
-  FParser.DoParseExpression(pParameter.Expression, FValue);
-  pParameter.Value:= FValue;
-end;
-
-procedure TProcessoBase.OnElementEval(const pElement: String; var Return: Variant);
-var
-  FElement: IActivityElement;
-begin
-  FElement:= FindElement(pElement);
-
-  if not Assigned(FElement) then
-    raise Exception.Create(Format('TProcessoBase.OnElementEval: Element %s not found on Activity/Process %s.', [pElement, Self.Name]));
-
-  if not Supports(FElement, IActivityValue) then
-    raise Exception.Create('TProcessoBase.OnElementEval: Element '+FElement.GetName+' is not a value!');
-
-  Return:= (FElement as IActivityValue).GetValue;
+  FExpressionEvaluator:= Value;
 end;
 
 function TProcessoBase.GetExecutor: IExecutorBase;
 begin
   Result:= Executor;
+end;
+
+function TProcessoBase.GetExpressionEvaluator: IExpressionEvaluator;
+begin
+  Result:= FExpressionEvaluator;
 end;
 
 function TProcessoBase.GetName: String;
@@ -553,9 +552,9 @@ begin
     fProcesso.CheckValidity(fFullName);
 end;
 
-constructor TActivity.Create(pDaoUtils: TDaoUtils);
+constructor TActivity.Create(AExpressionEvaluator: IExpressionEvaluator);
 begin
-  inherited Create(nil, pDaoUtils);
+  inherited Create(nil, AExpressionEvaluator);
 end;
 
 destructor TActivity.Destroy;
@@ -608,7 +607,7 @@ begin
       Processos[I].ExecOrder:= I+1;
 end;
 
-function TActivity.Executar(ValuateParameterExpression: TValuateParameterExpression): TOutputList;
+function TActivity.Executar(AEvaluator: IExpressionEvaluator): TOutputList;
 var
   FProcesso: TProcessoBase;
   FOutput: TOutputParameter;
@@ -616,14 +615,17 @@ begin
   ReorderProcesses;
 
   { First evaluate all parameters }
-  ValuateInputs(ValuateParameterExpression);
+  ValuateInputs(AEvaluator);
 
   for FProcesso in Processos do
-    FProcesso.Executar(OnValuateParameterExpression); // The process inputs must be valuated from this activity, so they can find elemets that belongs to this activity, but not outside it.
+  // Inject the Evaluator from this Activity into the process,
+  // that means the root container will be this activity when resolving names from inside the Process's elements
+  // This way you can access other processess Inputs and Outputs when they belong to the same activity
+    FProcesso.Executar(FExpressionEvaluator);
 
   for FOutput in Outputs do
-    if VarIsNull(FOutput.Value) and (FOutput.Expression <> '') then
-      ValuateParameterExpression(Self, FOutput);
+    if FOutput.Expression <> '' then // Only evaluate output if it has a expression
+      EvaluateParam(AEvaluator, FOutput);
 
   Result:= Outputs;
 end;
@@ -742,11 +744,12 @@ begin
     Self.Parameters.Add(TParameter.CreateCopy(fParameter, pCopyID));
 end;
 
-constructor TParameter.CreateWithValue(pName: String;
-  pParameterType: TParameterType; pValue: Variant);
+function TParameter.FindElement(pElementPath: String; pCurrentContainer: IActivityElementContainer): IActivityElement;
 begin
-  Create(pName, pParameterType, '');
-  Value:= pValue;
+  if Assigned(pCurrentContainer) then
+    Result:= FindElementByPath(pElementPath, Self, pCurrentContainer)
+  else
+    Result:= FindElementByPath(pElementPath, Self, Self);
 end;
 
 function TParameter.FindElementByName(pElementName: String): IActivityElement;
@@ -789,11 +792,11 @@ begin
                  raise Exception.Create('Parameter "'+Name+'" should be a Value! List received');
       tbList: if not DocVariantType.IsOfType(Value) then
                  raise Exception.Create('Parameter "'+Name+'" should be a List!');
-      tbData: if not LadderVarIsDateTime(Value) then
+      tbDate: if not LadderVarIsDateTime(Value) then
                  raise Exception.Create('Parameter "'+Name+'" should be a DateTime!')
     end;
 
-    if ParameterType = tbData then
+    if ParameterType = tbDate then
       FValue:= LadderVarToDateTime(Value)
     else
       FValue:= Value;

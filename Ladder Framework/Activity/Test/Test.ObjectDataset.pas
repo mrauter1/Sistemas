@@ -1404,7 +1404,7 @@ begin
   FDataset.ObjectList := LCustomers;
   FDataset.Open;
   FDataset.Sort := 'AGE DESC';
-  FDataSet.Synchronize;
+//  FDataSet.Synchronize;
   i := 5;
   while not FDataset.Eof do
   begin

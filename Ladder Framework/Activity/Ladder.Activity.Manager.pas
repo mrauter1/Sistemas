@@ -3,9 +3,17 @@ unit Ladder.Activity.Manager;
 interface
 
 uses
-  Ladder.Activity.Classes, System.Generics.Collections, System.Generics.Defaults, SysUtils, System.Classes;
+  Ladder.Activity.Classes, System.Generics.Collections, System.Generics.Defaults, SysUtils, System.Classes, Forms;
 
 type
+  IProcessEditor = interface(IInterface)
+  ['{9366E88A-4D9F-4705-9DB8-D8138498B0D1}']
+    function NewProcess: TProcessoBase;
+    procedure EditProcess(pProcesso: TProcessoBase);
+    function Form: TForm;
+    procedure Free;
+  end;
+
   TOnGetExecutor = function: IExecutorBase of object;
   TOnGetProcessEditor = function(AOwner: TComponent): IProcessEditor of object;
 

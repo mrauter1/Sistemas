@@ -27,7 +27,7 @@ uses
   FireDAC.Comp.Client, cxGridLevel, cxGridCustomTableView, cxGridTableView,
   cxGridDBTableView, cxClasses, cxGridCustomView, cxGrid, Vcl.StdCtrls,
   Vcl.Mask, Vcl.DBCtrls, Vcl.Buttons, Vcl.ExtCtrls, uConClasses, uConClasses.Dao,
-  Ladder.Activity.Classes, cxDropDownEdit;
+  Ladder.Activity.Classes, cxDropDownEdit, Ladder.Activity.Manager;
 
 type
   TFormConsultaEditor = class(TFormProcessEditor)

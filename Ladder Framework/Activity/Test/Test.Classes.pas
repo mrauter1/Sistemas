@@ -14,7 +14,7 @@ interface
 uses
   TestFramework, System.SysUtils, uConsultaPersonalizada, uConClasses,
   System.Generics.Collections, Ladder.Activity.Classes, Ladder.ServiceLocator,
-  Data.DB, System.Classes, Variants;
+  Data.DB, System.Classes, Variants, Ladder.ExpressionEvaluator;
 
 type
   // Test methods for class TOutputBase
@@ -74,13 +74,20 @@ end;
 function CreateMockProcess: THackProcessoBase;
 var
   FInput1, FInput2, FInput3: TParameter;
+  FExpressionEvaluator: IExpressionEvaluator;
 begin
-  Result := THackProcessoBase.Create(TMockExecutor.Create, TFrwServiceLocator.Context.DaoUtils);
+  FExpressionEvaluator:= TExpressionEvaluator.Create(TFrwServiceLocator.Context.DaoUtils);
+  Result := THackProcessoBase.Create(TMockExecutor.Create, FExpressionEvaluator);
+  FExpressionEvaluator.RootContainer:= Result;
 end;
 
 procedure TestTProcessoBase.SetUp;
+var
+  FExpressionEvaluator: IExpressionEvaluator;
 begin
-  FProcessoBase:= THackProcessoBase.Create(TMockExecutor.Create, TFrwServiceLocator.Context.DaoUtils);
+  FExpressionEvaluator:= TExpressionEvaluator.Create(TFrwServiceLocator.Context.DaoUtils);
+  FProcessoBase:= THackProcessoBase.Create(TMockExecutor.Create, FExpressionEvaluator);
+  FExpressionEvaluator.RootContainer:= FProcessoBase;
 end;
 
 procedure TestTProcessoBase.TearDown;
@@ -116,7 +123,7 @@ begin
   CheckEquals('teste1', FInput1.Expression);
   Check(VarIsNull(FInput1.Value));
 
-  FProcessoBase.ValuateInputs(FProcessoBase.OnValuateParameterExpression);
+  FProcessoBase.ValuateInputs(FProcessoBase.ExpressionEvaluator);
 
   CheckEquals('teste1', FInput1.Value);
   CheckEquals('teste1', FInput3.Value._(0));
@@ -124,8 +131,12 @@ begin
 end;
 
 procedure TestTActivity.SetUp;
+var
+  FExpressionEvaluator: IExpressionEvaluator;
 begin
-  FActivity := THackActivity.Create(TFrwServiceLocator.Context.DaoUtils);
+  FExpressionEvaluator:= TExpressionEvaluator.Create(TFrwServiceLocator.Context.DaoUtils);
+  FActivity := THackActivity.Create(FExpressionEvaluator);
+  FExpressionEvaluator.RootContainer:= FActivity;
 end;
 
 procedure TestTActivity.TearDown;
@@ -182,7 +193,7 @@ begin
   //AddMockParameters(FProcesso1);
 
   FActivity.Processos.Add(FProcesso1);
-  FProcesso1.ValuateInputs(FActivity.OnValuateParameterExpression);
+  FProcesso1.ValuateInputs(FActivity.ExpressionEvaluator);
 
   CheckEquals('res1', FProcesso1.Inputs.ParamValue('p1'));
   CheckEquals('res2', FProcesso1.Inputs.ParamValue('p2'));
@@ -195,7 +206,7 @@ begin
 
   FActivity.Processos.Add(FProcesso2);
 
-  FProcesso2.ValuateInputs(FActivity.OnValuateParameterExpression);
+  FProcesso2.ValuateInputs(FActivity.ExpressionEvaluator);
 
   CheckEquals('res1', FProcesso2.Inputs.ParamValue('Par1'));
   CheckEquals('res2', FProcesso2.Inputs.ParamValue('Par2'));

@@ -167,7 +167,7 @@ end;
 
 function TFormCadastroAtividade.NovaAtividade: TActivity;
 begin
-  FActivity:= TActivity.Create(TFrwServiceLocator.Context.DaoUtils);
+  FActivity:= TActivity.Create(TFrwServiceLocator.Factory.NewExpressionEvaluator);
   FActivityDataSet.SetObject(FActivity);
 //  FProcessoDataSet.SetObjectList<TProcessoBase>(FActivity.Processos);
 

@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Mask, Vcl.DBCtrls,
-  Vcl.ComCtrls, uConClasses, Ladder.Activity.Classes, Vcl.CheckLst, Ladder.Activity.Parser,
+  Vcl.ComCtrls, uConClasses, Ladder.Activity.Classes, Vcl.CheckLst, Ladder.Parser,
   System.Generics.Collections, Ladder.Activity.Manager;
 
 type

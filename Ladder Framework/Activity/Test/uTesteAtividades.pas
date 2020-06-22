@@ -33,12 +33,12 @@ uses
 
 function TTesteAtividades.NewProcesso(pExecutor: IExecutorBase): TProcessoBase;
 begin
-  Result:= TProcessoBase.Create(pExecutor, TFrwServiceLocator.Context.DaoUtils);
+  Result:= TProcessoBase.Create(pExecutor);
 end;
 
 function TTesteAtividades.NewAtividade: TActivity;
 begin
-  Result:= TActivity.Create(TFrwServiceLocator.Context.DaoUtils);
+  Result:= TActivity.Create(TFrwServiceLocator.Context.ServiceFactory.NewExpressionEvaluator);
 end;
 
 function TTesteAtividades.NewProcessoEnviaEmailMeta: TProcessoBase;
@@ -91,10 +91,8 @@ begin
   FInput:= TParameter.Create('NomeConsulta', tbValue, 'MetaVendaEvolutivo');
   Result.Inputs.Add(FInput);
 
-  Result.Inputs.Add(TParameter.CreateWithValue('geDataIni', tbValue,
-                        StartOfTheMonth(LadderVarToDateTime('2020/04/01'))
-                    ));
-  Result.Inputs.Add(TParameter.CreateWithValue('geDataFim', tbValue, EndOfTheMonth(LadderVarToDateTime('2020/04/01'))));
+  Result.Inputs.Add(TParameter.Create('geDataIni', tbValue,'"2020/04/01"'));
+  Result.Inputs.Add(TParameter.Create('geDataFim', tbValue, '"2020/04/30"'));
 
   FExport:= TParameter.Create('Export', tbValue);
     FTipoExport:= TParameter.Create('Grafico', tbValue);

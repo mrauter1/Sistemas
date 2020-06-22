@@ -30,7 +30,7 @@ uses
   uConSqlServer, cxDBLookupComboBox, Ladder.ServiceLocator, Vcl.ComCtrls,
   Vcl.CheckLst, Ladder.Activity.Classes, Form.ProcessEditorBase, Ladder.ORM.DAO,
   Ladder.ORM.ObjectDataSet, Ladder.Activity.Classes.Dao,
-  System.Generics.Collections, uConClasses;
+  System.Generics.Collections, uConClasses, Ladder.Activity.Manager;
 
 type
   TFormProcessEditor = class(TFormProcessEditorBase, IProcessEditor)
@@ -101,7 +101,7 @@ implementation
 {$R *.dfm}
 
 uses
-  Form.SelecionaConsulta, GerenciadorUtils, Ladder.Activity.Parser, Ladder.Executor.Email;
+  Form.SelecionaConsulta, GerenciadorUtils, Ladder.Parser, Ladder.Executor.Email;
 
 procedure TFormProcessEditor.SetupScreen(AProcess: TProcessoBase);
 begin
@@ -118,7 +118,7 @@ end;
 
 function TFormProcessEditor.NewProcess: TProcessoBase;
 begin
-  FProcesso:= TProcessoBase.Create(FExecutor, TFrwServiceLocator.Context.DaoUtils);
+  FProcesso:= TProcessoBase.Create(FExecutor, TFrwServiceLocator.Factory.NewExpressionEvaluator);
 
   RefreshProcessInputs(FParametrosDef, FProcesso);
 

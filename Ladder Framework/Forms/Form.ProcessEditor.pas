@@ -73,6 +73,7 @@ type
 
     FParametrosDef: TObjectList<TParametroCon>;
     FOutputsDef: TOutputList;
+    FExpressionEvaluator: IExpressionEvaluator;
 
   protected
     constructor Create(AOwner: TComponent); overload; override;
@@ -85,8 +86,8 @@ type
 
     function Form: TForm;
 
-    function NewProcess: TProcessoBase; virtual;
-    procedure EditProcess(pProcesso: TProcessoBase); virtual;
+    function NewProcess(AExpressionEvaluator: IExpressionEvaluator): TProcessoBase; virtual;
+    procedure EditProcess(pProcesso: TProcessoBase; AExpressionEvaluator: IExpressionEvaluator); virtual;
 
     class function GetProcessEmailEditor(AOwner: TComponent): IProcessEditor;
 
@@ -116,9 +117,10 @@ begin
     GroupBoxOutputs.Visible:= False;
 end;
 
-function TFormProcessEditor.NewProcess: TProcessoBase;
+function TFormProcessEditor.NewProcess(AExpressionEvaluator: IExpressionEvaluator): TProcessoBase;
 begin
-  FProcesso:= TProcessoBase.Create(FExecutor, TFrwServiceLocator.Factory.NewExpressionEvaluator);
+  FExpressionEvaluator:= AExpressionEvaluator;
+  FProcesso:= TProcessoBase.Create(FExecutor, FExpressionEvaluator);
 
   RefreshProcessInputs(FParametrosDef, FProcesso);
 
@@ -141,7 +143,7 @@ begin
   if FProcessoDataSet.State in ([dsEdit,dsInsert]) then
     FProcessoDataSet.Post;
 
-  FProcesso.CheckValidity;
+  FProcesso.CheckValidity(FExpressionEvaluator);
 
   FOk:= True;
   Close;
@@ -170,8 +172,9 @@ begin
   inherited;
 end;
 
-procedure TFormProcessEditor.EditProcess(pProcesso: TProcessoBase);
+procedure TFormProcessEditor.EditProcess(pProcesso: TProcessoBase; AExpressionEvaluator: IExpressionEvaluator);
 begin
+  FExpressionEvaluator:= AExpressionEvaluator;
   FProcesso:= pProcesso;
 
   RefreshProcessInputs(FParametrosDef, FProcesso);

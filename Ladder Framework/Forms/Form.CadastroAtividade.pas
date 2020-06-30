@@ -225,7 +225,7 @@ begin
   if FExecutor = '' then
     Exit;
 
-  FProcesso:= Manager.NewProcess(FExecutor);
+  FProcesso:= Manager.NewProcess(FExecutor, FActivity.ExpressionEvaluator);
 
   if Assigned(FProcesso) then
   begin
@@ -251,7 +251,7 @@ begin
   if ProcessoSelecionado = nil then
     Exit;
 
-  Manager.EditProcess(ProcessoSelecionado);
+  Manager.EditProcess(ProcessoSelecionado, FActivity.ExpressionEvaluator);
 
   FProcessoDataSet.Synchronize;
 end;
@@ -384,7 +384,7 @@ begin
   if FActivityDataSet.State in ([dsEdit, dsInsert]) then
     FActivityDataSet.Post;
 
-  FActivity.CheckValidity();
+  FActivity.CheckValidity(FActivity.ExpressionEvaluator);
 
   FActivityDao.Save(FActivity);
   FActivityDataSet.Synchronize;

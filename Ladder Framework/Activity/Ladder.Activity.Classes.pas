@@ -180,10 +180,10 @@ type
     function Executar(AEvaluator: IExpressionEvaluator): TOutputList; overload; virtual;
 
     // Check if parameter name is valid and its expression can be parsed
-    procedure CheckParameter(AMasterName: String; AParameter: TParameter);
+    procedure CheckParameter(AEvaluator: IExpressionEvaluator; AMasterName: String; AParameter: TParameter);
 
     // Check if all the elements of the process have valid names and their expression can be parsed
-    procedure CheckValidity(AMasterName: String = ''); virtual;
+    procedure CheckValidity(AEvaluator: IExpressionEvaluator; AMasterName: String = ''); virtual;
 
     property ExpressionEvaluator: IExpressionEvaluator read GetExpressionEvaluator write SetExpressionEvaluator;
   published
@@ -208,7 +208,7 @@ type
 
     function Executar(AEvaluator: IExpressionEvaluator): TOutputList; overload; override;
     function FindElementByName(pElementName: String): IActivityElement; override;
-    procedure CheckValidity(AMasterName: String = ''); override;
+    procedure CheckValidity(AEvaluator: IExpressionEvaluator; AMasterName: String = ''); override;
 
     procedure ReorderProcesses(FNewProcess: TProcessoBase = nil);
     procedure AddProcess(AProcess: TProcessoBase); // Add the process and reorder the process list
@@ -352,7 +352,7 @@ begin
   FOutputs:= TOutputList.Create;
 end;
 
-procedure TProcessoBase.CheckParameter(AMasterName: String; AParameter: TParameter);
+procedure TProcessoBase.CheckParameter(AEvaluator: IExpressionEvaluator; AMasterName: String; AParameter: TParameter);
 var
   fParameter: TParameter;
   fFullName: String;
@@ -363,18 +363,20 @@ begin
   if not IsValidName(AParameter.Name) then
     raise EInvalidElementError.Create(self, fFullName, Format('Name %s is invalid.', [AParameter.Name]));
 
-  if FExpressionEvaluator.CheckExpressionSyntax(Self, AParameter.Expression, FErrorMsg) = False then
+  if AEvaluator.CheckExpressionSyntax(Self, AParameter.Expression, FErrorMsg) = False then
     raise EInvalidElementError.Create(self, fFullName, Format('Invalid expression %s.', [AParameter.Expression]));
 
   for fParameter in AParameter.Parameters do
-    CheckParameter(fFullName, fParameter);
+    CheckParameter(AEvaluator, fFullName, fParameter);
 end;
 
-procedure TProcessoBase.CheckValidity(AMasterName: String = '');
+procedure TProcessoBase.CheckValidity(AEvaluator: IExpressionEvaluator; AMasterName: String = '');
 var
   fParameter: TParameter;
   fFullName: String;
 begin
+  Assert(AEvaluator<>nil, 'TProcessoBase.CheckValidity: AEvaluator must be assigned!');
+
   if AMasterName <> '' then
     fFullName:= AMasterName+'.'+Self.Name
   else
@@ -384,10 +386,10 @@ begin
     raise EInvalidElementError.Create(self, fFullName, Format('Name %s is invalid.', [Self.Name]));
 
   for fParameter in Inputs do
-    CheckParameter(fFullName, fParameter);
+    CheckParameter(AEvaluator, fFullName, fParameter);
 
   for fParameter in Outputs do
-    CheckParameter(fFullName, fParameter);
+    CheckParameter(AEvaluator, fFullName, fParameter);
 
 end;
 
@@ -536,7 +538,7 @@ begin
   FProcessos:= TObjectList<TProcessoBase>.Create(True);
 end;
 
-procedure TActivity.CheckValidity(AMasterName: String = '');
+procedure TActivity.CheckValidity(AEvaluator: IExpressionEvaluator; AMasterName: String = '');
 var
   fProcesso: TProcessoBase;
   fFullName: String;
@@ -549,7 +551,7 @@ begin
     fFullName:= Self.Name;
 
   for fProcesso in Processos do
-    fProcesso.CheckValidity(fFullName);
+    fProcesso.CheckValidity(AEvaluator, fFullName);
 end;
 
 constructor TActivity.Create(AExpressionEvaluator: IExpressionEvaluator);

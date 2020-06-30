@@ -93,8 +93,10 @@ type
     class function CheckSyntax(AParser: TActivityParser; AExpression: String; out ErrorMessage: string): Boolean;
   end;
 
-
 implementation
+
+uses
+  Ladder.Utils;
 
 { EParseException }
 

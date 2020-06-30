@@ -68,11 +68,11 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
-    function NewProcess: TProcessoBase; override;
-    procedure EditProcess(pProcesso: TProcessoBase); override;
+    function NewProcess(AExpressionEvaluator: IExpressionEvaluator): TProcessoBase; override;
+    procedure EditProcess(pProcesso: TProcessoBase; AExpressionEvaluator: IExpressionEvaluator); override;
 
-    class function _NewProcess: TProcessoBase;
-    class procedure _EditProcess(pProcesso: TProcessoBase);
+    class function _NewProcess(AExpressionEvaluator: IExpressionEvaluator): TProcessoBase;
+    class procedure _EditProcess(pProcesso: TProcessoBase; AExpressionEvaluator: IExpressionEvaluator);
 
     class function GetProcessEditor(AOwner: TComponent): IProcessEditor;
   end;
@@ -95,7 +95,7 @@ begin
   FazLookupCxGrid(cxGridExportDBTableView1Visualizacao, format(cSqlVisualizacao, [FConsulta.ID]));
 end;
 
-function TFormConsultaEditor.NewProcess: TProcessoBase;
+function TFormConsultaEditor.NewProcess(AExpressionEvaluator: IExpressionEvaluator): TProcessoBase;
 var
   FIDConsulta: Integer;
 begin
@@ -111,7 +111,7 @@ begin
 
   RecreateParamertosDef;
 
-  Result:= inherited NewProcess;
+  Result:= inherited NewProcess(AExpressionEvaluator);
 
   Result.Name:= 'Consulta'+FConsulta.Nome;
   Result.Description:= GetNomeConsulta(FIDConsulta);
@@ -124,7 +124,7 @@ begin
   LblConsulta.Caption:= Format('Consulta: %s', [GetNomeConsulta(FConsulta.ID)]);
 end;
 
-procedure TFormConsultaEditor.EditProcess(pProcesso: TProcessoBase);
+procedure TFormConsultaEditor.EditProcess(pProcesso: TProcessoBase; AExpressionEvaluator: IExpressionEvaluator);
 var
   FIDConsulta: Integer;
 begin
@@ -138,7 +138,7 @@ begin
 
   RecreateParamertosDef;
 
-  inherited EditProcess(pProcesso);
+  inherited EditProcess(pProcesso, AExpressionEvaluator);
 end;
 
 function TFormConsultaEditor.GetConsulta(AProcess: TProcessoBase): TConsulta;
@@ -221,27 +221,26 @@ begin
   Result:= Self;
 end;
 
-class procedure TFormConsultaEditor._EditProcess(
-  pProcesso: TProcessoBase);
+class procedure TFormConsultaEditor._EditProcess(pProcesso: TProcessoBase; AExpressionEvaluator: IExpressionEvaluator);
 var
   vFrm: TFormConsultaEditor;
 begin
   vFrm:= TFormConsultaEditor.Create(nil);
   try
-    vFrm.EditProcess(pProcesso);
+    vFrm.EditProcess(pProcesso, AExpressionEvaluator);
     vFrm.ShowModal;
   finally
     vFrm.Free;
   end;
 end;
 
-class function TFormConsultaEditor._NewProcess: TProcessoBase;
+class function TFormConsultaEditor._NewProcess(AExpressionEvaluator: IExpressionEvaluator): TProcessoBase;
 var
   vFrm: TFormConsultaEditor;
 begin
   vFrm:= TFormConsultaEditor.Create(nil);
   try
-    Result:= vFrm.NewProcess;
+    Result:= vFrm.NewProcess(AExpressionEvaluator);
     vFrm.ShowModal;
   finally
     vFrm.Free;

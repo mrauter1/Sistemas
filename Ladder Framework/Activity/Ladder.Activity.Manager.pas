@@ -8,8 +8,8 @@ uses
 type
   IProcessEditor = interface(IInterface)
   ['{9366E88A-4D9F-4705-9DB8-D8138498B0D1}']
-    function NewProcess: TProcessoBase;
-    procedure EditProcess(pProcesso: TProcessoBase);
+    function NewProcess(AExpressionEvaluator: IExpressionEvaluator): TProcessoBase;
+    procedure EditProcess(pProcesso: TProcessoBase; AExpressionEvaluator: IExpressionEvaluator);
     function Form: TForm;
     procedure Free;
   end;
@@ -39,8 +39,8 @@ type
     function GetProcessEditor(ExecutorClass: TExecutorClass; AOwner: TComponent = nil): IProcessEditor; overload;
     function GetProcessEditor(pClassName: String; AOwner: TComponent = nil): IProcessEditor; overload;
 
-    procedure EditProcess(pProcesso: TProcessoBase);
-    function NewProcess(ExecutorClass: String): TProcessoBase;
+    procedure EditProcess(pProcesso: TProcessoBase; AExpressionEvaluator: IExpressionEvaluator);
+    function NewProcess(ExecutorClass: String; AExpressionEvaluator: IExpressionEvaluator): TProcessoBase;
 
     constructor Create;
     destructor Destroy; override;
@@ -63,7 +63,7 @@ begin
   inherited Destroy;
 end;
 
-procedure TActivityManager.EditProcess(pProcesso: TProcessoBase);
+procedure TActivityManager.EditProcess(pProcesso: TProcessoBase; AExpressionEvaluator: IExpressionEvaluator);
 var
   FEditor: IProcessEditor;
 begin
@@ -72,7 +72,7 @@ begin
 
   FEditor:= GetProcessEditor(pProcesso.GetExecutor.ClassType.ClassName, nil);
   try
-    FEditor.EditProcess(pProcesso);
+    FEditor.EditProcess(pProcesso, AExpressionEvaluator);
     FEditor.Form.ShowModal;
   finally
 //    FEditor.Free;
@@ -109,13 +109,13 @@ begin
   Result:= FOnGetProcessEditor(AOwner);
 end;
 
-function TActivityManager.NewProcess(ExecutorClass: String): TProcessoBase;
+function TActivityManager.NewProcess(ExecutorClass: String; AExpressionEvaluator: IExpressionEvaluator): TProcessoBase;
 var
   FEditor: IProcessEditor;
 begin
   FEditor:= GetProcessEditor(ExecutorClass, nil);
   try
-    Result:= FEditor.NewProcess();
+    Result:= FEditor.NewProcess(AExpressionEvaluator);
     FEditor.Form.ShowModal;
   finally
 //    FEditor.Free;

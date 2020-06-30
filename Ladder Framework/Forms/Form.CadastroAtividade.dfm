@@ -21,7 +21,6 @@ object FormCadastroAtividade: TFormCadastroAtividade
     Height = 78
     Align = alTop
     TabOrder = 0
-    ExplicitWidth = 599
     DesignSize = (
       606
       78)
@@ -58,7 +57,6 @@ object FormCadastroAtividade: TFormCadastroAtividade
       DataField = 'Name'
       DataSource = DsAtividade
       TabOrder = 1
-      ExplicitWidth = 313
     end
     object DBEditID: TDBEdit
       Left = 64
@@ -79,7 +77,6 @@ object FormCadastroAtividade: TFormCadastroAtividade
       DataField = 'Description'
       DataSource = DsAtividade
       TabOrder = 2
-      ExplicitWidth = 521
     end
   end
   object PanelCentro: TPanel
@@ -89,8 +86,6 @@ object FormCadastroAtividade: TFormCadastroAtividade
     Height = 420
     Align = alClient
     TabOrder = 1
-    ExplicitWidth = 599
-    ExplicitHeight = 410
     object Splitter1: TSplitter
       Left = 1
       Top = 308
@@ -120,8 +115,6 @@ object FormCadastroAtividade: TFormCadastroAtividade
       Align = alClient
       Caption = 'Processos'
       TabOrder = 0
-      ExplicitWidth = 597
-      ExplicitHeight = 200
       object PanelControles: TPanel
         Left = 2
         Top = 142
@@ -129,8 +122,6 @@ object FormCadastroAtividade: TFormCadastroAtividade
         Height = 41
         Align = alBottom
         TabOrder = 0
-        ExplicitLeft = 3
-        ExplicitTop = 141
         DesignSize = (
           600
           41)
@@ -357,8 +348,6 @@ object FormCadastroAtividade: TFormCadastroAtividade
       Align = alBottom
       Caption = 'Inputs'
       TabOrder = 1
-      ExplicitTop = 192
-      ExplicitWidth = 597
       object cxGridParametros: TcxGrid
         Left = 2
         Top = 15
@@ -366,10 +355,6 @@ object FormCadastroAtividade: TFormCadastroAtividade
         Height = 102
         Align = alClient
         TabOrder = 0
-        ExplicitLeft = 1
-        ExplicitTop = 11
-        ExplicitWidth = 593
-        ExplicitHeight = 80
         object cxGridParametrosDBTableView1: TcxGridDBTableView
           Navigator.Buttons.CustomButtons = <>
           Navigator.Buttons.First.Visible = False
@@ -420,7 +405,6 @@ object FormCadastroAtividade: TFormCadastroAtividade
       Align = alBottom
       Caption = 'Outputs'
       TabOrder = 2
-      ExplicitWidth = 597
       object cxGrid1: TcxGrid
         Left = 2
         Top = 15
@@ -428,10 +412,6 @@ object FormCadastroAtividade: TFormCadastroAtividade
         Height = 91
         Align = alClient
         TabOrder = 0
-        ExplicitLeft = 3
-        ExplicitTop = 17
-        ExplicitWidth = 593
-        ExplicitHeight = 88
         object cxGridDBTableView1: TcxGridDBTableView
           Navigator.Buttons.CustomButtons = <>
           Navigator.Buttons.First.Visible = False
@@ -482,8 +462,6 @@ object FormCadastroAtividade: TFormCadastroAtividade
     Height = 44
     Align = alBottom
     TabOrder = 2
-    ExplicitTop = 488
-    ExplicitWidth = 599
     object BtnSalvar: TBitBtn
       Left = 12
       Top = 5

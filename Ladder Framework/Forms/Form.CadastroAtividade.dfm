@@ -383,13 +383,9 @@ object FormCadastroAtividade: TFormCadastroAtividade
             DataBinding.FieldName = 'Name'
             Width = 128
           end
-          object cxGridParametrosDBTableView1ParameterType: TcxGridDBColumn
-            DataBinding.FieldName = 'ParameterType'
-            Width = 92
-          end
           object cxGridParametrosDBTableView1Expression: TcxGridDBColumn
             DataBinding.FieldName = 'Expression'
-            Width = 194
+            Width = 333
           end
         end
         object cxGridParametrosLevel1: TcxGridLevel
@@ -440,13 +436,9 @@ object FormCadastroAtividade: TFormCadastroAtividade
             DataBinding.FieldName = 'Name'
             Width = 121
           end
-          object cxGridDBTableView1ParameterType: TcxGridDBColumn
-            DataBinding.FieldName = 'ParameterType'
-            Width = 86
-          end
           object cxGridDBTableView1Expression: TcxGridDBColumn
             DataBinding.FieldName = 'Expression'
-            Width = 217
+            Width = 376
           end
         end
         object cxGridLevel1: TcxGridLevel

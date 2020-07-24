@@ -57,10 +57,15 @@ uses
   Test.DaoUtils in 'Test.DaoUtils.pas',
   uConClasses.Dao in '..\..\..\utils\uConClasses.Dao.pas',
   Form.ProcessEditorBase in '..\..\Forms\Form.ProcessEditorBase.pas' {FormProcessEditorBase},
-  Form.ConsultaEditor in 'Form.ConsultaEditor.pas' {FormConsultaEditor},
+  Form.ConsultaEditor in '..\..\Forms\Form.ConsultaEditor.pas' {FormConsultaEditor},
   Ladder.Parser in '..\..\Ladder.Parser.pas',
   Ladder.SyntaxChecker in '..\..\Ladder.SyntaxChecker.pas',
-  Ladder.ExpressionEvaluator in '..\..\Ladder.ExpressionEvaluator.pas';
+  Ladder.ExpressionEvaluator in '..\..\Ladder.ExpressionEvaluator.pas',
+  Ladder.Activity.Scheduler in '..\Ladder.Activity.Scheduler.pas',
+  maxCron in '..\..\Library\maxCron\maxCron.pas',
+  Test.Scheduler in 'Test.Scheduler.pas',
+  Ladder.Executor.Activity in '..\Executor\Ladder.Executor.Activity.pas',
+  Form.ProcessActivityEditor in '..\..\Forms\Form.ProcessActivityEditor.pas' {FormProcessActivityEditor};
 
 {$R *.RES}
 
@@ -70,6 +75,8 @@ begin
 
   DUnitTestRunner.RunRegisteredTests;
   Application.CreateForm(TConSqlServer, ConSqlServer);
+  Application.CreateForm(TFormProcessActivityEditor, FormProcessActivityEditor);
+  Application.CreateForm(TFormProcessActivityEditor, FormProcessActivityEditor);
   Application.Run;
 end.
 

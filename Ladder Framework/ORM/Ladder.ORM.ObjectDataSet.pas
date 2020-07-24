@@ -1006,7 +1006,8 @@ begin
   try
     Refresh;
     if Assigned(FCurrent) then
-      Select(FCurrent);
+      if fDataList.Contains(FCurrent) then
+        Select(FCurrent);
 
   finally
     EnableControls;

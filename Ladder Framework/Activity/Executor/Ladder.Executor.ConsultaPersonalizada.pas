@@ -27,15 +27,8 @@ uses
   Variants, SynCommons;
 
 procedure TExecutorConsultaPersonalizada.CheckInputs;
-var
-  FOutput: TOutputParameter;
 begin
-  FOutput:= Outputs.Param('Files');
-  if not Assigned(FOutput) then
-  begin
-    FOutput:= TOutputParameter.Create('Files', tbList, '');
-    Outputs.Add(FOutput);
-  end;
+
 end;
 
 procedure TExecutorConsultaPersonalizada.ProcessaOutput(pConsulta: TFrmConsultaPersonalizada; pExportParameter: TParameter);
@@ -70,14 +63,20 @@ begin
 
   pExportParameter.Value:= FNameArquivo;
 
-  FOutput:= Outputs.Param('Files');
+  FOutput:= Outputs.Param(pExportParameter.Name);
+  if not Assigned(FOutput) then
+    FOutput:= TOutputParameter.Create(pExportParameter.Name, tbAny, '');
+
+  FOutput.Value:= FNameArquivo;
+
+{  FOutput:= Outputs.Param('Files');
   FResult:= FOutput.Value;
   if VarIsNull(FResult) then
     FResult:= _Arr([FNameArquivo])
   else
     TDocVariantData(FResult).AddItem(FNameArquivo);
 
-  FOutput.Value:= FResult;
+  FOutput.Value:= FResult;          }
 end;
 
 function TExecutorConsultaPersonalizada.ConfiguraConsulta: TFrmConsultaPersonalizada;
@@ -148,7 +147,6 @@ begin
     if Assigned(FExport) then
       for FExportParam in FExport.Parameters do
         ProcessaOutput(FConsulta, FExportParam);
-
   finally
     TFrwServiceLocator.Synchronize(
       procedure begin

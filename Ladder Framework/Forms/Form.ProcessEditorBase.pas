@@ -21,6 +21,7 @@ type
     function GetControlHeight(pTipo: TTipoParametro): Integer;
     { Private declarations }
   public
+    constructor Create(AOwner: TComponent); override;
     function CriaLabel(pParent: TWinControl; Position: TPoint; pParametro: TParametroCon): TLabel;
     function CriaPageControl(pBox: TWinControl; Position: TPoint; pParametro: TParametroCon): TParamPageControl;
     function CreateTabSheet(pPageControl: TPageControl; pCaption, pName: String): TTabSheet;
@@ -32,26 +33,23 @@ type
     function CriaParChecklistBox(pBox: TWinControl; pParametro: TParametroCon; pValorParam: Variant): TCheckListBox;
 
     // Return a valid Expression matching the visual component value
-    function ControlToExpression(pComponent: TComponent; pParametroCon: TParametroCon): String;
+    function ControlToExpression(pComponent: TComponent; pParametroCon: TParametroCon): String; virtual;
 
     // Return a valid Expression matching pValue value
-    function ParamValueToExpression(pValue: Variant): String;
+    function ParamValueToExpression(pValue: Variant): String; virtual;
 
     // For each TParameterCon create a PageControl with an TEDit for Expression and a component matching the field type (eg.: TDateTimePicker for ptDate)
     // For each TParameterCon there must be a AProcess.Input of the same name
     // The values shown on the visual components are computed from the AProcess.Input.Expression.
-    procedure CreateScreenParameters(AScreenParameters: TObjectList<TParametroCon>; AProcess: TProcessoBase; pBox: TWinControl);
+    procedure CreateScreenParameters(AScreenParameters: TObjectList<TParametroCon>; AParameterContainer: IActivityElementContainer; pBox: TWinControl); virtual;
 
     // Map the values of the visual components to AProcess.Inputs.Expression values
-    procedure ScreenParamToProcess(pScreenParameters: TObjectList<TParametroCon>; AProcess: TProcessoBase; pBox: TWinControl);
+    procedure ScreenParamToProcess(pScreenParameters: TObjectList<TParametroCon>; AParameterContainer: IActivityElementContainer; pBox: TWinControl); virtual;
 
     // For each TParameterCon in AScreenParameters an Input will be added to AProcess.Input if it does not exist already
-    procedure RefreshProcessInputs(AScreenParameters: TObjectList<TParametroCon>; AProcess: TProcessoBase);
+    procedure RefreshProcessInputs(AScreenParameters: TObjectList<TParametroCon>; AParameterContainer: IActivityElementContainer); virtual;
 
-    // Copy ASource to ADest
-    procedure CopyOutputList(ASource, ADest: TOutputList);
-
-    class function ActivityManager: TActivityManager;
+    class function ActivityManager: TActivityManager; virtual;
   end;
 
 implementation
@@ -204,7 +202,7 @@ begin
 
 //      Align     := alClient;
     Name      := 'V'+pParametro.Nome;
-    Text      := VarToStrDef(pValorParam, '');
+    Text      := LadderVarToStr(pValorParam, '');
     Parent    := pBox;
   end;
 end;
@@ -229,7 +227,8 @@ begin
   end;
 end;
 
-procedure TFormProcessEditorBase.RefreshProcessInputs(AScreenParameters: TObjectList<TParametroCon>; AProcess: TProcessoBase);
+// Names that have a dot are considered to be multilevel.: eg.: "ParamMaster.ParamChild" ParamChild will be created as a child of ParamMaster
+procedure TFormProcessEditorBase.RefreshProcessInputs(AScreenParameters: TObjectList<TParametroCon>; AParameterContainer: IActivityElementContainer);
 var
   fParametro: TParametroCon;
 
@@ -241,25 +240,29 @@ var
 
     Result:= AParam.ValorPadrao;
   end;
+
+  procedure CreateParam(AParametro: TParametroCon);
+  var
+    FCreatedParam: TParameter;
+  begin
+    FCreatedParam:= TParameter.Create(AParametro.Nome, tbAny, ParameterConToExpression(AParametro));
+
+    if (AParameterContainer is TProcessoBase) then
+      (AParameterContainer as TProcessoBase).Inputs.Add(FCreatedParam)
+    else
+      (AParameterContainer as TParameter).Parameters.Add(FCreatedParam);
+  end;
+
 begin
   for fParametro in AScreenParameters do
-    if AProcess.Inputs.Param(fParametro.Nome) = nil then
-      AProcess.Inputs.Add(TParameter.Create(fParametro.Nome, tbAny, ParameterConToExpression(fParametro)));
+    if AParameterContainer.FindElement(fParametro.Nome) = nil then
+      CreateParam(fParametro);
 
 end;
 
-procedure TFormProcessEditorBase.CopyOutputList(ASource, ADest: TOutputList);
+procedure TFormProcessEditorBase.ScreenParamToProcess(pScreenParameters: TObjectList<TParametroCon>; AParameterContainer: IActivityElementContainer; pBox: TWinControl);
 var
-  fOutputDef: TOutputParameter;
-begin
-  ADest.Clear;
-  for fOutputDef in ASource do
-    ADest.Add(fOutputDef.CreateCopy(fOutputDef));
-
-end;
-
-procedure TFormProcessEditorBase.ScreenParamToProcess(pScreenParameters: TObjectList<TParametroCon>; AProcess: TProcessoBase; pBox: TWinControl);
-var
+  FElement: IActivityElement;
   fPageControl: TParamPageControl;
   fParametro: TParametroCon;
   fParam: TParameter;
@@ -267,9 +270,11 @@ var
 begin
   for fParametro in pScreenParameters do
   begin
-    fParam:= AProcess.Inputs.Param(fParametro.Nome);
-    if not Assigned(fParam) then
+    FElement:= AParameterContainer.FindElement(FParametro.Nome);
+    if not (FElement is TParameter) then
       Continue;
+
+    fParam:= (FElement as TParameter);
 
     FComponent:= pBox.FindComponent('PG'+FParametro.Nome);
     if not (FComponent is TParamPageControl) then
@@ -284,7 +289,12 @@ begin
    end;
 end;
 
-procedure TFormProcessEditorBase.CreateScreenParameters(AScreenParameters: TObjectList<TParametroCon>; AProcess: TProcessoBase; pBox: TWinControl);
+constructor TFormProcessEditorBase.Create(AOwner: TComponent);
+begin
+  inherited;
+end;
+
+procedure TFormProcessEditorBase.CreateScreenParameters(AScreenParameters: TObjectList<TParametroCon>; AParameterContainer: IActivityElementContainer; pBox: TWinControl);
 var
   FTop: Integer;
   FPageControl: TParamPageControl;
@@ -311,13 +321,24 @@ const
     end;
   end;
 
+  function FindParam(ParamName: String): TParameter;
+  var
+    Element: IActivityElement;
+  begin
+    Element:= AParameterContainer.FindElement(ParamName);
+    if Element is TParameter then
+      Result:= (Element as TParameter)
+    else
+      Result:= nil;
+  end;
+
 begin
   FTop:= 0;
   for fParametro in AScreenParameters do
   begin
     FIsExpression:= False;
 
-    fParam:= AProcess.Inputs.Param(FParametro.Nome);
+    fParam:= FindParam(FParametro.Nome);
     if not Assigned(fParam) then
       Continue;
 //      raise Exception.Create(Format('Input %s da consulta personalizada %s não encontrado.', [fParametro.Name, FConsulta.Name]);
@@ -395,10 +416,11 @@ begin
     Exit;
   end;
 
-  if LadderVarIsDateTime(pValue) then
+  Result:= LadderVarToStr(pValue);
+{  if LadderVarIsDateTime(pValue) then
     Result:= LadderDateToStr(pValue, True)
   else
-    Result:= QuotedStr(VarToStrDef(pValue, ''));
+    Result:= QuotedStr(VarToStrDef(pValue, ''));    }
 end;
 
 end.

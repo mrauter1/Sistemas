@@ -167,7 +167,7 @@ type
     constructor Create(pExecutor: IExecutorBase); overload; virtual;
 
     // if SelfAsRoot is true, then the RootContainer of AExpressionEvaluator will be set to self.
-    constructor Create(pExecutor: IExecutorBase; AExpressionEvaluator: IExpressionEvaluator; SelfAsRoot: Boolean = True); overload; virtual;
+    constructor Create(pExecutor: IExecutorBase; AExpressionEvaluator: IExpressionEvaluator); overload; virtual;
     destructor Destroy; override;
     function GetName: String;
 
@@ -203,7 +203,7 @@ type
   protected
     procedure AfterConstruction; override;
   public
-    constructor Create(AExpressionEvaluator: IExpressionEvaluator); overload;
+    constructor Create(AExpressionEvaluator: IExpressionEvaluator); virtual;
     destructor Destroy; override;
 
     function Executar(AEvaluator: IExpressionEvaluator): TOutputList; overload; override;
@@ -235,6 +235,10 @@ var
   i: Integer;
 begin
   Result:= False;
+
+  if Trim(AName) = '' then
+    Exit;
+
   for i := 1 to Length(AName) do
   begin
     if i=1 then
@@ -260,6 +264,8 @@ var
 
   function FindSingleElement(pCurrentElement: IActivityElement; pNames: TArray<String>; pIndex: Integer): IActivityElement;
   begin
+    Result:= nil;
+
     if pIndex > High(pNames) then
     begin
       Result:= (pCurrentElement as IActivityValue);
@@ -267,12 +273,14 @@ var
     end;
 
     if not Supports(pCurrentElement, IActivityElementContainer) then
-      raise Exception.Create('TExpressionEvaluator.OnElementEval: Element '+pCurrentElement.GetName+' is not a container!');
+      Exit;
+//      raise Exception.Create('TExpressionEvaluator.OnElementEval: Element '+pCurrentElement.GetName+' is not a container!');
 
     FElement:= (pCurrentElement as IActivityElementContainer).FindElementByName(pNames[pIndex]);
 
     if not Assigned(FElement) then
-      raise Exception.Create('TExpressionEvaluator.OnElementEval: Element '+pNames[pIndex]+' not found!');
+      Exit;
+//      raise Exception.Create('TExpressionEvaluator.OnElementEval: Element '+pNames[pIndex]+' not found!');
 
     Result:= FindSingleElement(FElement, FNames, pIndex+1);
   end;
@@ -398,15 +406,16 @@ begin
   Create(pExecutor, nil);
 end;
 
-constructor TProcessoBase.Create(pExecutor: IExecutorBase; AExpressionEvaluator: IExpressionEvaluator; SelfAsRoot: Boolean = True);
+constructor TProcessoBase.Create(pExecutor: IExecutorBase; AExpressionEvaluator: IExpressionEvaluator);
 begin
   inherited Create;
   Executor:= pExecutor;
 
   FExpressionEvaluator:= AExpressionEvaluator;
 
-  if SelfAsRoot and Assigned(FExpressionEvaluator) then
-    FExpressionEvaluator.RootContainer:= Self;
+  if Assigned(FExpressionEvaluator) then
+    if not Assigned(FExpressionEvaluator.RootContainer) then
+      FExpressionEvaluator.RootContainer:= Self; // First to assign is the root
 end;
 
 destructor TProcessoBase.Destroy;
@@ -421,7 +430,8 @@ var
   var
     FParameter: TParameter;
   begin
-    EvaluateParam(AEvaluator, pInput);
+    if pInput.Expression <> '' then // if Expression is blank, keep the value
+      EvaluateParam(AEvaluator, pInput);
 
     for FParameter in pInput.Parameters do
       ValuateInput(AEvaluator, FParameter);
@@ -482,10 +492,14 @@ end;
 
 function TProcessoBase.FindElement(pElementPath: String; pCurrentContainer: IActivityElementContainer=nil): IActivityElement;
 begin
-  if Assigned(pCurrentContainer) then
-    Result:= FindElementByPath(pElementPath, Self, pCurrentContainer)
-  else
-    Result:= FindElementByPath(pElementPath, Self, Self);
+  try
+    if Assigned(pCurrentContainer) then
+      Result:= FindElementByPath(pElementPath, Self, pCurrentContainer)
+    else
+      Result:= FindElementByPath(pElementPath, Self, Self);
+  except
+    Result:= nil;
+  end;
 end;
 
 function TProcessoBase.FindElementByName(pElementName: String): IActivityElement;
@@ -627,7 +641,7 @@ begin
 
   for FOutput in Outputs do
     if FOutput.Expression <> '' then // Only evaluate output if it has a expression
-      EvaluateParam(AEvaluator, FOutput);
+      EvaluateParam(FExpressionEvaluator, FOutput);
 
   Result:= Outputs;
 end;
@@ -739,7 +753,7 @@ constructor TParameter.CreateCopy(ASource: TParameter; pCopyID: Boolean);
 var
   fParameter: TParameter;
 begin
-  TParameter.Create(ASource.Name, ASource.ParameterType, ASource.Expression);
+  Create(ASource.Name, ASource.ParameterType, ASource.Expression);
   if pCopyID then
     Self.ID:= ASource.ID;
   for fParameter in ASource.Parameters do

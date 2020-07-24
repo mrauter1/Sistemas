@@ -43,9 +43,6 @@ type
     GroupBoxOutputs: TGroupBox;
     cxGrid1: TcxGrid;
     cxGridDBTableView1: TcxGridDBTableView;
-    cxGridDBColumn1: TcxGridDBColumn;
-    cxGridDBColumn2: TcxGridDBColumn;
-    cxGridDBColumn3: TcxGridDBColumn;
     cxGridLevel1: TcxGridLevel;
     DBEditNomeProcesso: TDBEdit;
     Label3: TLabel;
@@ -60,24 +57,38 @@ type
     TbProcessoDescription: TMemoField;
     TbProcessoClassName: TMemoField;
     TbProcessoExecutorClass: TMemoField;
+    DsOutput: TDataSource;
+    TBOutput: TFDMemTable;
+    TBOutputID: TFDAutoIncField;
+    TBOutputIDProcesso: TIntegerField;
+    TBOutputName: TMemoField;
+    TBOutputParameterType: TIntegerField;
+    TBOutputExpression: TMemoField;
+    TBOutputIDMaster: TIntegerField;
+    cxGridDBTableView1ID: TcxGridDBColumn;
+    cxGridDBTableView1Name: TcxGridDBColumn;
+    cxGridDBTableView1Expression: TcxGridDBColumn;
     procedure BtnOKClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
     FOK: Boolean;
-    FProcesso: TProcessoBase;
-    FProcessoDao: IDaoGeneric<TProcessoBase>;
+    FProcessoDao: IProcessoDao<TProcessoBase>;
     FProcessoDataSet: TObjectDataSet;
+    FOutputDataSet: TObjectDataSet;
 
     FExecutor: IExecutorBase;
 
     FParametrosDef: TObjectList<TParametroCon>;
     FOutputsDef: TOutputList;
     FExpressionEvaluator: IExpressionEvaluator;
-
   protected
+    FProcesso: TProcessoBase;
     constructor Create(AOwner: TComponent); overload; override;
-    procedure SetupScreen(AProcess: TProcessoBase); virtual;
+    procedure SetupProcess(AProcess: TProcessoBase); virtual;
+    function CreateNewProcess(AExpressionEvaluator: IExpressionEvaluator): TProcessoBase; virtual;
+    procedure CreateOutputs; virtual;
+    procedure Synchronize; virtual;
   public
     { Public declarations }
     //WARNING: AParameterDef and AOutputs will be destroyed by this class when its freed
@@ -88,6 +99,8 @@ type
 
     function NewProcess(AExpressionEvaluator: IExpressionEvaluator): TProcessoBase; virtual;
     procedure EditProcess(pProcesso: TProcessoBase; AExpressionEvaluator: IExpressionEvaluator); virtual;
+
+    function GetParameterContainer: IActivityElementContainer; virtual;
 
     class function GetProcessEmailEditor(AOwner: TComponent): IProcessEditor;
 
@@ -104,29 +117,52 @@ implementation
 uses
   Form.SelecionaConsulta, GerenciadorUtils, Ladder.Parser, Ladder.Executor.Email;
 
-procedure TFormProcessEditor.SetupScreen(AProcess: TProcessoBase);
+procedure TFormProcessEditor.SetupProcess(AProcess: TProcessoBase);
 begin
-  FProcessoDataSet.SetObject(FProcesso);
+  RefreshProcessInputs(FParametrosDef, GetParameterContainer);
 
-  CreateScreenParameters(FParametrosDef, FProcesso, ScrollBoxParametros);
+  CreateOutputs;
+  CreateScreenParameters(FParametrosDef, GetParameterContainer, ScrollBoxParametros);
 
   if FParametrosDef.Count = 0 then
     ScrollBoxParametros.Visible:= False;
 
-  if FOutputsDef.Count = 0 then
+  if FProcesso.Outputs.Count = 0 then
     GroupBoxOutputs.Visible:= False;
+
+  FProcessoDataSet.SetObject(FProcesso);
+  FOutputDataSet.SetObjectList<TOutputParameter>(FProcesso.Outputs);
+end;
+
+procedure TFormProcessEditor.Synchronize;
+begin
+  FProcessoDataSet.Synchronize;
+  FOutputDataSet.Synchronize;
+end;
+
+function TFormProcessEditor.CreateNewProcess(AExpressionEvaluator: IExpressionEvaluator): TProcessoBase;
+begin
+  Result:= TProcessoBase.Create(FExecutor, AExpressionEvaluator);
+end;
+
+procedure TFormProcessEditor.CreateOutputs;
+var
+  FOutput: TOutputParameter;
+begin
+  if not Assigned(FOutputsDef) then
+    Exit;
+
+  for FOutput in OutputsDef do
+    if Processo.Outputs.Param(FOutput.Name) = nil then
+      Processo.Outputs.Add(TOutputParameter.CreateCopy(FOutput));
 end;
 
 function TFormProcessEditor.NewProcess(AExpressionEvaluator: IExpressionEvaluator): TProcessoBase;
 begin
   FExpressionEvaluator:= AExpressionEvaluator;
-  FProcesso:= TProcessoBase.Create(FExecutor, FExpressionEvaluator);
+  FProcesso:= CreateNewProcess(AExpressionEvaluator);
 
-  RefreshProcessInputs(FParametrosDef, FProcesso);
-
-  CopyOutputList(fOutputsDef, FProcesso.Outputs);
-
-  SetupScreen(FProcesso);
+  SetupProcess(FProcesso);
 
   Result:= FProcesso;
 end;
@@ -138,7 +174,7 @@ end;
 
 procedure TFormProcessEditor.BtnOKClick(Sender: TObject);
 begin
-  ScreenParamToProcess(FParametrosDef, FProcesso, ScrollBoxParametros) ;
+  ScreenParamToProcess(FParametrosDef, GetParameterContainer, ScrollBoxParametros) ;
 
   if FProcessoDataSet.State in ([dsEdit,dsInsert]) then
     FProcessoDataSet.Post;
@@ -155,7 +191,11 @@ begin
   FOk:= True;
   FProcessoDao:= TProcessoDao<TProcessoBase>.Create;
   FProcessoDataSet:= TObjectDataSet.Create(Self, FProcessoDao.ModeloBD);
+  FOutputDataSet:= TObjectDataSet.Create(Self, FProcessoDao.OutputDao.ModeloBD);
+  FOutputDataSet.SetMaster(FProcessoDataSet, 'Outputs');
+
   DsProcesso.DataSet:= FProcessoDataSet;
+  DsOutput.DataSet:= FOutputDataSet;
 
   FParametrosDef:= AParametersDef;
   FOutputsDef:= AOutputsDef;
@@ -166,9 +206,13 @@ destructor TFormProcessEditor.Destroy;
 begin
   FProcessoDataSet:= nil;
   DsProcesso.DataSet:= nil;
+  FOutputDataSet:= nil;
+  DsProcesso.DataSet:= nil;
 
   FParametrosDef.Free;
-  FOutputsDef.Free;
+
+  if Assigned(FOutputsDef) then
+    FOutputsDef.Free;
   inherited;
 end;
 
@@ -177,9 +221,7 @@ begin
   FExpressionEvaluator:= AExpressionEvaluator;
   FProcesso:= pProcesso;
 
-  RefreshProcessInputs(FParametrosDef, FProcesso);
-
-  SetupScreen(FProcesso);
+  SetupProcess(FProcesso);
 end;
 
 function TFormProcessEditor.Form: TForm;
@@ -191,6 +233,11 @@ procedure TFormProcessEditor.FormClose(Sender: TObject; var Action: TCloseAction
 begin
   Action:= caFree;
   inherited;
+end;
+
+function TFormProcessEditor.GetParameterContainer: IActivityElementContainer;
+begin
+  Result:= FProcesso;
 end;
 
 class function TFormProcessEditor.GetProcessEmailEditor(AOwner: TComponent): IProcessEditor;

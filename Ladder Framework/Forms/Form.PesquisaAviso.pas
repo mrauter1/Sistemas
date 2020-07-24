@@ -68,6 +68,7 @@ type
     { Public declarations }
     constructor Create(AOwner: TComponent); override;
     class procedure AbrirPesquisa;
+    class function SelectActivity: Integer;
   end;
 
 var
@@ -172,6 +173,24 @@ begin
   if not FActivityDataSet.IsEmpty then
     if Application.MessageBox('Você tem certeza que deseja excluir este aviso?', 'Atenção!',  MB_YESNO) = ID_YES  then
       RemoveAvisoDepencias(FActivityDataSet.GetCurrentModel<TActivity>);
+
+end;
+
+class function TFormPesquisaAviso.SelectActivity: Integer;
+var
+  FFrm: TFormPesquisaAviso;
+begin
+  FFrm:= TFormPesquisaAviso.Create(Application);
+  try
+    FFrm.ShowModal;
+    if FFrm.AtividadeSelecionada <> nil then
+      Result:= FFrm.AtividadeSelecionada.ID
+    else
+      Result:= 0;
+
+  finally
+    FFrm.Free;
+  end;
 
 end;
 

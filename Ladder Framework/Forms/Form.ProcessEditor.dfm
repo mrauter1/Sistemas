@@ -136,22 +136,25 @@ object FormProcessEditor: TFormProcessEditor
         TabOrder = 0
         object cxGridDBTableView1: TcxGridDBTableView
           Navigator.Buttons.CustomButtons = <>
+          DataController.DataSource = DsOutput
           DataController.Summary.DefaultGroupSummaryItems = <>
           DataController.Summary.FooterSummaryItems = <>
           DataController.Summary.SummaryGroups = <>
+          OptionsData.Deleting = False
+          OptionsData.DeletingConfirmation = False
+          OptionsData.Editing = False
+          OptionsData.Inserting = False
           OptionsView.GroupByBox = False
-          object cxGridDBColumn1: TcxGridDBColumn
-            DataBinding.FieldName = 'IDParametro'
-            Width = 57
+          object cxGridDBTableView1ID: TcxGridDBColumn
+            DataBinding.FieldName = 'ID'
           end
-          object cxGridDBColumn2: TcxGridDBColumn
-            Caption = 'Nome'
-            DataBinding.FieldName = 'IDParametro'
-            Width = 187
+          object cxGridDBTableView1Name: TcxGridDBColumn
+            DataBinding.FieldName = 'Name'
+            Width = 173
           end
-          object cxGridDBColumn3: TcxGridDBColumn
-            DataBinding.FieldName = 'Valor'
-            Width = 213
+          object cxGridDBTableView1Expression: TcxGridDBColumn
+            DataBinding.FieldName = 'Expression'
+            Width = 280
           end
         end
         object cxGridLevel1: TcxGridLevel
@@ -205,6 +208,52 @@ object FormProcessEditor: TFormProcessEditor
       Origin = 'ExecutorClass'
       BlobType = ftMemo
       Size = 2147483647
+    end
+  end
+  object DsOutput: TDataSource
+    DataSet = TBOutput
+    Left = 443
+    Top = 282
+  end
+  object TBOutput: TFDMemTable
+    FetchOptions.AssignedValues = [evMode]
+    FetchOptions.Mode = fmAll
+    ResourceOptions.AssignedValues = [rvSilentMode]
+    ResourceOptions.SilentMode = True
+    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
+    UpdateOptions.CheckRequired = False
+    UpdateOptions.AutoCommitUpdates = True
+    Left = 361
+    Top = 282
+    object TBOutputID: TFDAutoIncField
+      FieldName = 'ID'
+      Origin = 'ID'
+      ProviderFlags = [pfInWhere, pfInKey]
+      ReadOnly = True
+    end
+    object TBOutputIDProcesso: TIntegerField
+      FieldName = 'IDProcesso'
+      Origin = 'IDProcesso'
+    end
+    object TBOutputName: TMemoField
+      FieldName = 'Name'
+      Origin = 'Name'
+      BlobType = ftMemo
+      Size = 2147483647
+    end
+    object TBOutputParameterType: TIntegerField
+      FieldName = 'ParameterType'
+      Origin = 'ParameterType'
+    end
+    object TBOutputExpression: TMemoField
+      FieldName = 'Expression'
+      Origin = 'Expression'
+      BlobType = ftMemo
+      Size = 2147483647
+    end
+    object TBOutputIDMaster: TIntegerField
+      FieldName = 'IDMaster'
+      Origin = 'IDMaster'
     end
   end
 end

@@ -56,10 +56,12 @@ type
     function GetConsulta(AProcess: TProcessoBase): TConsulta;
     procedure ExportParamToDataSet(AProcess: TProcessoBase);
     procedure DataSetToExportParam(AProcess: TProcessoBase);
-    procedure RecreateParamertosDef;
+    procedure RecreateParametrosDef;
     procedure SetLabelConsulta;
+    procedure RefreshOutputs;
+    function ExportParams: TParameter;
   protected
-    procedure SetupScreen(AProcess: TProcessoBase); override;
+    procedure SetupProcess(AProcess: TProcessoBase); override;
     { Private declarations }
   public
     { Public declarations }
@@ -85,7 +87,7 @@ uses
   Form.SelecionaConsulta, Ladder.ServiceLocator, System.Generics.Collections, Ladder.Executor.ConsultaPersonalizada,
   Ladder.Utils, Utils, GerenciadorUtils;
 
-procedure TFormConsultaEditor.SetupScreen(AProcess: TProcessoBase);
+procedure TFormConsultaEditor.SetupProcess(AProcess: TProcessoBase);
 const
   cSqlVisualizacao = 'SELECT DESCRICAO, DESCRICAO AS DESC2 FROM CONS.VISUALIZACOES WHERE CONSULTA = %d';
 begin
@@ -109,7 +111,7 @@ begin
   if not Assigned(FConsulta) then
     raise Exception.Create(Format('TFormCadastroProcessoConsulta.NewProcess: Consulta cod.: %d não encontrada.', [FIDConsulta]));
 
-  RecreateParamertosDef;
+  RecreateParametrosDef;
 
   Result:= inherited NewProcess(AExpressionEvaluator);
 
@@ -117,6 +119,7 @@ begin
   Result.Description:= GetNomeConsulta(FIDConsulta);
 
   Result.Inputs.Add(TParameter.Create('IDConsulta', tbValue, IntToStr(FIDConsulta)));
+  Synchronize;
 end;
 
 procedure TFormConsultaEditor.SetLabelConsulta;
@@ -136,7 +139,7 @@ begin
   if not Assigned(FConsulta) then
     raise Exception.Create(Format('TFormCadastroProcessoConsulta.NewProcess: Consulta cod.: %d não encontrada.', [pProcesso.Inputs.ParamValue('IDConsulta', 0)]));
 
-  RecreateParamertosDef;
+  RecreateParametrosDef;
 
   inherited EditProcess(pProcesso, AExpressionEvaluator);
 end;
@@ -161,17 +164,35 @@ begin
   end;
 end;
 
+function TFormConsultaEditor.ExportParams: TParameter;
+begin
+  Result:= Processo.Inputs.Param('Export');
+end;
+
+procedure TFormConsultaEditor.RefreshOutputs;
+var
+  FParam: TParameter;
+begin
+  CreateOutputs;
+  if ExportParams = nil then
+    Exit;
+
+  for FParam in ExportParams.Parameters do
+    if Processo.Outputs.Param(FParam.Name) = nil then
+      Processo.Outputs.Add(TOutputParameter.Create(FParam.Name, tbAny, ''));
+
+  Synchronize;
+end;
+
 procedure TFormConsultaEditor.DataSetToExportParam(AProcess: TProcessoBase);
 var
-  FExport, FParam: TParameter;
+  FParam: TParameter;
 begin
-  FExport:= AProcess.Inputs.Param('Export');
-  if not Assigned(FExport) then
-  begin
-    FExport:= TParameter.Create('Export', tbAny, '');
-    AProcess.Inputs.Add(FExport);
-  end;
-  FExport.Parameters.Clear;
+  if ExportParams=nil then
+    AProcess.Inputs.Add(TParameter.Create('Export', tbAny, ''));
+
+  Assert(ExportParams<>nil, 'TFormConsultaEditor.DataSetToExportParam: ExportParams must be assigned.');
+  ExportParams.Parameters.Clear;
 
   TBExport.First;
   while not TBExport.Eof do
@@ -181,7 +202,8 @@ begin
     FParam.Parameters.Add(TParameter.Create('NomeArquivo', tbAny, TBExportNomeArquivo.AsString));
     FParam.Parameters.Add(TParameter.Create('TipoVisualizacao', tbAny, TBExportTipoVisualizacao.AsString));
 
-    FExport.Parameters.Add(FParam);
+    ExportParams.Parameters.Add(FParam);
+
     TBExport.Next;
   end;
 end;
@@ -207,7 +229,7 @@ begin
   end;
 end;
 
-procedure TFormConsultaEditor.RecreateParamertosDef;
+procedure TFormConsultaEditor.RecreateParametrosDef;
 var
   FParametro: TParametroCon;
 begin
@@ -291,12 +313,17 @@ end;
 procedure TFormConsultaEditor.BtnOKClick(Sender: TObject);
 begin
   DataSetToExportParam(Processo);
+  RefreshOutputs;
   inherited;
 end;
 
 constructor TFormConsultaEditor.Create(AOwner: TComponent);
+var
+  FOutputsDef: TOutputList;
 begin
-  inherited Create(AOwner, TObjectList<TParametroCon>.Create, TOutputList.Create, ActivityManager.GetExecutor(TExecutorConsultaPersonalizada));
+  FOutputsDef:= TOutputList.Create;
+  FOutputsDef.Add(TOutputParameter.Create('Data', tbAny, ''));
+  inherited Create(AOwner, TObjectList<TParametroCon>.Create, FOutputsDef, ActivityManager.GetExecutor(TExecutorConsultaPersonalizada));
 //  ArquivosExport.Active:= True;
 
   ConsultaDao:= TConsultaDao<TConsulta>.Create;

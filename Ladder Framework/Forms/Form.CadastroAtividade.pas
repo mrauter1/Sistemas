@@ -86,7 +86,6 @@ type
     TBInputsIDMaster: TIntegerField;
     cxGridParametrosDBTableView1ID: TcxGridDBColumn;
     cxGridParametrosDBTableView1Name: TcxGridDBColumn;
-    cxGridParametrosDBTableView1ParameterType: TcxGridDBColumn;
     cxGridParametrosDBTableView1Expression: TcxGridDBColumn;
     TBOutputs: TFDMemTable;
     TBOutputsID: TFDAutoIncField;
@@ -97,7 +96,6 @@ type
     TBOutputsIDMaster: TIntegerField;
     cxGridDBTableView1ID: TcxGridDBColumn;
     cxGridDBTableView1Name: TcxGridDBColumn;
-    cxGridDBTableView1ParameterType: TcxGridDBColumn;
     cxGridDBTableView1Expression: TcxGridDBColumn;
     Splitter1: TSplitter;
     Splitter2: TSplitter;
@@ -119,7 +117,7 @@ type
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
   private
     FActivity: TActivity;
-    FActivityDao: IDaoGeneric<TActivity>;
+    FActivityDao: IProcessoDao<TActivity>;
 
     FActivityDataSet: TObjectDataSet;
     FProcessoDataSet: TObjectDataSet;
@@ -269,8 +267,8 @@ begin
   FActivityDataSet.BeforePost:= ActivityBeforePost;
 
   FProcessoDataSet:= TObjectDataSet.Create(Self, ProcessoDao.ModeloBD);
-  FInputDataSet:= TObjectDataSet.Create(Self, FActivityDao.ChildDaoByPropName('Inputs').ModeloBD);
-  FOutputDataSet:= TObjectDataSet.Create(Self, FActivityDao.ChildDaoByPropName('Outputs').ModeloBD);
+  FInputDataSet:= TObjectDataSet.Create(Self, FActivityDao.InputDao.ModeloBD);
+  FOutputDataSet:= TObjectDataSet.Create(Self, FActivityDao.OutputDao.ModeloBD);
 
   FProcessoDataSet.SetMaster(FActivityDataSet, 'Processos');
   FInputDataSet.SetMaster(FActivityDataSet, 'Inputs');
@@ -279,6 +277,8 @@ begin
   DsAtividade.DataSet:= FActivityDataSet;
   DsProcessos.DataSet:= FProcessoDataSet;
   DsInputs.DataSet:= FInputDataSet;
+  DsOutputs.DataSet:= FOutputDataSet;
+
 end;
 
 destructor TFormCadastroAtividade.Destroy;

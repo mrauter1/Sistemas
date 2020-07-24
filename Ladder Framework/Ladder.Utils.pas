@@ -3,13 +3,14 @@ unit Ladder.Utils;
 interface
 
 uses
-  RTTI, SynCommons;
+  RTTI, SynCommons, SysUtils;
 
 function LadderVarIsList(const pValue: Variant): Boolean;
 function LadderVarIsIso8601(const pValue: Variant): Boolean;
 function LadderVarIsDateTime(const pValue: Variant): Boolean;
 function LadderVarToDateTime(const pValue: Variant): TDateTime;
 function LadderDateToStr(pValue: Variant; pQuote: Boolean=False): String;
+function LadderVarToStr(pValue: Variant; pDefault: String = ''): String;
 
 function JoinList(const pValue: Variant; const pSeparator: String): String;
 
@@ -27,11 +28,12 @@ function DoubleQuote(const AStr: String): String;
 
 var
   SynAnsiConvert: TSynAnsiConvert;
+  LadderFormatSettings: TFormatSettings;
 
 implementation
 
 uses
-  Variants, Spring.Reflection, StrUtils, SysUtils;
+  Variants, Spring.Reflection, StrUtils;
 
 function StrToLadderArray(const AStr: String; ASeparator: String): Variant;
 var
@@ -150,6 +152,16 @@ begin
   end;
 end;
 
+function LadderVarToStr(pValue: Variant; pDefault: String = ''): String;
+begin
+  if LadderVarIsDateTime(pValue) then
+    Result:= LadderDateToStr(pValue, True)
+  else if VarIsFloat(pValue) then
+    Result:= FloatToStr(pValue, LadderFormatSettings)
+  else
+    Result:= VarToStrDef(pValue, '');
+end;
+
 function InheritFromGenericOfType(classType: TRttiType; const genericType: string): Boolean;
 var
   baseType: TRttiType;
@@ -179,5 +191,7 @@ end;
 
 initialization
   SynAnsiConvert:= TSynAnsiConvert.Engine(0); // Windows current code page;
+  LadderFormatSettings:= TFormatSettings.Create();
+  LadderFormatSettings.DecimalSeparator:= '.';
 
 end.

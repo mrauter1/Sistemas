@@ -161,13 +161,21 @@
             <Form>FormProcessEditorBase</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="Form.ConsultaEditor.pas">
+        <DCCReference Include="..\..\Forms\Form.ConsultaEditor.pas">
             <Form>FormConsultaEditor</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\..\Ladder.Parser.pas"/>
         <DCCReference Include="..\..\Ladder.SyntaxChecker.pas"/>
         <DCCReference Include="..\..\Ladder.ExpressionEvaluator.pas"/>
+        <DCCReference Include="..\Ladder.Activity.Scheduler.pas"/>
+        <DCCReference Include="..\..\Library\maxCron\maxCron.pas"/>
+        <DCCReference Include="Test.Scheduler.pas"/>
+        <DCCReference Include="..\Executor\Ladder.Executor.Activity.pas"/>
+        <DCCReference Include="..\..\Forms\Form.ProcessActivityEditor.pas">
+            <Form>FormProcessActivityEditor</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

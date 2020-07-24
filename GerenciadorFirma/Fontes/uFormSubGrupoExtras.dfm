@@ -2,7 +2,7 @@ object FormSubGrupoExtras: TFormSubGrupoExtras
   Left = 0
   Top = 0
   Caption = 'Informa'#231#245'es da Etiqueta por Grupo de Produto'
-  ClientHeight = 538
+  ClientHeight = 558
   ClientWidth = 785
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -18,10 +18,12 @@ object FormSubGrupoExtras: TFormSubGrupoExtras
     Left = 0
     Top = 0
     Width = 785
-    Height = 513
+    Height = 533
     Align = alClient
     TabOrder = 0
+    ExplicitHeight = 513
     object cxGridDadosGrupoDBTableView: TcxGridDBTableView
+      PopupMenu = PopupMenu1
       Navigator.Buttons.CustomButtons = <>
       Navigator.Buttons.PriorPage.Enabled = False
       Navigator.Buttons.PriorPage.Visible = False
@@ -84,6 +86,14 @@ object FormSubGrupoExtras: TFormSubGrupoExtras
         DataBinding.FieldName = 'DiasParaEntrega'
         Width = 81
       end
+      object cxGridDadosGrupoDBTableViewDensidade: TcxGridDBColumn
+        DataBinding.FieldName = 'Densidade'
+        Options.Editing = False
+      end
+      object cxGridDadosGrupoDBTableViewDescricaoOnu: TcxGridDBColumn
+        Caption = 'Descri'#231#227'o Onu'
+        DataBinding.FieldName = 'DescricaoOnu'
+      end
     end
     object cxGridDadosGrupoLevel: TcxGridLevel
       GridView = cxGridDadosGrupoDBTableView
@@ -91,12 +101,13 @@ object FormSubGrupoExtras: TFormSubGrupoExtras
   end
   object DBNavigator1: TDBNavigator
     Left = 0
-    Top = 513
+    Top = 533
     Width = 785
     Height = 25
     VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbEdit, nbPost, nbCancel]
     Align = alBottom
     TabOrder = 1
+    ExplicitTop = 513
   end
   object DsGrupoSubExtras: TDataSource
     DataSet = QryGrupoSubExtras
@@ -167,6 +178,25 @@ object FormSubGrupoExtras: TFormSubGrupoExtras
       Origin = 'DescricaoRisco'
       BlobType = ftMemo
       Size = 2147483647
+    end
+    object QryGrupoSubExtrasDensidade: TBCDField
+      FieldName = 'Densidade'
+      Origin = 'Densidade'
+      Precision = 16
+    end
+    object QryGrupoSubExtrasDescricaoOnu: TMemoField
+      FieldName = 'DescricaoOnu'
+      Origin = 'DescricaoOnu'
+      BlobType = ftMemo
+      Size = 2147483647
+    end
+  end
+  object PopupMenu1: TPopupMenu
+    Left = 304
+    Top = 80
+    object AtualizarDescriodosProdutosnoSidicom1: TMenuItem
+      Caption = 'Atualizar Descri'#231#227'o dos Produtos no Sidicom'
+      OnClick = AtualizarDescriodosProdutosnoSidicom1Click
     end
   end
 end

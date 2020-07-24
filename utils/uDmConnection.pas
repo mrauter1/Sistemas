@@ -9,7 +9,7 @@ uses
   Variants, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error,
   FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
   FireDAC.Phys, FireDAC.Phys.FB, FireDAC.Phys.FBDef, FireDAC.ConsoleUI.Wait,
-  FireDAC.Comp.Client, Utils, System.Rtti, uAppConfig, Ladder.Activity.Parser,
+  FireDAC.Comp.Client, Utils, System.Rtti, uAppConfig, Ladder.Parser,
   FireDAC.VCLUI.Wait;
 
 type

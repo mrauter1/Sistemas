@@ -240,7 +240,7 @@ procedure PopulaComboBoxQry(pComboBox: TComboBox; pSql: String; ValorPadrao: var
 
 implementation
 
-uses Utils, System.UITypes, jpeg, Ladder.Activity.LadderVarToSql, Ladder.ORM.DaoUtils, Ladder.Activity.Parser, Ladder.Utils;
+uses Utils, System.UITypes, jpeg, Ladder.Activity.LadderVarToSql, Ladder.ORM.DaoUtils, Ladder.Parser, Ladder.Utils;
 
 {$R *.dfm}
 

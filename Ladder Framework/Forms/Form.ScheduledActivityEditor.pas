@@ -1,4 +1,5 @@
-unit Form.CadastroAtividade;
+
+unit Form.ScheduledActivityEditor;
 
 interface
 
@@ -28,11 +29,11 @@ uses
   FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS,
   FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
   FireDAC.Comp.DataSet, FireDAC.Comp.Client, uConSqlServer, Ladder.Activity.Classes,
-  Ladder.ORM.Dao, Ladder.Activity.Classes.Dao,
-  Ladder.ORM.ObjectDataSet, Ladder.Activity.Manager;
+  Ladder.ORM.Dao, Ladder.Activity.Scheduler.Dao, Ladder.Activity.Scheduler,
+  Ladder.ORM.ObjectDataSet, Ladder.Activity.Manager, Vcl.ComCtrls;
 
 type
-  TFormCadastroAtividade = class(TForm)
+  TFormScheduledActivityEditor = class(TForm)
     PanelTop: TPanel;
     PanelCentro: TPanel;
     DBEditNomeAtividade: TDBEdit;
@@ -53,15 +54,6 @@ type
     DsProcessos: TDataSource;
     DBEditDescricao: TDBEdit;
     Label3: TLabel;
-    GroupBoxInputs: TGroupBox;
-    cxGridParametros: TcxGrid;
-    cxGridParametrosDBTableView1: TcxGridDBTableView;
-    cxGridParametrosLevel1: TcxGridLevel;
-    GroupBox1: TGroupBox;
-    cxGrid1: TcxGrid;
-    cxGridDBTableView1: TcxGridDBTableView;
-    cxGridLevel1: TcxGridLevel;
-    DsOutputs: TDataSource;
     TbProcessos: TFDMemTable;
     TbProcessosID: TIntegerField;
     TbProcessosIDActivity: TIntegerField;
@@ -69,40 +61,27 @@ type
     TbProcessosDescription: TMemoField;
     TbProcessosClassName: TMemoField;
     TbProcessosExecutorClass: TMemoField;
-    TbActivity: TFDMemTable;
-    TbActivityIDActivity: TIntegerField;
-    TbActivityName: TMemoField;
-    TbActivityDescription: TMemoField;
-    TbActivityClassName: TMemoField;
-    TbActivityExecutorClass: TMemoField;
-    TbActivityID: TIntegerField;
-    TBInputs: TFDMemTable;
-    DsInputs: TDataSource;
-    TBInputsID: TFDAutoIncField;
-    TBInputsIDProcesso: TIntegerField;
-    TBInputsName: TMemoField;
-    TBInputsParameterType: TIntegerField;
-    TBInputsExpression: TMemoField;
-    TBInputsIDMaster: TIntegerField;
-    cxGridParametrosDBTableView1ID: TcxGridDBColumn;
-    cxGridParametrosDBTableView1Name: TcxGridDBColumn;
-    cxGridParametrosDBTableView1Expression: TcxGridDBColumn;
-    TBOutputs: TFDMemTable;
-    TBOutputsID: TFDAutoIncField;
-    TBOutputsIDProcesso: TIntegerField;
-    TBOutputsName: TMemoField;
-    TBOutputsParameterType: TIntegerField;
-    TBOutputsExpression: TMemoField;
-    TBOutputsIDMaster: TIntegerField;
-    cxGridDBTableView1ID: TcxGridDBColumn;
-    cxGridDBTableView1Name: TcxGridDBColumn;
-    cxGridDBTableView1Expression: TcxGridDBColumn;
-    Splitter1: TSplitter;
-    Splitter2: TSplitter;
+    TbScheduledActivity: TFDMemTable;
+    TbScheduledActivityIDActivity: TIntegerField;
+    TbScheduledActivityName: TMemoField;
+    TbScheduledActivityDescription: TMemoField;
+    TbScheduledActivityClassName: TMemoField;
+    TbScheduledActivityExecutorClass: TMemoField;
+    TbScheduledActivityID: TIntegerField;
     TbProcessosExecOrder: TIntegerField;
     BtnMoveUp: TBitBtn;
     BtnMoveDown: TBitBtn;
     BtnExecutar: TBitBtn;
+    DBEditCronExpression: TDBEdit;
+    Label4: TLabel;
+    Label5: TLabel;
+    Label6: TLabel;
+    DBEditLastExecutedTime: TDBEdit;
+    DBEditNextExecutionTime: TDBEdit;
+    TbScheduledActivityCronExpression: TMemoField;
+    TbScheduledActivityLastExecutionTime: TSQLTimeStampField;
+    TbScheduledActivityNextExecutionTime: TSQLTimeStampField;
+    TbScheduledActivityExecuting: TBooleanField;
     procedure BtnSalvarClick(Sender: TObject);
     procedure BtnFecharClick(Sender: TObject);
     procedure BtnAddProcessoClick(Sender: TObject);
@@ -116,29 +95,27 @@ type
     procedure BtnExecutarClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
   private
-    FActivity: TActivity;
-    FActivityDao: IProcessoDao<TActivity>;
+    FScheduledActivity: TScheduledActivity;
+    FScheduledActivityDao: IScheduledActivityDao<TScheduledActivity>;
 
-    FActivityDataSet: TObjectDataSet;
+    FScheduledActivityDataSet: TObjectDataSet;
     FProcessoDataSet: TObjectDataSet;
-    FInputDataSet: TObjectDataSet;
-    FOutputDataSet: TObjectDataSet;
     procedure RemoverProcesso;
     procedure ConfigurarProcesso;
     function ProcessoSelecionado: TProcessoBase;
     function ProcessoDao: IDaoBase;
 
-    function NovaAtividade: TActivity;
+    function NewSchedule: TScheduledActivity;
     function Manager: TActivityManager;
     procedure ActivityBeforePost(DataSet: TDataSet);
     { Private declarations }
   public
     constructor Create(AOWner: TComponent); override;
     destructor Destroy; override;
-    procedure AbrirConfig(pAtividade: TActivity);
+    procedure OpenSchedule(pAtividade: TScheduledActivity);
 
-    class procedure _AbrirConfigAviso(pAtividade: TActivity);
-    class function _NovaAtividade: TActivity;
+    class procedure _OpenSchedule(pAtividade: TScheduledActivity);
+    class function _NewSchedule: TScheduledActivity;
     { Public declarations }
   end;
 
@@ -149,71 +126,71 @@ implementation
 uses
   Form.SelecionaConsulta, Ladder.ServiceLocator, Form.NovoProcesso;
 
-{ TuFormCadastrarAvisosAutomaticos }
+{ TFormActivityEditor }
 
-procedure TFormCadastroAtividade.AbrirConfig(pAtividade: TActivity);
+procedure TFormScheduledActivityEditor.OpenSchedule(pAtividade: TScheduledActivity);
 begin
-  FActivity:= pAtividade;
+  FScheduledActivity:= pAtividade;
 
-  FActivityDataSet.SetObject(FActivity);
+  FScheduledActivityDataSet.SetObject(FScheduledActivity);
 
-  FActivity.ReorderProcesses; // If the processes have no explicit order already, give them based on their Index;
+  FScheduledActivity.ReorderProcesses; // If the processes have no explicit order already, give them based on their Index;
 //  FProcessoDataSet.SetObjectList<TProcessoBase>(FActivity.Processos);
 
   ShowModal;
 end;
 
-function TFormCadastroAtividade.NovaAtividade: TActivity;
+function TFormScheduledActivityEditor.NewSchedule: TScheduledActivity;
 begin
-  FActivity:= TActivity.Create(TFrwServiceLocator.Factory.NewExpressionEvaluator);
-  FActivityDataSet.SetObject(FActivity);
+  FScheduledActivity:= TScheduledActivity.Create(TFrwServiceLocator.Factory.NewExpressionEvaluator);
+  FScheduledActivityDataSet.SetObject(FScheduledActivity);
 //  FProcessoDataSet.SetObjectList<TProcessoBase>(FActivity.Processos);
 
   ShowModal;
-  if FActivity.ID = 0 then
+  if FScheduledActivity.ID = 0 then
   begin
-    FActivity.Free;
+    FScheduledActivity.Free;
     Result:= nil
   end
  else
-    Result:= FActivity;
+    Result:= FScheduledActivity;
 end;
 
-class procedure TFormCadastroAtividade._AbrirConfigAviso(pAtividade: TActivity);
+class procedure TFormScheduledActivityEditor._OpenSchedule(pAtividade: TScheduledActivity);
 var
-  FFrm: TFormCadastroAtividade;
+  FFrm: TFormScheduledActivityEditor;
 begin
-  FFrm:= TFormCadastroAtividade.Create(Application);
+  FFrm:= TFormScheduledActivityEditor.Create(Application);
   try
-    FFrm.AbrirConfig(pAtividade);
+    FFrm.OpenSchedule(pAtividade);
   finally
     FFrm.Free;
   end;
 end;
 
-class function TFormCadastroAtividade._NovaAtividade: TActivity;
+class function TFormScheduledActivityEditor._NewSchedule: TScheduledActivity;
 var
-  FFrm: TFormCadastroAtividade;
+  FFrm: TFormScheduledActivityEditor;
 begin
-  FFrm:= TFormCadastroAtividade.Create(Application);
+  FFrm:= TFormScheduledActivityEditor.Create(Application);
   try
-    Result:= FFrm.NovaAtividade;
+    Result:= FFrm.NewSchedule;
   finally
     FFrm.Free;
   end;
 end;
 
-procedure TFormCadastroAtividade.BtnConfiguraProcessoClick(Sender: TObject);
+procedure TFormScheduledActivityEditor.BtnConfiguraProcessoClick(Sender: TObject);
 begin
   ConfigurarProcesso;
 end;
 
-procedure TFormCadastroAtividade.BtnExecutarClick(Sender: TObject);
+procedure TFormScheduledActivityEditor.BtnExecutarClick(Sender: TObject);
 begin
-  FActivity.Executar;
+  FScheduledActivity.Executar;
 end;
 
-procedure TFormCadastroAtividade.BtnAddProcessoClick(Sender: TObject);
+procedure TFormScheduledActivityEditor.BtnAddProcessoClick(Sender: TObject);
 var
   FIDConsulta: Integer;
   FProcesso: TProcessoBase;
@@ -223,65 +200,58 @@ begin
   if FExecutor = '' then
     Exit;
 
-  FProcesso:= Manager.NewProcess(FExecutor, FActivity.ExpressionEvaluator);
+  FProcesso:= Manager.NewProcess(FExecutor, FScheduledActivity.ExpressionEvaluator);
 
   if Assigned(FProcesso) then
   begin
-    FActivity.AddProcess(FProcesso);
+    FScheduledActivity.AddProcess(FProcesso);
     FProcessoDataSet.Synchronize;
   end;
 end;
 
-function TFormCadastroAtividade.ProcessoSelecionado: TProcessoBase;
+function TFormScheduledActivityEditor.ProcessoSelecionado: TProcessoBase;
 begin
   Result:= FProcessoDataSet.GetCurrentModel<TProcessoBase>;
 end;
 
-function TFormCadastroAtividade.Manager: TActivityManager;
+function TFormScheduledActivityEditor.Manager: TActivityManager;
 begin
   Result:= TFrwServiceLocator.Context.ActivityManager;
 end;
 
-procedure TFormCadastroAtividade.ConfigurarProcesso;
+procedure TFormScheduledActivityEditor.ConfigurarProcesso;
 var
   FProcesso: TProcessoBase;
 begin
   if ProcessoSelecionado = nil then
     Exit;
 
-  Manager.EditProcess(ProcessoSelecionado, FActivity.ExpressionEvaluator);
+  Manager.EditProcess(ProcessoSelecionado, FScheduledActivity.ExpressionEvaluator);
 
   FProcessoDataSet.Synchronize;
 end;
 
-function TFormCadastroAtividade.ProcessoDao: IDaoBase;
+function TFormScheduledActivityEditor.ProcessoDao: IDaoBase;
 begin
-  Result:= FActivityDao.ChildDaoByPropName('Processos');
+  Result:= FScheduledActivityDao.ChildDaoByPropName('Processos');
 end;
 
-constructor TFormCadastroAtividade.Create(AOWner: TComponent);
+constructor TFormScheduledActivityEditor.Create(AOWner: TComponent);
 begin
   inherited;
-  FActivityDao:= TActivityDao<TActivity>.Create;
-  FActivityDataSet:= TObjectDataSet.Create(Self, FActivityDao.ModeloBD);
-  FActivityDataSet.BeforePost:= ActivityBeforePost;
+  FScheduledActivityDao:= TScheduledActivityDao<TScheduledActivity>.Create;
+  FScheduledActivityDataSet:= TObjectDataSet.Create(Self, TScheduledActivity);
+  FScheduledActivityDataSet.BeforePost:= ActivityBeforePost;
 
   FProcessoDataSet:= TObjectDataSet.Create(Self, ProcessoDao.ModeloBD);
-  FInputDataSet:= TObjectDataSet.Create(Self, FActivityDao.InputDao.ModeloBD);
-  FOutputDataSet:= TObjectDataSet.Create(Self, FActivityDao.OutputDao.ModeloBD);
 
-  FProcessoDataSet.SetMaster(FActivityDataSet, 'Processos');
-  FInputDataSet.SetMaster(FActivityDataSet, 'Inputs');
-  FOutputDataSet.SetMaster(FActivityDataSet, 'Outputs');
+  FProcessoDataSet.SetMaster(FScheduledActivityDataSet, 'Processos');
 
-  DsAtividade.DataSet:= FActivityDataSet;
+  DsAtividade.DataSet:= FScheduledActivityDataSet;
   DsProcessos.DataSet:= FProcessoDataSet;
-  DsInputs.DataSet:= FInputDataSet;
-  DsOutputs.DataSet:= FOutputDataSet;
-
 end;
 
-destructor TFormCadastroAtividade.Destroy;
+destructor TFormScheduledActivityEditor.Destroy;
 begin
   DsAtividade.DataSet:= nil;
   DsProcessos.DataSet:= nil;
@@ -289,65 +259,65 @@ begin
   inherited;
 end;
 
-procedure TFormCadastroAtividade.FieldGetText(Sender: TField;
+procedure TFormScheduledActivityEditor.FieldGetText(Sender: TField;
   var Text: string; DisplayText: Boolean);
 begin
   Text:= Sender.AsString;
 end;
 
-procedure TFormCadastroAtividade.FieldSetText(Sender: TField;
+procedure TFormScheduledActivityEditor.FieldSetText(Sender: TField;
   const Text: string);
 begin
   Sender.AsString:= Text;
 end;
 
-procedure TFormCadastroAtividade.FormCloseQuery(Sender: TObject;
+procedure TFormScheduledActivityEditor.FormCloseQuery(Sender: TObject;
   var CanClose: Boolean);
 begin
   CanClose:= True;
-  if FActivityDataSet.Modified then
+  if FScheduledActivityDataSet.Modified then
     if Application.MessageBox('Existem modificações não salvas, deseja sair sem salvar?', 'Atenção!',  MB_YESNO) = ID_NO then
       CanClose:= False;
 end;
 
-procedure TFormCadastroAtividade.BtnFecharClick(Sender: TObject);
+procedure TFormScheduledActivityEditor.BtnFecharClick(Sender: TObject);
 begin
   Close;
 end;
 
-procedure TFormCadastroAtividade.BtnMoveDownClick(Sender: TObject);
+procedure TFormScheduledActivityEditor.BtnMoveDownClick(Sender: TObject);
 var
   FCurIndex: Integer;
 begin
   if ProcessoSelecionado=nil then
     Exit;
 
-  FCurIndex:= FActivity.Processos.IndexOf(ProcessoSelecionado);
-  if (FCurIndex <= -1) or (FCurIndex >= FActivity.Processos.Count-1) then
+  FCurIndex:= FScheduledActivity.Processos.IndexOf(ProcessoSelecionado);
+  if (FCurIndex <= -1) or (FCurIndex >= FScheduledActivity.Processos.Count-1) then
     Exit;
 
-  ProcessoSelecionado.ExecOrder:= FActivity.Processos[FCurIndex+1].ExecOrder;
-  FActivity.ReorderProcesses(ProcessoSelecionado);
+  ProcessoSelecionado.ExecOrder:= FScheduledActivity.Processos[FCurIndex+1].ExecOrder;
+  FScheduledActivity.ReorderProcesses(ProcessoSelecionado);
   FProcessoDataSet.Synchronize(ProcessoSelecionado);
 end;
 
-procedure TFormCadastroAtividade.BtnMoveUpClick(Sender: TObject);
+procedure TFormScheduledActivityEditor.BtnMoveUpClick(Sender: TObject);
 var
   FCurIndex: Integer;
 begin
   if ProcessoSelecionado=nil then
     Exit;
 
-  FCurIndex:= FActivity.Processos.IndexOf(ProcessoSelecionado);
+  FCurIndex:= FScheduledActivity.Processos.IndexOf(ProcessoSelecionado);
   if FCurIndex <= 0 then
     Exit;
 
-  ProcessoSelecionado.ExecOrder:= FActivity.Processos[FCurIndex-1].ExecOrder;
-  FActivity.ReorderProcesses(ProcessoSelecionado);
+  ProcessoSelecionado.ExecOrder:= FScheduledActivity.Processos[FCurIndex-1].ExecOrder;
+  FScheduledActivity.ReorderProcesses(ProcessoSelecionado);
   FProcessoDataSet.Synchronize(ProcessoSelecionado);
 end;
 
-procedure TFormCadastroAtividade.RemoverProcesso;
+procedure TFormScheduledActivityEditor.RemoverProcesso;
 begin
   if ProcessoSelecionado = nil then
     Exit;
@@ -355,15 +325,15 @@ begin
   if Application.MessageBox('Você tem certeza que deseja excluir este proesso?', 'Atenção!',  MB_YESNO) = ID_YES  then
   begin
     if ProcessoSelecionado.ID > 0 then
-      FActivityDao.DeleteChild(FActivity, ProcessoSelecionado);
+      FScheduledActivityDao.DeleteChild(FScheduledActivity, ProcessoSelecionado);
 
-    FActivity.Processos.Remove(ProcessoSelecionado);
-    FActivity.ReorderProcesses;
+    FScheduledActivity.Processos.Remove(ProcessoSelecionado);
+    FScheduledActivity.ReorderProcesses;
     FProcessoDataSet.Synchronize;
   end;
 end;
 
-procedure TFormCadastroAtividade.ActivityBeforePost(DataSet: TDataSet);
+procedure TFormScheduledActivityEditor.ActivityBeforePost(DataSet: TDataSet);
 const
   cMsg = 'Atividade precisa ter um nome válido.';
 begin
@@ -374,20 +344,20 @@ begin
   end;
 end;
 
-procedure TFormCadastroAtividade.BtnRemoveProcessoClick(Sender: TObject);
+procedure TFormScheduledActivityEditor.BtnRemoveProcessoClick(Sender: TObject);
 begin
   RemoverProcesso;
 end;
 
-procedure TFormCadastroAtividade.BtnSalvarClick(Sender: TObject);
+procedure TFormScheduledActivityEditor.BtnSalvarClick(Sender: TObject);
 begin
-  if FActivityDataSet.State in ([dsEdit, dsInsert]) then
-    FActivityDataSet.Post;
+  if FScheduledActivityDataSet.State in ([dsEdit, dsInsert]) then
+    FScheduledActivityDataSet.Post;
 
-  FActivity.CheckValidity(FActivity.ExpressionEvaluator);
+  FScheduledActivity.CheckValidity(FScheduledActivity.ExpressionEvaluator);
 
-  FActivityDao.Save(FActivity);
-  FActivityDataSet.Synchronize;
+  FScheduledActivityDao.Save(FScheduledActivity);
+  FScheduledActivityDataSet.Synchronize;
 end;
 
 end.

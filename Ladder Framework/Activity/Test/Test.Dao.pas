@@ -15,9 +15,30 @@ uses
   TestFramework, Ladder.ServiceLocator, System.Contnrs, Ladder.ORM.Classes,
   Generics.Collections, Ladder.ORM.ModeloBD, Ladder.ORM.QueryBuilder, RTTI,
   Ladder.Messages, Ladder.ORM.Dao, Data.DB, Ladder.ORM.DaoUtils, Test.MockClasses,
-  SysUtils;
+  SysUtils, SynDB;
 
 type
+  IDaoComposite = interface(IDaoGeneric<TTesteComposite>)
+    function GetCompositeDao: IDaoGeneric<TTesteComposite>;
+  end;
+
+  TTesteDao<T: TTeste> = class(TDaoGeneric<T>)
+  private
+    FDaoTestChild: IDaoGeneric<TTestChild>;
+  public
+    constructor Create;
+  end;
+
+  TDaoComposite = class(TTesteDao<TTesteComposite>, IDaoComposite)
+  private
+    FCompositeDao: IDaoGeneric<TTesteComposite>;
+  protected
+    function NewObject(pDBRows: ISqlDBRows): TObject;
+  public
+    constructor Create;
+    function GetCompositeDao: IDaoGeneric<TTesteComposite>;
+  end;
+
   // Test methods for class TDaoBase
   TRecursiveObject = class
   public
@@ -41,12 +62,14 @@ type
     procedure TestInsertChild;
     procedure TestRecursiveObject;
   end;
+
   // Test methods for class TDaoGeneric
 
   TestTDaoGeneric = class(TTestCase)
   strict private
     FDaoGeneric: IDaoGeneric<TTeste>;
-    FDaoTestChild: IDaoGeneric<TTestChild>;
+    FDaoTestChild: IDaoBase;
+    FDaoComposite: IDaoComposite;
   public
     procedure SetUp; override;
     procedure TearDown; override;
@@ -58,7 +81,10 @@ type
     procedure TestInsert;
     procedure TestUpdate;
     procedure TestDelete;
-    procedure TestDelete1;
+    procedure TestCompositeInsert;
+    procedure TestCompositeUpdate;
+    procedure TestCompositeDelete;
+
   end;
   // Test methods for class TNullDao
 
@@ -78,7 +104,7 @@ type
 implementation
 
 uses
-  DateUtils;
+  DateUtils, Math;
 
 procedure TestTDaoBase.SetUp;
 var
@@ -161,11 +187,9 @@ end;
 
 procedure TestTDaoGeneric.SetUp;
 begin
-  FDaoGeneric := TDaoGeneric<TTeste>.Create('Teste', 'ID');
-  with FDaoGeneric.ModeloBD do UpdateOptions:= UpdateOptions + [DeleteMissingChilds];
-
-  FDaoTestChild := TDaoGeneric<TTestChild>.Create('TestChild', 'ID');
-  FDaoGeneric.AddChildDao('Childs', 'ID', 'IDPAI', FDaoTestChild);
+  FDaoGeneric:= TTesteDao<TTeste>.Create;
+  FDaoTestChild:= FDaoGeneric.ChildDaoByPropName('Childs');
+  FDaoComposite:= TDaoComposite.Create;
 end;
 
 procedure TestTDaoGeneric.TearDown;
@@ -256,6 +280,60 @@ begin
   FTeste.Free;
 end;
 
+procedure TestTDaoGeneric.TestCompositeDelete;
+var
+  pObjeto: TTesteComposite;
+  FID, FIDChild: Integer;
+begin
+  pObjeto:= TTesteComposite.Create('teste', now, 123, 1.25, False);
+  pObjeto.Childs.Add(TTestChild.Create(222));
+  FDaoComposite.Insert(pObjeto);
+  FID:= pObjeto.ID;
+  FIDChild:= pObjeto.Childs[0].ID;
+
+  FDaoComposite.Delete(pObjeto);
+
+  Check(FDaoComposite.SelectKey(FID) = nil);
+  Check(FDaoComposite.GetCompositeDao.SelectKey(FID) = nil);
+  Check(FDaoTestChild.SelectKey(FIDChild) = nil);
+  // TODO: Validate method results
+end;
+
+procedure TestTDaoGeneric.TestCompositeInsert;
+var
+  FTeste: TTesteComposite;
+  FID: Integer;
+begin
+  FTeste:= TTesteComposite.Create('Teste', now, 122, 1.25, False);
+  FDaoComposite.Insert(FTeste);
+  FID:= FTeste.ID;
+  FTeste.Free;
+  FTeste:= FDaoComposite.SelectKey(FID);
+
+  Check(Assigned(FTeste));
+  CheckEquals(FTeste.Number, 1.25);
+//  Check(FTeste.IsCool = False);
+end;
+
+procedure TestTDaoGeneric.TestCompositeUpdate;
+var
+  FTeste: TTesteComposite;
+  FID: Integer;
+begin
+  FTeste:= TTesteComposite.Create('UpdateTeste', now, 200, 2111.252, True);
+  FDaoComposite.Insert(FTeste);
+  FID:= FTeste.ID;
+  FTeste.Float:= 21.2;
+  FTeste.Number:= 400;
+  FTeste.IsCool:= False;
+  FDaoComposite.Update(FTeste);
+  FTeste.Free;
+  FTeste:= FDaoComposite.SelectKey(FID);
+  CheckEquals(400,FTeste.Number);
+  Check(SameValue(21.2,FTeste.Float));
+  CheckEquals(FTeste.IsCool, False);
+end;
+
 procedure TestTDaoGeneric.TestDelete;
 var
   pObjeto: TTeste;
@@ -271,15 +349,6 @@ begin
 
   Check(FDaoGeneric.SelectKey(FID) = nil);
   Check(FDaoTestChild.SelectKey(FIDChild) = nil);
-  // TODO: Validate method results
-end;
-
-procedure TestTDaoGeneric.TestDelete1;
-var
-  ID: Integer;
-begin
-  // TODO: Setup method call parameters
-  FDaoGeneric.Delete(ID);
   // TODO: Validate method results
 end;
 
@@ -355,6 +424,49 @@ destructor TRecursiveObject.Destroy;
 begin
   Childs.Free;
   inherited;
+end;
+
+{ TTesteDao }
+
+constructor TTesteDao<T>.Create;
+begin
+  inherited Create('Teste', 'ID', TTeste);
+  with ModeloBD do UpdateOptions:= UpdateOptions + [uoDeleteMissingChilds];
+
+  FDaoTestChild := TDaoGeneric<TTestChild>.Create('TestChild', 'ID');
+  Self.AddChildDao('Childs', 'ID', 'IDPAI', FDaoTestChild);
+end;
+
+{ TDaoComposite }
+
+constructor TDaoComposite.Create;
+var
+  FModeloBD: TModeloBD;
+begin
+  inherited Create;
+
+  NewObjectFunction:= NewObject; // Since ItemClass is baseclass, baseclass will be created by default, here we override
+
+  FModeloBD:= TModeloBD.Create(TTesteComposite, False);
+  FModeloBD.NomeTabela:= 'TestComposite';
+  FModeloBD.NomePropChave:= 'ID';
+  FModeloBD.ChaveIncremental:= False;
+  FModeloBD.DoMapPublishedFields(True); // Only map published field of TTesteComposite (don't map fields from base class)
+  FModeloBD.Map('ID', 'ID'); // Since ID is a member of Base Class it must be explicitly added;
+
+  FCompositeDao:= TDaoGeneric<TTesteComposite>.Create(FModeloBD);
+
+  AddCompositeDao(FCompositeDao);
+end;
+
+function TDaoComposite.GetCompositeDao: IDaoGeneric<TTesteComposite>;
+begin
+  Result:= FCompositeDao;
+end;
+
+function TDaoComposite.NewObject(pDBRows: ISqlDBRows): TObject;
+begin
+  Result:= TTesteComposite.Create;
 end;
 
 initialization

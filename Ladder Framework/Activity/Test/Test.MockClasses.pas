@@ -54,6 +54,16 @@ type
     property Childs: TObjectList<TTestChild> read FChilds write FChilds;
   end;
 
+  TTesteComposite = class(TTeste)
+  public
+    FNumber: Double;
+    FIsCool: Boolean;
+  published
+    constructor Create(pTexto: String; pData: TDateTime; pFloat: Double; pNumber: Double; pIsCool: Boolean); overload;
+    property Number: Double read FNumber write FNumber;
+    property IsCool: Boolean read FIsCool write FIsCool;
+  end;
+
 implementation
 
 { TTeste }
@@ -89,6 +99,16 @@ end;
 constructor TTestChild.Create(pNum: Integer; pTexto: String);
 begin
   Create(pNum);
+end;
+
+{ TTesteComposite }
+
+constructor TTesteComposite.Create(pTexto: String; pData: TDateTime; pFloat,
+  pNumber: Double; pIsCool: Boolean);
+begin
+  inherited Create(pTexto, pData, pFloat);
+  FNumber:= pNumber;
+  FIsCool:= pIsCool;
 end;
 
 end.

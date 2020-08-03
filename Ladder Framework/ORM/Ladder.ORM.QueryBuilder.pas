@@ -114,6 +114,7 @@ begin
     FFieldMapping:= ModeloBD.FieldMappingByFieldName(FField);
     Result:= Result+Format('%s = %s', [FFieldMapping.FieldName, MapToSqlValue(FFieldMapping, pObject)]);
   end;
+  Assert(Result<>'', 'TSqlServerQueryBuilder.GetUpdateDeleteWhere: At least one field must be in the where clause for update or Delete.');
 end;
 
 class function TSqlServerQueryBuilder.DateTimeSqlServer(pData: TDateTime; withQuotes: Boolean = true): String;

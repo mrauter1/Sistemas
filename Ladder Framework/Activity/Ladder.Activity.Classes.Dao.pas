@@ -20,9 +20,10 @@ type
   private
     FOutputDao: IDaoGeneric<TOutputParameter>;
     FInputDao: IDaoGeneric<TParameter>;
+  protected
     function GetExecutorClass(const pFieldName: String; Instance: TObject; MasterInstance: TObject=nil): Variant; virtual;
     function GetClassName(const pFieldName: String; Instance: TObject; MasterInstance: TObject=nil): Variant; virtual;
-    function GetExecutor(const pPropName: String; pCurrentValue: TValue; Instance: TObject; pDBRows: ISqlDBRows; Sender: TObject): TValue;
+    function GetExecutor(const pPropName: String; pCurrentValue: TValue; Instance: TObject; pDBRows: ISqlDBRows; Sender: TObject): TValue; virtual;
   public
     constructor Create; overload;
     constructor Create(pItemClass: TClass); overload;
@@ -35,8 +36,10 @@ type
   TActivityDao<T: TActivity> = class(TProcessoDao<T>)
   private
     FProcessoDao: TProcessoDao<TProcessoBase>;
+    procedure OnAfterLoad(Sender: TObject);
   public
     constructor Create;
+    destructor Destroy; override;
     function NewProcess(pDBRows: ISqlDBRows): TObject; override;
   end;
 
@@ -132,14 +135,29 @@ end;
 
 constructor TActivityDao<T>.Create;
 begin
-  inherited Create(T);
+  inherited Create(TActivity);
+  ModeloBD.AfterLoadObjectEvent.Add(OnAfterLoad);
   FProcessoDao:= TProcessoDao<TProcessoBase>.Create;
   AddChildDao('Processos', 'ID', 'IDActivity', FProcessoDao);
+end;
+
+destructor TActivityDao<T>.Destroy;
+begin
+  ModeloBD.AfterLoadObjectEvent.Remove(OnAfterLoad);
+  inherited;
 end;
 
 function TActivityDao<T>.NewProcess(pDBRows: ISqlDBRows): TObject;
 begin
   Result:= TActivity.Create(TFrwServiceLocator.Factory.NewExpressionEvaluator(ModeloBD.DaoUtils));
+end;
+
+procedure TActivityDao<T>.OnAfterLoad(Sender: TObject);
+begin
+  if not (Sender is TActivity) then
+    Exit;
+
+  (Sender as TActivity).ReorderProcesses;
 end;
 
 end.

@@ -130,6 +130,7 @@ type
     function GetChangedSortText(const sortText: string): string;
     function CreateIndexList(const sortText: string): TArray<TIndexFieldInfo>;
     function FieldInSortIndex(AField: TField): Boolean;
+    function GetObjectCount: Integer; // Returns ObjectList.Count or ObjectList<T>.Count
   public
     constructor Create(AOwner: TComponent); overload; override;
     constructor Create(AOwner: TComponent; pModeloBD: TModeloBD); overload; virtual;
@@ -320,6 +321,7 @@ begin
   else
     RaiseObjectListNotAssigned;
 
+  Synchronize(Item);
 end;
 
 function TObjectDataSet.RemoveItem(Item: TObject): Integer;
@@ -330,6 +332,8 @@ begin
     Result:= fGenericObjectList.Remove(Item)
   else
     RaiseObjectListNotAssigned;
+
+  Synchronize;
 end;
 
 function TObjectDataSet.ExtractItem(Item: TObject): TObject;
@@ -340,6 +344,8 @@ begin
     Result:= fGenericObjectList.Extract(Item)
   else
     RaiseObjectListNotAssigned;
+
+  Synchronize;
 end;
 
 procedure TObjectDataSet.DoOnDataListChange(Sender: TObject;
@@ -580,8 +586,8 @@ function TObjectDataSet.GetCurrentModel<T>: T;
 begin
 //  Result := System.Default(T);
   Result:= nil;
-  if Active and (Index > -1) and (Index < RecordCount) then
-    Result := T(IndexList.Items[Index]);
+  if Active and (Index > -1) and (Index < GetObjectCount) then
+    Result := (IndexList.Items[Index] as T);
 end;
 
 function TObjectDataSet.GetFilterCount: Integer;
@@ -598,6 +604,16 @@ begin
   Result := TCollections.CreateList<T>;
   for i := 0 to IndexList.Count - 1 do
     Result.Add(IndexList.Items[i]);
+end;
+
+function TObjectDataSet.GetObjectCount: Integer;
+begin
+  if Assigned(fObjectList) then
+    Result:= fObjectList.Count
+  else if Assigned(fGenericObjectList) then
+    Result:= fGenericObjectList.Count
+  else
+    Result:= 0;
 end;
 
 function TObjectDataSet.GetRecordCount: Integer;

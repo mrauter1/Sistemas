@@ -29,8 +29,8 @@ type
   published
     property CronExpression: String read FCronExpression write SetCronExpression;
     property LastExecutionTime: TDateTime read FLastExecutionTime write SetLastExecutionTime;
-    property NextExecutionTime: TDateTime read GetNextExecutionTime;
-    property Executing: Boolean read FExecuting;
+    property NextExecutionTime: TDateTime read GetNextExecutionTime write FNextExecutionTime;
+    property Executing: Boolean read FExecuting write FExecuting;
   end;
 
   TScheduledActivities = TObjectList<TScheduledActivity>;

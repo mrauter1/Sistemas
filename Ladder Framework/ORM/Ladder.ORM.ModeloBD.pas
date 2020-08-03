@@ -5,7 +5,7 @@ interface
 uses
   Data.DB, System.Contnrs, System.Classes, Generics.Collections, RTTI, Ladder.ORM.DaoUtils,
   Ladder.Messages, Ladder.ORM.Classes, SysUtils, Utils, Math, Ladder.ServiceLocator, SynDB,
-  Ladder.ORM.SQLDBRowsDataSet;
+  Ladder.ORM.SQLDBRowsDataSet, Spring.Events, Spring;
 
   function PropertyToFieldType(pProperty: TRttiMember): TFieldType;
   function GetPropertyRttiType(pRttiMember: TRttiMember): TRttiType;
@@ -56,7 +56,7 @@ type
   TSelectOption = (Top0);
   TSelectOptions = set of TSelectOption;
 
-  TUpdateOption = (DeleteMissingChilds);
+  TUpdateOption = (uoDeleteMissingChilds);
   TUpdateOptions = set of TUpdateOption;
 
   TTipoMapeamento = (tmObjectToDataset, tmObjectFromDataSet);
@@ -75,6 +75,8 @@ type
     FMappedFieldList: TFieldMappingList;
     fOpcoesMapeamento: TOpcoesMapeamento;
     fNewObjectFunction: TFunNewObject;
+    fAfterLoadObjectEvent: IEvent<TNotifyEvent>;
+    //FOnAfterLoad: TNotifyEvent;
     rttiCreateMethod: TRttiMethod;
     rttiType: TRttiType;
     FFieldsInUpdateDeleteWhere: TList<String>;
@@ -100,9 +102,12 @@ type
     function GetPropChave: TRttiMember;
     function GetNomeCampoChave: string;
     procedure SetItemClass(const Value: TClass);
+    procedure SetNomePropChave(const Value: String);
+  protected
+    procedure DoAfterLoadObject(Sender: TObject); virtual;
   public
-    property NomeTabela: String read FNomeTabela;
-    property NomePropChave: String read FNomePropChave;
+    property NomeTabela: String read FNomeTabela write FNomeTabela;
+    property NomePropChave: String read FNomePropChave write SetNomePropChave;
     property NomeCampoChave: string read GetNomeCampoChave;
     property ItemClass: TClass read FItemClass write SetItemClass;
     property NewObjectFunction: TFunNewObject read fNewObjectFunction write fNewObjectFunction;
@@ -111,6 +116,8 @@ type
     property ChaveIncremental: Boolean read FChaveIncremental write FChaveIncremental;
     property FieldsInUpdateDeleteWhere: TList<String> read FFieldsInUpdateDeleteWhere;
     property UpdateOptions: TUpdateOptions read FUpdateOptions write FUpdateOptions;
+    property AfterLoadObjectEvent: IEvent<TNotifyEvent> read fAfterLoadObjectEvent write fAfterLoadObjectEvent;
+    //property OnAfterLoad: TNotifyEvent read FOnAfterLoad write FOnAfterLoad;
 
     constructor Create(pItemClass: TClass; pMapAllPublishedFields: Boolean = True); overload;
     constructor Create(pNomeTabela: String; pNomePropChave: string; pItemClass: TClass); overload;
@@ -118,8 +125,6 @@ type
 
     function Connection: TSQLDBConnectionProperties;
     function DaoUtils: TDaoUtils;
-
-    procedure DoMapPublishedFields;
 
     function GetPropByName(const pNomeProp: String): TRttiMember;
 
@@ -132,6 +137,10 @@ type
     function Map(pProp, pField: String; pFieldType: TFieldType = ftUnknown): TFieldMappingList;
     function MapField(pField: String; pFieldType: TFieldType; pFunGetFieldValue: TFunGetFieldValue): TFieldMappingList;
     function MapProperty(pPropName: String; pFunGetPropValue: TFunGetPropValue): TFieldMappingList;
+
+    procedure DoMapPublishedFields; overload;
+    procedure DoMapPublishedFields(pOnlyImmediate: Boolean); overload;
+    procedure DoMapPublishedFields(pItemClass: TClass; pOnlyImmediate: Boolean = False); overload;
 
     procedure AddFieldInUpdateDeleteWhere(pFieldName: String);
 
@@ -169,6 +178,9 @@ type
     function CreateObject(pDataSet: TDataSet): TObject; overload;
   end;
 
+var
+  RttiContext: TRttiContext;
+
 // Use Rtti to execute the Create constructor of the object, if there is not Create calls TClass.Create
 // Will not work if Constructor contains indexed Enumerators as parameter, since it RTTI will show it has no parameters
 function CreateObjectOfClass(pClass: TClass): TObject;
@@ -177,9 +189,6 @@ implementation
 
 uses
   TypInfo;
-
-var
-  RttiContext: TRttiContext;
 
 function GetPropertyRttiType(pRttiMember: TRttiMember): TRttiType;
 begin
@@ -437,7 +446,7 @@ begin
   Result:= FazMapeamentoECopiaValores(pObjeto, pDataSet, tmObjectToDataSet, nil);
 end;
 
-procedure TModeloBD.DoMapPublishedFields;
+procedure TModeloBD.DoMapPublishedFields(pItemClass: TClass; pOnlyImmediate: Boolean = False);
 var
   RttiType: TRttiType;
   Prop: TRttiProperty;
@@ -451,6 +460,9 @@ var
     if PropertyToFieldType(pFieldOrProp) = ftUnknown then
       Exit;
 
+    if pOnlyImmediate and (pFieldOrProp.Parent.AsInstance.MetaclassType <> pItemClass) then
+      Exit;
+
     if Assigned(FMappedFieldList.GetFieldMappingByPropName(pFieldOrProp.Name)) then // Field already mapped
       Exit;
 
@@ -458,7 +470,7 @@ var
   end;
 
 begin
-  RttiType := RttiContext.GetType(ItemClass);
+  RttiType := RttiContext.GetType(pItemClass);
 
   for Prop in RttiType.GetProperties do
     MapFieldOrProperty(Prop);
@@ -510,8 +522,7 @@ end;
 function TModeloBD.ObjectFromDBRows(pDBRows: ISqlDBRows; Sender: TObject = nil): TObject;
 begin
   Result:=CreateObject(pDBRows);
-
-  FazMapeamentoECopiaValores(Result, pDBRows, tmObjectFromDataSet, Sender);
+  ObjectFromDBRows(Result, pDBRows, Sender);
 end;
 
 procedure TModeloBD.InicializaObjeto;
@@ -523,12 +534,14 @@ end;
 constructor TModeloBD.Create(pItemClass: TClass; pMapAllPublishedFields: Boolean = True);
 begin
   inherited Create;
-  FUpdateOptions:= [DeleteMissingChilds]; // Delete missing childs by default
+  FUpdateOptions:= [uoDeleteMissingChilds]; // Delete missing childs by default
 
   ItemClass:= pItemClass;
 
   FFieldsInUpdateDeleteWhere:= TList<String>.Create;
   FMappedFieldList:= TFieldMappingList.Create(ItemClass);
+
+  fAfterLoadObjectEvent:= TEvent<TNotifyEvent>.Create;
 
   InicializaObjeto;
 
@@ -551,8 +564,7 @@ begin
   Create(pItemClass);
 
   FNomeTabela:= pNomeTabela;
-  FNomePropChave:= pNomePropChave;
-  AddFieldInUpdateDeleteWhere(FNomePropChave);
+  NomePropChave:= pNomePropChave;
 
 //  FPropChave:= GetPropByName(GetPropNameByFieldName(FNomePropChave));
 end;
@@ -568,6 +580,16 @@ begin
   FFieldsInUpdateDeleteWhere.Free;
 
   inherited;
+end;
+
+procedure TModeloBD.DoMapPublishedFields;
+begin
+  DoMapPublishedFields(ItemClass, False);
+end;
+
+procedure TModeloBD.DoMapPublishedFields(pOnlyImmediate: Boolean);
+begin
+  DoMapPublishedFields(ItemClass, pOnlyImmediate);
 end;
 
 procedure TModeloBD.AddFieldInUpdateDeleteWhere(pFieldName: String);
@@ -743,6 +765,20 @@ begin
    raise Exception.Create(Format('TModeloBD.SetKeyValue: Property %s not found on object of class %s!', [PropChave, ItemClass.ClassName]));
 end;
 
+procedure TModeloBD.SetNomePropChave(const Value: String);
+begin
+  FNomePropChave := Value;
+  AddFieldInUpdateDeleteWhere(FNomePropChave);
+end;
+
+procedure TModeloBD.DoAfterLoadObject(Sender: TObject);
+begin
+//  if Assigned(FOnAfterLoad) then
+//    fOnAfterLoad(pObjeto);
+  if AfterLoadObjectEvent.CanInvoke then
+    TNotifyEvent(AfterLoadObjectEvent.Invoke)(Sender);
+end;
+
 function TModeloBD.FazMapeamentoECopiaValores(pObjeto: TObject; pDBRows: ISqlDBRows; TipoMapeamento: TTipoMapeamento; Sender: TObject): Boolean;
 var
   fCallback: TMapeamentoCallback;
@@ -759,6 +795,8 @@ begin
   // *FIM* Método anônimo de callback
 
   FazMapeamentoDaClasse(fCallback, False, Sender);
+
+  DoAfterLoadObject(pObjeto);
 
   Result:= True;
 end;
@@ -784,6 +822,8 @@ begin
   // *FIM* Método anônimo de callback
 
   FazMapeamentoDaClasse(fCallback, False, Sender);
+
+  DoAfterLoadObject(pObjeto);
 
   Result:= True;
 end;
@@ -916,6 +956,7 @@ function TModeloBD.ObjectFromSql(const pSql: String; Sender: TObject = nil): TOb
 var
   FRows: ISqlDBRows;
 begin
+  Result:= nil;
   FRows := Connection.Execute(pSql, []);
   try
     if FRows.Step then

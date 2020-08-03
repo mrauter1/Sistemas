@@ -43,12 +43,12 @@ uses
   Test.LadderVarToSql in 'Test.LadderVarToSql.pas',
   Ladder.SqlServerConnection in '..\..\Ladder.SqlServerConnection.pas',
   Ladder.Utils in '..\..\Ladder.Utils.pas',
-  Form.CadastroAtividade in '..\..\Forms\Form.CadastroAtividade.pas' {FormCadastroAtividade},
+  Form.ScheduledActivityEditor in '..\..\Forms\Form.ScheduledActivityEditor.pas' {FormScheduledActivityEditor},
   Form.ProcessEditor in '..\..\Forms\Form.ProcessEditor.pas' {FormProcessEditor},
   Form.NovoProcesso in '..\..\Forms\Form.NovoProcesso.pas' {FormNovoProcesso},
   Form.SelecionaConsulta in '..\..\Forms\Form.SelecionaConsulta.pas' {FormSelecionaConsulta},
   Test.Forms in 'Test.Forms.pas',
-  Form.PesquisaAviso in '..\..\Forms\Form.PesquisaAviso.pas' {FormPesquisaAviso},
+  Form.ScheduledActivities in '..\..\Forms\Form.ScheduledActivities.pas' {FormScheduledActivities},
   Ladder.ORM.ObjectDataSet in '..\..\ORM\Ladder.ORM.ObjectDataSet.pas',
   uConClasses in '..\..\..\utils\uConClasses.pas',
   Test.ObjectDataset in 'Test.ObjectDataset.pas',
@@ -65,18 +65,21 @@ uses
   maxCron in '..\..\Library\maxCron\maxCron.pas',
   Test.Scheduler in 'Test.Scheduler.pas',
   Ladder.Executor.Activity in '..\Executor\Ladder.Executor.Activity.pas',
-  Form.ProcessActivityEditor in '..\..\Forms\Form.ProcessActivityEditor.pas' {FormProcessActivityEditor};
+  Form.ProcessActivityEditor in '..\..\Forms\Form.ProcessActivityEditor.pas' {FormProcessActivityEditor},
+  Form.ActivityEditor in '..\..\Forms\Form.ActivityEditor.pas' {FormActivityEditor},
+  Ladder.Activity.Scheduler.Dao in '..\Ladder.Activity.Scheduler.Dao.pas',
+  Form.PesquisaAviso in '..\..\Forms\Form.PesquisaAviso.pas' {FormPesquisaAviso};
 
 {$R *.RES}
 
 begin
+  ReportMemoryLeaksOnShutdown := True;
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
 
   DUnitTestRunner.RunRegisteredTests;
   Application.CreateForm(TConSqlServer, ConSqlServer);
-  Application.CreateForm(TFormProcessActivityEditor, FormProcessActivityEditor);
-  Application.CreateForm(TFormProcessActivityEditor, FormProcessActivityEditor);
+  Application.CreateForm(TFormPesquisaAviso, FormPesquisaAviso);
   Application.Run;
 end.
 

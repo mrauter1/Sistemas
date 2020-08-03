@@ -129,8 +129,8 @@
         <DCCReference Include="Test.LadderVarToSql.pas"/>
         <DCCReference Include="..\..\Ladder.SqlServerConnection.pas"/>
         <DCCReference Include="..\..\Ladder.Utils.pas"/>
-        <DCCReference Include="..\..\Forms\Form.CadastroAtividade.pas">
-            <Form>FormCadastroAtividade</Form>
+        <DCCReference Include="..\..\Forms\Form.ScheduledActivityEditor.pas">
+            <Form>FormScheduledActivityEditor</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\..\Forms\Form.ProcessEditor.pas">
@@ -146,8 +146,8 @@
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="Test.Forms.pas"/>
-        <DCCReference Include="..\..\Forms\Form.PesquisaAviso.pas">
-            <Form>FormPesquisaAviso</Form>
+        <DCCReference Include="..\..\Forms\Form.ScheduledActivities.pas">
+            <Form>FormScheduledActivities</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\..\ORM\Ladder.ORM.ObjectDataSet.pas"/>
@@ -174,6 +174,15 @@
         <DCCReference Include="..\Executor\Ladder.Executor.Activity.pas"/>
         <DCCReference Include="..\..\Forms\Form.ProcessActivityEditor.pas">
             <Form>FormProcessActivityEditor</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\..\Forms\Form.ActivityEditor.pas">
+            <Form>FormActivityEditor</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\Ladder.Activity.Scheduler.Dao.pas"/>
+        <DCCReference Include="..\..\Forms\Form.PesquisaAviso.pas">
+            <Form>FormPesquisaAviso</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <BuildConfiguration Include="Release">

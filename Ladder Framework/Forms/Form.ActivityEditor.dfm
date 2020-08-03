@@ -1,9 +1,9 @@
-object FormCadastroAtividade: TFormCadastroAtividade
+object FormActivityEditor: TFormActivityEditor
   Left = 0
   Top = 0
   Caption = 'Configurar Atividades'
   ClientHeight = 542
-  ClientWidth = 606
+  ClientWidth = 575
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,12 +17,12 @@ object FormCadastroAtividade: TFormCadastroAtividade
   object PanelTop: TPanel
     Left = 0
     Top = 0
-    Width = 606
+    Width = 575
     Height = 78
     Align = alTop
     TabOrder = 0
     DesignSize = (
-      606
+      575
       78)
     object Label1: TLabel
       Left = 176
@@ -51,7 +51,7 @@ object FormCadastroAtividade: TFormCadastroAtividade
     object DBEditNomeAtividade: TDBEdit
       Left = 272
       Top = 15
-      Width = 320
+      Width = 289
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       DataField = 'Name'
@@ -71,7 +71,7 @@ object FormCadastroAtividade: TFormCadastroAtividade
     object DBEditDescricao: TDBEdit
       Left = 64
       Top = 42
-      Width = 528
+      Width = 497
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       DataField = 'Description'
@@ -82,14 +82,14 @@ object FormCadastroAtividade: TFormCadastroAtividade
   object PanelCentro: TPanel
     Left = 0
     Top = 78
-    Width = 606
+    Width = 575
     Height = 420
     Align = alClient
     TabOrder = 1
     object Splitter1: TSplitter
       Left = 1
       Top = 308
-      Width = 604
+      Width = 573
       Height = 3
       Cursor = crVSplit
       Align = alBottom
@@ -100,7 +100,7 @@ object FormCadastroAtividade: TFormCadastroAtividade
     object Splitter2: TSplitter
       Left = 1
       Top = 186
-      Width = 604
+      Width = 573
       Height = 3
       Cursor = crVSplit
       Align = alBottom
@@ -110,7 +110,7 @@ object FormCadastroAtividade: TFormCadastroAtividade
     object GroupBoxProcessos: TGroupBox
       Left = 1
       Top = 1
-      Width = 604
+      Width = 573
       Height = 185
       Align = alClient
       Caption = 'Processos'
@@ -118,15 +118,15 @@ object FormCadastroAtividade: TFormCadastroAtividade
       object PanelControles: TPanel
         Left = 2
         Top = 142
-        Width = 600
+        Width = 569
         Height = 41
         Align = alBottom
         TabOrder = 0
         DesignSize = (
-          600
+          569
           41)
         object Panel1: TPanel
-          Left = 102
+          Left = 87
           Top = 0
           Width = 404
           Height = 36
@@ -162,10 +162,11 @@ object FormCadastroAtividade: TFormCadastroAtividade
           end
         end
         object BtnMoveUp: TBitBtn
-          Left = 550
+          Left = 514
           Top = 0
           Width = 32
           Height = 21
+          Anchors = [akTop, akRight]
           Glyph.Data = {
             76060000424D7606000000000000360000002800000014000000140000000100
             2000000000004006000000000000000000000000000000000000000000000000
@@ -223,10 +224,11 @@ object FormCadastroAtividade: TFormCadastroAtividade
           OnClick = BtnMoveUpClick
         end
         object BtnMoveDown: TBitBtn
-          Left = 550
+          Left = 514
           Top = 18
           Width = 32
           Height = 21
+          Anchors = [akTop, akRight]
           Glyph.Data = {
             76060000424D7606000000000000360000002800000014000000140000000100
             2000000000004006000000000000000000000000000000000000000000000000
@@ -296,7 +298,7 @@ object FormCadastroAtividade: TFormCadastroAtividade
       object DBGridRelatorios: TDBGrid
         Left = 2
         Top = 15
-        Width = 600
+        Width = 569
         Height = 127
         Align = alClient
         DataSource = DsProcessos
@@ -343,7 +345,7 @@ object FormCadastroAtividade: TFormCadastroAtividade
     object GroupBoxInputs: TGroupBox
       Left = 1
       Top = 189
-      Width = 604
+      Width = 573
       Height = 119
       Align = alBottom
       Caption = 'Inputs'
@@ -351,7 +353,7 @@ object FormCadastroAtividade: TFormCadastroAtividade
       object cxGridParametros: TcxGrid
         Left = 2
         Top = 15
-        Width = 600
+        Width = 569
         Height = 102
         Align = alClient
         TabOrder = 0
@@ -396,7 +398,7 @@ object FormCadastroAtividade: TFormCadastroAtividade
     object GroupBox1: TGroupBox
       Left = 1
       Top = 311
-      Width = 604
+      Width = 573
       Height = 108
       Align = alBottom
       Caption = 'Outputs'
@@ -404,7 +406,7 @@ object FormCadastroAtividade: TFormCadastroAtividade
       object cxGrid1: TcxGrid
         Left = 2
         Top = 15
-        Width = 600
+        Width = 569
         Height = 91
         Align = alClient
         TabOrder = 0
@@ -450,7 +452,7 @@ object FormCadastroAtividade: TFormCadastroAtividade
   object PanelBot: TPanel
     Left = 0
     Top = 498
-    Width = 606
+    Width = 575
     Height = 44
     Align = alBottom
     TabOrder = 2

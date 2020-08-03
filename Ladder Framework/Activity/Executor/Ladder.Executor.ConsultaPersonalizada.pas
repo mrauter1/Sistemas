@@ -65,7 +65,10 @@ begin
 
   FOutput:= Outputs.Param(pExportParameter.Name);
   if not Assigned(FOutput) then
+  begin
     FOutput:= TOutputParameter.Create(pExportParameter.Name, tbAny, '');
+    Outputs.Add(FOutput);
+  end;
 
   FOutput.Value:= FNameArquivo;
 

@@ -1,4 +1,4 @@
-unit Form.PesquisaAviso;
+unit Form.ScheduledActivities;
 
 interface
 
@@ -26,11 +26,11 @@ uses
   cxGrid, uConSqlServer, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
   FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
   FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet, FireDAC.Comp.Client,
-  Ladder.ORM.Dao, Ladder.Activity.Classes.Dao, Ladder.Activity.Classes,
+  Ladder.ORM.Dao, Ladder.Activity.Scheduler.Dao, Ladder.Activity.Scheduler,
   Ladder.ORM.ObjectDataSet;
 
 type
-  TFormPesquisaAviso = class(TForm)
+  TFormScheduledActivities = class(TForm)
     Panel1: TPanel;
     Panel2: TPanel;
     BtnSelecionar: TButton;
@@ -57,49 +57,49 @@ type
     procedure BtnFecharClick(Sender: TObject);
     procedure BtnSelecionarClick(Sender: TObject);
   private
-    FActivityDao: IDaoGeneric<TActivity>;
+    FActivityDao: IDaoGeneric<TScheduledActivity>;
     FActivityDataSet: TObjectDataSet;
-    procedure RemoveAviso;
-    procedure AbrirConfigAviso;
-    procedure NovoAviso;
-    function AtividadeSelecionada: TActivity;
+    procedure RemoveSchedule;
+    procedure OpenSchedule;
+    procedure NewSchedule;
+    function SelectedActivity: TScheduledActivity;
     { Private declarations }
   public
     { Public declarations }
     constructor Create(AOwner: TComponent); override;
-    class procedure AbrirPesquisa;
+    class procedure OpenScheduledActivities;
     class function SelectActivity: Integer;
   end;
 
 var
-  FormPesquisaAviso: TFormPesquisaAviso;
+  FormScheduledActivities: TFormScheduledActivities;
 
 implementation
 
 {$R *.dfm}
 
 uses
-  Form.ActivityEditor;
+  Form.ScheduledActivityEditor;
 
-function TFormPesquisaAviso.AtividadeSelecionada: TActivity;
+function TFormScheduledActivities.SelectedActivity: TScheduledActivity;
 begin
-  Result:= FActivityDataSet.GetCurrentModel<TActivity>;
+  Result:= FActivityDataSet.GetCurrentModel<TScheduledActivity>;
 end;
 
-procedure TFormPesquisaAviso.AbrirConfigAviso;
+procedure TFormScheduledActivities.OpenSchedule;
 begin
-  if (AtividadeSelecionada = nil) then
+  if (SelectedActivity = nil) then
     Exit;
 
-  TFormActivityEditor._AbrirConfigAviso(AtividadeSelecionada);
+  TFormScheduledActivityEditor._OpenSchedule(SelectedActivity);
   FActivityDataSet.Synchronize;
 end;
 
-class procedure TFormPesquisaAviso.AbrirPesquisa;
+class procedure TFormScheduledActivities.OpenScheduledActivities;
 var
-  FFrm: TFormPesquisaAviso;
+  FFrm: TFormScheduledActivities;
 begin
-  FFrm:= TFormPesquisaAviso.Create(Application);
+  FFrm:= TFormScheduledActivities.Create(Application);
   try
     FFrm.ShowModal;
   finally
@@ -107,48 +107,66 @@ begin
   end;
 end;
 
-procedure TFormPesquisaAviso.BtnFecharClick(Sender: TObject);
+class function TFormScheduledActivities.SelectActivity: Integer;
+var
+  FFrm: TFormScheduledActivities;
+begin
+  FFrm:= TFormScheduledActivities.Create(Application);
+  try
+    FFrm.ShowModal;
+    if FFrm.SelectedActivity <> nil then
+      Result:= FFrm.SelectedActivity.ID
+    else
+      Result:= 0;
+
+  finally
+    FFrm.Free;
+  end;
+
+end;
+
+procedure TFormScheduledActivities.BtnFecharClick(Sender: TObject);
 begin
   Close;
 end;
 
-procedure TFormPesquisaAviso.BtnNovoAvisoClick(Sender: TObject);
+procedure TFormScheduledActivities.BtnNovoAvisoClick(Sender: TObject);
 var
   fInput: String;
 begin
 {  fInput:= InputBox('Avisos', 'Digite o nome do novo aviso:', '');
   if fInput = '' then Exit;    }
 
-  NovoAviso;
+  NewSchedule;
 end;
 
-procedure TFormPesquisaAviso.BtnRemoverAvisoClick(Sender: TObject);
+procedure TFormScheduledActivities.BtnRemoverAvisoClick(Sender: TObject);
 begin
-  RemoveAviso;
+  RemoveSchedule;
 end;
 
-procedure TFormPesquisaAviso.BtnSelecionarClick(Sender: TObject);
+procedure TFormScheduledActivities.BtnSelecionarClick(Sender: TObject);
 begin
-  AbrirConfigAviso;
+  OpenSchedule;
 end;
 
-constructor TFormPesquisaAviso.Create(AOwner: TComponent);
+constructor TFormScheduledActivities.Create(AOwner: TComponent);
 begin
   inherited;
-  FActivityDao:= TActivityDao<TActivity>.Create;
+  FActivityDao:= TScheduledActivityDao<TScheduledActivity>.Create;
 
   FActivityDataSet:= TObjectDataSet.Create(Self, FActivityDao.ModeloBD);
   FActivityDataSet.OwnsObjectList:= True;
-  FActivityDataSet.ObjectList:= FActivityDao.SelectWhere('className = ''TActivity''');
+  FActivityDataSet.ObjectList:= FActivityDao.SelectWhere('className = ''TScheduledActivity''');
 
   DsAvisos.DataSet:= FActivityDataSet;
 end;
 
-procedure TFormPesquisaAviso.NovoAviso;
+procedure TFormScheduledActivities.NewSchedule;
 var
-  FAtividade: TActivity;
+  FAtividade: TScheduledActivity;
 begin
-  FAtividade:= TFormActivityEditor._NovaAtividade;
+  FAtividade:= TFormScheduledActivityEditor._NewSchedule;
   if not Assigned(FAtividade) then
     Exit;
 
@@ -156,9 +174,9 @@ begin
   FActivityDataSet.Synchronize;
 end;
 
-procedure TFormPesquisaAviso.RemoveAviso;
+procedure TFormScheduledActivities.RemoveSchedule;
 
-  procedure RemoveAvisoDepencias(pAtividade: TActivity);
+  procedure RemoveAvisoDepencias(pAtividade: TScheduledActivity);
   var
     FSql: String;
   begin
@@ -171,25 +189,7 @@ procedure TFormPesquisaAviso.RemoveAviso;
 begin
   if not FActivityDataSet.IsEmpty then
     if Application.MessageBox('Você tem certeza que deseja excluir este aviso?', 'Atenção!',  MB_YESNO) = ID_YES  then
-      RemoveAvisoDepencias(FActivityDataSet.GetCurrentModel<TActivity>);
-
-end;
-
-class function TFormPesquisaAviso.SelectActivity: Integer;
-var
-  FFrm: TFormPesquisaAviso;
-begin
-  FFrm:= TFormPesquisaAviso.Create(Application);
-  try
-    FFrm.ShowModal;
-    if FFrm.AtividadeSelecionada <> nil then
-      Result:= FFrm.AtividadeSelecionada.ID
-    else
-      Result:= 0;
-
-  finally
-    FFrm.Free;
-  end;
+      RemoveAvisoDepencias(FActivityDataSet.GetCurrentModel<TScheduledActivity>);
 
 end;
 

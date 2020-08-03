@@ -30,40 +30,53 @@ uses
   FireDAC.DatS, cxGraphics, cxFilter, Vcl.DBCtrls, dxSkinSevenClassic, cxClasses,
   Vcl.Grids, dxSkinLondonLiquidSky, dxSkinsCore, dxSkinPumpkin,
   dxSkinDevExpressDarkStyle, dxSkinSharp, dxSkinscxPCPainter, dxSkinOffice2007Pink,
-  dxSkinMetropolis, FireDAC.Phys.Intf, Form.CadastroAtividade, Vcl.Controls,
+  dxSkinMetropolis, FireDAC.Phys.Intf, Form.ActivityEditor, Vcl.Controls,
   Vcl.StdCtrls, dxSkinStardust, cxGridCustomTableView, dxSkinCaramel, Winapi.Windows,
   cxControls, Winapi.Messages, Vcl.DBGrids, dxSkinOffice2007Blue,
   cxLookAndFeelPainters, Vcl.Dialogs, dxSkinLiquidSky, dxSkinOffice2010Blue,
   dxSkinOffice2007Silver, dxSkinWhiteprint, cxDBData, dxSkinOffice2010Black,
   System.SysUtils, dxSkinOffice2016Dark, cxGridTableView, dxSkinVS2010,
-  Form.PesquisaAviso;
+  Form.PesquisaAviso, Form.ScheduledActivities;
 
 type
   // Test methods for class TFormCadastroAviso
 
-  TestTFormCadastroAviso = class(TTestCase)
+  TestTFormActivityEditor = class(TTestCase)
   strict private
     FFormPesquisaAviso: TFormPesquisaAviso;
   public
     procedure SetUp; override;
     procedure TearDown; override;
   published
-    procedure AbrirFormCadastroAtividade;
+    procedure OpenFormActivityEditor;
+    procedure OpenFormScheduledActivities;
   end;
 
 implementation
 
-procedure TestTFormCadastroAviso.AbrirFormCadastroAtividade;
+procedure TestTFormActivityEditor.OpenFormActivityEditor;
 begin
   FFormPesquisaAviso.ShowModal;
 end;
 
-procedure TestTFormCadastroAviso.SetUp;
+procedure TestTFormActivityEditor.OpenFormScheduledActivities;
+var
+  FFormScheduledActivities: TFormScheduledActivities;
+begin
+  FFormScheduledActivities:= TFormScheduledActivities.Create(nil);
+  try
+    FFormScheduledActivities.ShowModal;
+  finally
+    FFormScheduledActivities.Free;
+  end;
+end;
+
+procedure TestTFormActivityEditor.SetUp;
 begin
   FFormPesquisaAviso := TFormPesquisaAviso.Create(nil);
 end;
 
-procedure TestTFormCadastroAviso.TearDown;
+procedure TestTFormActivityEditor.TearDown;
 begin
   FFormPesquisaAviso.Free;
   FFormPesquisaAviso := nil;
@@ -71,6 +84,6 @@ end;
 
 initialization
   // Register any test cases with the test runner
-  RegisterTest(TestTFormCadastroAviso.Suite);
+  RegisterTest(TestTFormActivityEditor.Suite);
 end.
 

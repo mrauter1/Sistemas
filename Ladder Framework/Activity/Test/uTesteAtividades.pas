@@ -47,7 +47,7 @@ begin
   Result.Inputs.Add(TParameter.Create('Titulo', tbValue, '@EnviaEmailMeta.Titulo'));
   Result.Inputs.Add(TParameter.Create('Body', tbValue, '@EnviaEmailMeta.Body'));
   Result.Inputs.Add(TParameter.Create('Destinatarios', tbValue, 'marcelo@rauter.com.br'));
-  Result.Inputs.Add(TParameter.Create('Anexos', tbList, '[@Consulta.Files[0], @Consulta.Files[1], @MetaEvolutivo.Export.Grafico]'));
+  Result.Inputs.Add(TParameter.Create('Anexos', tbList, '[@Consulta.Grafico, @Consulta.Tabela, @MetaEvolutivo.Export.Grafico]'));
 end;
 
 function TTesteAtividades.NewProcessoRelatororiosMeta: TProcessoBase;

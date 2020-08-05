@@ -3,10 +3,10 @@ unit Ladder.Activity.Scheduler;
 interface
 
 uses
-  Ladder.Activity.Classes, System.Generics.Collections, System.Classes, maxCron;
+  Ladder.Activity.Classes, Ladder.ServiceLocator, System.Generics.Collections, System.Classes, maxCron, Ladder.Activity.Classes.Dao;
 
 type
-  TNotifyThread = class(TThread)
+  TNotifyThread = class(TFrwThread)
   public
     OnExecute: TNotifyEvent;
     Sender: TObject;
@@ -29,22 +29,28 @@ type
   published
     property CronExpression: String read FCronExpression write SetCronExpression;
     property LastExecutionTime: TDateTime read FLastExecutionTime write SetLastExecutionTime;
-    property NextExecutionTime: TDateTime read GetNextExecutionTime write FNextExecutionTime;
-    property Executing: Boolean read FExecuting write FExecuting;
+    property NextExecutionTime: TDateTime read GetNextExecutionTime; //write FNextExecutionTime;
+    property Executing: Boolean read FExecuting; //write FExecuting;
   end;
 
   TScheduledActivities = TObjectList<TScheduledActivity>;
+
+  IScheduledActivityDao<T: TScheduledActivity> = interface(IProcessoDao<T>)
+  end;
 
   TScheduler = class(TObject)
   private
     FLoopingThread: TNotifyThread;
     FScheduledActivities: TScheduledActivities;
+    FDao: IScheduledActivityDao<TScheduledActivity>;
     FStopped: Boolean;
     procedure OnExecute(Sender: TObject);
     procedure ExecuteActivity(AActivity: TScheduledActivity);
   public
-    constructor Create;
+    constructor Create(pLoadScheduledActivities: Boolean = True);
     destructor Destroy; override;
+
+    procedure LoadScheduledActivities;
 
     procedure Start;
     procedure Stop;
@@ -58,7 +64,7 @@ type
 implementation
 
 uses
-  SysUtils, Ladder.ServiceLocator, DateUtils;
+  SysUtils, DateUtils, Ladder.Activity.Scheduler.Dao;
 
 { TScheduledActivity }
 
@@ -104,12 +110,18 @@ end;
 
 { TScheduler }
 
-constructor TScheduler.Create;
+constructor TScheduler.Create(pLoadScheduledActivities: Boolean = True);
 begin
-  inherited;
+  inherited Create;
   FStopped:= False;
+  FDao:= TScheduledActivityDao<TScheduledActivity>.Create;
+
   FScheduledActivities:= TScheduledActivities.Create;
   FLoopingThread:= TNotifyThread.Create(OnExecute, Self);
+
+  if pLoadScheduledActivities then
+     LoadScheduledActivities;
+
   FLoopingThread.Start;
 end;
 
@@ -127,6 +139,7 @@ procedure TScheduler.ExecuteActivity(AActivity: TScheduledActivity);
 begin
   // Execute on main Thread
   AActivity.FExecuting:= True;
+  FDao.UpdateProperties(AActivity, 'Executing');
   try
     TFrwServiceLocator.Synchronize(
     procedure
@@ -136,7 +149,14 @@ begin
   finally
     AActivity.LastExecutionTime:= Now;
     AActivity.FExecuting:= False;
+    FDao.UpdateProperties(AActivity, 'LastExecutionTime, Executing');
   end;
+end;
+
+procedure TScheduler.LoadScheduledActivities;
+begin
+  ScheduledActivities.Clear;
+  FDao.SelectWhere(ScheduledActivities, 'className = ''TScheduledActivity''');
 end;
 
 procedure TScheduler.OnExecute(Sender: TObject);
@@ -169,7 +189,7 @@ begin
     FNextActivity:= GetNextActivity;
     if not Assigned(FNextActivity) then
     begin
-      Sleep(1000); // Sleeps for one second if there is no ScheduledActivity
+      Sleep(cSleepTime); // Sleeps for one second if there is no ScheduledActivity
       Continue;
     end;
 

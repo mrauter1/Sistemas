@@ -7,9 +7,6 @@ uses
   Ladder.ServiceLocator, Ladder.ORM.ModeloBD;
 
 type
-  IScheduledActivityDao<T: TScheduledActivity> = interface(IProcessoDao<T>)
-  end;
-
   TScheduledActivityDao<T: TScheduledActivity> = class(TActivityDao<T>, IScheduledActivityDao<T>)
   private
     FCompositeDao: IDaoGeneric<TScheduledActivity>;

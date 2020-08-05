@@ -79,7 +79,6 @@ begin
 
   DUnitTestRunner.RunRegisteredTests;
   Application.CreateForm(TConSqlServer, ConSqlServer);
-  Application.CreateForm(TFormPesquisaAviso, FormPesquisaAviso);
   Application.Run;
 end.
 

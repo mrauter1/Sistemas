@@ -43,6 +43,7 @@ type
     procedure TearDown; override;
   published
     procedure TestScheduler;
+    procedure LoadAndRunSchedulerForever;
   end;
 
 function NewScheduledActivity(ACronExpression: String): TScheduledActivity;
@@ -97,9 +98,18 @@ begin
   CheckCronExpression('0 0 * * * *', LadderVarToDateTime('2020-07-07 00:00:00.000'), LadderVarToDateTime('2020-07-06 10:05:15.000'));
 end;
 
+procedure TestTScheduler.LoadAndRunSchedulerForever;
+begin
+  FScheduler.Stop;
+  FScheduler.LoadScheduledActivities;
+  FScheduler.Start;
+  while True do
+    Application.ProcessMessages;
+end;
+
 procedure TestTScheduler.SetUp;
 begin
-  FScheduler := TScheduler.Create;
+  FScheduler := TScheduler.Create(False);
 end;
 
 procedure TestTScheduler.TestScheduler;

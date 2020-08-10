@@ -68,14 +68,24 @@ uses
   Form.ProcessActivityEditor in '..\..\Forms\Form.ProcessActivityEditor.pas' {FormProcessActivityEditor},
   Form.ActivityEditor in '..\..\Forms\Form.ActivityEditor.pas' {FormActivityEditor},
   Ladder.Activity.Scheduler.Dao in '..\Ladder.Activity.Scheduler.Dao.pas',
-  Form.PesquisaAviso in '..\..\Forms\Form.PesquisaAviso.pas' {FormPesquisaAviso};
+  Form.PesquisaAviso in '..\..\Forms\Form.PesquisaAviso.pas' {FormPesquisaAviso},
+  Root in '..\..\Root.pas';
 
 {$R *.RES}
+
+var
+  FRootClass: TRootClass;
 
 begin
   ReportMemoryLeaksOnShutdown := True;
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
+  FRootClass:= TRootClass.Create;
+  try
+    FRootClass.CreateAllTables;
+  finally
+    FRootClass.Free;
+  end;
 
   DUnitTestRunner.RunRegisteredTests;
   Application.CreateForm(TConSqlServer, ConSqlServer);

@@ -3,7 +3,7 @@ unit Ladder.Utils;
 interface
 
 uses
-  RTTI, SynCommons, SysUtils;
+  RTTI, SynCommons, SysUtils, SynTable, DB;
 
 function LadderVarIsList(const pValue: Variant): Boolean;
 function LadderVarIsIso8601(const pValue: Variant): Boolean;
@@ -26,6 +26,8 @@ function StrToLadderArray(const AStr: String; ASeparator: String): Variant;
 function VarIsLadderArray(AVar: Variant): Boolean;
 function DoubleQuote(const AStr: String): String;
 
+function FieldTypeToSqlDBFieldType(AFieldType: TFieldType): TSqlDBFieldType;
+
 var
   SynAnsiConvert: TSynAnsiConvert;
   LadderFormatSettings: TFormatSettings;
@@ -34,6 +36,19 @@ implementation
 
 uses
   Variants, Spring.Reflection, StrUtils;
+
+  function FieldTypeToSqlDBFieldType(AFieldType: TFieldType): TSqlDBFieldType;
+begin
+  case AFieldType of
+    ftString, ftVariant, ftWideString: Result:= ftUTF8;
+    ftShortint, ftSmallint, ftInteger, ftLargeint, ftWord, ftBoolean, ftByte: Result:= TSqlDBFieldType.ftInt64;
+    ftFloat, ftExtended, ftCurrency, ftBCD: Result:= TSqlDBFieldType.ftCurrency;
+    ftDate, ftTime, ftDateTime, ftTimeStamp: Result:= TSqlDBFieldType.ftDate;
+    ftBytes, ftVarBytes, ftBlob, ftMemo, ftWideMemo, ftGraphic: Result:= TSqlDBFieldType.ftBlob;
+    else
+      raise Exception.Create('FieldTypeToSqlDBFieldType: Invalid Field Type!');
+  end;
+end;
 
 function StrToLadderArray(const AStr: String; ASeparator: String): Variant;
 var
@@ -193,5 +208,8 @@ initialization
   SynAnsiConvert:= TSynAnsiConvert.Engine(0); // Windows current code page;
   LadderFormatSettings:= TFormatSettings.Create();
   LadderFormatSettings.DecimalSeparator:= '.';
+
+finalization
+  SynAnsiConvert.Free;
 
 end.

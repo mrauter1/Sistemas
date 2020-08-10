@@ -3,7 +3,7 @@ unit Ladder.Activity.Scheduler;
 interface
 
 uses
-  Ladder.Activity.Classes, Ladder.ServiceLocator, System.Generics.Collections, System.Classes, maxCron, Ladder.Activity.Classes.Dao;
+  Ladder.Activity.Classes, Ladder.ServiceLocator, System.Generics.Collections, System.Classes, maxCron, Ladder.Activity.Classes.Dao, SyncObjs;
 
 type
   TNotifyThread = class(TFrwThread)
@@ -44,13 +44,16 @@ type
     FScheduledActivities: TScheduledActivities;
     FDao: IScheduledActivityDao<TScheduledActivity>;
     FStopped: Boolean;
+
+    FListCriticalSection: TCriticalSection; // Must be used when writing from any thread or when reading is not done from the main thread
+
     procedure OnExecute(Sender: TObject);
     procedure ExecuteActivity(AActivity: TScheduledActivity);
   public
     constructor Create(pLoadScheduledActivities: Boolean = True);
     destructor Destroy; override;
 
-    procedure LoadScheduledActivities;
+    procedure ReloadScheduledActivities;
 
     procedure Start;
     procedure Stop;
@@ -116,13 +119,15 @@ begin
   FStopped:= False;
   FDao:= TScheduledActivityDao<TScheduledActivity>.Create;
 
+  FListCriticalSection:= TCriticalSection.Create;
+
   FScheduledActivities:= TScheduledActivities.Create;
   FLoopingThread:= TNotifyThread.Create(OnExecute, Self);
 
-  if pLoadScheduledActivities then
-     LoadScheduledActivities;
-
   FLoopingThread.Start;
+
+  if pLoadScheduledActivities then
+     ReloadScheduledActivities;
 end;
 
 destructor TScheduler.Destroy;
@@ -132,6 +137,7 @@ begin
 
   FScheduledActivities.Free;
   FLoopingThread.Free;
+  FListCriticalSection.Free;
   inherited;
 end;
 
@@ -153,10 +159,15 @@ begin
   end;
 end;
 
-procedure TScheduler.LoadScheduledActivities;
+procedure TScheduler.ReloadScheduledActivities;
 begin
-  ScheduledActivities.Clear;
-  FDao.SelectWhere(ScheduledActivities, 'className = ''TScheduledActivity''');
+  FListCriticalSection.Acquire;
+  try
+    ScheduledActivities.Clear;
+    FDao.SelectWhere(ScheduledActivities, 'className = ''TScheduledActivity''');
+  finally
+    FListCriticalSection.Release;
+  end;
 end;
 
 procedure TScheduler.OnExecute(Sender: TObject);
@@ -171,13 +182,17 @@ var
     FScheduledActivity: TScheduledActivity;
   begin
     Result:= nil;
-
-    for FScheduledActivity in ScheduledActivities do
-    begin
-      if not Assigned(Result) then
-        Result:= FScheduledActivity
-      else if FScheduledActivity.NextExecutionTime < Result.NextExecutionTime then
-        Result:= FScheduledActivity;
+    FListCriticalSection.Acquire;
+    try
+      for FScheduledActivity in ScheduledActivities do
+      begin
+        if not Assigned(Result) then
+          Result:= FScheduledActivity
+        else if FScheduledActivity.NextExecutionTime < Result.NextExecutionTime then
+          Result:= FScheduledActivity;
+      end;
+    finally
+      FListCriticalSection.Release;
     end;
   end;
 begin

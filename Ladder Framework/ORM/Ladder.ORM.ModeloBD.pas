@@ -11,6 +11,7 @@ uses
   function GetPropertyRttiType(pRttiMember: TRttiMember): TRttiType;
   function GetPropertyValue(pRttiMember: TRttiMember; Instance: Pointer): TValue;
   procedure SetPropertyValue(pRttiMember: TRttiMember; Instance: Pointer; AValue: TValue);
+  function PropIsWritable(pRttiMember: TRttiMember): Boolean;
 
 type
   TFunGetFieldValue = reference to function (const pFieldName: String; Instance: TObject; MasterInstance: TObject = nil): Variant;
@@ -86,7 +87,12 @@ type
     function FazMapeamentoECopiaValores(pObjeto: TObject; pDataSet: TDataSet;
       TipoMapeamento: TTipoMapeamento; Sender: TObject): Boolean; overload;
 
-    procedure SetPropValue(Instance: TObject; pFieldMapping: TFieldMapping; pDataSet: TDataSet; Sender: TObject);
+    procedure ObjectFromDBRows(pObject: TObject; pDBRows: ISqlDBRows; Sender: TObject = nil); overload;
+    function ObjectFromDBRows(pDBRows: ISqlDBRows; Sender: TObject = nil): TObject; overload;
+
+//    procedure SetPropValue(Instance: TObject; pFieldMapping: TFieldMapping; pDataSet: TDataSet; Sender: TObject);
+    procedure ColumnToProp(Instance: TObject; pRows: ISqlDBRows; pFieldMapping: TFieldMapping; Sender: TObject = nil);
+
     procedure SetFieldValue(Instance: TObject; pFieldMapping: TFieldMapping; pDataSet: TDataSet);
 
     procedure InicializaObjeto;
@@ -95,10 +101,6 @@ type
     procedure PopulaObjectListFromDBRows(pObjectList: TObjectList; pRows: ISqlDBRows; Sender: TObject = nil); overload;
     procedure PopulaObjectListFromDBRows<T: Class>(pObjectList: TObjectList<T>; pRows: ISqlDBRows; Sender: TObject = nil); overload;
 
-    procedure ObjectFromDBRows(pObject: TObject; pDBRows: ISqlDBRows; Sender: TObject = nil); overload;
-    function ObjectFromDBRows(pDBRows: ISqlDBRows; Sender: TObject = nil): TObject; overload;
-
-    procedure ColumnParaProp(Instance: TObject; pRows: ISqlDBRows; pFieldMapping: TFieldMapping; Sender: TObject = nil);
     function GetPropChave: TRttiMember;
     function GetNomeCampoChave: string;
     procedure SetItemClass(const Value: TClass);
@@ -188,7 +190,7 @@ function CreateObjectOfClass(pClass: TClass): TObject;
 implementation
 
 uses
-  TypInfo;
+  TypInfo, Ladder.Utils;
 
 function GetPropertyRttiType(pRttiMember: TRttiMember): TRttiType;
 begin
@@ -242,6 +244,14 @@ begin
     TRttiField(pRttiMember).SetValue(Instance, AValue)
   else
     raise Exception.Create(Format('TFieldMappingList.GetMemberType: Member %s must be field or property', [pRttiMember.Name]));
+end;
+
+function PropIsWritable(pRttiMember: TRttiMember): Boolean;
+begin
+  if pRttiMember is TRttiProperty then
+    Result:= TRttiProperty(pRttiMember).IsWritable
+  else
+    Result:= True;
 end;
 
 // Will not work if Constructor contains indexed Enumerators as parameter
@@ -600,10 +610,11 @@ begin
   FFieldsInUpdateDeleteWhere.Add(pFieldName);
 end;
 
-procedure TModeloBD.ColumnParaProp(Instance: TObject; pRows: ISqlDBRows; pFieldMapping: TFieldMapping; Sender: TObject = nil);
+procedure TModeloBD.ColumnToProp(Instance: TObject; pRows: ISqlDBRows; pFieldMapping: TFieldMapping; Sender: TObject = nil);
 var
   FProp: TRttiMember;
   FFieldIndex: Integer;
+  Value: TValue;
 begin
   FProp:= pFieldMapping.Prop;
   if not Assigned(FProp) then
@@ -611,22 +622,26 @@ begin
 
   if Assigned(pFieldMapping.FunGetPropValue) then
   begin
-    SetPropertyValue(FProp, Instance,
-                     pFieldMapping.FunGetPropValue(FProp.Name, GetPropertyValue(FProp, Instance), Instance, pRows, Sender)
-                    );
+    Value:= pFieldMapping.FunGetPropValue(FProp.Name, GetPropertyValue(FProp, Instance),Instance, pRows, Sender);
+    if PropIsWritable(FProp) then
+      SetPropertyValue(FProp, Instance, Value);
+
     Exit;
   end;
 
+  if not PropIsWritable(FProp) then
+    Exit;
+
   FFieldIndex:= pRows.ColumnIndex(pFieldMapping.FieldName);
   if FFieldIndex = -1 then
-    raise Exception.Create(Format('TModeloBD.ColumnParaProp: Field %s not found on Dataset for property %s', [pFieldMapping.FieldName, pFieldMapping.PropName]));
+    raise Exception.Create(Format('TModeloBD.ColumnToProp: Field %s not found on Dataset for property %s', [pFieldMapping.FieldName, pFieldMapping.PropName]));
 
   if GetPropertyRttiType(FProp).TypeKind = tkEnumeration then
     SetPropertyValue(FProp, Instance, TValue.FromOrdinal(GetPropertyRttiType(FProp).Handle, pRows.ColumnInt(FFieldIndex)))
   else
     SetPropertyValue(FProp, Instance, TValue.FromVariant(pRows.ColumnVariant(FFieldIndex)));
 end;
-
+{
 procedure TModeloBD.SetPropValue(Instance: TObject; pFieldMapping: TFieldMapping; pDataSet: TDataSet; Sender: TObject);
 var
   FValue: Integer;
@@ -663,7 +678,7 @@ begin
   else
     SetPropertyValue(FProp, Instance, TValue.FromVariant(FField.Value))
 end;
-
+ }
 procedure TModeloBD.SetFieldValue(Instance: TObject; pFieldMapping: TFieldMapping; pDataSet: TDataSet);
 var
   FField: Data.DB.TField;
@@ -789,7 +804,7 @@ begin
     begin
       case TipoMapeamento of
         tmObjectToDataset: raise Exception.Create('TModeloBD.FazMapeamentoECopiaValores é read only!');
-        tmObjectFromDataset: ColumnParaProp(pObjeto, pDBRows, pFieldMapping, Sender);
+        tmObjectFromDataset: ColumnToProp(pObjeto, pDBRows, pFieldMapping, Sender);
       end;
     end;
   // *FIM* Método anônimo de callback
@@ -816,7 +831,8 @@ begin
 
       case TipoMapeamento of
         tmObjectToDataSet: SetFieldValue(pObjeto, pFieldMapping, pDataSet);
-        tmObjectFromDataset: SetPropValue(pObjeto, pFieldMapping, pDataSet, Sender);
+        tmObjectFromDataset: ColumnToProp(pObjeto, TSqlDBRowDataSet.Create(pDataSet), pFieldMapping, Sender);
+        //tmObjectFromDataset: SetPropValue(pObjeto, pFieldMapping, pDataSet, Sender);
       end;
     end;
   // *FIM* Método anônimo de callback

@@ -38,8 +38,12 @@ type
   end;
 
   TFrwThread = class(TThread)
+  private
+    FContext: TFrwContext;
   public
-    Context: TFrwContext;
+    constructor Create; overload;
+    constructor Create(CreateSuspended: Boolean); overload;
+    property Context: TFrwContext read FContext;
   end;
 
   TFrwServiceLocator = class(TObject)
@@ -52,6 +56,9 @@ type
   public
     // Call once on main thread
     class procedure Inicializar(ServiceFactory: TFrwServiceFactory);
+
+    class procedure Finalizar;
+
     // Execute method on Main Thread
     class procedure Synchronize(FMethod: TThreadProcedure);
 
@@ -97,6 +104,11 @@ begin
   FExeName:= Application.ExeName;
   mainThreadID:= GetCurrentThreadID;
   GlobalContext:= TFrwContext.Create(ServiceFactory);
+end;
+
+class procedure TFrwServiceLocator.Finalizar;
+begin
+  GlobalContext.Free;
 end;
 
 class function TFrwServiceLocator.IsMainThread: Boolean;
@@ -200,7 +212,23 @@ begin
                                             end);
 end;
 
+{ TFrwThread }
+
+constructor TFrwThread.Create;
+begin
+  Create(False);
+end;
+
+constructor TFrwThread.Create(CreateSuspended: Boolean);
+begin
+  inherited Create(CreateSuspended);
+  FContext:=TFrwContext.Create(TFrwServiceFactory.Create);
+end;
+
 initialization
   TFrwServiceLocator.Inicializar(TFrwServiceFactory.Create);
+
+finalization
+  TFrwServiceLocator.Finalizar;
 
 end.

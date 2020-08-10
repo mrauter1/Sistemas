@@ -4,7 +4,7 @@ interface
 
 uses
   Data.DB, System.Contnrs, Generics.Collections, RTTI, Ladder.ORM.DaoUtils, Ladder.Messages, Ladder.ORM.ModeloBD,
-  Ladder.ORM.Classes, Ladder.ServiceLocator, Ladder.ORM.QueryBuilder, Spring.Reflection, SynDB;
+  Ladder.ORM.Classes, Ladder.ServiceLocator, Ladder.ORM.QueryBuilder, Spring.Reflection, SynDB, SynCommons;
 
 type
   // If this function returns false, the object and its childs will no be inserted/updated.
@@ -73,6 +73,8 @@ type
 
     procedure Insert(pObject: TObject; pMasterInstance: TObject = nil);
     function Update(pObject: TObject; pMasterInstance: TObject = nil): Boolean;
+    function UpdateProperties(pObject: TObject; APropertyNames: String; pMasterInstance: TObject=nil): Boolean;
+
     procedure Save(pObject: TObject; pMasterInstance: TObject = nil);
     procedure SaveList(pObjectList: TObjectList; pMasterInstance: TObject = nil); overload;
     procedure SaveList(pObjectList: TObjectList<TObject>; pMasterInstance: TObject = nil); overload;
@@ -100,6 +102,8 @@ type
     function ChildDaoByPropName(pPropertyName: String): IDaoBase;
     procedure AddChildDao(pPropertyName: String; pMasterFieldName: String; pChildFieldName: String; pDao: IDaoBase);
     procedure AddCompositeDao(pDao: IDaoBase);
+
+    procedure CreateTableAndFields; // Check if table and mapped fields exists on database and if not create them;
 
     property ModeloBD: TModeloBD read GetModeloBD;
     property QueryBuilder: TQueryBuilderBase read GetQueryBuilder;
@@ -157,6 +161,7 @@ type
     function DaoUtils: TDaoUtils;
 
     procedure OnAfterLoadObject(AObject: TObject); virtual;
+    function TableExists: Boolean; virtual;
   public
     property QueryBuilder: TQueryBuilderBase read GetQueryBuilder write fQueryBuilder;
     property ModeloBD: TModeloBD read fModeloBD write SetModeloBD;
@@ -173,6 +178,7 @@ type
 
     procedure Insert(pObject: TObject; pMasterInstance: TObject = nil); virtual;
     function Update(pObject: TObject; pMasterInstance: TObject = nil): Boolean; virtual;
+    function UpdateProperties(pObject: TObject; APropertyNames: String; pMasterInstance: TObject=nil): Boolean; virtual;
 
     procedure Save(pObject: TObject; pMasterInstance: TObject = nil); virtual;
     procedure SaveList(pObjectList: TObjectList; pMasterInstance: TObject = nil); overload; virtual;
@@ -201,6 +207,8 @@ type
 
     function SelectWhere<T: Class>(const pWhere: String): TObjectList<T>; overload;
     procedure SelectWhere<T: Class>(pObjectList: TObjectList<T>; const pWhere: String); overload;
+
+    procedure CreateTableAndFields; virtual; // Check if table and mapped fields exists on database and if not create them;
 
     function ChildDaoByPropName(pPropertyName: String): IDaoBase;
     procedure AddChildDao(pPropertyName: String; pMasterFieldName: String; pChildFieldName: String; pDao: IDaoBase); virtual;
@@ -275,6 +283,17 @@ type
     function NewQueryBuilder(ModeloBD: TModeloBD): TQueryBuilderBase;
   end;
 
+  TConnectionPropertiesHelper = class helper for TSqlDBConnectionProperties
+  private
+    function GetSQLCreateField: TSQLDBFieldTypeDefinition;
+    function GetSqlCreateFieldMax: cardinal;
+  public
+    function SQLFieldCreate(const aField: TSQLDBColumnCreate;
+      var aAddPrimaryKey: RawUTF8): RawUTF8; virtual;
+   property SqlCreateField: TSQLDBFieldTypeDefinition read GetSQLCreateField;
+   property SQLCreateFieldMax: cardinal read GetSqlCreateFieldMax;
+  end;
+
 var
  // Singleton
   DaoFactory: TDaoFactory;
@@ -282,7 +301,88 @@ var
 implementation
 
 uses
-  SysUtils, Classes, TypInfo, Controls, StrUtils, Variants, Ladder.Utils;
+  SysUtils, Classes, TypInfo, Controls, StrUtils, Variants, Ladder.Utils, SynTable;
+
+function SqlDbColumnCreateFromFieldMapping(AFieldMapping: TFieldMapping; ModeloBD: TModeloBD): TSQLDBColumnCreate;
+begin
+  Result.DBType:= FieldTypeToSqlDBFieldType(AFieldMapping.FieldType);
+  Result.Name:= AFieldMapping.FieldName;
+  Result.Width:= 0;
+  Result.Unique:= False;
+  Result.NonNullable:= False;
+  Result.PrimaryKey:= SameText(ModeloBD.NomeCampoChave, AFieldMapping.FieldName);
+end;
+
+function SQLFieldCreate(Connection: TSQLDBConnectionProperties; const AFieldMapping: TFieldMapping; ModeloBD: TModeloBD;
+  var aAddPrimaryKey: RawUTF8): RawUTF8;
+var
+  aField: TSQLDBColumnCreate;
+  fIsPrimaryKey: Boolean;
+  fAutoIncrement: Boolean;
+begin
+  fIsPrimaryKey:= SameText(ModeloBD.NomeCampoChave, AFieldMapping.FieldName);
+  fAutoIncrement:= fIsPrimaryKey and ModeloBD.ChaveIncremental;
+
+  aField:= SqlDbColumnCreateFromFieldMapping(AFieldMapping, ModeloBD);
+  if (aField.DBType=ftUTF8) and (cardinal(aField.Width-1)<Connection.SQLCreateFieldMax) then
+    FormatUTF8(Connection.SQLCreateField[ftNull],[aField.Width],result) else
+    result := Connection.SQLCreateField[aField.DBType];
+
+  if fAutoIncrement then
+    case Connection.DBMS of
+      dMSSQL: Result:= Result+' Identity(1,1)';
+    else raise Exception.Create('SQLFieldCreate: AutoIncrement field not implemented for this database.');
+    end;
+
+  if aField.NonNullable or aField.Unique or aField.PrimaryKey then
+    result := result+' NOT NULL';
+  if aField.Unique and not aField.PrimaryKey then
+    result := result+' UNIQUE'; // see http://www.w3schools.com/sql/sql_unique.asp
+  if aField.PrimaryKey then
+    case Connection.DBMS of
+    dSQLite, dMSSQL, dOracle, dJet, dPostgreSQL, dFirebird, dNexusDB, dInformix:
+      result := result+' PRIMARY KEY';
+    dDB2, dMySQL:
+      aAddPrimaryKey := aField.Name;
+    end;
+  result := aField.Name+result;
+end;
+
+function SQLAddColumn(Connection: TSQLDBConnectionProperties; AFieldMapping: TFieldMapping; ModeloBD: TModeloBD): RawUTF8;
+var AddPrimaryKey: RawUTF8;
+begin
+  FormatUTF8('ALTER TABLE % ADD %',[ModeloBD.NomeTabela ,SQLFieldCreate(Connection, AFieldMapping,ModeloBD,AddPrimaryKey)],result);
+end;
+
+function SQLCreate(Connection: TSQLDBConnectionProperties; ModeloBD: TModeloBD): RawUTF8;
+var i: integer;
+    F: RawUTF8;
+    FieldID: TSQLDBColumnCreate;
+    AddPrimaryKey: RawUTF8;
+    aFields: TSQLDBColumnCreateDynArray;
+    fFieldMapping: TFieldMapping;
+begin
+  result := '';
+
+  for fFieldMapping in ModeloBD.MappedFieldList do
+  begin
+    if fFieldMapping.FieldName = '' then
+      Continue;
+
+    if Result<>'' then
+      Result:= Result+',';
+    Result:= Result+SqlFieldCreate(Connection, FFieldMapping, ModeloBD, AddPrimaryKey);
+  end;
+  if Result='' then
+    Exit; // nothing to create
+
+  if AddPrimaryKey<>'' then
+    result := result+', PRIMARY KEY('+AddPrimaryKey+')';
+  result := 'CREATE TABLE '+ModeloBD.NomeTabela+' ('+result+')';
+  case Connection.DBMS of
+  dDB2: result := result+' CCSID Unicode';
+  end;
+end;
 
 { TDaoChildDefinitions }
 
@@ -450,6 +550,46 @@ begin
   Create(TModeloBD.Create(pNomeTabela, pCampoChave, pItemClass), True);
 end;
 
+procedure TDaoBase.CreateTableAndFields;
+var
+  FTableExists: Boolean;
+  fChildDao: TChildDaoDefs;
+
+  procedure CheckAndCreateFields;
+  var
+    FDataSet: TDataSet;
+    fFieldMapping: TFieldMapping;
+  begin
+    FDataSet:= DaoUtils.SelectAsDataset(Format('select * from %s where 1=0', [ModeloBD.NomeTabela]));
+    try
+      for fFieldMapping in ModeloBD.MappedFieldList do
+      begin
+        if fFieldMapping.FieldName='' then
+          Continue;
+
+        if FTableExists then
+          if FDataSet.FindField(fFieldMapping.FieldName)=nil then
+            DaoUtils.ExecuteNoResult(SQLAddColumn(DaoUtils.Connection, fFieldMapping, ModeloBD));
+      end;
+    finally
+      FDataSet.Free;
+    end;
+  end;
+
+begin
+  FTableExists:= TableExists;
+
+  if FTableExists then
+    CheckAndCreateFields
+  else
+    DaoUtils.ExecuteNoResult(SQLCreate(DaoUtils.Connection, ModeloBD));
+
+  for FChildDao in fChildDaoList do
+    if TObject(fChildDao.Dao) <> Self then
+      fChildDao.Dao.CreateTableAndFields;
+
+end;
+
 destructor TDaoBase.Destroy;
 var
   fChildDao: TChildDaoDefs;
@@ -610,6 +750,11 @@ begin
   Result:= Format('%s = %s', [pChildDefs.ChildFieldName,
                                  QueryBuilder.MapToSqlValue(FMasterFieldMapping, Instance)]);
 
+end;
+
+function TDaoBase.TableExists: Boolean;
+begin
+  Result:= DaoUtils.SelectInt(QueryBuilder.TableExists(ModeloBD.NomeTabela), 0) > 0;
 end;
 
 function TDaoBase.GetFunPropertyChild(pChildDefs: TChildDaoDefs): TFunGetPropValue;
@@ -960,6 +1105,21 @@ begin
   end;
 end;
 
+function TDaoBase.UpdateProperties(pObject: TObject; APropertyNames: String; pMasterInstance: TObject=nil): Boolean;
+var
+  fChildDaoDef: TChildDaoDefs;
+  FUpdateSql: String;
+begin
+  Result:= False;
+  FUpdateSql:= QueryBuilder.UpdateProperties(pObject, APropertyNames, pMasterInstance); // if Result is empty string there are no fields to update
+  if FUpdateSql <> '' then
+    Result:= DaoUtils.ExecuteNoResult(FUpdateSql) > 0;
+
+  for fChildDaoDef in fChildDaoList do
+    if fChildDaoDef is TCompositeChildDaoDefs then
+      Result:= Result or fChildDaoDef.Dao.UpdateProperties(pObject, APropertyNames, pObject); // Property might be part of a composite DAO
+end;
+
 procedure TDaoBase.InsertChild(pMaster, pChild: TObject; ChildDefs: TChildDaoDefs = nil);
 begin
   if not Assigned(ChildDefs) then
@@ -1213,7 +1373,28 @@ begin
   // Não faz nada
 end;}
 
+{ TConnectionPropertiesHelper }
+
+function TConnectionPropertiesHelper.GetSQLCreateField: TSQLDBFieldTypeDefinition;
+begin
+  Result:= fSqlCreateField;
+end;
+
+function TConnectionPropertiesHelper.GetSqlCreateFieldMax: cardinal;
+begin
+  Result:= fSqlCreateFieldMax;
+end;
+
+function TConnectionPropertiesHelper.SQLFieldCreate(
+  const aField: TSQLDBColumnCreate; var aAddPrimaryKey: RawUTF8): RawUTF8;
+begin
+  inherited;
+end;
+
 initialization
   DaoFactory:= TDaoFactory.Create;
+
+finalization
+  DaoFactory.Free;
 
 end.

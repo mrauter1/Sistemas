@@ -72,6 +72,7 @@ end;
 function NewProcessoEnviaEmailMeta: TProcessoBase;
 begin
   Result:= NewProcesso(TExecutorSendMail.GetExecutor);
+  Result.Name:= 'EnvioDeEmail';
   Result.Inputs.Add(TParameter.Create('Titulo', tbValue, '@EnviaEmailMeta.Titulo'));
   Result.Inputs.Add(TParameter.Create('Body', tbValue, '@EnviaEmailMeta.Body'));
   Result.Inputs.Add(TParameter.Create('Destinatarios', tbValue, 'marcelo@rauter.com.br'));

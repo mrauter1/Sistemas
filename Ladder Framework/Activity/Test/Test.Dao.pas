@@ -18,39 +18,6 @@ uses
   SysUtils, SynDB;
 
 type
-  IDaoComposite = interface(IDaoGeneric<TTesteComposite>)
-    function GetCompositeDao: IDaoGeneric<TTesteComposite>;
-  end;
-
-  TTesteDao<T: TTeste> = class(TDaoGeneric<T>)
-  private
-    FDaoTestChild: IDaoGeneric<TTestChild>;
-  public
-    constructor Create;
-  end;
-
-  TDaoComposite = class(TTesteDao<TTesteComposite>, IDaoComposite)
-  private
-    FCompositeDao: IDaoGeneric<TTesteComposite>;
-  protected
-    function NewObject(pDBRows: ISqlDBRows): TObject;
-  public
-    constructor Create;
-    function GetCompositeDao: IDaoGeneric<TTesteComposite>;
-  end;
-
-  // Test methods for class TDaoBase
-  TRecursiveObject = class
-  public
-    procedure AfterConstruction; override;
-    destructor Destroy; override;
-  public
-    FID: Integer;
-  published
-    Childs: TObjectList<TRecursiveObject>;
-    property ID: Integer read FID write FID;
-  end;
-
   TestTDaoBase = class(TTestCase)
   strict private
     FDaoBase: IDaoBase;
@@ -59,6 +26,7 @@ type
     procedure SetUp; override;
     procedure TearDown; override;
   published
+    procedure CreateTableAndFields; // Must be the first test
     procedure TestInsertChild;
     procedure TestRecursiveObject;
   end;
@@ -106,6 +74,13 @@ implementation
 uses
   DateUtils, Math;
 
+procedure TestTDaoBase.CreateTableAndFields;
+begin
+  FDaoBase.ModeloBD.Connection.ExecuteNoResult('DROP TABLE TESTE',[]);
+  FDaoBase.ModeloBD.Connection.ExecuteNoResult('DROP TABLE TestChild',[]);
+  FDaoBase.CreateTableAndFields;
+end;
+
 procedure TestTDaoBase.SetUp;
 var
   FDaoTestChild: TDaoBase;
@@ -118,8 +93,6 @@ end;
 procedure TestTDaoBase.TearDown;
 begin
   FDaoBase := nil;
-  TFrwServiceLocator.Context.DaoUtils.ExecuteNoResult('DELETE FROM TESTE');
-  TFrwServiceLocator.Context.DaoUtils.ExecuteNoResult('DELETE FROM TestChild');
 end;
 
 procedure TestTDaoBase.TestRecursiveObject;
@@ -410,63 +383,6 @@ begin
   // TODO: Setup method call parameters
   ReturnValue := FDaoFactory.NewQueryBuilder(ModeloBD);
   // TODO: Validate method results
-end;
-
-{ TRecursiveObject }
-
-procedure TRecursiveObject.AfterConstruction;
-begin
-  inherited;
-  Childs:= TObjectList<TRecursiveObject>.Create;
-end;
-
-destructor TRecursiveObject.Destroy;
-begin
-  Childs.Free;
-  inherited;
-end;
-
-{ TTesteDao }
-
-constructor TTesteDao<T>.Create;
-begin
-  inherited Create('Teste', 'ID', TTeste);
-  with ModeloBD do UpdateOptions:= UpdateOptions + [uoDeleteMissingChilds];
-
-  FDaoTestChild := TDaoGeneric<TTestChild>.Create('TestChild', 'ID');
-  Self.AddChildDao('Childs', 'ID', 'IDPAI', FDaoTestChild);
-end;
-
-{ TDaoComposite }
-
-constructor TDaoComposite.Create;
-var
-  FModeloBD: TModeloBD;
-begin
-  inherited Create;
-
-  NewObjectFunction:= NewObject; // Since ItemClass is baseclass, baseclass will be created by default, here we override
-
-  FModeloBD:= TModeloBD.Create(TTesteComposite, False);
-  FModeloBD.NomeTabela:= 'TestComposite';
-  FModeloBD.NomePropChave:= 'ID';
-  FModeloBD.ChaveIncremental:= False;
-  FModeloBD.DoMapPublishedFields(True); // Only map published field of TTesteComposite (don't map fields from base class)
-  FModeloBD.Map('ID', 'ID'); // Since ID is a member of Base Class it must be explicitly added;
-
-  FCompositeDao:= TDaoGeneric<TTesteComposite>.Create(FModeloBD);
-
-  AddCompositeDao(FCompositeDao);
-end;
-
-function TDaoComposite.GetCompositeDao: IDaoGeneric<TTesteComposite>;
-begin
-  Result:= FCompositeDao;
-end;
-
-function TDaoComposite.NewObject(pDBRows: ISqlDBRows): TObject;
-begin
-  Result:= TTesteComposite.Create;
 end;
 
 initialization

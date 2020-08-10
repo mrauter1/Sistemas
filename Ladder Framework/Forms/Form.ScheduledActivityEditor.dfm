@@ -3,7 +3,7 @@ object FormScheduledActivityEditor: TFormScheduledActivityEditor
   Top = 0
   Caption = 'Configurar Atividades'
   ClientHeight = 412
-  ClientWidth = 625
+  ClientWidth = 606
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,12 +17,13 @@ object FormScheduledActivityEditor: TFormScheduledActivityEditor
   object PanelTop: TPanel
     Left = 0
     Top = 0
-    Width = 625
+    Width = 606
     Height = 105
     Align = alTop
     TabOrder = 0
+    ExplicitWidth = 625
     DesignSize = (
-      625
+      606
       105)
     object Label1: TLabel
       Left = 170
@@ -49,13 +50,15 @@ object FormScheduledActivityEditor: TFormScheduledActivityEditor
       Caption = 'Descri'#231#227'o'
     end
     object Label4: TLabel
-      Left = 422
+      Left = 403
       Top = 39
       Width = 52
       Height = 26
       Alignment = taRightJustify
+      Anchors = [akTop, akRight]
       Caption = 'Cron Expression'
       WordWrap = True
+      ExplicitLeft = 422
     end
     object Label5: TLabel
       Left = 3
@@ -78,12 +81,13 @@ object FormScheduledActivityEditor: TFormScheduledActivityEditor
     object DBEditNomeAtividade: TDBEdit
       Left = 288
       Top = 15
-      Width = 323
+      Width = 304
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       DataField = 'Name'
       DataSource = DsAtividade
       TabOrder = 1
+      ExplicitWidth = 323
     end
     object DBEditID: TDBEdit
       Left = 80
@@ -98,28 +102,30 @@ object FormScheduledActivityEditor: TFormScheduledActivityEditor
     object DBEditDescricao: TDBEdit
       Left = 80
       Top = 42
-      Width = 324
+      Width = 305
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       DataField = 'Description'
       DataSource = DsAtividade
       TabOrder = 2
+      ExplicitWidth = 324
     end
     object DBEditCronExpression: TDBEdit
-      Left = 480
+      Left = 461
       Top = 42
       Width = 131
       Height = 21
-      DataField = 'Description'
+      Anchors = [akTop, akRight]
+      DataField = 'CronExpression'
       DataSource = DsAtividade
       TabOrder = 3
+      ExplicitLeft = 480
     end
     object DBEditLastExecutedTime: TDBEdit
-      Left = 81
-      Top = 72
-      Width = 155
+      Left = 80
+      Top = 69
+      Width = 141
       Height = 21
-      Anchors = [akLeft, akTop, akRight]
       DataField = 'LastExecutionTime'
       DataSource = DsAtividade
       TabOrder = 4
@@ -129,7 +135,6 @@ object FormScheduledActivityEditor: TFormScheduledActivityEditor
       Top = 72
       Width = 155
       Height = 21
-      Anchors = [akLeft, akTop, akRight]
       DataField = 'NextExecutionTime'
       DataSource = DsAtividade
       TabOrder = 5
@@ -138,36 +143,40 @@ object FormScheduledActivityEditor: TFormScheduledActivityEditor
   object PanelCentro: TPanel
     Left = 0
     Top = 105
-    Width = 625
+    Width = 606
     Height = 263
     Align = alClient
     TabOrder = 1
+    ExplicitWidth = 625
     object GroupBoxProcessos: TGroupBox
       Left = 1
       Top = 1
-      Width = 623
+      Width = 604
       Height = 261
       Align = alClient
       Caption = 'Processos'
       TabOrder = 0
+      ExplicitWidth = 623
       object PanelControles: TPanel
         Left = 2
         Top = 218
-        Width = 619
+        Width = 600
         Height = 41
         Align = alBottom
         TabOrder = 0
+        ExplicitWidth = 619
         DesignSize = (
-          619
+          600
           41)
         object Panel1: TPanel
-          Left = 112
+          Left = 102
           Top = 0
           Width = 404
           Height = 36
           Anchors = [akBottom]
           BevelOuter = bvNone
           TabOrder = 0
+          ExplicitLeft = 112
           object BtnAddProcesso: TBitBtn
             Left = 13
             Top = 8
@@ -197,7 +206,7 @@ object FormScheduledActivityEditor: TFormScheduledActivityEditor
           end
         end
         object BtnMoveUp: TBitBtn
-          Left = 564
+          Left = 545
           Top = 0
           Width = 32
           Height = 21
@@ -257,9 +266,10 @@ object FormScheduledActivityEditor: TFormScheduledActivityEditor
             0000000000000000000000000000000000000000000000000000}
           TabOrder = 1
           OnClick = BtnMoveUpClick
+          ExplicitLeft = 564
         end
         object BtnMoveDown: TBitBtn
-          Left = 564
+          Left = 545
           Top = 18
           Width = 32
           Height = 21
@@ -319,6 +329,7 @@ object FormScheduledActivityEditor: TFormScheduledActivityEditor
             0000000000000000000000000000000000000000000000000000}
           TabOrder = 2
           OnClick = BtnMoveDownClick
+          ExplicitLeft = 564
         end
         object BtnExecutar: TBitBtn
           Left = 9
@@ -333,7 +344,7 @@ object FormScheduledActivityEditor: TFormScheduledActivityEditor
       object DBGridRelatorios: TDBGrid
         Left = 2
         Top = 15
-        Width = 619
+        Width = 600
         Height = 203
         Align = alClient
         DataSource = DsProcessos
@@ -381,10 +392,11 @@ object FormScheduledActivityEditor: TFormScheduledActivityEditor
   object PanelBot: TPanel
     Left = 0
     Top = 368
-    Width = 625
+    Width = 606
     Height = 44
     Align = alBottom
     TabOrder = 2
+    ExplicitWidth = 625
     object BtnSalvar: TBitBtn
       Left = 12
       Top = 5

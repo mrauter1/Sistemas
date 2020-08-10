@@ -90,7 +90,7 @@ procedure TestTScheduledActivity.TestNextExecutionTime;
 begin
 // One minute  before the end of year if the last day of the year is Friday
   CheckCronExpression('59 23 31 12 5 *', LadderVarToDateTime('2021-12-31 23:59:00.000'), LadderVarToDateTime('2020-01-01 10:59:00.000'));
-// One minute  before the end of year if the last day of the year is Friday
+// One minute before the end of year if the last day of the year is Friday
   CheckCronExpression('59 23 31 12 5 *', LadderVarToDateTime('2027-12-31 23:59:00.000'), LadderVarToDateTime('2021-12-31 23:59:00.000'));
 // At midnight, on the first day of each month
   CheckCronExpression('0 0 1 * * *', LadderVarToDateTime('2020-08-01 00:00:00.000'), LadderVarToDateTime('2020-07-01 10:00:00.000'));
@@ -101,7 +101,7 @@ end;
 procedure TestTScheduler.LoadAndRunSchedulerForever;
 begin
   FScheduler.Stop;
-  FScheduler.LoadScheduledActivities;
+  FScheduler.ReLoadScheduledActivities;
   FScheduler.Start;
   while True do
     Application.ProcessMessages;

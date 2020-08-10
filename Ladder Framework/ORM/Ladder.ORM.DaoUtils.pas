@@ -10,7 +10,7 @@ type
   TDaoUtils = class
   private
     FConnection: TSQLDBConnectionProperties;
-    property Connection: TSQLDBConnectionProperties read FConnection;
+  protected
   public
     class var RttiContext: TRttiContext;
     constructor Create(pConnection: TSQLDBConnectionProperties);
@@ -38,6 +38,8 @@ type
     // ATENÇÃO:: AS PROPRIEDADES DO OBJETO QUE DEVEM SER RETORNADAS TEM QUE ESTAR NA SEÇÃO PUBLISHED!!!
     function SelectAsObjectList(var ObjectInstance: TObjectList; ItemClass: TClass; const pSql: String): Boolean; overload;
     function SelectAsObjectList<T: class>(var ObjectList: TObjectList<T>; ItemClass: TClass; const pSql: String): Boolean; overload;
+
+    property Connection: TSQLDBConnectionProperties read FConnection;
   end;
 
 procedure CopyFields(Source, Dest: TDataSet);

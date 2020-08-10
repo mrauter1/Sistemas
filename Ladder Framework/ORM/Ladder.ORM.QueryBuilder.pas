@@ -25,6 +25,7 @@ type
 
     function Insert(pObject: TObject; pMasterInstance: TObject=nil; pOutputID: Boolean = False): String; virtual; abstract;
     function Update(pObject: TObject; pMasterInstance: TObject=nil): String; virtual; abstract;
+    function UpdateProperties(pObject: TObject; APropertyNames: String; pMasterInstance: TObject=nil): String; virtual; abstract;
     function Delete(pObject: TObject; pMasterInstance: TObject=nil): String; overload; virtual; abstract;
     function Delete(pKeyValue: Integer): String; overload; virtual; abstract;
 
@@ -50,6 +51,9 @@ type
 
     function Insert(pObject: TObject; pMasterInstance: TObject=nil; pOutputID: Boolean = False): String; override;
     function Update(pObject: TObject; pMasterInstance: TObject=nil): String; override;
+    // if APropertyNames = '*' update all properties
+    function UpdateProperties(pObject: TObject; APropertyNames: String; pMasterInstance: TObject=nil): String; override;
+
     function Delete(pObject: TObject; pMasterInstance: TObject=nil): String; overload; override;
     function Delete(pKeyValue: Integer): String; overload; override;
 
@@ -302,7 +306,7 @@ begin
   end;
 end;
 
-function TSqlServerQueryBuilder.Update(pObject: TObject; pMasterInstance: TObject=nil): String;
+{function TSqlServerQueryBuilder.Update(pObject: TObject; pMasterInstance: TObject=nil): String;
 var
   fSql: TStringBuilder;
   fPrimeiroCampo: Boolean;
@@ -333,6 +337,86 @@ begin
 
     fPrimeiroCampo:= True;
     ModeloBD.FazMapeamentoDaClasse(fCallBack, True);
+
+    fSql.AppendFormat('WHERE %s ', [GetUpdateDeleteWhere(pObject)]);
+
+    Result:= fSql.ToString;
+
+  finally
+    fSql.Free;
+  end;
+end;        }
+
+function TSqlServerQueryBuilder.Update(pObject: TObject; pMasterInstance: TObject=nil): String;
+begin
+  Result:= UpdateProperties(pObject, '*', pMasterInstance);
+end;
+
+function TSqlServerQueryBuilder.UpdateProperties(pObject: TObject; APropertyNames: String;
+  pMasterInstance: TObject): String; // if APropertyNames = '*' update all fields
+var
+  FProps: TArray<String>;
+  fSql: TStringBuilder;
+  fPrimeiroCampo: Boolean;
+  fCallBack: TMapeamentoCallback;
+begin
+  fCallBack:=
+    procedure (pClass: TClass; pFieldMapping: TFieldMapping; Sender: TObject)
+      function ShouldUpdateProp(const AProperties: TArray<String>; const APropName: String): Boolean;
+      var
+        FPropName: String;
+      begin
+        if APropertyNames='*' then
+        begin
+          Result:= True;
+          Exit;
+        end;
+
+        for FPropName in AProperties do
+          if SameText(Trim(FPropName), APropName) then
+          begin
+            Result:= True;
+            Exit;
+          end;
+
+        Result:= False;
+      end;
+
+    begin
+      if (fModeloBD.ChaveIncremental) and (pFieldMapping.Prop = fModeloBD.PropChave) then
+        Exit;
+
+      if not ShouldUpdateProp(FProps, pFieldMapping.PropName) then
+        Exit;
+
+      if not fPrimeiroCampo then
+        fSql.Append(' , ');
+
+      fSql.Append('  ').Append(pFieldMapping.FieldName);
+
+      fSql.Append(' = ').AppendLine(MapToSqlValue(pFieldMapping, pObject, pMasterInstance));
+
+      if fPrimeiroCampo then
+        fPrimeiroCampo:= False;
+    end;
+
+  FProps:= APropertyNames.Split([',']);
+
+  fSql:= TStringBuilder.Create;
+  try
+    fSql.Append('UPDATE ').AppendLine(ModeloBD.NomeTabela);
+
+    fSql.Append(' SET ');
+
+    fPrimeiroCampo:= True;
+    ModeloBD.FazMapeamentoDaClasse(fCallBack, True);
+
+    if fPrimeiroCampo then // No properties to update
+    begin
+      Result:= ''; // Returns empty string if there are no fields to update
+      Exit;
+//      raise Exception.Create('TSqlServerQueryBuilder.UpdateProperties: No properties to update!');
+    end;
 
     fSql.AppendFormat('WHERE %s ', [GetUpdateDeleteWhere(pObject)]);
 

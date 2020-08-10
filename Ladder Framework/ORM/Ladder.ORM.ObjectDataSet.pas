@@ -127,6 +127,10 @@ type
     procedure InternalRefresh; override;
     procedure SetFilterText(const Value: string); override;
 
+    function InternalAddItem(Item: TObject): Integer; virtual;
+    function InternalExtractItem(Item: TObject): TObject; virtual;
+    function InternalRemoveItem(Item: TObject): Integer; virtual;
+
     function GetChangedSortText(const sortText: string): string;
     function CreateIndexList(const sortText: string): TArray<TIndexFieldInfo>;
     function FieldInSortIndex(AField: TField): Boolean;
@@ -314,36 +318,19 @@ end;
 
 function TObjectDataSet.AddItem(Item: TObject): Integer;
 begin
-  if Assigned(fObjectList) then
-    Result:= fObjectList.Add(Item)
-  else if Assigned(fGenericObjectList) then
-    Result:= fGenericObjectList.Add(Item)
-  else
-    RaiseObjectListNotAssigned;
-
+  InternalAddItem(Item);
   Synchronize(Item);
 end;
 
 function TObjectDataSet.RemoveItem(Item: TObject): Integer;
 begin
-  if Assigned(fObjectList) then
-    Result:= fObjectList.Remove(Item)
-  else if Assigned(fGenericObjectList) then
-    Result:= fGenericObjectList.Remove(Item)
-  else
-    RaiseObjectListNotAssigned;
-
+  InternalRemoveItem(Item);
   Synchronize;
 end;
 
 function TObjectDataSet.ExtractItem(Item: TObject): TObject;
 begin
-  if Assigned(fObjectList) then
-    Result:= fObjectList.Extract(Item)
-  else if Assigned(fGenericObjectList) then
-    Result:= fGenericObjectList.Extract(Item)
-  else
-    RaiseObjectListNotAssigned;
+  InternalExtractItem(Item);
 
   Synchronize;
 end;
@@ -358,9 +345,9 @@ begin
     Exit;
 
   case Action of
-    caAdded: AddItem(Item);
-    caRemoved: RemoveItem(Item);
-    caExtracted: ExtractItem(Item);
+    caAdded: InternalAddItem(Item);
+    caRemoved: InternalRemoveItem(Item);
+    caExtracted: InternalExtractItem(Item);
 {    caReplaced: fObjectList.(Item);
     caMoved: ;
     caReseted: ;
@@ -637,6 +624,17 @@ begin
     fFilterParser.Expression := Filter;
 end;
 
+function TObjectDataSet.InternalAddItem(Item: TObject): Integer;
+begin
+  if Assigned(fObjectList) then
+    Result:= fObjectList.Add(Item)
+  else if Assigned(fGenericObjectList) then
+    Result:= fGenericObjectList.Add(Item)
+  else
+    RaiseObjectListNotAssigned;
+
+end;
+
 procedure TObjectDataSet.InternalClose;
 begin
   inherited InternalClose;
@@ -732,6 +730,26 @@ begin
   inherited InternalRefresh;
   if Sorted then
     InternalSetSort(Sort);
+end;
+
+function TObjectDataSet.InternalExtractItem(Item: TObject): TObject;
+begin
+  if Assigned(fObjectList) then
+    Result:= fObjectList.Extract(Item)
+  else if Assigned(fGenericObjectList) then
+    Result:= fGenericObjectList.Extract(Item)
+  else
+    RaiseObjectListNotAssigned;
+end;
+
+function TObjectDataSet.InternalRemoveItem(Item: TObject): Integer;
+begin
+  if Assigned(fObjectList) then
+    Result:= fObjectList.Remove(Item)
+  else if Assigned(fGenericObjectList) then
+    Result:= fGenericObjectList.Remove(Item)
+  else
+    RaiseObjectListNotAssigned;
 end;
 
 procedure TObjectDataSet.InternalSetSort(const value: string; index: Integer);

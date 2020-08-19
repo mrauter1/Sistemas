@@ -12,6 +12,7 @@ inherited ConSqlServer: TConSqlServer
       'User_Name=user'
       'Database=Logistec')
     ResourceOptions.AssignedValues = [rvAutoConnect, rvAutoReconnect, rvKeepConnection]
+    Connected = True
     Left = 113
     Top = 56
   end

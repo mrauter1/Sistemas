@@ -126,6 +126,7 @@ procedure TDmGravaLista.LerEAtualizarListaDePrecoSidicom(NomeListaGoogle: String
   end;
 
 begin
+  WriteLog('Monitor.log', Format('Iniciando script de atualização da lista remota %s para a lista do Sidicom %s', [NomeListaGoogle, CodListaSidicom]));
   LerListaGoogle(NomeListaGoogle);
 
   ZerarPrecoLista;
@@ -164,7 +165,7 @@ begin
     FDM.LerEAtualizarListaDePrecoSidicom('IPC2725', '0004'); // ICM + Pis + Cofins = 27,25%
     FDM.LerEAtualizarListaDePrecoSidicom('IPC2125', '0005'); // ICM + Pis + Cofins = 21,25%
     FDM.LerEAtualizarListaDePrecoSidicom('IPC12', '0006'); // ICM + Pis + Cofins = 12%
-//    FDM.LerEAtualizarListaDePrecoSidicom('ND', '0007'); // ICM + Pis + Cofins = 0%
+    FDM.LerEAtualizarListaDePrecoSidicom('ND', '0007'); // ICM + Pis + Cofins = 0%
   finally
     FDM.Free;
   end;

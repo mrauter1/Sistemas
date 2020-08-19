@@ -17,22 +17,25 @@ TConnectionParams = record
   end;
 
   TAppConfig = class
+  protected
+    procedure DoReadIniFile(AIniFile: TIniFile); virtual;
+    procedure LerConfig; virtual;
+    function LerConfigBanco(pIniFile: TIniFile; pSection: String): TConnectionParams; virtual;
+    procedure LerConfUsuario; virtual;
+  public
     PastaUpdate: String;
     PythonPath: String;
     PythonFilePath: String;
     GruposUsuario: TGruposUsuarios;
     ConSqlServer: TConnectionParams;
     ConFirebird: TConnectionParams;
+//    property IniFile: TIniFile read FIniFile write FIniFile;
 
-    const
-      IniFile = 'Config.ini';
-      ConfUsuario = 'Usuario.ini';
+    IniFileName: String;
+    UserConfFileName: String;
 
     constructor Create;
-  private
-    procedure LerIniFile;
-    function LerConfigBanco(pIniFile: TIniFile; pSection: String): TConnectionParams;
-    procedure LerConfUsuario;
+    destructor Destroy; override;
   end;
 
 var
@@ -42,6 +45,12 @@ implementation
 
 { TAppConfig }
 
+destructor TAppConfig.Destroy;
+begin
+
+  inherited;
+end;
+
 function TAppConfig.LerConfigBanco(pIniFile: TIniFile; pSection: String): TConnectionParams;
 begin
   Result.Server:= pIniFile.ReadString(pSection, 'Server', '');
@@ -50,21 +59,25 @@ begin
   Result.Port:= pIniFile.ReadInteger(pSection, 'Port', 0);
 end;
 
-procedure TAppConfig.LerIniFile;
+procedure TAppConfig.DoReadIniFile(AIniFile: TIniFile);
+begin
+  PastaUpdate:= AIniFile.ReadString('GERAL', 'PastaUpdate', '');
+  ConSqlServer:= LerConfigBanco(AIniFile, 'SQLSERVER');
+  ConFirebird:= LerConfigBanco(AIniFile, 'FIREBIRD');
+
+  PythonPath:= AIniFile.ReadString('PYTHON', 'Path', 'C:\ProgramData\Anaconda3\python.exe');
+  PythonFilePath:= AIniFile.ReadString('PYTHON', 'FilePath', 'E:\SistemaGerenciador\ListaPrecos');
+end;
+
+procedure TAppConfig.LerConfig;
 var
   FIniFile: TIniFile;
 begin
   GruposUsuario:= [];
 
-  FIniFile:= TIniFile.Create(ExtractFilePath(Application.ExeName)+ IniFile);
+  FIniFile:= TIniFile.Create(ExtractFilePath(Application.ExeName)+ IniFileName);
   try
-    PastaUpdate:= FIniFile.ReadString('GERAL', 'PastaUpdate', '');
-    ConSqlServer:= LerConfigBanco(FIniFile, 'SQLSERVER');
-    ConFirebird:= LerConfigBanco(FIniFile, 'FIREBIRD');
-
-    PythonPath:= FIniFile.ReadString('PYTHON', 'Path', 'C:\ProgramData\Anaconda3\python.exe');
-    PythonFilePath:= FIniFile.ReadString('PYTHON', 'FilePath', 'E:\SistemaGerenciador\ListaPrecos');
-
+    DoReadIniFile(FIniFile);
   finally
     FIniFile.Free;
   end;
@@ -76,7 +89,7 @@ var
 begin
   GruposUsuario:= [];
 
-  FIniFile:= TIniFile.Create(ExtractFilePath(Application.ExeName)+ ConfUsuario);
+  FIniFile:= TIniFile.Create(ExtractFilePath(Application.ExeName)+ UserConfFileName);
   try
     if FIniFile.ReadBool('USUARIO', 'PRODUCAO', False) then
       Include(GruposUsuario, puGerenteProducao);
@@ -93,7 +106,10 @@ constructor TAppConfig.Create;
 begin
   inherited;
 
-  LerIniFile;
+  IniFileName:= 'Config.ini';
+  UserConfFileName:= 'Usuario.ini';
+
+  LerConfig;
   LerConfUsuario;
 end;
 

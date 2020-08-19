@@ -209,6 +209,7 @@ type
     function ExportaTabelaDinamica(pNomeArquivo: String): Boolean;
     function ExportaGrafico(pNomeArquivo: String): Boolean;
     function ResultAsDocVariant: Variant;
+    function ResultRecordCount: Integer;
     procedure AbrirConsultaPersonalizada(Consulta :string; pExecutar: Boolean = True);
 
     property Params: TParametros read GetParams;
@@ -1324,12 +1325,16 @@ end;
 
 function TFrmConsultaPersonalizada.ResultAsDocVariant: Variant;
 begin
-  if VarIsEmptyOrNull(Variant(FResultDocVariant)) then
-    FResultDocVariant:= TLadderVarToSql.DataSetToDocVariant(QryConsulta)
-  else if FResultDocVariant.Count <> QryConsulta.RecordCount then
-    FResultDocVariant:= TLadderVarToSql.DataSetToDocVariant(QryConsulta);
+  FResultDocVariant:= TLadderVarToSql.DataSetToDocVariant(QryConsulta, True);
 
   Result:= Variant(FResultDocVariant);
+end;
+
+function TFrmConsultaPersonalizada.ResultRecordCount: Integer;
+begin
+  Result:= 0;
+  if QryConsulta.Active then
+    Result:= QryConsulta.RecordCount;
 end;
 
 procedure TFrmConsultaPersonalizada.FormCreate(Sender: TObject);

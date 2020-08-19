@@ -366,6 +366,8 @@ object FormPrincipal: TFormPrincipal
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 1
+      ExplicitLeft = -2
+      ExplicitTop = 38
     end
   end
   object TreeViewMenu: TdxDBTreeView
@@ -469,6 +471,17 @@ object FormPrincipal: TFormPrincipal
     end
     object Consultas1: TMenuItem
       Caption = 'Consultas'
+    end
+    object Atividades1: TMenuItem
+      Caption = 'Atividades'
+      object CadastrodeAtividades1: TMenuItem
+        Caption = 'Cadastro de Atividades'
+        OnClick = CadastrodeAtividades1Click
+      end
+      object Agendamentos1: TMenuItem
+        Caption = 'Agendamentos'
+        OnClick = Agendamentos1Click
+      end
     end
   end
   object Timer1: TTimer

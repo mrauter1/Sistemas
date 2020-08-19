@@ -45,9 +45,17 @@ uses
   uAppConfig in '..\utils\uAppConfig.pas',
   uDmGravaLista in '..\utils\uDmGravaLista.pas' {DmGravaLista: TDataModule},
   uFormLogistica in 'Fontes\uFormLogistica.pas' {FormLogistica},
-  uFormEntregaPorProduto in 'Fontes\uFormEntregaPorProduto.pas' {FormEntregaPorProduto};
+  uFormEntregaPorProduto in 'Fontes\uFormEntregaPorProduto.pas' {FormEntregaPorProduto},
+  Root,
+  Form.ActivityEditor in '..\Ladder Framework\Forms\Form.ActivityEditor.pas' {FormActivityEditor},
+  Form.ConsultaEditor in '..\Ladder Framework\Forms\Form.ConsultaEditor.pas',
+  Form.ProcessActivityEditor in '..\Ladder Framework\Forms\Form.ProcessActivityEditor.pas',
+  Form.SimpleProcessEditor in '..\Ladder Framework\Forms\Form.SimpleProcessEditor.pas';
 
 {$R *.res}
+
+var
+  FRootClass: TRootClass;
 
 begin
   with TAtualiza.Create(AppConfig.PastaUpdate) do
@@ -55,6 +63,13 @@ begin
     VerificaEAtualiza;
   finally
     Free;
+  end;
+
+  FRootClass:= TRootClass.Create;
+  try
+    FRootClass.CreateAllTables;
+  finally
+    FRootClass.Free;
   end;
 
   Application.Initialize;

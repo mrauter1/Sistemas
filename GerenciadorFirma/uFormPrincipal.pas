@@ -16,7 +16,8 @@ uses
   FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
   FireDAC.Comp.DataSet, FireDAC.Comp.Client, uFrmConsulta, Vcl.ComCtrls, dxtree,
   dxdbtree, uConSqlServer, uConsultaPersonalizada, cxSplitter, ChromeTabs,
-  ChromeTabsClasses, ChromeTabsTypes, uAppConfig, uDmGeradorConsultas, uFormLogistica;
+  ChromeTabsClasses, ChromeTabsTypes, uAppConfig, uDmGeradorConsultas, uFormLogistica,
+  Form.ScheduledActivities, Form.PesquisaAviso;
 
 type
   TTabPanel = class(TPanel)
@@ -80,6 +81,9 @@ type
     MenuCicloVendas: TMenuItem;
     AtualizaTodasasListasdePreo1: TMenuItem;
     ControleLogistica1: TMenuItem;
+    Atividades1: TMenuItem;
+    CadastrodeAtividades1: TMenuItem;
+    Agendamentos1: TMenuItem;
     procedure Pedidos1Click(Sender: TObject);
     procedure Fila1Click(Sender: TObject);
     procedure Densidade1Click(Sender: TObject);
@@ -123,6 +127,8 @@ type
     procedure MenuCicloVendasClick(Sender: TObject);
     procedure AtualizaTodasasListasdePreo1Click(Sender: TObject);
     procedure ControleLogistica1Click(Sender: TObject);
+    procedure CadastrodeAtividades1Click(Sender: TObject);
+    procedure Agendamentos1Click(Sender: TObject);
   private
     FDmGeradorConsultas: TDmGeradorConsultas;
     FPopupActive: Boolean;
@@ -252,6 +258,8 @@ end;
 
 procedure TFormPrincipal.FormShow(Sender: TObject);
 begin
+  Atividades1.Visible:= (puDesenvolvedor in AppConfig.GruposUsuario);
+
   if Application.MainForm = Self then
   begin
     DMFilaProducao.AtualizaFilaProducao;
@@ -537,6 +545,11 @@ begin
     FIDNodeSelecionado:= 0;
 end;
 
+procedure TFormPrincipal.CadastrodeAtividades1Click(Sender: TObject);
+begin
+  TFormPesquisaAviso.AbrirPesquisa;
+end;
+
 procedure TFormPrincipal.CarregaConsultas;
 var
   FMenuItem: TMenuItem;
@@ -659,6 +672,11 @@ begin
     FTab.Free;
     raise;
   end;
+end;
+
+procedure TFormPrincipal.Agendamentos1Click(Sender: TObject);
+begin
+  TFormScheduledActivities.OpenScheduledActivities;
 end;
 
 procedure TFormPrincipal.AtualizaTabAtiva(pTab: TChromeTab);

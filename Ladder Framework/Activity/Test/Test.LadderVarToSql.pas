@@ -38,7 +38,7 @@ function GetDaoUtils: TDaoUtils;
 implementation
 
 uses
-  DateUtils, Dialogs, Classes, Data.DB;
+  DateUtils, Dialogs, Classes, Data.DB, Ladder.Utils;
 
 function GetDaoUtils: TDaoUtils;
 begin
@@ -92,31 +92,41 @@ begin
 end;
 
 procedure TestTLadderVarToSql.TestDataSetToDocVariant;
-var
-  FDataSet: TDataset;
-  FCount: Integer;
-  pDocVariant, ReturnValue: TDocVariantData;
-  I, j: Integer;
-begin
-  pDocVariant:= TDocVariantData(GetDaoUtils.SelectAsDocVariant('select chavenf, dataentrada, totitens, substituicao from mfor '));
-  FDataSet:= FLadderVarToSql.DocVariantToDataSet(nil, pDocVariant);
-  try                                                          
-    ReturnValue:= FLadderVarToSql.DataSetToDocVariant(FDataSet);
-    Check(ReturnValue.Count = FDataSet.RecordCount);
-    FDataSet.First;
-    for I := 0 to FDataSet.RecordCount-1 do
-    begin
-      for J := 0 to FDataSet.FieldCount-1 do
-      begin  
-        CheckEquals(FDataSet.Fields[j].FieldName, ReturnValue._[I].Names[j]);
-        Check(FDataSet.Fields[j].Value = ReturnValue._[I].Values[j]);  
-        
+  procedure TestSql(pSql: String);
+  var
+    FDataSet: TDataset;
+    FCount: Integer;
+    pDocVariant, ReturnValue: TDocVariantData;
+    I, j: Integer;
+  begin
+    pDocVariant:= TDocVariantData(GetDaoUtils.SelectAsDocVariant(pSql, True));
+    FDataSet:= FLadderVarToSql.DocVariantToDataSet(nil, pDocVariant);
+    try
+      ReturnValue:= FLadderVarToSql.DataSetToDocVariant(FDataSet);
+      Check(ReturnValue.Count = FDataSet.RecordCount);
+      FDataSet.First;
+      for I := 0 to FDataSet.RecordCount-1 do
+      begin
+        for J := 0 to FDataSet.FieldCount-1 do
+        begin
+          CheckEquals(FDataSet.Fields[j].FieldName, ReturnValue._[I].Names[j]);
+          if FDataSet.Fields[j].DataType = ftDateTime then
+            Check(FDataSet.Fields[j].AsDateTime = LadderVarToDateTime(ReturnValue._[I].Values[j]))
+          else
+            Check(FDataSet.Fields[j].Value = ReturnValue._[I].Values[j]);
+
+        end;
+        FDataSet.Next;
       end;
-      FDataSet.Next;
+    finally
+      FDataset.Free;
     end;
-  finally
-    FDataSet.Free;
   end;
+
+begin
+  TestSql('select top 100 chavenf, dataentrada, totitens, substituicao from mfor ');
+  TestSql('select top 0 chavenf, dataentrada, totitens, substituicao from mfor ');
+  TestSql('select null as chavenf, getdate() as dataentrada, 2 as totitens, null as substituicao ');
 end;
 
 procedure TestTLadderVarToSql.TestDocVariantToDataSet;

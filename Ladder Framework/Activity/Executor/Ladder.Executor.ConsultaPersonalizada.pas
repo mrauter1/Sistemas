@@ -134,7 +134,7 @@ function TExecutorConsultaPersonalizada.Executar: TOutputList;
 var
   FExport: TParameter;
   FExportParam: TParameter;
-  FDataParam: TOutputParameter;
+  FDataParam, FCountParam: TOutputParameter;
   FConsulta: TFrmConsultaPersonalizada;
   FData: Variant;
 begin
@@ -145,6 +145,10 @@ begin
     FDataParam:= Outputs.Param('Data');
     if Assigned(FDataParam) then
       FDataParam.Value:= FConsulta.ResultAsDocVariant;
+
+    FCountParam:= Outputs.Param('Count');
+    if Assigned(FCountParam) then
+      FCountParam.Value:= FConsulta.ResultRecordCount;
 
     FExport:= Inputs.Param('Export'); // Export result to file
     if Assigned(FExport) then

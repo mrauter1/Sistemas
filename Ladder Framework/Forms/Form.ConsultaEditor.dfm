@@ -1,13 +1,13 @@
 inherited FormConsultaEditor: TFormConsultaEditor
   Caption = 'FormConsultaEditor'
-  ClientHeight = 482
-  ClientWidth = 607
-  ExplicitWidth = 623
-  ExplicitHeight = 521
+  ClientHeight = 474
+  ClientWidth = 590
+  ExplicitWidth = 606
+  ExplicitHeight = 513
   PixelsPerInch = 96
   TextHeight = 13
   inherited Panel1: TPanel
-    Width = 607
+    Width = 590
     Height = 91
     ExplicitWidth = 607
     ExplicitHeight = 91
@@ -20,123 +20,131 @@ inherited FormConsultaEditor: TFormConsultaEditor
       Caption = 'Consulta'
     end
     inherited BtnOK: TBitBtn
-      Left = 483
+      Left = 466
       ExplicitLeft = 483
     end
     inherited DBEditNomeProcesso: TDBEdit
-      Width = 277
+      Width = 260
       ExplicitWidth = 277
     end
     inherited DBEdit1: TDBEdit
-      Width = 494
+      Width = 477
       ExplicitWidth = 494
     end
   end
   inherited Panel2: TPanel
     Top = 91
-    Width = 607
-    Height = 391
+    Width = 590
+    Height = 383
     ExplicitTop = 91
     ExplicitWidth = 607
-    ExplicitHeight = 391
-    object Splitter1: TSplitter [0]
-      Left = 1
-      Top = 168
-      Width = 605
+    ExplicitHeight = 383
+    inherited Splitter1: TSplitter
+      Top = 165
+      Width = 588
       Height = 3
-      Cursor = crVSplit
-      Align = alBottom
-      ExplicitTop = 1
-      ExplicitWidth = 192
+      ExplicitTop = 159
+      ExplicitWidth = 605
+      ExplicitHeight = 3
     end
     inherited GroupBoxInputs: TGroupBox
-      Width = 605
-      Height = 167
+      Width = 588
+      Height = 164
       ExplicitWidth = 605
-      ExplicitHeight = 167
+      ExplicitHeight = 164
       inherited ScrollBoxParametros: TScrollBox
-        Width = 601
-        Height = 150
+        Width = 584
+        Height = 147
+        ExplicitLeft = 2
         ExplicitWidth = 601
-        ExplicitHeight = 150
+        ExplicitHeight = 147
       end
     end
     inherited GroupBoxOutputs: TGroupBox
-      Top = 280
-      Width = 605
+      Top = 272
+      Width = 588
       Height = 110
-      ExplicitTop = 280
+      ExplicitTop = 272
       ExplicitWidth = 605
       ExplicitHeight = 110
-      inherited cxGrid1: TcxGrid
-        Width = 601
+      inherited cxGridOutputs: TcxGrid
+        Width = 584
         Height = 93
         ExplicitWidth = 601
         ExplicitHeight = 93
       end
     end
-    object cxGridExport: TcxGrid
+    object GroupBox1: TGroupBox
       Left = 1
-      Top = 171
-      Width = 605
-      Height = 109
+      Top = 168
+      Width = 588
+      Height = 104
       Align = alBottom
+      Caption = 'Arquivos para exporta'#231#227'o'
       TabOrder = 2
-      ExplicitLeft = 2
-      ExplicitTop = 172
-      object cxGridDBTableView2: TcxGridDBTableView
-        Navigator.Buttons.CustomButtons = <>
-        DataController.Summary.DefaultGroupSummaryItems = <>
-        DataController.Summary.FooterSummaryItems = <>
-        DataController.Summary.SummaryGroups = <>
-        OptionsView.GroupByBox = False
-      end
-      object cxGridExportDBTableView1: TcxGridDBTableView
-        Navigator.Buttons.CustomButtons = <>
-        Navigator.Buttons.First.Visible = False
-        Navigator.Buttons.PriorPage.Visible = False
-        Navigator.Buttons.Prior.Visible = False
-        Navigator.Buttons.Next.Visible = False
-        Navigator.Buttons.NextPage.Visible = False
-        Navigator.Buttons.Last.Visible = False
-        Navigator.Buttons.Delete.Visible = True
-        Navigator.Buttons.Edit.Visible = False
-        Navigator.Buttons.Post.Visible = True
-        Navigator.Buttons.Cancel.Visible = False
-        Navigator.Buttons.Refresh.Visible = False
-        Navigator.Buttons.SaveBookmark.Visible = False
-        Navigator.Buttons.GotoBookmark.Visible = False
-        Navigator.Buttons.Filter.Visible = False
-        Navigator.Visible = True
-        DataController.DataSource = DsExport
-        DataController.Summary.DefaultGroupSummaryItems = <>
-        DataController.Summary.FooterSummaryItems = <>
-        DataController.Summary.SummaryGroups = <>
-        OptionsView.GroupByBox = False
-        object cxGridExportDBTableView1Nome: TcxGridDBColumn
-          DataBinding.FieldName = 'Nome'
-          Width = 142
+      ExplicitWidth = 605
+      object cxGridExport: TcxGrid
+        Left = 2
+        Top = 15
+        Width = 584
+        Height = 87
+        Align = alClient
+        TabOrder = 0
+        ExplicitWidth = 601
+        object cxGridDBTableView2: TcxGridDBTableView
+          Navigator.Buttons.CustomButtons = <>
+          DataController.Summary.DefaultGroupSummaryItems = <>
+          DataController.Summary.FooterSummaryItems = <>
+          DataController.Summary.SummaryGroups = <>
+          OptionsView.GroupByBox = False
         end
-        object cxGridExportDBTableView1Visualizacao: TcxGridDBColumn
-          DataBinding.FieldName = 'Visualizacao'
-          Width = 173
+        object cxGridExportDBTableView1: TcxGridDBTableView
+          Navigator.Buttons.CustomButtons = <>
+          Navigator.Buttons.First.Visible = False
+          Navigator.Buttons.PriorPage.Visible = False
+          Navigator.Buttons.Prior.Visible = False
+          Navigator.Buttons.Next.Visible = False
+          Navigator.Buttons.NextPage.Visible = False
+          Navigator.Buttons.Last.Visible = False
+          Navigator.Buttons.Delete.Visible = True
+          Navigator.Buttons.Edit.Visible = False
+          Navigator.Buttons.Post.Visible = True
+          Navigator.Buttons.Cancel.Visible = False
+          Navigator.Buttons.Refresh.Visible = False
+          Navigator.Buttons.SaveBookmark.Visible = False
+          Navigator.Buttons.GotoBookmark.Visible = False
+          Navigator.Buttons.Filter.Visible = False
+          Navigator.Visible = True
+          DataController.DataSource = DsExport
+          DataController.Summary.DefaultGroupSummaryItems = <>
+          DataController.Summary.FooterSummaryItems = <>
+          DataController.Summary.SummaryGroups = <>
+          OptionsView.GroupByBox = False
+          object cxGridExportDBTableView1Nome: TcxGridDBColumn
+            DataBinding.FieldName = 'Nome'
+            Width = 142
+          end
+          object cxGridExportDBTableView1Visualizacao: TcxGridDBColumn
+            DataBinding.FieldName = 'Visualizacao'
+            Width = 173
+          end
+          object cxGridExportDBTableView1NomeArquivo: TcxGridDBColumn
+            DataBinding.FieldName = 'NomeArquivo'
+            Width = 152
+          end
+          object cxGridExportDBTableView1TipoVisualizacao: TcxGridDBColumn
+            DataBinding.FieldName = 'TipoVisualizacao'
+            PropertiesClassName = 'TcxComboBoxProperties'
+            Properties.DropDownListStyle = lsEditFixedList
+            Properties.Items.Strings = (
+              'TABELA'
+              'TABELADINAMICA'
+              'GRAFICO')
+          end
         end
-        object cxGridExportDBTableView1NomeArquivo: TcxGridDBColumn
-          DataBinding.FieldName = 'NomeArquivo'
-          Width = 152
+        object cxGridExportLevel1: TcxGridLevel
+          GridView = cxGridExportDBTableView1
         end
-        object cxGridExportDBTableView1TipoVisualizacao: TcxGridDBColumn
-          DataBinding.FieldName = 'TipoVisualizacao'
-          PropertiesClassName = 'TcxComboBoxProperties'
-          Properties.DropDownListStyle = lsEditFixedList
-          Properties.Items.Strings = (
-            'TABELA'
-            'TABELADINAMICA'
-            'GRAFICO')
-        end
-      end
-      object cxGridExportLevel1: TcxGridLevel
-        GridView = cxGridExportDBTableView1
       end
     end
   end

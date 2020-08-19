@@ -27,26 +27,26 @@ uses
   FireDAC.Comp.Client, cxGridLevel, cxGridCustomTableView, cxGridTableView,
   cxGridDBTableView, cxClasses, cxGridCustomView, cxGrid, Vcl.StdCtrls,
   Vcl.Mask, Vcl.DBCtrls, Vcl.Buttons, Vcl.ExtCtrls, uConClasses, uConClasses.Dao,
-  Ladder.Activity.Classes, cxDropDownEdit, Ladder.Activity.Manager;
+  Ladder.Activity.Classes, cxDropDownEdit, Ladder.Activity.Manager, cxSplitter;
 
 type
   TFormConsultaEditor = class(TFormProcessEditor)
     LblConsulta: TLabel;
-    cxGridExport: TcxGrid;
-    cxGridDBTableView2: TcxGridDBTableView;
     TBExport: TFDMemTable;
     DsExport: TDataSource;
     TBExportNome: TStringField;
     TBExportVisualizacao: TStringField;
     TBExportNomeArquivo: TStringField;
-    cxGridExportLevel1: TcxGridLevel;
+    TBExportTipoVisualizacao: TStringField;
+    GroupBox1: TGroupBox;
+    cxGridExport: TcxGrid;
+    cxGridDBTableView2: TcxGridDBTableView;
     cxGridExportDBTableView1: TcxGridDBTableView;
     cxGridExportDBTableView1Nome: TcxGridDBColumn;
     cxGridExportDBTableView1Visualizacao: TcxGridDBColumn;
     cxGridExportDBTableView1NomeArquivo: TcxGridDBColumn;
-    TBExportTipoVisualizacao: TStringField;
     cxGridExportDBTableView1TipoVisualizacao: TcxGridDBColumn;
-    Splitter1: TSplitter;
+    cxGridExportLevel1: TcxGridLevel;
     procedure BtnOKClick(Sender: TObject);
   private
     FConsulta: TConsulta;
@@ -323,6 +323,7 @@ var
 begin
   FOutputsDef:= TOutputList.Create;
   FOutputsDef.Add(TOutputParameter.Create('Data', tbAny, ''));
+  FOutputsDef.Add(TOutputParameter.Create('Count', tbAny, ''));
   inherited Create(AOwner, TObjectList<TParametroCon>.Create, FOutputsDef, ActivityManager.GetExecutor(TExecutorConsultaPersonalizada));
 //  ArquivosExport.Active:= True;
 

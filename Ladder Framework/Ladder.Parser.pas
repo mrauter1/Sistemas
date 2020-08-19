@@ -29,6 +29,7 @@ type
     function LenExpression: Integer;
     procedure ParseOtherExpression(pNewExpression: String; var Return: Variant);
     function FunLiteralTranslation(const pValue: Variant): String;
+    function FunSqlTanslation(const pValue: Variant): String;
   protected
     function ExtractTextDelimitedBy(var Index: Integer; const OpenDelimiter, CloseDelimiter: String; NeedCloseDelimiter: Boolean = True): String; overload; virtual;
     function ExtractTextDelimitedBy(var Index: Integer; const OpenDelimiter, CloseDelimiter: String; pDoInterpolation: Boolean; pFunTranslateValue: TFunTranslateValue; NeedCloseDelimiter: Boolean = True): String; overload; virtual;
@@ -96,7 +97,7 @@ type
 implementation
 
 uses
-  Ladder.Utils;
+  Ladder.Utils, Ladder.Activity.LadderVarToSql;
 
 { EParseException }
 
@@ -148,7 +149,7 @@ begin
  else
    FDoInterpolation:= True;
 
-  FSql:= ExtractTextDelimitedBy(Index, '$', '$', FDoInterpolation, FunLiteralTranslation, False);
+  FSql:= ExtractTextDelimitedBy(Index, '$', '$', FDoInterpolation, FunSqlTanslation, False);
 
   if Trim(FSql) = '' then
     raise EParseException.Create('ParseSQL: Empty Sql Expression.', FExpression, Index);
@@ -162,17 +163,19 @@ begin
 
   FOnSqlEval(FSql, Return);
 
+  if not LadderVarIsTable(Return) then
+  begin
+    Return:= Null;
+    Exit;
+  end;
+
   if not DocVariantType.IsOfType(Return) then
     raise Exception.Create(Format('ParseSQL: Return value of OnSqlEval must be TDocVariantData. Expression: "%s". Pos: %d', [FExpression, Index]));
 
   FData:= TDocVariantData(Return);
   if FSingleValue then
-  begin
-    if FData.Count>0 then
-      Return:=FData._[0]^.Values[0]
-    else
-      Return:=null;
-  end;
+     Return:=FData._[0]^.Values[0]
+
 end;
 
 function TActivityParser.FunLiteralTranslation(const pValue: Variant): String;
@@ -206,6 +209,32 @@ begin
  else
   Result:= VarToStrDef(pValue, '');
 
+end;
+
+function TActivityParser.FunSqlTanslation(const pValue: Variant): String;
+  function ArrayToSql(pArray: TDocVariantData): String;
+  var
+    I: Integer;
+  begin
+    Result:= '';
+
+    for I := 0 to pArray.Count-1 do
+    begin
+      if I>0 then
+        Result:= Result+',';
+
+      Result:= Result+TLadderVarToSql.LadderVarToStr(pValue);
+    end;
+
+  end;
+
+begin
+  if LadderVarIsTable(pValue) then
+    Result:= '('+TLadderVarToSql.TableDocToInlineSql(TDocVariantData(pValue))+')X'
+  else if LadderVarIsList(pValue) and (TDocVariantData(pValue).Kind = dvArray) then
+    Result:= ArrayToSql(TDocVariantData(pValue))
+  else
+    Result:= TLadderVarToSql.LadderVarToStr(pValue);
 end;
 
 procedure TActivityParser.ParseNumber(var Index: Integer; var Return: Variant);
@@ -508,7 +537,7 @@ function TActivityParser.ExtractTextDelimitedBy(var Index: Integer;
   const OpenDelimiter, CloseDelimiter: String; pDoInterpolation: Boolean;
   pFunTranslateValue: TFunTranslateValue; NeedCloseDelimiter: Boolean = True): String;
 
-  function ReplaceInterpolation(var Index: Integer): String;
+  procedure ParseInterpolation(var Index: Integer; ReplaceValue: Boolean);
   var
     FStart: Integer;
     FSubExpression: String;
@@ -516,7 +545,10 @@ function TActivityParser.ExtractTextDelimitedBy(var Index: Integer;
     FValue: variant;
   begin
     FStart:= Index;
-    FSubExpression:= ExtractTextDelimitedBy(Index, '{', '}');
+    FSubExpression:= ExtractTextDelimitedBy(Index, '{', '}', True, nil, True);
+
+    if not ReplaceValue then // If replace value is false just increase the index and don't change the expression.
+      Exit;
 
     Delete(FExpression, FStart, Index-FStart);
     ParseOtherExpression(FSubExpression, FValue);
@@ -552,7 +584,7 @@ begin
 
     if (pDoInterpolation and (FExpression[Index] = '{')) then
     begin
-      ReplaceInterpolation(Index);
+      ParseInterpolation(Index, Assigned(pFunTranslateValue));
       continue;
     end;
 

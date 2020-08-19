@@ -118,7 +118,7 @@ type
     property ChaveIncremental: Boolean read FChaveIncremental write FChaveIncremental;
     property FieldsInUpdateDeleteWhere: TList<String> read FFieldsInUpdateDeleteWhere;
     property UpdateOptions: TUpdateOptions read FUpdateOptions write FUpdateOptions;
-    property AfterLoadObjectEvent: IEvent<TNotifyEvent> read fAfterLoadObjectEvent write fAfterLoadObjectEvent;
+    property AfterLoadObjectEvent: IEvent<TNotifyEvent> read fAfterLoadObjectEvent;
     //property OnAfterLoad: TNotifyEvent read FOnAfterLoad write FOnAfterLoad;
 
     constructor Create(pItemClass: TClass; pMapAllPublishedFields: Boolean = True); overload;

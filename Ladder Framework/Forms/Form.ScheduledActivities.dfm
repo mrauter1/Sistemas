@@ -3,7 +3,7 @@ object FormScheduledActivities: TFormScheduledActivities
   Top = 0
   Caption = 'Agendamentos'
   ClientHeight = 346
-  ClientWidth = 599
+  ClientWidth = 764
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,20 +16,22 @@ object FormScheduledActivities: TFormScheduledActivities
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 599
+    Width = 764
     Height = 305
     Align = alClient
     TabOrder = 0
+    ExplicitWidth = 599
     object cxGridAvisos: TcxGrid
       Left = 1
       Top = 1
-      Width = 597
+      Width = 762
       Height = 303
       Align = alClient
       TabOrder = 0
+      ExplicitLeft = 0
       object cxGridAvisosDBTableView1: TcxGridDBTableView
         Navigator.Buttons.CustomButtons = <>
-        DataController.DataSource = DsAvisos
+        DataController.DataSource = DsSchedules
         DataController.Summary.DefaultGroupSummaryItems = <>
         DataController.Summary.FooterSummaryItems = <>
         DataController.Summary.SummaryGroups = <>
@@ -41,7 +43,7 @@ object FormScheduledActivities: TFormScheduledActivities
         OptionsView.GroupByBox = False
         object cxGridAvisosDBTableView1ID: TcxGridDBColumn
           DataBinding.FieldName = 'ID'
-          Width = 61
+          Width = 57
         end
         object cxGridAvisosDBTableView1IDActivity: TcxGridDBColumn
           DataBinding.FieldName = 'IDActivity'
@@ -49,11 +51,23 @@ object FormScheduledActivities: TFormScheduledActivities
         end
         object cxGridAvisosDBTableView1Name: TcxGridDBColumn
           DataBinding.FieldName = 'Name'
-          Width = 169
+          Width = 156
         end
         object cxGridAvisosDBTableView1Description: TcxGridDBColumn
           DataBinding.FieldName = 'Description'
-          Width = 310
+          Width = 213
+        end
+        object cxGridAvisosDBTableView1CronExpression: TcxGridDBColumn
+          DataBinding.FieldName = 'CronExpression'
+          Width = 85
+        end
+        object cxGridAvisosDBTableView1LastExecutionTime: TcxGridDBColumn
+          DataBinding.FieldName = 'LastExecutionTime'
+          Width = 103
+        end
+        object cxGridAvisosDBTableView1NextExecutionTime: TcxGridDBColumn
+          DataBinding.FieldName = 'NextExecutionTime'
+          Width = 110
         end
       end
       object cxGridAvisosLevel1: TcxGridLevel
@@ -64,12 +78,13 @@ object FormScheduledActivities: TFormScheduledActivities
   object Panel2: TPanel
     Left = 0
     Top = 305
-    Width = 599
+    Width = 764
     Height = 41
     Align = alBottom
     TabOrder = 1
+    ExplicitWidth = 599
     DesignSize = (
-      599
+      764
       41)
     object BtnSelecionar: TButton
       Left = 240
@@ -81,7 +96,7 @@ object FormScheduledActivities: TFormScheduledActivities
       OnClick = BtnSelecionarClick
     end
     object BtnFechar: TButton
-      Left = 496
+      Left = 661
       Top = 6
       Width = 75
       Height = 25
@@ -89,6 +104,7 @@ object FormScheduledActivities: TFormScheduledActivities
       Caption = 'Fechar'
       TabOrder = 1
       OnClick = BtnFecharClick
+      ExplicitLeft = 496
     end
     object BtnRemoverAviso: TButton
       Left = 119
@@ -109,13 +125,13 @@ object FormScheduledActivities: TFormScheduledActivities
       OnClick = BtnNovoAvisoClick
     end
   end
-  object DsAvisos: TDataSource
+  object DsSchedules: TDataSource
     AutoEdit = False
-    DataSet = TbAvisos
+    DataSet = TbSchedules
     Left = 280
     Top = 104
   end
-  object TbAvisos: TFDMemTable
+  object TbSchedules: TFDMemTable
     FetchOptions.AssignedValues = [evMode]
     FetchOptions.Mode = fmAll
     ResourceOptions.AssignedValues = [rvSilentMode]
@@ -125,36 +141,46 @@ object FormScheduledActivities: TFormScheduledActivities
     UpdateOptions.AutoCommitUpdates = True
     Left = 385
     Top = 106
-    object TbAvisosID: TIntegerField
+    object TbSchedulesID: TIntegerField
       FieldName = 'ID'
     end
-    object TbAvisosIDActivity: TIntegerField
+    object TbSchedulesIDActivity: TIntegerField
       FieldName = 'IDActivity'
       Origin = 'IDActivity'
     end
-    object TbAvisosName: TMemoField
+    object TbSchedulesName: TMemoField
       FieldName = 'Name'
       Origin = 'Name'
       BlobType = ftMemo
       Size = 2147483647
     end
-    object TbAvisosDescription: TMemoField
+    object TbSchedulesDescription: TMemoField
       FieldName = 'Description'
       Origin = 'Description'
       BlobType = ftMemo
       Size = 2147483647
     end
-    object TbAvisosClassName: TMemoField
+    object TbSchedulesClassName: TMemoField
       FieldName = 'ClassName'
       Origin = 'ClassName'
       BlobType = ftMemo
       Size = 2147483647
     end
-    object TbAvisosExecutorClass: TMemoField
+    object TbSchedulesExecutorClass: TMemoField
       FieldName = 'ExecutorClass'
       Origin = 'ExecutorClass'
       BlobType = ftMemo
       Size = 2147483647
+    end
+    object TbSchedulesCronExpression: TMemoField
+      FieldName = 'CronExpression'
+      BlobType = ftMemo
+    end
+    object TbSchedulesLastExecutionTime: TDateTimeField
+      FieldName = 'LastExecutionTime'
+    end
+    object TbSchedulesNextExecutionTime: TDateTimeField
+      FieldName = 'NextExecutionTime'
     end
   end
 end

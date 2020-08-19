@@ -35,6 +35,7 @@ type
     procedure TestParseNumber;
     procedure TestParseString;
     procedure TestStringInterpolations;
+    procedure TestSqlInterpolations;
     procedure TestParseList;
     procedure TestListIndex;
     procedure TestParseNext;
@@ -172,6 +173,7 @@ end;
 procedure TestTActivityParser.TestParseSql;
 const
   s0 = '$@ SELECT 0$'; //$@ operator makes SQL expression evaluate to a single value
+  sNull = '$@SELECT 0 WHERE 1=0$'; //$@ operator makes SQL expression evaluate to a single value
   sString = '$@ SELECT ''ABCDE''$';
   sDate = '$@ SELECT GETDATE()$';
   sList = '$ SELECT 1 AS NUM UNION SELECT 2 UNION SELECT 3  $';
@@ -192,6 +194,9 @@ var
 
 begin
   CheckEquals(0, VarToIntDef(ParseNewSql(s0),1));
+
+  Check(ParseNewSql(sNull)=null);
+
   CheckEquals('ABCDE',VarToStr(ParseNewSql(sString)));
 
   ReturnValue:= ParseNewSql(sDate);
@@ -263,15 +268,31 @@ begin
   // TODO: Validate method results
 end;
 
+procedure TestTActivityParser.TestSqlInterpolations;
+const
+  t1:  TArray<String> = ['$@select ''test ''+{"right"} as field $ ', 'test right'];
+  cSql = 'select ''teste'' as nome, 1 as int  union select ''teste2'' as nome, 2 as int  ';
+  t2: TArray<String> = ['$@select count(*) from {$'+cSql+'$} $', '2'];
+  t3: TArray<String> = ['$@select sum(int) from {$'+cSql+'$} $', '3'];
+var
+  FArr: Variant;
+begin
+  DoTest(t1);
+  DoTest(t2);
+  DoTest(t3);
+end;
+
 procedure TestTActivityParser.TestStringInterpolations;
 const
   t1:  TArray<String> = ['"test {"right"}"', 'test right'];
   tList: TArray<String> = ['"t{["e","s","t"]}"', 't["e", "s", "t"]'];
   tSql: TArray<String> = ['"t{$@SELECT ''est''$}"', 'test'];
+  tDoubleInterpolation: TArray<String> = ['"test {"{"double"} right"}"', 'test double right'];
 begin
   DoTest(t1);
   DoTest(tList);
   DoTest(tSql);
+  DoTest(tDoubleInterpolation);
 end;
 
 procedure TestTActivityParser.TestListIndex;

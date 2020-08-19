@@ -19,7 +19,7 @@ type
 
     function SelectAsJSon(const pSql: String): String;
     function SelectAsDataset(const pSql: String; AOwner: TComponent = nil): TDataSet;
-    function SelectAsDocVariant(const pSql: String): Variant;
+    function SelectAsDocVariant(const pSql: String; NullValuesWhenEmpty: Boolean = False): Variant;
 
     function SelectValue(const pSql: String): Variant;
     function SelectDouble(const pSQL: String; pValorDef: Double = 0): Double;
@@ -47,7 +47,7 @@ procedure CopyFields(Source, Dest: TDataSet);
 implementation
 
 uses
-  mORMot, MormotVCL, SynDBVCL, Ladder.Utils, TypInfo;
+  mORMot, MormotVCL, SynDBVCL, Ladder.Utils, TypInfo, Variants;
 
 { TDaoUtils }
 
@@ -101,9 +101,28 @@ begin
   Result:= ToDataSet(AOwner,Connection.Execute(pSql,[]));
 end;
 
-function TDaoUtils.SelectAsDocVariant(const pSql: String): Variant;
+function TDaoUtils.SelectAsDocVariant(const pSql: String; NullValuesWhenEmpty: Boolean = False): Variant;
+var
+  fFields: variant;
+  I: Integer;
+  fFieldValues: TDocVariantData;
 begin
   Result:= _Json(SelectAsJSon(pSql));
+  if (TDocVariantData(Result).Kind = dvObject) and (NullValuesWhenEmpty) then // if Return DocVariant is of type dvObject it means RowCount is 0
+  begin
+    fFields:= TDocVariantData(Result).Values[TDocVariantData(Result).GetValueIndex('values')];
+    if not VarIsNull(fFields) then
+    begin
+      fFieldValues.InitObject([]);
+
+      for I := 0 to TDocVariantData(fFields).Count-1 do
+        fFieldValues.AddValue(TDocVariantData(fFields).Value[I], null);
+
+    end;
+    TDocVariantData(Result).Clear;
+    TDocVariantData(Result).Init();
+    TDocVariantData(Result).AddItem(variant(fFieldValues))
+  end;
 end;
 
 function TDaoUtils.SelectDouble(const pSQL: String; pValorDef: Double = 0): Double;

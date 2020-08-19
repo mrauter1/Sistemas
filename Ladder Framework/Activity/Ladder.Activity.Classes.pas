@@ -433,6 +433,9 @@ var
     if pInput.Expression <> '' then // if Expression is blank, keep the value
       EvaluateParam(AEvaluator, pInput);
 
+    if VarIsEmpty(pInput.Value) then
+      pInput.Value:= Null;
+
     for FParameter in pInput.Parameters do
       ValuateInput(AEvaluator, FParameter);
   end;

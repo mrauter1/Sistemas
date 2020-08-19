@@ -30,7 +30,7 @@ uses
   uConSqlServer, cxDBLookupComboBox, Ladder.ServiceLocator, Vcl.ComCtrls,
   Vcl.CheckLst, Ladder.Activity.Classes, Form.ProcessEditorBase, Ladder.ORM.DAO,
   Ladder.ORM.ObjectDataSet, Ladder.Activity.Classes.Dao,
-  System.Generics.Collections, uConClasses, Ladder.Activity.Manager;
+  System.Generics.Collections, uConClasses, Ladder.Activity.Manager, cxSplitter;
 
 type
   TFormProcessEditor = class(TFormProcessEditorBase, IProcessEditor)
@@ -41,7 +41,7 @@ type
     Label2: TLabel;
     DBEditIDConsulta: TDBEdit;
     GroupBoxOutputs: TGroupBox;
-    cxGrid1: TcxGrid;
+    cxGridOutputs: TcxGrid;
     cxGridDBTableView1: TcxGridDBTableView;
     cxGridLevel1: TcxGridLevel;
     DBEditNomeProcesso: TDBEdit;
@@ -68,6 +68,7 @@ type
     cxGridDBTableView1ID: TcxGridDBColumn;
     cxGridDBTableView1Name: TcxGridDBColumn;
     cxGridDBTableView1Expression: TcxGridDBColumn;
+    Splitter1: TSplitter;
     procedure BtnOKClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
@@ -91,6 +92,10 @@ type
     procedure Synchronize; virtual;
   public
     { Public declarations }
+    DefaultName: String;
+    ShowInputBoxWhenNoInputs: Boolean;
+    ShowOutputBoxWhenNoOutputs: Boolean;
+
     //WARNING: AParameterDef and AOutputs will be destroyed by this class when its freed
     constructor Create(AOwner: TComponent; AParametersDef: TObjectList<TParametroCon>; AOutputsDef: TOutputList; AExecutor: IExecutorBase); overload;
     destructor Destroy; override;
@@ -108,6 +113,10 @@ type
     property ParametrosDef: TObjectList<TParametroCon> read FParametrosDef write FParametrosDef;
     property OutputsDef: TOutputList read FOutputsDef write FOutputsDef;
     property Executor: IExecutorBase read FExecutor write FExecutor;
+
+    property ProcessoDao: IProcessoDao<TProcessoBase> read FProcessoDao;
+    property ProcessoDataSet: TObjectDataSet read FProcessoDataSet;
+    property OutputDataSet: TObjectDataSet read FOutputDataSet;
   end;
 
 implementation
@@ -115,7 +124,7 @@ implementation
 {$R *.dfm}
 
 uses
-  Form.SelecionaConsulta, GerenciadorUtils, Ladder.Parser, Ladder.Executor.Email;
+  Form.SelecionaConsulta, GerenciadorUtils, Ladder.Parser, Ladder.Executor.Email, Ladder.Executor.Simple;
 
 procedure TFormProcessEditor.SetupProcess(AProcess: TProcessoBase);
 begin
@@ -124,14 +133,14 @@ begin
   CreateOutputs;
   CreateScreenParameters(FParametrosDef, GetParameterContainer, ScrollBoxParametros);
 
-  if FParametrosDef.Count = 0 then
-    ScrollBoxParametros.Visible:= False;
+  ScrollBoxParametros.Visible:= ShowInputBoxWhenNoInputs or (FParametrosDef.Count > 0);
 
-  if FProcesso.Outputs.Count = 0 then
-    GroupBoxOutputs.Visible:= False;
+  GroupBoxOutputs.Visible:= ShowOutputBoxWhenNoOutputs or (FProcesso.Outputs.Count > 0);
 
   FProcessoDataSet.SetObject(FProcesso);
   FOutputDataSet.SetObjectList<TOutputParameter>(FProcesso.Outputs);
+
+  Splitter1.Visible:= ScrollBoxParametros.Visible and GroupBoxOutputs.Visible;
 end;
 
 procedure TFormProcessEditor.Synchronize;
@@ -161,6 +170,7 @@ function TFormProcessEditor.NewProcess(AExpressionEvaluator: IExpressionEvaluato
 begin
   FExpressionEvaluator:= AExpressionEvaluator;
   FProcesso:= CreateNewProcess(AExpressionEvaluator);
+  FProcesso.Name:= DefaultName;
 
   SetupProcess(FProcesso);
 
@@ -200,6 +210,9 @@ begin
   FParametrosDef:= AParametersDef;
   FOutputsDef:= AOutputsDef;
   FExecutor:= AExecutor;
+
+  ShowInputBoxWhenNoInputs:= False;
+  ShowOutputBoxWhenNoOutputs:= False;
 end;
 
 destructor TFormProcessEditor.Destroy;
@@ -244,6 +257,7 @@ class function TFormProcessEditor.GetProcessEmailEditor(AOwner: TComponent): IPr
 var
   FParametrosDef: TObjectList<TParametroCon>;
   FOutputDef: TOutputList;
+  FForm: TFormProcessEditor;
 begin
   FParametrosDef:= TObjectList<TParametroCon>.Create;
   FParametrosDef.Add(TParametroCon.Create('Titulo', null, TTipoParametro.ptTexto, 'Título', ''));
@@ -252,7 +266,9 @@ begin
   FParametrosDef.Add(TParametroCon.Create('Anexos', null, TTipoParametro.ptTexto, 'Anexos', ''));
   FOutputDef:= TOutputList.Create;//No outputs
 
-  Result:= TFormProcessEditor.Create(AOwner, FParametrosDef, FOutputDef, ActivityManager.GetExecutor(TExecutorSendMail));
+  FForm:= TFormProcessEditor.Create(AOwner, FParametrosDef, FOutputDef, ActivityManager.GetExecutor(TExecutorSendMail));
+  FForm.DefaultName:= 'Email';
+  Result:= FForm;
 end;
 
 initialization

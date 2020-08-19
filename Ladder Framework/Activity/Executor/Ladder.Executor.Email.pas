@@ -51,8 +51,8 @@ var
   VarAnexos: Variant;
   FAnexos: Variant;
 begin
-  FTitulo:= Inputs.ParamValue('Titulo', '');
-  FBody:= Inputs.ParamValue('Body', '');
+  FTitulo:= DecodeLadderStr(Inputs.ParamValue('Titulo', ''));
+  FBody:= DecodeLadderStr(Inputs.ParamValue('Body', ''));
   VarDestinatarios:= Inputs.ParamValue('Destinatarios', '');
 
   if LadderVarIsList(VarDestinatarios) then

@@ -99,7 +99,7 @@ end;
 
 procedure TExpressionEvaluator.OnSqlEval(const pSql: String; var Return: Variant);
 begin
-  Return:= FDaoUtils.SelectAsDocVariant(pSql);
+  Return:= FDaoUtils.SelectAsDocVariant(pSql, True);
 end;
 
 procedure TExpressionEvaluator.SetRootContainer(const AValue: IActivityElementContainer);

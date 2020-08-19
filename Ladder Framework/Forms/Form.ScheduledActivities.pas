@@ -40,18 +40,24 @@ type
     cxGridAvisosDBTableView1: TcxGridDBTableView;
     cxGridAvisosLevel1: TcxGridLevel;
     cxGridAvisos: TcxGrid;
-    DsAvisos: TDataSource;
+    DsSchedules: TDataSource;
     cxGridAvisosDBTableView1ID: TcxGridDBColumn;
     cxGridAvisosDBTableView1IDActivity: TcxGridDBColumn;
     cxGridAvisosDBTableView1Name: TcxGridDBColumn;
     cxGridAvisosDBTableView1Description: TcxGridDBColumn;
-    TbAvisos: TFDMemTable;
-    TbAvisosID: TIntegerField;
-    TbAvisosIDActivity: TIntegerField;
-    TbAvisosName: TMemoField;
-    TbAvisosDescription: TMemoField;
-    TbAvisosClassName: TMemoField;
-    TbAvisosExecutorClass: TMemoField;
+    TbSchedules: TFDMemTable;
+    TbSchedulesID: TIntegerField;
+    TbSchedulesIDActivity: TIntegerField;
+    TbSchedulesName: TMemoField;
+    TbSchedulesDescription: TMemoField;
+    TbSchedulesClassName: TMemoField;
+    TbSchedulesExecutorClass: TMemoField;
+    TbSchedulesCronExpression: TMemoField;
+    TbSchedulesLastExecutionTime: TDateTimeField;
+    TbSchedulesNextExecutionTime: TDateTimeField;
+    cxGridAvisosDBTableView1CronExpression: TcxGridDBColumn;
+    cxGridAvisosDBTableView1LastExecutionTime: TcxGridDBColumn;
+    cxGridAvisosDBTableView1NextExecutionTime: TcxGridDBColumn;
     procedure BtnRemoverAvisoClick(Sender: TObject);
     procedure BtnNovoAvisoClick(Sender: TObject);
     procedure BtnFecharClick(Sender: TObject);
@@ -155,11 +161,11 @@ begin
   inherited;
   FActivityDao:= TScheduledActivityDao<TScheduledActivity>.Create;
 
-  FActivityDataSet:= TObjectDataSet.Create(Self, FActivityDao.ModeloBD);
+  FActivityDataSet:= TObjectDataSet.Create(Self, TScheduledActivity);
   FActivityDataSet.OwnsObjectList:= True;
   FActivityDataSet.ObjectList:= FActivityDao.SelectWhere('className = ''TScheduledActivity''');
 
-  DsAvisos.DataSet:= FActivityDataSet;
+  DsSchedules.DataSet:= FActivityDataSet;
 end;
 
 procedure TFormScheduledActivities.NewSchedule;

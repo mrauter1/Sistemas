@@ -2,8 +2,8 @@ object FormProcessEditor: TFormProcessEditor
   Left = 0
   Top = 0
   Caption = 'Configura'#231#227'o do Processo'
-  ClientHeight = 490
-  ClientWidth = 611
+  ClientHeight = 405
+  ClientWidth = 597
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,12 +18,13 @@ object FormProcessEditor: TFormProcessEditor
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 611
+    Width = 597
     Height = 81
     Align = alTop
     TabOrder = 0
+    ExplicitWidth = 614
     DesignSize = (
-      611
+      597
       81)
     object Label2: TLabel
       Left = 77
@@ -50,7 +51,7 @@ object FormProcessEditor: TFormProcessEditor
       Caption = 'Descri'#231#227'o'
     end
     object BtnOK: TBitBtn
-      Left = 487
+      Left = 473
       Top = 9
       Width = 108
       Height = 25
@@ -58,13 +59,13 @@ object FormProcessEditor: TFormProcessEditor
       Caption = 'OK'
       TabOrder = 0
       OnClick = BtnOKClick
+      ExplicitLeft = 490
     end
     object DBEditIDConsulta: TDBEdit
       Left = 97
       Top = 11
-      Width = 62
+      Width = 65
       Height = 21
-      Anchors = [akLeft, akTop, akRight]
       DataField = 'ID'
       DataSource = DsProcesso
       ReadOnly = True
@@ -73,67 +74,85 @@ object FormProcessEditor: TFormProcessEditor
     object DBEditNomeProcesso: TDBEdit
       Left = 200
       Top = 11
-      Width = 281
+      Width = 267
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       DataField = 'Name'
       DataSource = DsProcesso
       TabOrder = 2
+      ExplicitWidth = 284
     end
     object DBEdit1: TDBEdit
       Left = 97
       Top = 40
-      Width = 498
+      Width = 484
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       DataField = 'Description'
       DataSource = DsProcesso
       TabOrder = 3
+      ExplicitWidth = 501
     end
   end
   object Panel2: TPanel
     Left = 0
     Top = 81
-    Width = 611
-    Height = 409
+    Width = 597
+    Height = 324
     Align = alClient
     TabOrder = 1
+    ExplicitWidth = 614
+    object Splitter1: TSplitter
+      Left = 1
+      Top = 159
+      Width = 595
+      Height = 4
+      Cursor = crVSplit
+      Align = alBottom
+      ExplicitTop = 111
+      ExplicitWidth = 609
+    end
     object GroupBoxInputs: TGroupBox
       Left = 1
       Top = 1
-      Width = 609
-      Height = 247
+      Width = 595
+      Height = 158
       Align = alClient
       Caption = 'Inputs'
       TabOrder = 0
+      ExplicitWidth = 612
       object ScrollBoxParametros: TScrollBox
         Left = 2
         Top = 15
-        Width = 605
-        Height = 230
+        Width = 591
+        Height = 141
         Align = alClient
         BevelEdges = []
         BevelInner = bvNone
         BevelOuter = bvNone
         BorderStyle = bsNone
         TabOrder = 0
+        ExplicitLeft = -54
+        ExplicitWidth = 645
       end
     end
     object GroupBoxOutputs: TGroupBox
       Left = 1
-      Top = 248
-      Width = 609
+      Top = 163
+      Width = 595
       Height = 160
       Align = alBottom
       Caption = 'Outputs'
       TabOrder = 1
-      object cxGrid1: TcxGrid
+      ExplicitWidth = 612
+      object cxGridOutputs: TcxGrid
         Left = 2
         Top = 15
-        Width = 605
+        Width = 591
         Height = 143
         Align = alClient
         TabOrder = 0
+        ExplicitWidth = 608
         object cxGridDBTableView1: TcxGridDBTableView
           Navigator.Buttons.CustomButtons = <>
           DataController.DataSource = DsOutput
@@ -213,7 +232,7 @@ object FormProcessEditor: TFormProcessEditor
   object DsOutput: TDataSource
     DataSet = TBOutput
     Left = 443
-    Top = 282
+    Top = 306
   end
   object TBOutput: TFDMemTable
     FetchOptions.AssignedValues = [evMode]
@@ -224,7 +243,7 @@ object FormProcessEditor: TFormProcessEditor
     UpdateOptions.CheckRequired = False
     UpdateOptions.AutoCommitUpdates = True
     Left = 361
-    Top = 282
+    Top = 306
     object TBOutputID: TFDAutoIncField
       FieldName = 'ID'
       Origin = 'ID'

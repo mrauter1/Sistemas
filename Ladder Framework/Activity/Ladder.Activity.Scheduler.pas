@@ -3,9 +3,13 @@ unit Ladder.Activity.Scheduler;
 interface
 
 uses
-  Ladder.Activity.Classes, Ladder.ServiceLocator, System.Generics.Collections, System.Classes, maxCron, Ladder.Activity.Classes.Dao, SyncObjs;
+  Ladder.Activity.Classes, Ladder.ServiceLocator, System.Generics.Collections, System.Classes, maxCron, Ladder.Activity.Classes.Dao, SyncObjs,
+  Spring, Spring.Events;
 
 type
+  TLogType = (ltNotification, ltError);
+  TLogEvent = procedure(ALogType: TLogType; AMessage: String) of object;
+
   TNotifyThread = class(TFrwThread)
   public
     OnExecute: TNotifyEvent;
@@ -43,14 +47,17 @@ type
     FLoopingThread: TNotifyThread;
     FScheduledActivities: TScheduledActivities;
     FDao: IScheduledActivityDao<TScheduledActivity>;
+    FStop: Boolean;
     FStopped: Boolean;
 
     FListCriticalSection: TCriticalSection; // Must be used when writing from any thread or when reading is not done from the main thread
 
     procedure OnExecute(Sender: TObject);
     procedure ExecuteActivity(AActivity: TScheduledActivity);
+    procedure DoLogEvent(ALogType: TLogType; AMessage: String);
   public
-    constructor Create(pLoadScheduledActivities: Boolean = True);
+    OnLogEvent: IEvent<TLogEvent>;
+    constructor Create(ALoadScheduledActivities: Boolean = True; AStopped: Boolean = False);
     destructor Destroy; override;
 
     procedure ReloadScheduledActivities;
@@ -67,7 +74,7 @@ type
 implementation
 
 uses
-  SysUtils, DateUtils, Ladder.Activity.Scheduler.Dao;
+  SysUtils, DateUtils, Ladder.Activity.Scheduler.Dao, Utils;
 
 { TScheduledActivity }
 
@@ -113,32 +120,46 @@ end;
 
 { TScheduler }
 
-constructor TScheduler.Create(pLoadScheduledActivities: Boolean = True);
+constructor TScheduler.Create(ALoadScheduledActivities: Boolean = True; AStopped: Boolean = False);
 begin
   inherited Create;
-  FStopped:= False;
+  FStop:= AStopped;
+  FStopped:= AStopped;
   FDao:= TScheduledActivityDao<TScheduledActivity>.Create;
 
   FListCriticalSection:= TCriticalSection.Create;
 
   FScheduledActivities:= TScheduledActivities.Create;
+  OnLogEvent:= TEvent<TLogEvent>.Create;
+
   FLoopingThread:= TNotifyThread.Create(OnExecute, Self);
 
   FLoopingThread.Start;
 
-  if pLoadScheduledActivities then
+  if ALoadScheduledActivities then
      ReloadScheduledActivities;
 end;
 
 destructor TScheduler.Destroy;
 begin
+  Stop;
+  while not Stopped do
+    Sleep(10);
+
   FLoopingThread.Terminate;
   FLoopingThread.WaitFor;
 
+  OnLogEvent:= nil;
   FScheduledActivities.Free;
   FLoopingThread.Free;
   FListCriticalSection.Free;
   inherited;
+end;
+
+procedure TScheduler.DoLogEvent(ALogType: TLogType; AMessage: String);
+begin
+  if OnLogEvent.CanInvoke then
+    TLogEvent(OnLogEvent.Invoke)(ALogType, AMessage);
 end;
 
 procedure TScheduler.ExecuteActivity(AActivity: TScheduledActivity);
@@ -150,7 +171,14 @@ begin
     TFrwServiceLocator.Synchronize(
     procedure
     begin
-      AActivity.Executar(AActivity.ExpressionEvaluator);
+      try
+        DoLogEvent(ltNotification, Format('Activity %s started.', [AActivity.Name]));
+        AActivity.Executar(AActivity.ExpressionEvaluator);
+        DoLogEvent(ltNotification, Format('Activity %s finished.', [AActivity.Name]));
+      except
+        on E: Exception do
+          DoLogEvent(ltError, Format('Error executing activity %s: %s', [AActivity.Name, E.Message]));
+      end;
     end);
   finally
     AActivity.LastExecutionTime:= Now;
@@ -196,39 +224,47 @@ var
     end;
   end;
 begin
-  while not FLoopingThread.Terminated do
-  begin
-    while FStopped do
-      Sleep(100);
-
-    FNextActivity:= GetNextActivity;
-    if not Assigned(FNextActivity) then
+  try
+    while not FLoopingThread.Terminated do
     begin
-      Sleep(cSleepTime); // Sleeps for one second if there is no ScheduledActivity
-      Continue;
-    end;
+      while FStop do
+      begin
+        FStopped:= True;
+        Sleep(100);
+      end;
+      FStopped:= False;
 
-    if FNextActivity.NextExecutionTime <= Now then
-      ExecuteActivity(FNextActivity)
-    else
-    begin
-      FTimeToNext:= MilliSecondsBetween(FNextActivity.NextExecutionTime, Now);
-      if FTimeToNext>cSleepTime then
-        Sleep(cSleepTime)
+      FNextActivity:= GetNextActivity;
+      if not Assigned(FNextActivity) then
+      begin
+        Sleep(cSleepTime); // Sleeps for one second if there is no ScheduledActivity
+        Continue;
+      end;
+
+      if FNextActivity.NextExecutionTime <= Now then
+        ExecuteActivity(FNextActivity)
       else
-        Sleep(FTimeToNext);
-     end;
+      begin
+        FTimeToNext:= MilliSecondsBetween(FNextActivity.NextExecutionTime, Now);
+        if FTimeToNext>cSleepTime then
+          Sleep(cSleepTime)
+        else
+          Sleep(FTimeToNext);
+       end;
+    end;
+  finally
+    FStopped:= True;
   end;
 end;
 
 procedure TScheduler.Start;
 begin
-  FStopped:= False;
+  FStop:= False;
 end;
 
 procedure TScheduler.Stop;
 begin
-  FStopped:= True;
+  FStop:= True;
 end;
 
 end.

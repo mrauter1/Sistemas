@@ -16,6 +16,8 @@ type
   end;
 
   TFormProcessEditorBase = class(TForm)
+    MaskEdit1: TMaskEdit;
+    Memo1: TMemo;
   public
   private
     function GetControlHeight(pTipo: TTipoParametro): Integer;
@@ -30,6 +32,7 @@ type
     function CriaEdit(pBox: TWinControl; pParametro: TParametroCon; pExpression: String): TEdit;
     function CriaParComboBox(pBox: TWinControl; pParametro: TParametroCon; pValorParam: Variant): TComboBox;
     function CriaParMaskEdit(pBox: TWinControl; pParametro: TParametroCon; pValorParam: Variant): TMaskEdit;
+    function CriaParMemo(pBox: TWinControl; pParametro: TParametroCon; pValorParam: Variant): TMemo;
     function CriaParChecklistBox(pBox: TWinControl; pParametro: TParametroCon; pValorParam: Variant): TCheckListBox;
 
     // Return a valid Expression matching the visual component value
@@ -207,6 +210,28 @@ begin
   end;
 end;
 
+function TFormProcessEditorBase.CriaParMemo(pBox: TWinControl;
+  pParametro: TParametroCon; pValorParam: Variant): TMemo;
+begin
+  Result:= TMemo.Create(pBox);
+  with Result do
+  begin
+    Visible   := true;
+    Top:= 0;
+    Left:= 0;
+
+    if pParametro.Tamanho > 0 then
+      Width:= pParametro.Tamanho
+    else
+      Width:= pBox.ClientWidth;
+
+    Align     := alClient;
+    Name      := 'V'+pParametro.Nome;
+    Parent    := pBox;
+    Lines.Text:= DecodeLadderStr(LadderVarToStr(pValorParam, ''));
+  end;
+end;
+
 function TFormProcessEditorBase.CriaDateTimePicker(pBox: TWinControl; pParametro: TParametroCon; pValorParam: Variant): TDateTimePicker;
 begin
   Result:= TDateTimePicker.Create(pBox);
@@ -355,7 +380,7 @@ begin
 
     case fParametro.Tipo of
       ptComboBox: FPageControl.Control:= CriaParCombobox(FPageControl.Pages[1], fParametro, fValorParam);
-      ptTexto: FPageControl.Control:= CriaParMaskEdit(FPageControl.Pages[1], fParametro, fValorParam);
+      ptTexto: FPageControl.Control:= CriaParMemo(FPageControl.Pages[1], fParametro, fValorParam);
       TTipoParametro.ptDateTime: FPageControl.Control:= CriaDateTimePicker(FPageControl.Pages[1], fParametro, fValorParam);
       ptCheckListBox: FPageControl.Control:= CriaParCheckListBox(FPageControl.Pages[1], fParametro, fValorParam);
     end;
@@ -389,6 +414,8 @@ begin
     Result:= '['+TValorChave.ObterValoresSelecionados(TCheckListBox(pComponent), ',', True)+']'
   else if (pComponent is TMaskEdit) then
     Result:= '"'+TMaskEdit(pComponent).EditText+'"'
+  else if (pComponent is TMemo) then
+    Result:= '"'+EncodeLadderStr(TMemo(pComponent).Lines.Text)+'"'
   else if (pComponent is TDateTimePicker) then
     Result:= LadderDateToStr(TDateTimePicker(pComponent).DateTime, True);
 

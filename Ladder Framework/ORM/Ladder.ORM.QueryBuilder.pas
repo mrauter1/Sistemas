@@ -71,7 +71,7 @@ type
 implementation
 
 uses
-  Variants;
+  Variants, Ladder.Utils;
 
 { TQueryBuilderBase }
 
@@ -82,7 +82,8 @@ end;
 
 class function TQueryBuilderBase.FloatToSqlStr(pValor: Extended): String;
 begin
-  Result:= StringReplace(FloatToStr(pValor), ',', '.', []);
+//  Result:= StringReplace(FloatToStr(pValor), ',', '.', []);
+  Result:= FloatToStr(pValor, LadderFormatSettings);
 end;
 
 function TQueryBuilderBase.MappedFieldList: TFieldMappingList;
@@ -177,9 +178,9 @@ begin
     procedure (pClass: TClass; pFieldMapping: TFieldMapping; Sender: TObject)
     begin
       if not fPrimeiroCampo then
-        fSql.Append(' , ');
+        fSql.Append(', ');
 
-      fSql.Append('  ').AppendLine(pFieldMapping.FieldName);
+      fSql.Append(pFieldMapping.FieldName);
 
       if fPrimeiroCampo then
         fPrimeiroCampo:= False;
@@ -189,17 +190,17 @@ begin
 
   fSql:= TStringBuilder.Create;
   try
-    fSql.AppendLine('SELECT ');
+    fSql.Append('SELECT ');
 
     if Top0 in pSelectOptions then
-      fSql.AppendLine(' TOP 0 ');
+      fSql.Append(' TOP 0 ');
 
     ModeloBD.FazMapeamentoDaClasse(fCallBack, True);
 
-    fSql.Append('FROM ').AppendLine(ModeloBD.NomeTabela);
+    fSql.AppendLine.Append('FROM ').Append(ModeloBD.NomeTabela);
 
     if pWhere <> '' then
-      fSql.AppendLine('WHERE '+pWhere);
+      fSql.AppendLine.Append('WHERE ').Append(pWhere);
 
     Result:= fSql.ToString;
 

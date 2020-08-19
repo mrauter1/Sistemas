@@ -6,11 +6,18 @@ uses
   RTTI, SynCommons, SysUtils, SynTable, DB;
 
 function LadderVarIsList(const pValue: Variant): Boolean;
+function DocVariantIsTable(const pDocVariantData: TDocVariantData): Boolean;
+function LadderVarIsTable(const pValue: Variant): Boolean;
+
+function LadderVarIsFloat(const pValue: Variant; var pFloatValue: Extended): Boolean;
 function LadderVarIsIso8601(const pValue: Variant): Boolean;
 function LadderVarIsDateTime(const pValue: Variant): Boolean;
 function LadderVarToDateTime(const pValue: Variant): TDateTime;
 function LadderDateToStr(pValue: Variant; pQuote: Boolean=False): String;
 function LadderVarToStr(pValue: Variant; pDefault: String = ''): String;
+
+function DecodeLadderStr(AStr: String): String;
+function EncodeLadderStr(AStr: String): String;
 
 function JoinList(const pValue: Variant; const pSeparator: String): String;
 
@@ -83,6 +90,9 @@ var
 
   procedure DoJoin(const pText: String);
   begin
+    if pText='' then
+      Exit;
+
     if Result = '' then
       Result:= pText
     else
@@ -94,13 +104,62 @@ begin
     Exit;
 
   for I := 0 to pValue._Count-1 do
-    DoJoin(pValue._(I));
+    DoJoin(VarToStrDef(pValue._(I),''));
 
 end;
 
 function LadderVarIsList(const pValue: Variant): Boolean;
 begin
   Result:= DocVariantType.IsOfType(pValue);
+end;
+
+function DocVariantIsTable(const pDocVariantData: TDocVariantData): Boolean;
+begin
+  Result:= False;
+  if (pDocVariantData.Kind = dvArray) and (pDocVariantData.Count > 0) then
+    if TDocVariantData(pDocVariantData.Values[0]).Kind = dvObject then
+      Result:= True;
+
+end;
+
+function LadderVarIsTable(const pValue: Variant): Boolean;
+begin
+  Result:= False;
+  if DocVariantType.IsOfType(pValue) then
+    Result:= DocVariantIsTable(TDocVariantData(pValue));
+
+end;
+
+function LadderVarIsFloat(const pValue: Variant; var pFloatValue: Extended): Boolean;
+
+  function TryParseFloat(const pFloatStr: String): Boolean;
+  begin
+    Result:= False;
+    if pFloatStr='' then
+      Exit(False)
+    else if pFloatStr = '0' then
+      Exit(True)
+    else if VarToFloatDef(pFloatStr, 0) = 0 then
+      Exit(False)
+    else if pFloatStr[1]='0' then // do not consider as float 000.23, 01, etc...
+    begin
+      if pFloatStr[2]<> '.' then
+        Exit(False);
+    end;
+    Result:= True;
+  end;
+begin
+  pFloatValue:= 0;
+  Result:= VarIsFloat(pValue);
+  if Result then
+  begin
+    pFloatValue:= pValue;
+    Exit;
+  end;
+
+  Result:= TryParseFloat(VarToStrDef(pValue,''));
+  if Result then
+    TextToFloat(VarToStrDef(pValue,''), pFloatValue, LadderFormatSettings);
 end;
 
 function LadderVarIsIso8601(const pValue: Variant): Boolean;
@@ -175,6 +234,16 @@ begin
     Result:= FloatToStr(pValue, LadderFormatSettings)
   else
     Result:= VarToStrDef(pValue, '');
+end;
+
+function DecodeLadderStr(AStr: String): String;
+begin
+  Result:= ReplaceStr(AStr, '\n', sLineBreak);
+end;
+
+function EncodeLadderStr(AStr: String): String;
+begin
+  Result:= ReplaceStr(AStr, sLineBreak, '\n');
 end;
 
 function InheritFromGenericOfType(classType: TRttiType; const genericType: string): Boolean;

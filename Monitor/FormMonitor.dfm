@@ -100,9 +100,33 @@ object MonitorMain: TMonitorMain
   object PopupMenu1: TPopupMenu
     Left = 264
     Top = 120
+    object Agendamentos1: TMenuItem
+      Caption = 'Agendamentos'
+      OnClick = Agendamentos1Click
+    end
+    object Avisos1: TMenuItem
+      Caption = 'Avisos'
+      OnClick = Avisos1Click
+    end
+    object RefreshAgendamentos1: TMenuItem
+      Caption = 'Refresh Agendamentos'
+      OnClick = RefreshAgendamentos1Click
+    end
+    object MenuIniciar: TMenuItem
+      Caption = 'Iniciar Agendador'
+      OnClick = MenuIniciarClick
+    end
+    object N1: TMenuItem
+      Caption = '-'
+    end
     object Fechar1: TMenuItem
       Caption = 'Fechar'
       OnClick = Fechar1Click
     end
+  end
+  object Timer1: TTimer
+    OnTimer = Timer1Timer
+    Left = 368
+    Top = 24
   end
 end

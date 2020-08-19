@@ -80,6 +80,7 @@
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <DCC_UnitSearchPath>F:\Sistemas\Ladder Framework\Forms;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <Icon_MainIcon>Monitor_Icon.ico</Icon_MainIcon>
         <DCC_ExeOutput>F:\Sistemas\Monitor\bin</DCC_ExeOutput>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -102,6 +103,7 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
+        <DCCReference Include="uMonitorAppConfig.pas"/>
         <DCCReference Include="FormMonitor.pas">
             <Form>MonitorMain</Form>
         </DCCReference>
@@ -143,6 +145,25 @@
         <DCCReference Include="..\utils\uDmGravaLista.pas">
             <Form>DmGravaLista</Form>
             <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="..\Ladder Framework\Activity\Executor\Ladder.Executor.Activity.pas"/>
+        <DCCReference Include="..\Ladder Framework\Activity\Executor\Ladder.Executor.ConsultaPersonalizada.pas"/>
+        <DCCReference Include="..\Ladder Framework\Activity\Executor\Ladder.Executor.Email.pas"/>
+        <DCCReference Include="..\Ladder Framework\Forms\Form.ActivityEditor.pas">
+            <Form>FormActivityEditor</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\Ladder Framework\Forms\Form.ConsultaEditor.pas"/>
+        <DCCReference Include="..\Ladder Framework\Forms\Form.ProcessActivityEditor.pas"/>
+        <DCCReference Include="..\Ladder Framework\Activity\Ladder.Activity.Scheduler.pas"/>
+        <DCCReference Include="uMonitorRoot.pas"/>
+        <DCCReference Include="..\Ladder Framework\Forms\Form.ProcessEditor.pas">
+            <Form>FormProcessEditor</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\Ladder Framework\Forms\Form.ProcessEditorBase.pas">
+            <Form>FormProcessEditorBase</Form>
+            <FormType>dfm</FormType>
         </DCCReference>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

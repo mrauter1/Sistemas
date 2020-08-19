@@ -106,7 +106,7 @@ function TodosOsDias: TDiasSemana;
 implementation
 
 uses
-  uConFirebird, uDmGeradorConsultas, Utils, DateUtils, Dialogs, uAppConfig, uDmGravaLista;
+  uConFirebird, uDmGeradorConsultas, Utils, DateUtils, Dialogs, uMonitorAppConfig, uDmGravaLista, uMonitorRoot;
 
 {%CLASSGROUP 'Vcl.Controls.TControl'}
 
@@ -186,8 +186,13 @@ begin
   except
   end;
 
-  ShowMessage('Avisos automáticos não estão sendo executados.');
-  Exit;
+  if not MonitorAppConfig.SchedulerEnabled then
+  begin
+    ShowMessage('Avisos automáticos não estão sendo executados.');
+    Exit;
+  end;
+
+  FRootClass.Scheduler.Start;
 
   if not CdsGatilhos.Active then
     CdsGatilhos.CreateDataSet;
@@ -210,13 +215,21 @@ begin
           end,
           StrToTime('00:10:00'), [dsSegunda, dsTerca, dsQuarta, dsQuinta, dsSexta, dsSabado]);
 
+  TGatilho.Create(Self,
+          'AtualizaModelosProducao',
+          procedure()
+          begin
+            AtualizaModelosProducao;
+          end,
+          StrToTime('04:20:00'), TercaASabado);
+
 {  TGatilho.Create(Self,
           'AtualizaProdutosSimilares',
           procedure()
           begin
             AtualizaProdutosSimilares;
           end,
-          StrToTime('01:00:00'), TercaASabado);     }
+          StrToTime('01:00:00'), TercaASabado);
 
   TGatilho.Create(Self,
           'EnviaMetaVendas',
@@ -280,16 +293,7 @@ begin
           begin
             TEnviaModificacaoCustoMedio.EnviarEmail;
           end,
-          StrToTime('04:15:00'), TercaASabado);
-
-
-  TGatilho.Create(Self,
-          'AtualizaModelosProducao',
-          procedure()
-          begin
-            AtualizaModelosProducao;
-          end,
-          StrToTime('04:20:00'), TercaASabado);
+          StrToTime('04:15:00'), TercaASabado);     }
 
   uDataSetToHtml.WriteLog('Gatilhos criados');
 end;

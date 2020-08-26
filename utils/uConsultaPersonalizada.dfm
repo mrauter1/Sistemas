@@ -28,17 +28,13 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
     Top = 0
     Width = 824
     Height = 566
-    ActivePage = TabParametros
+    ActivePage = TabSheetResultado
     Align = alClient
     Style = tsFlatButtons
     TabOrder = 0
     object TabParametros: TTabSheet
       Caption = 'DEFINIR PAR'#194'METROS'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object DBText: TDBText
         Left = 0
         Top = 0
@@ -258,15 +254,11 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
     object TabSheetAguarde: TTabSheet
       Caption = 'EXECUTANDO CONSULTA'
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label1: TLabel
         Left = 0
         Top = 0
-        Width = 136
-        Height = 32
+        Width = 816
+        Height = 535
         Align = alClient
         Alignment = taCenter
         Caption = 'Aguarde.......'
@@ -276,15 +268,13 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
         Font.Name = 'Palatino Linotype'
         Font.Style = [fsBold]
         ParentFont = False
+        ExplicitWidth = 136
+        ExplicitHeight = 32
       end
     end
     object TabSheetResultado: TTabSheet
       Caption = 'RESULTADO'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object PageControlVisualizacoes: TPageControl
         Left = 0
         Top = 28
@@ -297,10 +287,6 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
         OnChange = PageControlVisualizacoesChange
         object TsTabela: TTabSheet
           Caption = 'Tabela'
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object cxGridTabela: TcxGrid
             Left = 0
             Top = 0
@@ -346,19 +332,11 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
         object TsDinamica: TTabSheet
           Caption = 'Tabela Din'#226'mica'
           ImageIndex = 1
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
         end
         object TsGrafico: TTabSheet
           Caption = 'Gr'#225'fico'
           ImageIndex = 2
           OnResize = TsGraficoResize
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object PanelTsGrafico: TPanel
             Left = 0
             Top = 0
@@ -576,10 +554,6 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
         object TabSheetSql: TTabSheet
           Caption = 'Sql'
           ImageIndex = 3
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object MemoSqlGerado: TMemo
             Left = 0
             Top = 0

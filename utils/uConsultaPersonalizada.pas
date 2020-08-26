@@ -199,6 +199,7 @@ type
 //    procedure PopulaCheckListBoxQry(pCheckListBox: TCheckListBox; pQry: TDataSet; ValorPadrao: variant);
     function GetParams: TParametros;
     class function Conn: TDmConnection; static;
+    procedure AjustaPropriedadesPivoGrid;
   public
     { Public declarations }
     function ExecutaConsulta: Boolean;
@@ -921,33 +922,35 @@ begin
   Result:= True;
 end;
 
-procedure TFrmConsultaPersonalizada.AtualizaCamposGrid;
-
-  procedure AjustaPropriedadesPivoGrid;
-  var
-    I: Integer;
-    FNomeCampo: String;
+procedure TFrmConsultaPersonalizada.AjustaPropriedadesPivoGrid;
+var
+  I: Integer;
+  FNomeCampo: String;
+begin
+  for I:= 0 to DBPivotGrid.FieldCount-1 do
   begin
-    for I:= 0 to DBPivotGrid.FieldCount-1 do
+    FNomeCampo:= TcxDBPivotGridFieldDataBinding(DBPivotGrid.Fields[i].DataBinding).FieldName;
+
+    if FDm.QryCampos.Locate('NomeCampo', FNomeCampo, [loCaseInsensitive]) then
     begin
-      FNomeCampo:= TcxDBPivotGridFieldDataBinding(DBPivotGrid.Fields[i].DataBinding).FieldName;
-
-      if FDm.QryCampos.Locate('NomeCampo', FNomeCampo, [loCaseInsensitive]) then
-      begin
-        case FDm.QryCamposAgrupamento.AsInteger of
-          0: DBPivotGrid.Fields[i].SummaryType:= stSum; //Soma
-          1: DBPivotGrid.Fields[i].SummaryType:= stAverage; //Média
-          2: DBPivotGrid.Fields[i].SummaryType:= stCount; //Contagem
-          3: DBPivotGrid.Fields[i].SummaryType:= stMax; //Max
-          4: DBPivotGrid.Fields[i].SummaryType:= stMin; //Min
-          5: DBPivotGrid.Fields[i].SummaryType:= stStdDev; //Desvio Padrão
-        end;
+      case FDm.QryCamposAgrupamento.AsInteger of
+        0: DBPivotGrid.Fields[i].SummaryType:= stSum; //Soma
+        1: DBPivotGrid.Fields[i].SummaryType:= stAverage; //Média
+        2: DBPivotGrid.Fields[i].SummaryType:= stCount; //Contagem
+        3: DBPivotGrid.Fields[i].SummaryType:= stMax; //Max
+        4: DBPivotGrid.Fields[i].SummaryType:= stMin; //Min
+        5: DBPivotGrid.Fields[i].SummaryType:= stStdDev; //Desvio Padrão
       end;
-    //  ShowMessage(TcxDBPivotGridFieldDataBinding(DBPivotGrid.Fields[i].DataBinding).FieldName);
-      DBPivotGrid.Fields[i].ExpandAll;
-    end;
-  end;
 
+      DBPivotGrid.Fields[I].Visible:= FDm.QryCamposVisivel.AsBoolean;
+
+    end;
+  //  ShowMessage(TcxDBPivotGridFieldDataBinding(DBPivotGrid.Fields[i].DataBinding).FieldName);
+    DBPivotGrid.Fields[i].ExpandAll;
+  end;
+end;
+
+procedure TFrmConsultaPersonalizada.AtualizaCamposGrid;
 begin
   cxGridTabelaDBTableView1.ClearItems;
   cxGridTabelaDBTableView1.DataController.CreateAllItems();
@@ -1290,8 +1293,9 @@ begin
 
   DBPivotGrid.BeginUpdate;
     try
-      for I := 0 to DBPivotGrid.FieldCount - 1 do
-        DBPivotGrid.Fields[I].ExpandAll;
+      AjustaPropriedadesPivoGrid;
+{      for I := 0 to DBPivotGrid.FieldCount - 1 do
+        DBPivotGrid.Fields[I].ExpandAll;    }
     finally
       DBPivotGrid.EndUpdate;
     end;

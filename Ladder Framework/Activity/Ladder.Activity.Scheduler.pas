@@ -227,30 +227,35 @@ begin
   try
     while not FLoopingThread.Terminated do
     begin
-      while FStop do
-      begin
-        FStopped:= True;
-        Sleep(100);
-      end;
-      FStopped:= False;
+      try
+        while FStop do
+        begin
+          FStopped:= True;
+          Sleep(100);
+        end;
+        FStopped:= False;
 
-      FNextActivity:= GetNextActivity;
-      if not Assigned(FNextActivity) then
-      begin
-        Sleep(cSleepTime); // Sleeps for one second if there is no ScheduledActivity
-        Continue;
-      end;
+        FNextActivity:= GetNextActivity;
+        if not Assigned(FNextActivity) then
+        begin
+          Sleep(cSleepTime); // Sleeps for one second if there is no ScheduledActivity
+          Continue;
+        end;
 
-      if FNextActivity.NextExecutionTime <= Now then
-        ExecuteActivity(FNextActivity)
-      else
-      begin
-        FTimeToNext:= MilliSecondsBetween(FNextActivity.NextExecutionTime, Now);
-        if FTimeToNext>cSleepTime then
-          Sleep(cSleepTime)
+        if FNextActivity.NextExecutionTime <= Now then
+          ExecuteActivity(FNextActivity)
         else
-          Sleep(FTimeToNext);
-       end;
+        begin
+          FTimeToNext:= MilliSecondsBetween(FNextActivity.NextExecutionTime, Now);
+          if FTimeToNext>cSleepTime then
+            Sleep(cSleepTime)
+          else
+            Sleep(FTimeToNext);
+         end;
+       except
+        on E: Exception do
+          DoLogEvent(ltError, Format('Error on scheduler %s', [E.Message]));
+      end;
     end;
   finally
     FStopped:= True;

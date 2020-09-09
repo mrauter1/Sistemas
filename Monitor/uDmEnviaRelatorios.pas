@@ -223,6 +223,8 @@ begin
           end,
           StrToTime('04:20:00'), TercaASabado);
 
+  uDataSetToHtml.WriteLog('Gatilhos criados');
+
 {  TGatilho.Create(Self,
           'AtualizaProdutosSimilares',
           procedure()
@@ -294,8 +296,6 @@ begin
             TEnviaModificacaoCustoMedio.EnviarEmail;
           end,
           StrToTime('04:15:00'), TercaASabado);     }
-
-  uDataSetToHtml.WriteLog('Gatilhos criados');
 end;
                       {
 procedure TCon.AtualizaProdutosSimilares;

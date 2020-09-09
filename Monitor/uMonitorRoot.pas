@@ -46,10 +46,10 @@ end;
 
 procedure TMonitorRoot.OnLogEvent(ALogType: TLogType; AMessage: String);
 begin
+  WriteLog('Monitor.log', AMessage);
   if ALogType = ltError then
-    WriteLog('Error.log', AMessage)
-  else
-    WriteLog('Monitor.log', AMessage);
+    WriteLog('Error.log', AMessage);
+
 end;
 
 end.

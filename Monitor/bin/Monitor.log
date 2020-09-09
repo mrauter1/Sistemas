@@ -1109,3 +1109,53 @@
 19082020-12:23:20 -> Activity MetaVendaGerencia finished.
 19082020-12:23:30 -> Activity VendaMargemBaixaOntem started.
 19082020-12:23:35 -> Activity VendaMargemBaixaOntem finished.
+19082020-16:54:03 -> Iniciando monitor...
+19082020-16:54:04 -> Criando TConSqlServer
+19082020-16:54:04 -> Criando TConFirebird
+19082020-16:54:04 -> Criando TMonitorMain
+19082020-16:54:04 -> Criando TDmSqlUtils
+19082020-16:54:04 -> Criando TCon
+19082020-16:54:04 -> Carregando Gatihlos.xml
+19082020-16:54:06 -> Inicializando message loop
+19082020-16:56:41 -> Iniciando monitor...
+19082020-16:56:42 -> Criando TConSqlServer
+19082020-16:56:42 -> Criando TConFirebird
+19082020-16:56:43 -> Criando TMonitorMain
+19082020-16:56:43 -> Criando TDmSqlUtils
+19082020-16:56:43 -> Criando TCon
+19082020-16:56:43 -> Carregando Gatihlos.xml
+19082020-16:56:43 -> Criando Gatilhos
+19082020-16:56:43 -> Gatilhos criados
+19082020-16:56:43 -> Inicializando message loop
+19082020-16:56:44 -> Iniciando execução do gatilho AtualizaModelosProducao
+19082020-16:56:46 -> Iniciando execução do gatilho AtualizaListaPreco
+19082020-16:56:46 -> Iniciando script de atualização da lista remota IPC2725 para a lista do Sidicom 0004
+19082020-16:56:50 -> Script para atualizar lista de preço incializado.
+19082020-16:57:47 -> Iniciando script de atualização da lista remota IPC2125 para a lista do Sidicom 0005
+19082020-16:57:49 -> Script para atualizar lista de preço incializado.
+25082020-16:02:03 -> Iniciando monitor...
+25082020-16:02:05 -> Criando TConSqlServer
+25082020-16:02:05 -> Criando TConFirebird
+25082020-16:02:08 -> Criando TMonitorMain
+25082020-16:02:09 -> Criando TDmSqlUtils
+25082020-16:02:09 -> Criando TCon
+25082020-16:02:09 -> Carregando Gatihlos.xml
+25082020-16:02:56 -> Inicializando message loop
+25082020-16:03:00 -> Iniciando script de atualização da lista remota IPC2725 para a lista do Sidicom 0004
+25082020-16:03:15 -> Script para atualizar lista de preço incializado.
+25082020-16:05:52 -> Iniciando monitor...
+25082020-16:05:53 -> Criando TConSqlServer
+25082020-16:05:53 -> Criando TConFirebird
+25082020-16:05:53 -> Criando TMonitorMain
+25082020-16:05:54 -> Criando TDmSqlUtils
+25082020-16:05:54 -> Criando TCon
+25082020-16:05:54 -> Carregando Gatihlos.xml
+25082020-16:09:04 -> Inicializando message loop
+25082020-16:09:09 -> Iniciando script de atualização da lista remota IPC2725 para a lista do Sidicom 0004
+25082020-16:09:45 -> Script para atualizar lista de preço incializado.
+25082020-16:10:51 -> Iniciando script de atualização da lista remota IPC2125 para a lista do Sidicom 0005
+25082020-16:11:31 -> Script para atualizar lista de preço incializado.
+25082020-16:12:51 -> Iniciando script de atualização da lista remota IPC12 para a lista do Sidicom 0006
+25082020-16:14:15 -> Script para atualizar lista de preço incializado.
+25082020-16:15:48 -> Iniciando script de atualização da lista remota ND para a lista do Sidicom 0007
+25082020-16:16:56 -> Script para atualizar lista de preço incializado.

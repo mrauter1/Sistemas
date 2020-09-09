@@ -15,7 +15,7 @@ type
     constructor Create;
     destructor Destroy; override;
 
-    procedure DoReadIniFile(AIniFile: TIniFile); virtual;
+    procedure DoReadIniFile(AIniFile: TIniFile); override;
 
   end;
 
@@ -39,7 +39,7 @@ end;
 procedure TMonitorAppConfig.DoReadIniFile(AIniFile: TIniFile);
 begin
   inherited;
-  SchedulerEnabled:= AIniFile.ReadBool('SchedulerEnabled', 'Monitor', False);
+  SchedulerEnabled:= AIniFile.ReadBool('MONITOR', 'SchedulerEnabled', False);
 end;
 
 procedure TMonitorAppConfig.LerConfig;

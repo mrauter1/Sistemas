@@ -116,6 +116,10 @@ object MonitorMain: TMonitorMain
       Caption = 'Iniciar Agendador'
       OnClick = MenuIniciarClick
     end
+    object AtualizaListadePreos1: TMenuItem
+      Caption = 'Atualiza Listas de Pre'#231'os'
+      OnClick = AtualizaListadePreos1Click
+    end
     object N1: TMenuItem
       Caption = '-'
     end

@@ -18,6 +18,7 @@ type
     RefreshAgendamentos1: TMenuItem;
     MenuIniciar: TMenuItem;
     Timer1: TTimer;
+    AtualizaListadePreos1: TMenuItem;
     procedure ApplicationEvents1Exception(Sender: TObject; E: Exception);
     procedure Fechar1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -27,6 +28,7 @@ type
     procedure RefreshAgendamentos1Click(Sender: TObject);
     procedure MenuIniciarClick(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
+    procedure AtualizaListadePreos1Click(Sender: TObject);
   private
     procedure SetMenuIniciarCaption;
     { Private declarations }
@@ -42,7 +44,7 @@ implementation
 {$R *.dfm}
 
 uses
-  Utils, Form.ScheduledActivities, Form.PesquisaAviso, uMonitorRoot;
+  Utils, Form.ScheduledActivities, Form.PesquisaAviso, uMonitorRoot, uDmGravaLista;
 
 procedure TMonitorMain.Agendamentos1Click(Sender: TObject);
 begin
@@ -64,6 +66,11 @@ begin
   TrayIcon1.Visible := True;
   TrayIcon1.Animate := True;
   TrayIcon1.ShowBalloonHint;
+end;
+
+procedure TMonitorMain.AtualizaListadePreos1Click(Sender: TObject);
+begin
+  TDmGravaLista.AtualizaTodasListasDePreco;
 end;
 
 procedure TMonitorMain.Avisos1Click(Sender: TObject);

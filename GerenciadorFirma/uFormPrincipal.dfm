@@ -468,6 +468,10 @@ object FormPrincipal: TFormPrincipal
         Caption = 'Atualiza Todas as Listas de Pre'#231'o'
         OnClick = AtualizaTodasasListasdePreo1Click
       end
+      object EmailEmbalagens1: TMenuItem
+        Caption = 'Email Embalagens'
+        OnClick = EmailEmbalagens1Click
+      end
     end
     object Consultas1: TMenuItem
       Caption = 'Consultas'

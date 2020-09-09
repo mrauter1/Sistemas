@@ -94,7 +94,7 @@ object FormCiclosVenda: TFormCiclosVenda
     Top = 0
     Width = 920
     Height = 502
-    ActivePage = TabParaComprar
+    ActivePage = TabIgnorados
     Align = alClient
     TabOrder = 1
     object TabParaComprar: TTabSheet
@@ -278,8 +278,6 @@ object FormCiclosVenda: TFormCiclosVenda
     object TabIgnorados: TTabSheet
       Caption = 'Clientes Ignorados'
       ImageIndex = 2
-      ExplicitLeft = 5
-      ExplicitTop = 22
       object cxGridClientesIgnorados: TcxGrid
         Left = 0
         Top = 0
@@ -287,8 +285,6 @@ object FormCiclosVenda: TFormCiclosVenda
         Height = 474
         Align = alClient
         TabOrder = 0
-        ExplicitLeft = 64
-        ExplicitTop = -3
         object cxGridDBTableView1: TcxGridDBTableView
           PopupMenu = PopupMenuIgnorados
           Navigator.Buttons.CustomButtons = <>
@@ -500,7 +496,6 @@ object FormCiclosVenda: TFormCiclosVenda
     end
   end
   object QryCiclos: TFDQuery
-    Active = True
     Connection = ConSqlServer.FDConnection
     SQL.Strings = (
       'select cc.*, C.Cidade, C.Estado'
@@ -614,7 +609,6 @@ object FormCiclosVenda: TFormCiclosVenda
     Top = 56
   end
   object QryRecuperar: TFDQuery
-    Active = True
     Connection = ConSqlServer.FDConnection
     SQL.Strings = (
       'select cc.*, C.Cidade, C.Estado'
@@ -730,7 +724,6 @@ object FormCiclosVenda: TFormCiclosVenda
     Top = 168
   end
   object QryIgnorados: TFDQuery
-    Active = True
     Connection = ConSqlServer.FDConnection
     SQL.Strings = (
       
@@ -871,7 +864,6 @@ object FormCiclosVenda: TFormCiclosVenda
     end
   end
   object QryTodosClientes: TFDQuery
-    Active = True
     Connection = ConSqlServer.FDConnection
     SQL.Strings = (
       'select cc.*, C.Cidade, C.Estado'

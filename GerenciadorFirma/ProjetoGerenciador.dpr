@@ -50,7 +50,9 @@ uses
   Form.ActivityEditor in '..\Ladder Framework\Forms\Form.ActivityEditor.pas' {FormActivityEditor},
   Form.ConsultaEditor in '..\Ladder Framework\Forms\Form.ConsultaEditor.pas',
   Form.ProcessActivityEditor in '..\Ladder Framework\Forms\Form.ProcessActivityEditor.pas',
-  Form.SimpleProcessEditor in '..\Ladder Framework\Forms\Form.SimpleProcessEditor.pas';
+  Form.SimpleProcessEditor in '..\Ladder Framework\Forms\Form.SimpleProcessEditor.pas',
+  uFormEmailEmbalagens in 'uFormEmailEmbalagens.pas' {FormGravaEmbalagens},
+  uFormEmbalagensClientes in 'Fontes\uFormEmbalagensClientes.pas' {FormEmbalagensClientes};
 
 {$R *.res}
 
@@ -81,6 +83,7 @@ begin
   Application.CreateForm(TDMFilaProducao, DMFilaProducao);
   Application.CreateForm(TPedidos, Pedidos);
   Application.CreateForm(TFormFilaProducao, FormFilaProducao);
+  Application.CreateForm(TFormEmbalagensClientes, FormEmbalagensClientes);
   //  Application.CreateForm(TFormProInfo, FormProInfo);
 //  Application.CreateForm(TDMConsistenciaOPs, DMConsistenciaOPs);
 //  Application.CreateForm(TFormPedidos, FormPedidos);

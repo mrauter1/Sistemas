@@ -84,6 +84,7 @@ type
     Atividades1: TMenuItem;
     CadastrodeAtividades1: TMenuItem;
     Agendamentos1: TMenuItem;
+    EmailEmbalagens1: TMenuItem;
     procedure Pedidos1Click(Sender: TObject);
     procedure Fila1Click(Sender: TObject);
     procedure Densidade1Click(Sender: TObject);
@@ -129,6 +130,7 @@ type
     procedure ControleLogistica1Click(Sender: TObject);
     procedure CadastrodeAtividades1Click(Sender: TObject);
     procedure Agendamentos1Click(Sender: TObject);
+    procedure EmailEmbalagens1Click(Sender: TObject);
   private
     FDmGeradorConsultas: TDmGeradorConsultas;
     FPopupActive: Boolean;
@@ -165,7 +167,7 @@ implementation
 uses
   uDmFilaProducao, Utils, uFormDetalheProdutos, uFormPedidos2, uFormValidaModelos, uFormExecSql,
   uFormRelatoriosPersonalizados, uFormSubGrupoExtras, uFormFeriados, uPython, uFormCiclosVenda,
-  uDmGravaLista;
+  uDmGravaLista, uFormEmailEmbalagens;
 
 procedure TFormPrincipal.RemoveTab(pTab: TChromeTab);
 begin
@@ -627,6 +629,11 @@ begin
   end;
 end;
 
+procedure TFormPrincipal.EmailEmbalagens1Click(Sender: TObject);
+begin
+  AbrirFormEmNovaAba(TFormGravaEmbalagens.Create(Self), True);
+end;
+
 procedure TFormPrincipal.EmbedFormEmTab(pForm: TForm; pTab: TChromeTab; pTabOwnsForm: Boolean = True);
 var
   FPanel: TTabPanel;
@@ -708,7 +715,8 @@ end;
 
 procedure TFormPrincipal.AtualizaTodasasListasdePreo1Click(Sender: TObject);
 begin
-  TDmGravaLista.AtualizaTodasListasDePreco;
+  if MessageDlg('Iniciar leitura da lista de preços remota?', mtConfirmation, [mbYes, mbNO], 0) = mrYes then
+    TDmGravaLista.AtualizaTodasListasDePreco;
 end;
 
 procedure TFormPrincipal.MostraNovoForm(pForm: TForm);

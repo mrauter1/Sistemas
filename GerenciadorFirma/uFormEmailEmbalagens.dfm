@@ -1,0 +1,553 @@
+object FormGravaEmbalagens: TFormGravaEmbalagens
+  Left = 0
+  Top = 0
+  Caption = 'Email de embalagens para os clientes'
+  ClientHeight = 509
+  ClientWidth = 946
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  PixelsPerInch = 96
+  TextHeight = 13
+  object TPanel
+    Left = 0
+    Top = 0
+    Width = 946
+    Height = 65
+    Align = alTop
+    TabOrder = 0
+    ExplicitLeft = 16
+    ExplicitTop = -5
+    ExplicitWidth = 927
+    object Label1: TLabel
+      Left = 214
+      Top = 41
+      Width = 53
+      Height = 13
+      Alignment = taRightJustify
+      Caption = 'Data Inicial'
+    end
+    object Label2: TLabel
+      Left = 427
+      Top = 41
+      Width = 48
+      Height = 13
+      Alignment = taRightJustify
+      Caption = 'Data Final'
+    end
+    object Label3: TLabel
+      Left = 234
+      Top = 14
+      Width = 33
+      Height = 13
+      Alignment = taRightJustify
+      Caption = 'Cliente'
+    end
+    object BtnAtualizar: TButton
+      Left = 728
+      Top = 3
+      Width = 75
+      Height = 25
+      Caption = 'Atualizar'
+      TabOrder = 0
+      OnClick = BtnAtualizarClick
+    end
+    object DataIniPicker: TDateTimePicker
+      Left = 273
+      Top = 38
+      Width = 112
+      Height = 21
+      Date = 44071.444021122680000000
+      Time = 44071.444021122680000000
+      TabOrder = 1
+    end
+    object DataFimPicker: TDateTimePicker
+      Left = 481
+      Top = 38
+      Width = 107
+      Height = 21
+      Date = 44071.444021122680000000
+      Time = 44071.444021122680000000
+      TabOrder = 2
+    end
+    object CheckBoxMostrarIgnorados: TCheckBox
+      Left = 16
+      Top = 42
+      Width = 169
+      Height = 17
+      Caption = 'Mostrar Embalagens Ignoradas'
+      TabOrder = 3
+      OnClick = CheckBoxMostrarIgnoradosClick
+    end
+    object EditCliente: TEdit
+      Left = 273
+      Top = 11
+      Width = 315
+      Height = 21
+      TabOrder = 4
+      OnKeyDown = EditClienteKeyDown
+    end
+    object CheckBoxMostrarEnviados: TCheckBox
+      Left = 16
+      Top = 15
+      Width = 169
+      Height = 17
+      Caption = 'Mostrar Embalagens Enviadas'
+      TabOrder = 5
+      OnClick = CheckBoxMostrarIgnoradosClick
+    end
+    object BtnEnviarEmail: TButton
+      Left = 728
+      Top = 35
+      Width = 75
+      Height = 25
+      Caption = 'Enviar Email'
+      TabOrder = 6
+      OnClick = BtnEnviarEmailClick
+    end
+  end
+  object Panel2: TPanel
+    Left = 0
+    Top = 65
+    Width = 946
+    Height = 402
+    Align = alClient
+    Caption = 'Panel2'
+    TabOrder = 1
+    ExplicitWidth = 927
+    object cxGridEmbalagens: TcxGrid
+      Left = 1
+      Top = 1
+      Width = 944
+      Height = 400
+      Align = alClient
+      TabOrder = 0
+      ExplicitLeft = 0
+      ExplicitTop = 2
+      object cxGridViewClientes: TcxGridDBTableView
+        PopupMenu = PopupMenu
+        Navigator.Buttons.CustomButtons = <>
+        OnCellClick = cxGridViewClientesCellClick
+        DataController.DataSource = DsEmbalagens
+        DataController.Summary.DefaultGroupSummaryItems = <>
+        DataController.Summary.FooterSummaryItems = <>
+        DataController.Summary.SummaryGroups = <>
+        FilterRow.Visible = True
+        OptionsData.CancelOnExit = False
+        OptionsData.Deleting = False
+        OptionsData.DeletingConfirmation = False
+        OptionsData.Editing = False
+        OptionsData.Inserting = False
+        OptionsSelection.CellSelect = False
+        OptionsView.HeaderAutoHeight = True
+        Styles.OnGetContentStyle = cxGridViewClientesStylesGetContentStyle
+        Styles.StyleSheet = FormGlobal.cxGridTableViewStyleSheet1
+        object cxGridViewClientesSelecionado: TcxGridDBColumn
+          DataBinding.FieldName = 'Selecionado'
+          PropertiesClassName = 'TcxCheckBoxProperties'
+          Width = 35
+        end
+        object cxGridViewClientesDESCSTATUS: TcxGridDBColumn
+          DataBinding.FieldName = 'DESCSTATUS'
+          Width = 63
+        end
+        object cxGridViewClientesstatus: TcxGridDBColumn
+          DataBinding.FieldName = 'status'
+          Visible = False
+        end
+        object cxGridViewClientesCODCLIENTE: TcxGridDBColumn
+          DataBinding.FieldName = 'CODCLIENTE'
+          Visible = False
+          Width = 59
+        end
+        object cxGridViewClientesRAZAOSOCIAL: TcxGridDBColumn
+          DataBinding.FieldName = 'RAZAOSOCIAL'
+          Width = 161
+        end
+        object cxGridViewClientesCIDADE: TcxGridDBColumn
+          DataBinding.FieldName = 'CIDADE'
+          Width = 96
+        end
+        object cxGridViewClientesdatacomprovante: TcxGridDBColumn
+          DataBinding.FieldName = 'datacomprovante'
+          Width = 82
+        end
+        object cxGridViewClienteschavenfpro: TcxGridDBColumn
+          DataBinding.FieldName = 'chavenfpro'
+          Visible = False
+        end
+        object cxGridViewClientesnumero: TcxGridDBColumn
+          DataBinding.FieldName = 'numero'
+          Width = 43
+        end
+        object cxGridViewClientesserie: TcxGridDBColumn
+          DataBinding.FieldName = 'serie'
+          Width = 46
+        end
+        object cxGridViewClientescodproduto: TcxGridDBColumn
+          DataBinding.FieldName = 'codproduto'
+          Visible = False
+          Width = 49
+        end
+        object cxGridViewClientesapresentacao: TcxGridDBColumn
+          DataBinding.FieldName = 'apresentacao'
+          Width = 121
+        end
+        object cxGridViewClientesQuantAtendida: TcxGridDBColumn
+          DataBinding.FieldName = 'QuantAtendida'
+          Width = 52
+        end
+        object cxGridViewClientesCHAVENF: TcxGridDBColumn
+          DataBinding.FieldName = 'CHAVENF'
+          Visible = False
+        end
+        object cxGridViewClientesTOTPAGO: TcxGridDBColumn
+          DataBinding.FieldName = 'TOTPAGO'
+          Width = 70
+        end
+        object cxGridViewClientesVALTOTAL: TcxGridDBColumn
+          DataBinding.FieldName = 'VALTOTAL'
+          Width = 69
+        end
+        object cxGridViewClientesEntregaParcial: TcxGridDBColumn
+          DataBinding.FieldName = 'EntregaParcial'
+          Width = 62
+        end
+      end
+      object cxGridEmbalagensDBTableView1: TcxGridDBTableView
+        Navigator.Buttons.CustomButtons = <>
+        DataController.DetailKeyFieldNames = 'CODPRODUTO'
+        DataController.KeyFieldNames = 'CODPRODUTO'
+        DataController.MasterKeyFieldNames = 'CODPRODUTO'
+        DataController.Summary.DefaultGroupSummaryItems = <>
+        DataController.Summary.FooterSummaryItems = <>
+        DataController.Summary.SummaryGroups = <>
+        OptionsSelection.CellSelect = False
+        OptionsView.GroupByBox = False
+        Styles.StyleSheet = FormGlobal.cxGridTableViewStyleSheet1
+      end
+      object cxGridEmbalagensDBTableView2: TcxGridDBTableView
+        Navigator.Buttons.CustomButtons = <>
+        FilterBox.Visible = fvNever
+        DataController.DataSource = DsEmbalagens
+        DataController.DetailKeyFieldNames = 'codcliente'
+        DataController.KeyFieldNames = 'codcliente'
+        DataController.MasterKeyFieldNames = 'CODCLIENTE'
+        DataController.Summary.DefaultGroupSummaryItems = <>
+        DataController.Summary.FooterSummaryItems = <>
+        DataController.Summary.SummaryGroups = <>
+        OptionsData.CancelOnExit = False
+        OptionsData.Deleting = False
+        OptionsData.DeletingConfirmation = False
+        OptionsData.Editing = False
+        OptionsData.Inserting = False
+        OptionsView.GroupByBox = False
+        OptionsView.HeaderAutoHeight = True
+        object cxGridEmbalagensDBTableView2Selecionado: TcxGridDBColumn
+          DataBinding.FieldName = 'Selecionado'
+          PropertiesClassName = 'TcxCheckBoxProperties'
+          Width = 41
+        end
+        object cxGridEmbalagensDBTableView2chavenfpro: TcxGridDBColumn
+          DataBinding.FieldName = 'chavenfpro'
+        end
+        object cxGridEmbalagensDBTableView2codcliente: TcxGridDBColumn
+          DataBinding.FieldName = 'codcliente'
+          Visible = False
+          Options.Editing = False
+        end
+        object cxGridEmbalagensDBTableView2numero: TcxGridDBColumn
+          DataBinding.FieldName = 'numero'
+          Options.Editing = False
+          Width = 62
+        end
+        object cxGridEmbalagensDBTableView2serie: TcxGridDBColumn
+          DataBinding.FieldName = 'serie'
+          Options.Editing = False
+          Width = 49
+        end
+        object cxGridEmbalagensDBTableView2datacomprovante: TcxGridDBColumn
+          Caption = 'Data Nota'
+          DataBinding.FieldName = 'datacomprovante'
+          Options.Editing = False
+          Width = 90
+        end
+        object cxGridEmbalagensDBTableView2codproduto: TcxGridDBColumn
+          DataBinding.FieldName = 'codproduto'
+          Options.Editing = False
+          Width = 62
+        end
+        object cxGridEmbalagensDBTableView2apresentacao: TcxGridDBColumn
+          DataBinding.FieldName = 'apresentacao'
+          Options.Editing = False
+          Width = 196
+        end
+        object cxGridEmbalagensDBTableView2NOMECLIENTE: TcxGridDBColumn
+          DataBinding.FieldName = 'NOMECLIENTE'
+          Visible = False
+          Options.Editing = False
+        end
+      end
+      object cxGridClientesLevel: TcxGridLevel
+        GridView = cxGridViewClientes
+      end
+    end
+  end
+  object Panel1: TPanel
+    Left = 0
+    Top = 467
+    Width = 946
+    Height = 42
+    Align = alBottom
+    TabOrder = 2
+    ExplicitWidth = 927
+    object BtnSeleciona: TBitBtn
+      Left = 8
+      Top = 6
+      Width = 49
+      Height = 27
+      Caption = '[V]'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 0
+      OnClick = BtnSelecionaClick
+    end
+  end
+  object QryEmbalagens: TFDQuery
+    AfterClose = QryEmbalagensAfterClose
+    AfterPost = QryEmbalagensAfterPost
+    OnCalcFields = QryEmbalagensCalcFields
+    AfterGetRecord = QryEmbalagensAfterGetRecord
+    Connection = ConSqlServer.FDConnection
+    SQL.Strings = (
+      'SELECT MCLIRECB.CHAVENF,'
+      '       MP.CHAVENFPRO,'
+      '       CASE WHEN MS.STATUS = 1 THEN '#39'ENVIADO'#39
+      '            WHEN MS.STATUS = 2 THEN '#39'IGNORADO'#39
+      '       ELSE '#39'N'#195'O ENVIADO'#39' END AS DESCSTATUS,'
+      '       ISNULL(MS.STATUS,0) AS STATUS,'
+      '       MCLIRECB.CODCLIENTE,'
+      '       M.DATACOMPROVANTE,'
+      '       M.NUMERO,'
+      '       M.SERIE,'
+      '       C.RAZAOSOCIAL,       '
+      '       C.CIDADE,'
+      '       IsNull(PAGO.TOTPAGO,0) as TOTPAGO,'
+      '       CASE WHEN PAGO.TOTPAGO > 0 THEN '
+      '       '#9#9#39'SIM'#39
+      '       ELSE '#39'N'#195'O'#39'     '
+      '       END AS EntregaParcial,'
+      '       P.CODPRODUTO,'
+      '       P.APRESENTACAO,'
+      '       MP.QUANTATENDIDA,'
+      '       MP.VALTOTAL'
+      'FROM MCLIRECB MCLIRECB'
+      'INNER JOIN MCLI M ON M.CHAVENF = MCLIRECB.CHAVENF'
+      'LEFT JOIN (SELECT PAGO.CHAVENF, SUM(PAGO.TOTNOTA) AS TOTPAGO'
+      
+        ' '#9#9'   FROM MCLIPAGO PAGO GROUP BY PAGO.CHAVENF) PAGO ON PAGO.CHA' +
+        'VENF = MCLIRECB.CHAVENF'
+      'LEFT JOIN MCLIPRO MP ON MP.CHAVENF = MCLIRECB.CHAVENF'
+      'LEFT JOIN PRODUTO P ON P.CODPRODUTO = MP.CODPRODUTO'
+      'LEFT JOIN CLIENTE C ON C.CODCLIENTE = MCLIRECB.CODCLIENTE'
+      'LEFT JOIN MCLIPROSTATUSRECB MS ON MS.CHAVENFPRO = MP.CHAVENFPRO'
+      'WHERE '
+      '     MCLIRECB.CODCOMPROVANTE IN ('#39'014'#39')'
+      '     AND MCLIRECB.DATACOMPROVANTE between :DataIni and :DataFim'
+      '     /*Ignorados*/'
+      '     /*Cliente*/'
+      
+        'ORDER BY m.datacomprovante desc, C.RAZAOSOCIAL, MCLIRECB.TOTNOTA' +
+        ' desc, MP.QUANTATENDIDA desc')
+    Left = 272
+    Top = 288
+    ParamData = <
+      item
+        Name = 'DATAINI'
+        DataType = ftDate
+        ParamType = ptInput
+        Value = '28/08/2020'
+      end
+      item
+        Name = 'DATAFIM'
+        DataType = ftDate
+        ParamType = ptInput
+        Value = '28/08/2020'
+      end>
+    object QryEmbalagensSelecionado: TBooleanField
+      DisplayLabel = 'Sel'
+      FieldKind = fkCalculated
+      FieldName = 'Selecionado'
+      Calculated = True
+    end
+    object QryEmbalagensDESCSTATUS: TStringField
+      DisplayLabel = 'Status'
+      FieldName = 'DESCSTATUS'
+      Origin = 'DESCSTATUS'
+      ReadOnly = True
+      Required = True
+      Size = 11
+    end
+    object QryEmbalagenscodcliente: TStringField
+      DisplayLabel = 'Cod. Cliente'
+      FieldName = 'codcliente'
+      Origin = 'codcliente'
+      Required = True
+      Visible = False
+      FixedChar = True
+      Size = 6
+    end
+    object QryEmbalagensstatus: TIntegerField
+      FieldName = 'status'
+      Origin = 'status'
+    end
+    object QryEmbalagensRAZAOSOCIAL: TStringField
+      DisplayLabel = 'Nome Cliente'
+      FieldName = 'RAZAOSOCIAL'
+      Origin = 'RAZAOSOCIAL'
+      Visible = False
+      Size = 80
+    end
+    object QryEmbalagensCIDADE: TStringField
+      DisplayLabel = 'Cidade'
+      FieldName = 'CIDADE'
+      Origin = 'CIDADE'
+      Visible = False
+      FixedChar = True
+      Size = 35
+    end
+    object QryEmbalagenschavenfpro: TStringField
+      FieldName = 'chavenfpro'
+      Origin = 'chavenfpro'
+      Required = True
+      FixedChar = True
+      Size = 21
+    end
+    object QryEmbalagensdatacomprovante: TDateField
+      DisplayLabel = 'Data Emiss'#227'o'
+      FieldName = 'datacomprovante'
+      Origin = 'datacomprovante'
+    end
+    object QryEmbalagensnumero: TStringField
+      DisplayLabel = 'N'#250'mero'
+      FieldName = 'numero'
+      Origin = 'numero'
+      FixedChar = True
+      Size = 6
+    end
+    object QryEmbalagensserie: TStringField
+      DisplayLabel = 'S'#233'rie'
+      FieldName = 'serie'
+      Origin = 'serie'
+      FixedChar = True
+      Size = 4
+    end
+    object QryEmbalagenscodproduto: TStringField
+      DisplayLabel = 'Cod. Produto'
+      FieldName = 'codproduto'
+      Origin = 'codproduto'
+      Required = True
+      FixedChar = True
+      Size = 6
+    end
+    object QryEmbalagensapresentacao: TStringField
+      DisplayLabel = 'Embalagem'
+      FieldName = 'apresentacao'
+      Origin = 'apresentacao'
+      Size = 80
+    end
+    object QryEmbalagensQuantAtendida: TBCDField
+      DisplayLabel = 'Quant.'
+      FieldName = 'QuantAtendida'
+      Origin = 'QuantAtendida'
+      Precision = 18
+    end
+    object QryEmbalagensCHAVENF: TStringField
+      FieldName = 'CHAVENF'
+      Origin = 'CHAVENF'
+      Required = True
+      Visible = False
+      FixedChar = True
+      Size = 15
+    end
+    object QryEmbalagensTOTPAGO: TFMTBCDField
+      DisplayLabel = 'Valor Devolvido'
+      DisplayWidth = 19
+      FieldName = 'TOTPAGO'
+      Origin = 'TOTPAGO'
+      ReadOnly = True
+      currency = True
+      Precision = 38
+      Size = 2
+    end
+    object QryEmbalagensVALTOTAL: TBCDField
+      DisplayLabel = 'Valor Total'
+      FieldName = 'VALTOTAL'
+      Origin = 'VALTOTAL'
+      currency = True
+      Precision = 18
+    end
+    object QryEmbalagensEntregaParcial: TStringField
+      DisplayLabel = 'Entrega Parcial'
+      FieldName = 'EntregaParcial'
+      Origin = 'EntregaParcial'
+      ReadOnly = True
+      Required = True
+      Size = 3
+    end
+  end
+  object DsEmbalagens: TDataSource
+    DataSet = QryEmbalagens
+    Left = 360
+    Top = 288
+  end
+  object PopupMenu: TPopupMenu
+    OnPopup = PopupMenuPopup
+    Left = 496
+    Top = 248
+    object EmbalagensCli1: TMenuItem
+      Caption = 'Abrir Embalagens do Cliente'
+      OnClick = EmbalagensCli1Click
+    end
+    object N1: TMenuItem
+      Caption = '-'
+    end
+    object IgnorarEmbalagem1: TMenuItem
+      Caption = 'Ignorar Embalagem'
+      OnClick = IgnorarEmbalagem1Click
+    end
+    object DeixardeIgnorarEmbalagem1: TMenuItem
+      Caption = 'Deixar de Ignorar Embalagem'
+      OnClick = DeixardeIgnorarEmbalagem1Click
+    end
+  end
+  object cxStyleRepository1: TcxStyleRepository
+    Left = 616
+    Top = 8
+    PixelsPerInch = 96
+    object cxStyleVermelho: TcxStyle
+      AssignedValues = [svColor, svFont, svTextColor]
+      Color = 2105599
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Arial'
+      Font.Style = [fsBold]
+      TextColor = clWhite
+    end
+    object cxStyleAmarelo: TcxStyle
+      AssignedValues = [svColor]
+      Color = clYellow
+    end
+  end
+end

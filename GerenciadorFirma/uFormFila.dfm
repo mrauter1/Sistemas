@@ -174,7 +174,7 @@ object FormFilaProducao: TFormFilaProducao
       OnClick = BtnAtualizaClick
     end
     object BtnOpcoes: TBitBtn
-      Left = 5
+      Left = 8
       Top = 6
       Width = 26
       Height = 27

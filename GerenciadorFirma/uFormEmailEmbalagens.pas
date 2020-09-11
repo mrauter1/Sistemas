@@ -87,6 +87,11 @@ type
     BtnEnviarEmail: TButton;
     QryEmbalagensDESCSTATUS: TStringField;
     cxGridViewClientesDESCSTATUS: TcxGridDBColumn;
+    QryEmbalagensVALUNIDADE: TFMTBCDField;
+    QryEmbalagensQuantDevolvida: TFMTBCDField;
+    cxGridViewClientesVALUNIDADE: TcxGridDBColumn;
+    cxGridViewClientesQuantDevolvida: TcxGridDBColumn;
+    PanelTop: TPanel;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure QryEmbalagensAfterPost(DataSet: TDataSet);
@@ -226,7 +231,7 @@ var
 
   function GetFiltroStatus: String;
   begin
-    Result:= ' AND IsNull(MS.Status,0) in (0';
+    Result:= ' AND IsNull(Status,0) in (0';
     if CheckBoxMostrarEnviados.Checked then
       Result:= Result+',1';
     if CheckBoxMostrarIgnorados.Checked then
@@ -242,7 +247,7 @@ begin
   FSql:= FSql.Replace('/*Ignorados*/', GetFiltroStatus);
 
   if Trim(EditCliente.Text)<>'' then
-    FSql:= FSql.Replace('/*Cliente*/', ' AND C.RAZAOSOCIAL LIKE ''%'+Trim(EditCliente.Text)+'%'' ');
+    FSql:= FSql.Replace('/*Cliente*/', ' AND RAZAOSOCIAL LIKE ''%'+Trim(EditCliente.Text)+'%'' ');
 
   QryEmbalagens.SQL.Text:= FSql;
   QryEmbalagens.ParamByName('DataIni').AsDate:= ADataIni;
@@ -445,7 +450,7 @@ end;
 
 procedure TFormGravaEmbalagens.QryEmbalagensAfterGetRecord(DataSet: TFDDataSet);
 begin
-  fSelecionados.AddOrSetValue(QryEmbalagenschavenfPro.AsString, False);
+//  fSelecionados.AddOrSetValue(QryEmbalagenschavenfPro.AsString, False);
 end;
 
 procedure TFormGravaEmbalagens.QryEmbalagensAfterPost(DataSet: TDataSet);

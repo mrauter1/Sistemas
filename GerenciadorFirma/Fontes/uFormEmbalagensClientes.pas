@@ -17,8 +17,6 @@ uses
 
 type
   TFormEmbalagensClientes = class(TForm)
-    Panel1: TPanel;
-    BtnSeleciona: TBitBtn;
     cxGridEmbalagens: TcxGrid;
     cxGridViewEmbalagens: TcxGridDBTableView;
     cxGridEmbalagensLevel: TcxGridLevel;
@@ -36,7 +34,6 @@ type
     QryEmbalagensCliSERIE: TStringField;
     QryEmbalagensCliQUANTATENDIDA: TBCDField;
     QryEmbalagensCliTOTPAGO: TFMTBCDField;
-    QryEmbalagensCliVALTOTAL: TBCDField;
     QryEmbalagensCliSTATUS: TIntegerField;
     QryEmbalagensCliCHAVENFPRO: TStringField;
 
@@ -52,7 +49,6 @@ type
     cxGridViewEmbalagensCODPRODUTO: TcxGridDBColumn;
     cxGridViewEmbalagensAPRESENTACAO: TcxGridDBColumn;
     cxGridViewEmbalagensQUANTATENDIDA: TcxGridDBColumn;
-    cxGridViewEmbalagensVALTOTAL: TcxGridDBColumn;
     cxGridViewEmbalagensSTATUS: TcxGridDBColumn;
     cxGridViewEmbalagensCHAVENFPRO: TcxGridDBColumn;
 
@@ -72,6 +68,16 @@ type
     QryEmbalagensCliDESCSTATUS: TStringField;
     cxGridViewEmbalagensDESCSTATUS: TcxGridDBColumn;
     BtnEnviarEmail: TButton;
+    QryEmbalagensCliVALUNIDADE: TFMTBCDField;
+    QryEmbalagensCliQuantDevolvida: TFMTBCDField;
+    QryEmbalagensCliVALTOTAL: TBCDField;
+    cxGridViewEmbalagensVALTOTAL: TcxGridDBColumn;
+    cxGridViewEmbalagensVALUNIDADE: TcxGridDBColumn;
+    cxGridViewEmbalagensQuantDevolvida: TcxGridDBColumn;
+    PanelTop: TPanel;
+    EditEmails: TEdit;
+    Label2: TLabel;
+    BtnContatos: TButton;
     procedure Ignorarembalagem1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure BtnAtualizarClick(Sender: TObject);
@@ -83,6 +89,8 @@ type
     procedure CheckBoxMostrarIgnoradosClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure BtnEnviarEmailClick(Sender: TObject);
+    procedure BtnContatosClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
     FCodCliente: string;
@@ -92,6 +100,7 @@ type
     function EmbalagemRecenteENaoEnviada: Boolean;
     procedure MarcarEmbalagensComoEnviadas;
     procedure EviarEmailCliente;
+    procedure AtualizaEmails;
   public
     procedure EnviaEmail;
     procedure CarregaEmbalagensCliente(ACodCliente: String);
@@ -105,6 +114,9 @@ var
 implementation
 
 {$R *.dfm}
+
+uses
+  uFormSelecionaEmailCliente;
 
 class procedure TFormEmbalagensClientes.AbreEmbalagensCliente(
   ACodCliente: String);
@@ -125,27 +137,49 @@ begin
   CarregaEmbalagensCliente(FCodCliente);
 end;
 
+procedure TFormEmbalagensClientes.AtualizaEmails;
+  function getSql(ACodCliente, EmailEmbalagem: String): String;
+  begin
+    Result:= 'IF EXISTS(SELECT * FROM CLIENTEEMBALAGEM WHERE CODCLIENTE = '''+ACodCliente+''') '
+            +Format('  UPDATE ClienteEmbalagem set EmailEmbalagem = ''%s'' where CodCliente = ''%s'' ',[EmailEmbalagem, ACodCliente])
+            +' ELSE '
+            +Format('INSERT INTO ClienteEmbalagem (CodCliente, EmailEmbalagem) values (''%s'', ''%s'') ', [ACodCliente, EmailEmbalagem]);
+  end;
+begin
+  ConSqlServer.ExecutaComando(getSql(QryEmbalagensCliCodCliente.AsString, EditEmails.Text));
+end;
+
+procedure TFormEmbalagensClientes.BtnContatosClick(Sender: TObject);
+begin
+  EditEmails.Text:= TFormSelecionaEmailCliente.SelecionaEmailContatos(QryEmbalagensCliCodCliente.AsString, EditEmails.Text);
+  AtualizaEmails;
+end;
+
 procedure TFormEmbalagensClientes.BtnEnviarEmailClick(Sender: TObject);
 begin
   EnviaEmail;
 end;
+
 
 procedure TFormEmbalagensClientes.CarregaEmbalagensCliente(ACodCliente: String);
 var
   FSql: String;
 begin
   FCodCliente:= ACodCliente;
+
   QryEmbalagensCli.Close;
 
   FSql:= FSqlQryEmbalagensCli;
   if CheckBoxMostrarIgnorados.Checked = False then
-    FSql:= FSql.Replace('/*Ignorados*/', ' AND IsNull(MS.STATUS,0) < 2');
+    FSql:= FSql.Replace('/*Ignorados*/', ' AND IsNull(STATUS,0) < 2');
 
   QryEmbalagensCli.SQL.Text:= FSql;
   QryEmbalagensCli.ParamByName('CodCliente').AsString:= ACodCliente;
   QryEmbalagensCli.ParamByName('DataIni').AsDate:= DataIniPicker.Date;
   QryEmbalagensCli.Open;
   Self.Caption:= 'Embalagens pendentes do cliente '+QryEmbalagensCliRAZAOSOCIAL.AsString;
+
+  EditEmails.Text:= ConSqlServer.RetornaValor(Format('SELECT EmailEmbalagem from ClienteEmbalagem where CodCliente = ''%s'' ',[ACodCliente]), '');
 end;
 
 procedure TFormEmbalagensClientes.CheckBoxMostrarIgnoradosClick(
@@ -278,6 +312,12 @@ begin
     ConSqlServer.ExecutaComando(Format(cSqlStatus, [QryEmbalagensCliChaveNFPro.AsString, 1, 'Email enviado']));
     QryEmbalagensCli.Next;
   end;
+end;
+
+procedure TFormEmbalagensClientes.FormClose(Sender: TObject;
+  var Action: TCloseAction);
+begin
+  AtualizaEmails;
 end;
 
 procedure TFormEmbalagensClientes.FormCreate(Sender: TObject);

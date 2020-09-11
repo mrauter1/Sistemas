@@ -3,7 +3,7 @@ object FormEmbalagensClientes: TFormEmbalagensClientes
   Top = 0
   Caption = 'Embalagens pendentes do cliente'
   ClientHeight = 422
-  ClientWidth = 825
+  ClientWidth = 833
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -11,42 +11,20 @@ object FormEmbalagensClientes: TFormEmbalagensClientes
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 13
-  object Panel1: TPanel
-    Left = 0
-    Top = 380
-    Width = 825
-    Height = 42
-    Align = alBottom
-    TabOrder = 0
-    ExplicitTop = 328
-    ExplicitWidth = 753
-    object BtnSeleciona: TBitBtn
-      Left = 8
-      Top = 6
-      Width = 49
-      Height = 27
-      Caption = '[V]'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -13
-      Font.Name = 'Tahoma'
-      Font.Style = []
-      ParentFont = False
-      TabOrder = 0
-    end
-  end
-  object TPanel
+  object PanelTop: TPanel
     Left = 0
     Top = 0
-    Width = 825
-    Height = 33
+    Width = 833
+    Height = 65
     Align = alTop
-    TabOrder = 1
-    ExplicitWidth = 753
+    TabOrder = 0
+    ExplicitLeft = -8
+    ExplicitTop = -6
     object Label1: TLabel
       Left = 190
       Top = 10
@@ -55,12 +33,20 @@ object FormEmbalagensClientes: TFormEmbalagensClientes
       Alignment = taRightJustify
       Caption = 'Data Inicial'
     end
+    object Label2: TLabel
+      Left = 28
+      Top = 35
+      Width = 215
+      Height = 13
+      Alignment = taRightJustify
+      Caption = 'Emails para envio de lembrete de embalagem'
+    end
     object CheckBoxMostrarIgnorados: TCheckBox
-      Left = 8
+      Left = 14
       Top = 8
       Width = 169
       Height = 17
-      Caption = 'Mostrar Notas Ignoradas'
+      Caption = 'Mostrar Embalagens Ignoradas'
       TabOrder = 0
       OnClick = CheckBoxMostrarIgnoradosClick
     end
@@ -91,16 +77,22 @@ object FormEmbalagensClientes: TFormEmbalagensClientes
       TabOrder = 3
       OnClick = BtnEnviarEmailClick
     end
+    object EditEmails: TEdit
+      Left = 249
+      Top = 33
+      Width = 345
+      Height = 21
+      TabOrder = 4
+    end
   end
   object cxGridEmbalagens: TcxGrid
     Left = 0
-    Top = 33
-    Width = 825
-    Height = 347
+    Top = 65
+    Width = 833
+    Height = 357
     Align = alClient
-    TabOrder = 2
-    ExplicitWidth = 753
-    ExplicitHeight = 295
+    TabOrder = 1
+    ExplicitTop = 62
     object cxGridViewEmbalagens: TcxGridDBTableView
       PopupMenu = PopupMenu
       Navigator.Buttons.CustomButtons = <>
@@ -156,20 +148,12 @@ object FormEmbalagensClientes: TFormEmbalagensClientes
       end
       object cxGridViewEmbalagensSERIE: TcxGridDBColumn
         DataBinding.FieldName = 'SERIE'
-        Width = 44
+        Width = 34
       end
       object cxGridViewEmbalagensCIDADE: TcxGridDBColumn
         DataBinding.FieldName = 'CIDADE'
         Visible = False
         Width = 105
-      end
-      object cxGridViewEmbalagensTOTPAGO: TcxGridDBColumn
-        DataBinding.FieldName = 'TOTPAGO'
-        Width = 58
-      end
-      object cxGridViewEmbalagensENTREGAPARCIAL: TcxGridDBColumn
-        DataBinding.FieldName = 'ENTREGAPARCIAL'
-        Width = 51
       end
       object cxGridViewEmbalagensCODPRODUTO: TcxGridDBColumn
         DataBinding.FieldName = 'CODPRODUTO'
@@ -178,15 +162,31 @@ object FormEmbalagensClientes: TFormEmbalagensClientes
       end
       object cxGridViewEmbalagensAPRESENTACAO: TcxGridDBColumn
         DataBinding.FieldName = 'APRESENTACAO'
-        Width = 206
+        Width = 163
       end
       object cxGridViewEmbalagensQUANTATENDIDA: TcxGridDBColumn
         DataBinding.FieldName = 'QUANTATENDIDA'
-        Width = 56
+        Width = 49
+      end
+      object cxGridViewEmbalagensENTREGAPARCIAL: TcxGridDBColumn
+        DataBinding.FieldName = 'ENTREGAPARCIAL'
+        Width = 51
+      end
+      object cxGridViewEmbalagensQuantDevolvida: TcxGridDBColumn
+        DataBinding.FieldName = 'QuantDevolvida'
+        Width = 55
       end
       object cxGridViewEmbalagensVALTOTAL: TcxGridDBColumn
         DataBinding.FieldName = 'VALTOTAL'
-        Width = 94
+        Width = 71
+      end
+      object cxGridViewEmbalagensVALUNIDADE: TcxGridDBColumn
+        DataBinding.FieldName = 'VALUNIDADE'
+        Visible = False
+      end
+      object cxGridViewEmbalagensTOTPAGO: TcxGridDBColumn
+        DataBinding.FieldName = 'TOTPAGO'
+        Width = 58
       end
     end
     object cxGridEmbalagensDBTableView1: TcxGridDBTableView
@@ -267,6 +267,15 @@ object FormEmbalagensClientes: TFormEmbalagensClientes
       GridView = cxGridViewEmbalagens
     end
   end
+  object BtnContatos: TButton
+    Left = 600
+    Top = 33
+    Width = 75
+    Height = 23
+    Caption = 'Contatos'
+    TabOrder = 2
+    OnClick = BtnContatosClick
+  end
   object DsEmbalagensCli: TDataSource
     DataSet = QryEmbalagensCli
     Left = 376
@@ -275,46 +284,15 @@ object FormEmbalagensClientes: TFormEmbalagensClientes
   object QryEmbalagensCli: TFDQuery
     Connection = ConSqlServer.FDConnection
     SQL.Strings = (
-      'SELECT MCLIRECB.CHAVENF,'
-      '       CASE WHEN MS.STATUS = 1 THEN '#39'ENVIADO'#39
-      '            WHEN MS.STATUS = 2 THEN '#39'IGNORADO'#39
-      '       ELSE '#39'N'#195'O ENVIADO'#39' END AS DESCSTATUS,'
-      '       ISNULL(MS.STATUS,0) AS STATUS,'
-      '       MP.CHAVENFPRO,'
-      '       MCLIRECB.CODCLIENTE,'
-      '       M.DATACOMPROVANTE,'
-      '       MCLIRECB.DataVencimento,'
-      '       M.NUMERO,'
-      '       M.SERIE,'
-      '       C.RAZAOSOCIAL,       '
-      '       C.CIDADE,'
-      '       IsNull(PAGO.TOTPAGO,0) as TOTPAGO,'
-      '       CASE WHEN PAGO.TOTPAGO > 0 THEN '
-      '       '#9#9#39'SIM'#39
-      '       ELSE '#39'N'#195'O'#39'     '
-      '       END AS EntregaParcial,'
-      '       P.CODPRODUTO,'
-      '       P.APRESENTACAO,'
-      '       MP.QUANTATENDIDA,'
-      '       MP.VALTOTAL'
-      'FROM MCLIRECB MCLIRECB'
-      'INNER JOIN MCLI M ON M.CHAVENF = MCLIRECB.CHAVENF'
-      'LEFT JOIN (SELECT PAGO.CHAVENF, SUM(PAGO.TOTNOTA) AS TOTPAGO'
-      
-        ' '#9#9'   FROM MCLIPAGO PAGO GROUP BY PAGO.CHAVENF) PAGO ON PAGO.CHA' +
-        'VENF = MCLIRECB.CHAVENF'
-      'LEFT JOIN MCLIPRO MP ON MP.CHAVENF = MCLIRECB.CHAVENF'
-      'LEFT JOIN PRODUTO P ON P.CODPRODUTO = MP.CODPRODUTO'
-      'LEFT JOIN CLIENTE C ON C.CODCLIENTE = MCLIRECB.CODCLIENTE'
-      'LEFT JOIN MCLIPROSTATUSRECB MS ON MS.CHAVENFPRO = MP.CHAVENFPRO'
+      'select *'
+      'from vwEmbalagemPendente'
       'WHERE '
-      '     MCLIRECB.CODCOMPROVANTE IN ('#39'014'#39')'
-      '     AND MCLIRECB.DATACOMPROVANTE >= :DataIni'
-      '     AND C.CODCLIENTE = :CODCLIENTE'
+      '     DATACOMPROVANTE >= :DataIni'
+      '     AND CODCLIENTE = :CODCLIENTE'
       '     /*Ignorados*/'
       
-        'ORDER BY m.datacomprovante desc, C.RAZAOSOCIAL, MCLIRECB.TOTNOTA' +
-        ' desc, MP.QUANTATENDIDA desc')
+        'ORDER BY datacomprovante desc, RAZAOSOCIAL, ValTotal desc, QUANT' +
+        'ATENDIDA desc')
     Left = 224
     Top = 192
     ParamData = <
@@ -414,15 +392,6 @@ object FormEmbalagensClientes: TFormEmbalagensClientes
       FixedChar = True
       Size = 35
     end
-    object QryEmbalagensCliTOTPAGO: TFMTBCDField
-      DisplayLabel = 'Tot. Devolvido'
-      FieldName = 'TOTPAGO'
-      Origin = 'TOTPAGO'
-      ReadOnly = True
-      currency = True
-      Precision = 38
-      Size = 2
-    end
     object QryEmbalagensCliENTREGAPARCIAL: TStringField
       AutoGenerateValue = arDefault
       DisplayLabel = 'Entrega Parcial'
@@ -453,17 +422,41 @@ object FormEmbalagensClientes: TFormEmbalagensClientes
       Size = 80
     end
     object QryEmbalagensCliQUANTATENDIDA: TBCDField
-      DisplayLabel = 'Quant.'
+      DisplayLabel = 'Qtd.'
       FieldName = 'QUANTATENDIDA'
       Origin = 'QUANTATENDIDA'
       Precision = 18
     end
+    object QryEmbalagensCliQuantDevolvida: TFMTBCDField
+      DisplayLabel = 'Qtd. Devolvida'
+      FieldName = 'QuantDevolvida'
+      Origin = 'QuantDevolvida'
+      ReadOnly = True
+      Precision = 38
+      Size = 6
+    end
     object QryEmbalagensCliVALTOTAL: TBCDField
-      DisplayLabel = 'Valor Total'
+      DisplayLabel = 'Val. Total'
       FieldName = 'VALTOTAL'
       Origin = 'VALTOTAL'
       currency = True
       Precision = 18
+    end
+    object QryEmbalagensCliTOTPAGO: TFMTBCDField
+      DisplayLabel = 'Valor Devolvido'
+      FieldName = 'TOTPAGO'
+      Origin = 'TOTPAGO'
+      ReadOnly = True
+      currency = True
+      Precision = 38
+      Size = 2
+    end
+    object QryEmbalagensCliVALUNIDADE: TFMTBCDField
+      FieldName = 'VALUNIDADE'
+      Origin = 'VALUNIDADE'
+      Visible = False
+      Precision = 38
+      Size = 20
     end
   end
   object PopupMenu: TPopupMenu
@@ -480,7 +473,7 @@ object FormEmbalagensClientes: TFormEmbalagensClientes
     end
   end
   object cxStyleRepository1: TcxStyleRepository
-    Left = 712
+    Left = 768
     Top = 8
     PixelsPerInch = 96
     object cxStyleVermelho: TcxStyle

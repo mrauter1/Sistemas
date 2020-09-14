@@ -164,17 +164,22 @@ object FormEmbalagensClientes: TFormEmbalagensClientes
         DataBinding.FieldName = 'APRESENTACAO'
         Width = 163
       end
-      object cxGridViewEmbalagensQUANTATENDIDA: TcxGridDBColumn
-        DataBinding.FieldName = 'QUANTATENDIDA'
-        Width = 49
-      end
       object cxGridViewEmbalagensENTREGAPARCIAL: TcxGridDBColumn
         DataBinding.FieldName = 'ENTREGAPARCIAL'
         Width = 51
       end
+      object cxGridViewEmbalagensQuantPendente: TcxGridDBColumn
+        DataBinding.FieldName = 'QuantPendente'
+        Width = 55
+      end
       object cxGridViewEmbalagensQuantDevolvida: TcxGridDBColumn
         DataBinding.FieldName = 'QuantDevolvida'
         Width = 55
+      end
+      object cxGridViewEmbalagensQUANTATENDIDA: TcxGridDBColumn
+        Caption = 'Qtd. Total'
+        DataBinding.FieldName = 'QUANTATENDIDA'
+        Width = 49
       end
       object cxGridViewEmbalagensVALTOTAL: TcxGridDBColumn
         DataBinding.FieldName = 'VALTOTAL'
@@ -458,6 +463,14 @@ object FormEmbalagensClientes: TFormEmbalagensClientes
       Precision = 38
       Size = 20
     end
+    object QryEmbalagensCliQuantPendente: TFMTBCDField
+      DisplayLabel = 'Qtd. Pendente'
+      FieldName = 'QuantPendente'
+      Origin = 'QuantPendente'
+      ReadOnly = True
+      Precision = 38
+      Size = 6
+    end
   end
   object PopupMenu: TPopupMenu
     OnPopup = PopupMenuPopup
@@ -490,5 +503,131 @@ object FormEmbalagensClientes: TFormEmbalagensClientes
       AssignedValues = [svColor]
       Color = clYellow
     end
+  end
+  object DsEmail: TDataSource
+    DataSet = QryEmail
+    Left = 288
+    Top = 311
+  end
+  object QryEmail: TFDQuery
+    Connection = ConSqlServer.FDConnection
+    SQL.Strings = (
+      'select *'
+      'from EmailEmbalagem'
+      'where'
+      '  Identificador = '#39'EMBALAGEM'#39)
+    Left = 224
+    Top = 311
+    object QryEmailIdentificador: TStringField
+      FieldName = 'Identificador'
+      Origin = 'Identificador'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+      FixedChar = True
+      Size = 10
+    end
+    object QryEmailUsuario: TStringField
+      FieldName = 'Usuario'
+      Origin = 'Usuario'
+      Size = 255
+    end
+    object QryEmailPassword: TStringField
+      FieldName = 'Password'
+      Origin = 'Password'
+      Size = 255
+    end
+    object QryEmailSMTPServer: TStringField
+      FieldName = 'SMTPServer'
+      Origin = 'SMTPServer'
+      Size = 255
+    end
+    object QryEmailPort: TIntegerField
+      FieldName = 'Port'
+      Origin = 'Port'
+    end
+    object QryEmailrequireAuth: TBooleanField
+      FieldName = 'requireAuth'
+      Origin = 'requireAuth'
+    end
+  end
+  object DsTextoEmail: TDataSource
+    DataSet = QryTextoEmail
+    Left = 288
+    Top = 364
+  end
+  object QryTextoEmail: TFDQuery
+    Connection = ConSqlServer.FDConnection
+    SQL.Strings = (
+      'select *'
+      'from ModeloEmailEmbalagem'
+      'where'
+      '  Identificador = '#39'EMBALAGEM'#39)
+    Left = 224
+    Top = 364
+    object QryTextoEmailIdentificador: TStringField
+      FieldName = 'Identificador'
+      Required = True
+      FixedChar = True
+      Size = 10
+    end
+    object QryTextoEmailTitulo: TStringField
+      FieldName = 'Titulo'
+      FixedChar = True
+      Size = 255
+    end
+    object QryTextoEmailIntroducao: TMemoField
+      FieldName = 'Introducao'
+      BlobType = ftMemo
+      Size = 2147483647
+    end
+    object QryTextoEmailPoliticaDevolucao: TMemoField
+      FieldName = 'PoliticaDevolucao'
+      BlobType = ftMemo
+      Size = 2147483647
+    end
+    object QryTextoEmailAssinatura: TMemoField
+      FieldName = 'Assinatura'
+      BlobType = ftMemo
+      Size = 2147483647
+    end
+  end
+  object QryImagemEmail: TFDQuery
+    Connection = ConSqlServer.FDConnection
+    SQL.Strings = (
+      'select *'
+      'from ModeloEmailImagens'
+      'where'
+      '  Identificador = '#39'EMBALAGEM'#39)
+    Left = 384
+    Top = 359
+    object QryImagemEmailidentificador: TStringField
+      FieldName = 'identificador'
+      Required = True
+      FixedChar = True
+      Size = 10
+    end
+    object QryImagemEmailIdImagem: TStringField
+      DisplayLabel = 'Identificador'
+      DisplayWidth = 10
+      FieldName = 'IdImagem'
+      Required = True
+      Size = 255
+    end
+    object QryImagemEmailImagem: TBlobField
+      FieldName = 'Imagem'
+      Size = 2147483647
+    end
+    object QryImagemEmailext: TStringField
+      DisplayLabel = 'Extens'#227'o'
+      FieldName = 'ext'
+      Origin = 'ext'
+      Size = 255
+    end
+  end
+  object DsImagemEmail: TDataSource
+    AutoEdit = False
+    DataSet = QryImagemEmail
+    Left = 480
+    Top = 359
   end
 end

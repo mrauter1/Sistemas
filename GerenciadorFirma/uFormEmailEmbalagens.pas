@@ -92,6 +92,12 @@ type
     cxGridViewClientesVALUNIDADE: TcxGridDBColumn;
     cxGridViewClientesQuantDevolvida: TcxGridDBColumn;
     PanelTop: TPanel;
+    BtnOpcoes: TButton;
+    PopupOpcoes: TPopupMenu;
+    ConfiguarEmaildeEnvio1: TMenuItem;
+    QryEmbalagensQuantPendente: TFMTBCDField;
+    cxGridViewClientesQuantPendente: TcxGridDBColumn;
+    ConfigurarTextodoEmail1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure QryEmbalagensAfterPost(DataSet: TDataSet);
@@ -116,6 +122,9 @@ type
     procedure EditClienteKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure BtnEnviarEmailClick(Sender: TObject);
+    procedure ConfiguarEmaildeEnvio1Click(Sender: TObject);
+    procedure BtnOpcoesClick(Sender: TObject);
+    procedure ConfigurarTextodoEmail1Click(Sender: TObject);
   private
     { Private declarations }
     fCliSelecionados: TDictionary<String, Boolean>;
@@ -145,7 +154,7 @@ implementation
 {$R *.dfm}
 
 uses
-  uFormEmbalagensClientes;
+  uFormEmbalagensClientes, uFormConfigurarEmailEmbalagens, uFormConfiguraTextoEmailEmbalagem;
 
 procedure TFormGravaEmbalagens.SelecionaDeselecionaTodos(pSeleciona: Boolean);
 begin
@@ -181,6 +190,11 @@ begin
       ShowMessage(Format('Existem outras embalagens pendentes para o cliente %s.',[QryEmbalagensRazaoSocial.AsString]));
       FFrm.ShowModal;
     end
+   else if Trim(FFrm.EditEmails.Text) = '' then
+   begin
+     ShowMessage(Format('É preciso indicar o email para envio de embalagens pendentes para o cliente %s.',[QryEmbalagensRazaoSocial.AsString]));
+     FFrm.ShowModal;
+   end
    else
     FFrm.EnviaEmail;
   finally
@@ -204,6 +218,14 @@ begin
   end;
 
   QryEmbalagens.Refresh;
+end;
+
+procedure TFormGravaEmbalagens.BtnOpcoesClick(Sender: TObject);
+var
+  pnt: TPoint;
+begin
+  GetCursorPos(pnt);
+  PopupOpcoes.Popup(pnt.X-20, pnt.Y-8);
 end;
 
 procedure TFormGravaEmbalagens.BtnSelecionaClick(Sender: TObject);
@@ -265,6 +287,16 @@ end;
 procedure TFormGravaEmbalagens.CheckBoxMostrarIgnoradosClick(Sender: TObject);
 begin
   CarregaEmbalagens(DataIniPicker.Date, DataFimPicker.Date);
+end;
+
+procedure TFormGravaEmbalagens.ConfiguarEmaildeEnvio1Click(Sender: TObject);
+begin
+  TFormConfigurarEmailEmbalagens.ConfiguraEmail;
+end;
+
+procedure TFormGravaEmbalagens.ConfigurarTextodoEmail1Click(Sender: TObject);
+begin
+  TFormConfiguraTextoEmailEmbalagem.ConfiguraTexto;
 end;
 
 constructor TFormGravaEmbalagens.Create(AOwner: TComponent);

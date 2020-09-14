@@ -2,7 +2,7 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
   Left = 0
   Top = 0
   Caption = 'Email de embalagens para os clientes'
-  ClientHeight = 509
+  ClientHeight = 529
   ClientWidth = 955
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -109,25 +109,36 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
       TabOrder = 6
       OnClick = BtnEnviarEmailClick
     end
+    object BtnOpcoes: TButton
+      Left = 632
+      Top = 4
+      Width = 75
+      Height = 25
+      Caption = 'Op'#231#245'es'
+      TabOrder = 7
+      OnClick = BtnOpcoesClick
+    end
   end
   object Panel2: TPanel
     Left = 0
     Top = 65
     Width = 955
-    Height = 402
+    Height = 422
     Align = alClient
     Caption = 'Panel2'
     TabOrder = 1
     ExplicitWidth = 946
+    ExplicitHeight = 402
     object cxGridEmbalagens: TcxGrid
       Left = 1
       Top = 1
       Width = 953
-      Height = 400
+      Height = 420
       Align = alClient
       TabOrder = 0
       ExplicitLeft = 2
       ExplicitTop = 2
+      ExplicitHeight = 400
       object cxGridViewClientes: TcxGridDBTableView
         PopupMenu = PopupMenu
         Navigator.Buttons.CustomButtons = <>
@@ -197,9 +208,9 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
           DataBinding.FieldName = 'apresentacao'
           Width = 121
         end
-        object cxGridViewClientesQuantAtendida: TcxGridDBColumn
-          DataBinding.FieldName = 'QuantAtendida'
-          Width = 45
+        object cxGridViewClientesQuantPendente: TcxGridDBColumn
+          DataBinding.FieldName = 'QuantPendente'
+          Width = 56
         end
         object cxGridViewClientesQuantDevolvida: TcxGridDBColumn
           DataBinding.FieldName = 'QuantDevolvida'
@@ -207,14 +218,17 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
         end
         object cxGridViewClientesTOTPAGO: TcxGridDBColumn
           DataBinding.FieldName = 'TOTPAGO'
+          Visible = False
           Width = 70
         end
         object cxGridViewClientesVALTOTAL: TcxGridDBColumn
           DataBinding.FieldName = 'VALTOTAL'
+          Visible = False
           Width = 59
         end
         object cxGridViewClientesEntregaParcial: TcxGridDBColumn
           DataBinding.FieldName = 'EntregaParcial'
+          Visible = False
           Width = 62
         end
         object cxGridViewClientesCHAVENF: TcxGridDBColumn
@@ -224,6 +238,10 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
         object cxGridViewClientesVALUNIDADE: TcxGridDBColumn
           DataBinding.FieldName = 'VALUNIDADE'
           Visible = False
+        end
+        object cxGridViewClientesQuantAtendida: TcxGridDBColumn
+          DataBinding.FieldName = 'QuantAtendida'
+          Width = 47
         end
       end
       object cxGridEmbalagensDBTableView1: TcxGridDBTableView
@@ -307,7 +325,7 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
   end
   object Panel1: TPanel
     Left = 0
-    Top = 467
+    Top = 487
     Width = 955
     Height = 42
     Align = alBottom
@@ -443,7 +461,7 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
       Size = 80
     end
     object QryEmbalagensQuantAtendida: TBCDField
-      DisplayLabel = 'Qtd.'
+      DisplayLabel = 'Qtd. Total'
       FieldName = 'QuantAtendida'
       Origin = 'QuantAtendida'
       Precision = 18
@@ -494,6 +512,14 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
       Precision = 38
       Size = 6
     end
+    object QryEmbalagensQuantPendente: TFMTBCDField
+      DisplayLabel = 'Qtd. Pendente'
+      FieldName = 'QuantPendente'
+      Origin = 'QuantPendente'
+      ReadOnly = True
+      Precision = 38
+      Size = 6
+    end
   end
   object DsEmbalagens: TDataSource
     DataSet = QryEmbalagens
@@ -521,7 +547,7 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
     end
   end
   object cxStyleRepository1: TcxStyleRepository
-    Left = 616
+    Left = 512
     Top = 8
     PixelsPerInch = 96
     object cxStyleVermelho: TcxStyle
@@ -537,6 +563,18 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
     object cxStyleAmarelo: TcxStyle
       AssignedValues = [svColor]
       Color = clYellow
+    end
+  end
+  object PopupOpcoes: TPopupMenu
+    Left = 328
+    Top = 201
+    object ConfiguarEmaildeEnvio1: TMenuItem
+      Caption = 'Configuar Email de Envio'
+      OnClick = ConfiguarEmaildeEnvio1Click
+    end
+    object ConfigurarTextodoEmail1: TMenuItem
+      Caption = 'Configurar Texto do Email'
+      OnClick = ConfigurarTextodoEmail1Click
     end
   end
 end

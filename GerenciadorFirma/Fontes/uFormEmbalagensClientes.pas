@@ -13,7 +13,7 @@ uses
   FireDAC.Comp.Client, cxGridLevel, cxGridCustomTableView, cxGridTableView,
   cxGridDBTableView, cxClasses, cxGridCustomView, cxGrid, Vcl.StdCtrls,
   Vcl.Buttons, Vcl.ExtCtrls, uConSqlServer, Vcl.ComCtrls, Vcl.Menus, System.Generics.Collections,
-  uSendMail;
+  uSendMail, uFrmShowMemo;
 
 type
   TFormEmbalagensClientes = class(TForm)
@@ -78,6 +78,29 @@ type
     EditEmails: TEdit;
     Label2: TLabel;
     BtnContatos: TButton;
+    QryEmbalagensCliQuantPendente: TFMTBCDField;
+    cxGridViewEmbalagensQuantPendente: TcxGridDBColumn;
+    DsEmail: TDataSource;
+    QryEmail: TFDQuery;
+    QryEmailIdentificador: TStringField;
+    QryEmailUsuario: TStringField;
+    QryEmailPassword: TStringField;
+    QryEmailSMTPServer: TStringField;
+    QryEmailPort: TIntegerField;
+    QryEmailrequireAuth: TBooleanField;
+    DsTextoEmail: TDataSource;
+    QryTextoEmail: TFDQuery;
+    QryTextoEmailIdentificador: TStringField;
+    QryTextoEmailTitulo: TStringField;
+    QryTextoEmailIntroducao: TMemoField;
+    QryTextoEmailPoliticaDevolucao: TMemoField;
+    QryTextoEmailAssinatura: TMemoField;
+    QryImagemEmail: TFDQuery;
+    QryImagemEmailidentificador: TStringField;
+    QryImagemEmailIdImagem: TStringField;
+    QryImagemEmailImagem: TBlobField;
+    QryImagemEmailext: TStringField;
+    DsImagemEmail: TDataSource;
     procedure Ignorarembalagem1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure BtnAtualizarClick(Sender: TObject);
@@ -97,6 +120,7 @@ type
     FSqlQryEmbalagensCli: String;
     FListaEmbalagensRecentes: TList<String>;
     FMailSender: TMailSender;
+    FormShowMemo: TFormShowMemo;
     function EmbalagemRecenteENaoEnviada: Boolean;
     procedure MarcarEmbalagensComoEnviadas;
     procedure EviarEmailCliente;
@@ -113,10 +137,10 @@ var
 
 implementation
 
-{$R *.dfm}
-
 uses
-  uFormSelecionaEmailCliente;
+  IdMessageBuilder, IdAttachmentMemory, uFormSelecionaEmailCliente;
+
+{$R *.dfm}
 
 class procedure TFormEmbalagensClientes.AbreEmbalagensCliente(
   ACodCliente: String);
@@ -157,6 +181,12 @@ end;
 
 procedure TFormEmbalagensClientes.BtnEnviarEmailClick(Sender: TObject);
 begin
+  if Trim(EditEmails.Text) = '' then
+  begin
+    ShowMessage('É preciso indicar um email para enviar!');
+    EditEmails.SetFocus;
+    Exit;
+  end;
   EnviaEmail;
 end;
 
@@ -225,6 +255,9 @@ begin
 end;
 
 procedure TFormEmbalagensClientes.EviarEmailCliente;
+var
+  FIdMessageBuilder: TIdMessageBuilderHtml;
+  FHtml: String;
 
   function GetSituacao: string;
   begin
@@ -248,12 +281,13 @@ procedure TFormEmbalagensClientes.EviarEmailCliente;
 
   function GetHtml: String;
   begin
-    Result:= '<HTML>Prezados senhores, segue abaixo lembrete de embalagens pendentes para devolução:<br><br> '
+    Result:= '<HTML>'+QryTextoEmailIntroducao.AsString+'<br><br> '
             +'<table style="border:1px solid; border-collapse: collapse"><tr>'
             +AddTH('Data Emissão')
             +AddTH('NFe')
             +AddTH('Embalagem')
             +AddTH('Qtd. Pendente')
+            +AddTH('Qtd. Devolvida')
             +AddTH('Data Vencimento')
             +AddTH('Situação')
             +'</tr> ';
@@ -261,20 +295,79 @@ procedure TFormEmbalagensClientes.EviarEmailCliente;
     QryEmbalagensCli.First;
     while not QryEmbalagensCli.Eof do
     begin
-      Result:= Result+'<tr> '
-           +AddTD(DateToStr(QryEmbalagensCliDATACOMPROVANTE.AsDateTime))
-           +AddTD(QryEmbalagensCliNumero.AsString+'-'+QryEmbalagensCliSerie.AsString)
-           +AddTD(QryEmbalagensCliApresentacao.AsString)
-           +AddTD(QryEmbalagensCliQuantAtendida.AsString)
-           +AddTD(DateToStr(QryEmbalagensCliDataVencimento.AsDateTime))
-           +AddTD(GetSituacao);
+      if QryEmbalagensCliQuantPendente.AsInteger > 0 then
+        Result:= Result+'<tr> '
+             +AddTD(DateToStr(QryEmbalagensCliDATACOMPROVANTE.AsDateTime))
+             +AddTD(QryEmbalagensCliNumero.AsString+'-'+QryEmbalagensCliSerie.AsString)
+             +AddTD(QryEmbalagensCliApresentacao.AsString)
+             +AddTD(QryEmbalagensCliQuantPendente.AsString)
+             +AddTD(IntToStr(QryEmbalagensCliQuantDevolvida.AsInteger))
+             +AddTD(DateToStr(QryEmbalagensCliDataVencimento.AsDateTime))
+             +AddTD(GetSituacao)+'</tr>';
 
       QryEmbalagensCli.Next;
     end;
-    Result:= Result+'</table></HTML>';
+    Result:= Result+'</table>'+
+    '<br>'+QryTextoEmailPoliticaDevolucao.AsString+
+    '<br><br>'+QryTextoEmailAssinatura.AsString+
+    '</HTML>';
   end;
+
+  function PrepareMessageBuilder(AHtml: String): TIdMessageBuilderHtml;
+  var
+    FAttachment: TIdMessageBuilderAttachment;
+    FStream: TMemoryStream;
+    FContentType: String;
+  begin
+    Result:= FMailSender.NewMessageBuilder(AHtml);
+    try
+      QryImagemEmail.First;
+      while not QryImagemEmail.Eof do
+      begin
+        if QryImagemEmailext.AsString.ToUpper.Contains('PNG') then
+          FContentType:= 'image/png'
+        else
+          FContentType := 'image/jpeg';
+
+        FStream:= TMemoryStream.Create;
+        QryImagemEmailImagem.SaveToStream(FStream);
+        FStream.Position:= 0;
+        FAttachment := Result.HtmlFiles.Add(FStream, FContentType, QryImagemEmailIdImagem.AsString);
+//        FAttachment.FileName:= 'C:\Users\Marcelo\Desktop\Firma\Logo.png';
+
+        QryImagemEmail.Next;
+      end;
+    except
+      Result.Free;
+      raise
+    end;
+  end;
+
+var
+  I: Integer;
 begin
-  FMailSender.EnviarEmail('Lembrete de embalagens pendentes com a Rauter Química.', GetHtml, 'marcelo@rauter.com.br; marcelorauter@gmail.com');
+  FormShowMemo.Show;
+  try
+    FormShowMemo.SetText('Enviando email para o cliente '+QryEmbalagensCliRAZAOSOCIAL.AsString);
+
+//    FIdMessage := FMailSender.PrepareMessage(QryTextoEmailTitulo.AsString, GetHtml, EditEmails.Text, QryEmailUsuario.AsString);
+    FHtml:= GetHtml;
+    FIdMessageBuilder:= PrepareMessageBuilder(FHtml);
+    try
+      FMailSender.SendEmailFromMessageBuilder(QryTextoEmailTitulo.AsString, FHtml, EditEmails.Text, QryEmailUsuario.AsString, '', FIdMessageBuilder, False);
+    finally
+      for I:= 0 to FIdMessageBuilder.HtmlFiles.Count-1 do
+        if FIdMessageBuilder.HtmlFiles[I].Data <> nil then
+         FIdMessageBuilder.HtmlFiles[I].Data.Free;
+
+      FIdMessageBuilder.Free;
+    end;
+
+
+//    FMailSender.SendMessage(FIdMessage);
+  finally
+    FormShowMemo.Hide;
+  end;
 end;
 
 procedure TFormEmbalagensClientes.EnviaEmail;
@@ -322,7 +415,13 @@ end;
 
 procedure TFormEmbalagensClientes.FormCreate(Sender: TObject);
 begin
-  FMailSender:= TMailSender.Create(Self, 'smtp.rauter.com.br', 587, 'marcelo@rauter.com.br', 'rtq1825', True, 'marcelo@rauter.com.br');
+  FormShowMemo:= TFormShowMemo.Create(Self);
+
+  QryEmail.Open;
+  QryTextoEmail.Open;
+  QryImagemEmail.Open;
+  FMailSender:= TMailSender.Create(Self, QryEmailSMTPServer.AsString, QryEmailPort.AsInteger, QryEmailUsuario.AsString,
+                  QryEmailPassword.AsString, QryEmailrequireAuth.AsBoolean, QryEmailUsuario.AsString);
   FListaEmbalagensRecentes:= TList<String>.Create;
   FSqlQryEmbalagensCli:= QryEmbalagensCli.SQL.Text;
 end;

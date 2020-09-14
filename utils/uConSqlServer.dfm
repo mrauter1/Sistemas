@@ -6,7 +6,7 @@ inherited ConSqlServer: TConSqlServer
     Params.Strings = (
       'DriverID=MSSQL'
       'Password=28021990'
-      'Server=127.0.0.1'
+      'Server=10.0.0.201'
       'Protocol=TCPIP'
       'Port=1433'
       'User_Name=user'

@@ -784,7 +784,7 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
         end
         object BtnExcelcxGridTarefa: TBitBtn
           Left = 644
-          Top = 0
+          Top = 2
           Width = 77
           Height = 25
           Anchors = [akRight, akBottom]

@@ -622,6 +622,8 @@ begin
       QryConsulta.SQL.Text:= FDm.SqlGerado;
       QryConsulta.Active:=True;
 
+      StatusBar1.SimpleText:= 'Sql execution time '+FormatDateTime('HH:MM:SS', Now-TIni);
+
       FDm.SetEstilosCamposQry(QryConsulta);
       AtualizaCamposGrid;
 

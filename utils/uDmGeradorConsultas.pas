@@ -696,21 +696,26 @@ var
   I: Integer;
   FField: TField;
 begin
-  for I:= 0 to Qry.FieldCount - 1 do
-  begin
-    FField:= Qry.Fields[i];
-    if QryCampos.Locate('NomeCampo', FField.FieldName, [loCaseInsensitive]) then
+  Qry.DisableControls;
+  try
+    for I:= 0 to Qry.FieldCount - 1 do
     begin
-      FField.DisplayLabel:= QryCamposDescricao.AsString;
-      FField.DisplayWidth:= QryCamposTamanhoCampo.AsInteger;
-      FField.Visible:= QryCamposVisivel.AsBoolean;
+      FField:= Qry.Fields[i];
+      if QryCampos.Locate('NomeCampo', FField.FieldName, [loCaseInsensitive]) then
+      begin
+        FField.DisplayLabel:= QryCamposDescricao.AsString;
+        FField.DisplayWidth:= QryCamposTamanhoCampo.AsInteger;
+        FField.Visible:= QryCamposVisivel.AsBoolean;
 
-      if QryCamposFormatacao.AsInteger = Ord(fcMoeda) then
-        SetFieldDisplayFormat(FField, 'R$ #,##0.00')
-      else if QryCamposFormatacao.AsInteger = Ord(fcPorcentagem) then
-        FField.OnGetText:= OnGetTextPercentual;
+        if QryCamposFormatacao.AsInteger = Ord(fcMoeda) then
+          SetFieldDisplayFormat(FField, 'R$ #,##0.00')
+        else if QryCamposFormatacao.AsInteger = Ord(fcPorcentagem) then
+          FField.OnGetText:= OnGetTextPercentual;
 
+      end;
     end;
+  finally
+    Qry.EnableControls;
   end;
 end;
 

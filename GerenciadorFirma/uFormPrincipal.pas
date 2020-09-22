@@ -4,7 +4,7 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uDmEstoqProdutos, Data.DB, Vcl.Grids,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, Vcl.Grids,
   Vcl.DBGrids, Datasnap.DBClient, Vcl.Menus, GerenciadorUtils, uFormPedidos, uFormFila,
   uFormDensidades, uFormConversorLKG, uFormProInfo, cxGraphics, cxControls,
   cxLookAndFeels, cxLookAndFeelPainters, cxStyles, dxSkinsCore,
@@ -51,9 +51,7 @@ type
     DetalhedosProdutos1: TMenuItem;
     Utilidades1: TMenuItem;
     Extras1: TMenuItem;
-    Timer1: TTimer;
     ValidaModelos1: TMenuItem;
-    Consultas1: TMenuItem;
     QryConsultas: TFDQuery;
     QryConsultasname: TWideStringField;
     ExecutarSql1: TMenuItem;
@@ -85,16 +83,28 @@ type
     CadastrodeAtividades1: TMenuItem;
     Agendamentos1: TMenuItem;
     EmailEmbalagens1: TMenuItem;
+    Sistema1: TMenuItem;
+    Usuriosepermisses1: TMenuItem;
+    Configuraes1: TMenuItem;
+    QryPermissaoMenu: TFDQuery;
+    QryPermissaoMenuuserid: TIntegerField;
+    QryPermissaoMenuMenuName: TStringField;
+    QryPermissaoMenuPermitido: TBooleanField;
+    QryUser: TFDQuery;
+    QryUseruserid: TFDAutoIncField;
+    QryUserNome: TStringField;
+    QryUserSenha: TStringField;
+    QryUseradmin: TBooleanField;
+    MenuLogin: TMenuItem;
+    trocardeusurio1: TMenuItem;
+    Sair1: TMenuItem;
     procedure Pedidos1Click(Sender: TObject);
     procedure Fila1Click(Sender: TObject);
     procedure Densidade1Click(Sender: TObject);
     procedure Conversor1Click(Sender: TObject);
     procedure MenuItemProInfoClick(Sender: TObject);
-    procedure BtnAtualizaClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure DetalhedosProdutos1Click(Sender: TObject);
-    procedure Pedidos21Click(Sender: TObject);
-    procedure Timer1Timer(Sender: TObject);
     procedure ValidaModelos1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure ExecutarSql1Click(Sender: TObject);
@@ -131,6 +141,9 @@ type
     procedure CadastrodeAtividades1Click(Sender: TObject);
     procedure Agendamentos1Click(Sender: TObject);
     procedure EmailEmbalagens1Click(Sender: TObject);
+    procedure Usuriosepermisses1Click(Sender: TObject);
+    procedure Sair1Click(Sender: TObject);
+    procedure trocardeusurio1Click(Sender: TObject);
   private
     FDmGeradorConsultas: TDmGeradorConsultas;
     FPopupActive: Boolean;
@@ -149,6 +162,8 @@ type
     procedure RemoveTab(pTab: TChromeTab);
     function ObtemDescricaoConsulta(pIDConsulta: Integer): String;
     procedure AoEditarConsulta(Sender: TObject);
+    procedure CarregaMenusPermissoes(AUserID: Integer);
+    function IsAdmin: Boolean;
     { Private declarations }
   public
     { Public declarations }
@@ -165,9 +180,53 @@ implementation
 {$R *.dfm}
 
 uses
-  uDmFilaProducao, Utils, uFormDetalheProdutos, uFormPedidos2, uFormValidaModelos, uFormExecSql,
+  Utils, uFormDetalheProdutos, uFormValidaModelos, uFormExecSql,
   uFormRelatoriosPersonalizados, uFormSubGrupoExtras, uFormFeriados, uPython, uFormCiclosVenda,
-  uDmGravaLista, uFormEmailEmbalagens;
+  uDmGravaLista, uFormEmailEmbalagens, uFormPermissoes, uFormLogin;
+
+function TFormPrincipal.IsAdmin: Boolean;
+begin
+  Result:= QryUseradmin.AsBoolean;
+end;
+
+procedure TFormPrincipal.CarregaMenusPermissoes(AUserID: Integer);
+var
+  I: Integer;
+  FMenuItem: TMenuItem;
+
+  procedure SetMenuVisible(AMenuItem: TMenuItem; AIsAdmin: Boolean);
+  var
+    I: Integer;
+  begin
+    if (AIsAdmin) then
+      AMenuItem.Visible:= True
+    else if QryPermissaoMenu.Locate('MenuName', AMenuItem.Name, []) then
+      AMenuItem.Visible:= QryPermissaoMenuPermitido.AsBoolean
+    else
+       AMenuItem.Visible:= False;
+
+    if AMenuItem.Visible then
+      for I := 0 to AMenuItem.Count-1 do
+        SetMenuVisible(AMenuItem.Items[I], AIsAdmin);
+  end;
+begin
+  QryUser.Close;
+  QryUser.ParamByName('userID').AsInteger:= AUserID;
+  QryUser.Open;
+
+  QryPermissaoMenu.Close;
+  QryPermissaoMenu.ParamByName('userID').AsInteger:= AUserID;
+  QryPermissaoMenu.Open;
+
+  QryMenu.Close;
+  QryMenu.ParamByName('userID').AsInteger:= AUserID;
+  QryMenu.Open;
+
+  for I := 0 to Menu.Items.Count-1 do
+    SetMenuVisible(Menu.Items[I], IsAdmin);
+
+  SetMenuVisible(MenuLogin, True); // Menu login é sempre visível
+end;
 
 procedure TFormPrincipal.RemoveTab(pTab: TChromeTab);
 begin
@@ -189,11 +248,6 @@ begin
 
   if Assigned(vForm) then
     AbrirFormEmNovaAba(vForm);
-end;
-
-procedure TFormPrincipal.BtnAtualizaClick(Sender: TObject);
-begin
-  DMFilaProducao.AtualizaFilaProducao;
 end;
 
 procedure TFormPrincipal.ControleLogistica1Click(Sender: TObject);
@@ -263,11 +317,8 @@ begin
   Atividades1.Visible:= (puDesenvolvedor in AppConfig.GruposUsuario);
 
   if Application.MainForm = Self then
-  begin
-    DMFilaProducao.AtualizaFilaProducao;
-  //  EmbedForm(PanelMain, FormPedidos);
     AbrirFormEmNovaAba(TFormPedidos.Create(Self), True);
-  end;
+
 end;
 
 procedure TFormPrincipal.MenuCicloVendasClick(Sender: TObject);
@@ -288,7 +339,7 @@ end;
 
 procedure TFormPrincipal.Fila1Click(Sender: TObject);
 begin
-  AbrirFormEmNovaAba(FormFilaProducao, False);
+  AbrirFormEmNovaAba(TFormFilaProducao.Create(Self), True);
 //  FormFilaProducao.Show;
 end;
 
@@ -296,12 +347,6 @@ procedure TFormPrincipal.Pedidos1Click(Sender: TObject);
 begin
   AbrirFormEmNovaAba(TFormPedidos.Create(Self), true);
 //  FormPedidos.Show;
-end;
-
-procedure TFormPrincipal.Pedidos21Click(Sender: TObject);
-begin
-  AbrirFormEmNovaAba(FormPedidos2, False);
-//  FormPedidos2.Show;
 end;
 
 procedure TFormPrincipal.OnConsultaClick(Sender: TObject);
@@ -334,8 +379,7 @@ begin
   if Application.MainForm = Self then
     CarregaConsultas;
 
-  if not QryMenu.Active then
-    QryMenu.Open;
+  CarregaMenusPermissoes(AppConfig.UserID);
 end;
 
 function TFormPrincipal.ObterKeyValueSelecionado(pTreeView: TdxDBTreeView): Variant;
@@ -488,11 +532,6 @@ begin
   Excluir1.Visible:= FConsultaSelecionada or FGrupoSelecionado;
 end;
 
-procedure TFormPrincipal.Timer1Timer(Sender: TObject);
-begin
-  DMFilaProducao.AtualizaFilaProducao;
-end;
-
 procedure TFormPrincipal.ValidaModelos1Click(Sender: TObject);
 begin
   AbrirFormEmNovaAba(TFormValidaModelos.Create(Self), True);
@@ -518,8 +557,29 @@ begin
    VK_RETURN:
      AbrirConsulta1.Click;
 
-
  end;
+end;
+
+procedure TFormPrincipal.trocardeusurio1Click(Sender: TObject);
+var
+  FNewID: Integer;
+begin
+  FNewID:= TFormLogin.NovoLogin;
+  if FNewID = 0 then
+    Exit;
+
+  CarregaMenusPermissoes(FNewID);
+end;
+
+procedure TFormPrincipal.Usuriosepermisses1Click(Sender: TObject);
+begin
+  AbrirFormEmNovaAba(TFormPermissoes.Create(Self, MainMenu), True);
+end;
+
+procedure TFormPrincipal.Sair1Click(Sender: TObject);
+begin
+  if Application.MessageBox('Confirma fechamento do Gerenciador?', 'Atenção', MB_YESNO) = ID_YES then
+    Close;
 
 end;
 
@@ -553,7 +613,8 @@ begin
 end;
 
 procedure TFormPrincipal.CarregaConsultas;
-var
+begin
+{var
   FMenuItem: TMenuItem;
 begin
   QryConsultas.Close;
@@ -570,7 +631,7 @@ begin
     Consultas1.Add(FMenuItem);
 
     QryConsultas.Next;
-  end;
+  end;}
 end;
 
 procedure TFormPrincipal.ChromeTabs1ActiveTabChanged(Sender: TObject;

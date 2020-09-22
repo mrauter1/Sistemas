@@ -2,8 +2,8 @@ object FormEmbalagensClientes: TFormEmbalagensClientes
   Left = 0
   Top = 0
   Caption = 'Embalagens pendentes do cliente'
-  ClientHeight = 422
-  ClientWidth = 833
+  ClientHeight = 462
+  ClientWidth = 903
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -19,12 +19,13 @@ object FormEmbalagensClientes: TFormEmbalagensClientes
   object PanelTop: TPanel
     Left = 0
     Top = 0
-    Width = 833
+    Width = 903
     Height = 65
     Align = alTop
     TabOrder = 0
     ExplicitLeft = -8
     ExplicitTop = -6
+    ExplicitWidth = 833
     object Label1: TLabel
       Left = 190
       Top = 10
@@ -88,11 +89,13 @@ object FormEmbalagensClientes: TFormEmbalagensClientes
   object cxGridEmbalagens: TcxGrid
     Left = 0
     Top = 65
-    Width = 833
-    Height = 357
+    Width = 903
+    Height = 397
     Align = alClient
     TabOrder = 1
     ExplicitTop = 62
+    ExplicitWidth = 833
+    ExplicitHeight = 357
     object cxGridViewEmbalagens: TcxGridDBTableView
       PopupMenu = PopupMenu
       Navigator.Buttons.CustomButtons = <>
@@ -162,7 +165,7 @@ object FormEmbalagensClientes: TFormEmbalagensClientes
       end
       object cxGridViewEmbalagensAPRESENTACAO: TcxGridDBColumn
         DataBinding.FieldName = 'APRESENTACAO'
-        Width = 163
+        Width = 144
       end
       object cxGridViewEmbalagensENTREGAPARCIAL: TcxGridDBColumn
         DataBinding.FieldName = 'ENTREGAPARCIAL'
@@ -192,6 +195,10 @@ object FormEmbalagensClientes: TFormEmbalagensClientes
       object cxGridViewEmbalagensTOTPAGO: TcxGridDBColumn
         DataBinding.FieldName = 'TOTPAGO'
         Width = 58
+      end
+      object cxGridViewEmbalagensValorPendente: TcxGridDBColumn
+        DataBinding.FieldName = 'ValorPendente'
+        Width = 57
       end
     end
     object cxGridEmbalagensDBTableView1: TcxGridDBTableView
@@ -468,6 +475,15 @@ object FormEmbalagensClientes: TFormEmbalagensClientes
       FieldName = 'QuantPendente'
       Origin = 'QuantPendente'
       ReadOnly = True
+      Precision = 38
+      Size = 6
+    end
+    object QryEmbalagensCliValorPendente: TFMTBCDField
+      DisplayLabel = 'Valor Pendente'
+      FieldName = 'ValorPendente'
+      Origin = 'ValorPendente'
+      ReadOnly = True
+      currency = True
       Precision = 38
       Size = 6
     end

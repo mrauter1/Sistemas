@@ -76,13 +76,14 @@
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <BRCC_IncludePath>F:\Sistemas\utils\DelphiEncryptionCompendium;$(BRCC_IncludePath)</BRCC_IncludePath>
         <DCC_UnitSearchPath>F:\Sistemas\Ladder Framework\Forms;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
-        <VerInfo_Build>12</VerInfo_Build>
+        <VerInfo_Build>14</VerInfo_Build>
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
         <VerInfo_Release>2</VerInfo_Release>
         <VerInfo_MajorVer>0</VerInfo_MajorVer>
         <VerInfo_MinorVer>9</VerInfo_MinorVer>
-        <VerInfo_Keys>CompanyName=;FileVersion=0.9.2.12;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=;FileVersion=0.9.2.14;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <DCC_ExeOutput>.\bin</DCC_ExeOutput>
         <BT_BuildType>Debug</BT_BuildType>
@@ -102,10 +103,6 @@
         </DelphiCompile>
         <DCCReference Include="uFormPrincipal.pas">
             <Form>FormPrincipal</Form>
-        </DCCReference>
-        <DCCReference Include="uDmFilaProducao.pas">
-            <Form>DMFilaProducao</Form>
-            <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="uDmEstoqProdutos.pas">
             <Form>DmEstoqProdutos</Form>
@@ -137,106 +134,80 @@
         <DCCReference Include="..\utils\JSONConverter.pas"/>
         <DCCReference Include="uFrmShowMemo.pas">
             <Form>FormShowMemo</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="Fontes\uPedidos.pas">
             <Form>Pedidos</Form>
-            <FormType>dfm</FormType>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="uFormGlobal.pas">
             <Form>FormGlobal</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="Fontes\uFormDetalheProdutos.pas">
             <Form>FormDetalheProdutos</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\utils\Utils.pas"/>
-        <DCCReference Include="Fontes\uFormPedidos2.pas">
-            <Form>FormPedidos2</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
         <DCCReference Include="Fontes\uFormAdicionarSimilaridade.pas">
             <Form>FormAdicionarSimilaridade</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="Fontes\uFormInsumos.pas">
             <Form>FormInsumos</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="Fontes\uFormSelecionaModelos.pas">
             <Form>FormSelecionaModelo</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="uFormValidaModelos.pas">
             <Form>FormValidaModelos</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\utils\uConSqlServer.pas">
             <Form>ConSqlServer</Form>
-            <FormType>dfm</FormType>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="..\utils\uDmConnection.pas">
             <Form>DmConnection</Form>
-            <FormType>dfm</FormType>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="Fontes\uFrmConsulta.pas">
             <Form>FrmConsulta</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="Fontes\uFormExecSql.pas">
             <Form>FormExecSql</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="Fontes\uFormRelatoriosPersonalizados.pas">
             <Form>FormRelatoriosPersonalizados</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\utils\uConsultaPersonalizada.pas">
             <Form>FrmConsultaPersonalizada</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="Fontes\UCopyFolder3Test.pas"/>
         <DCCReference Include="Fontes\uAtualiza.pas"/>
         <DCCReference Include="..\utils\uSendMail.pas"/>
         <DCCReference Include="..\utils\uDmGeradorConsultas.pas">
             <Form>DmGeradorConsultas</Form>
-            <FormType>dfm</FormType>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="..\utils\uConFirebird.pas">
             <Form>ConFirebird</Form>
-            <FormType>dfm</FormType>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="Fontes\uFormSubGrupoExtras.pas">
             <Form>FormSubGrupoExtras</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="Fontes\uFormFeriados.pas">
             <Form>FormFeriados</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="Fontes\uFormCiclosVenda.pas">
             <Form>FormCiclosVenda</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="uFormMotivoParaIgnorar.pas">
             <Form>FormMotivoIgnorar</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="Fontes\uFormCompras.pas">
             <Form>FormCiclos</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\utils\GerenciadorUtils.pas"/>
         <DCCReference Include="..\utils\uAppConfig.pas"/>
         <DCCReference Include="..\utils\uDmGravaLista.pas">
             <Form>DmGravaLista</Form>
-            <FormType>dfm</FormType>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="Fontes\uFormLogistica.pas">
@@ -244,7 +215,6 @@
         </DCCReference>
         <DCCReference Include="Fontes\uFormEntregaPorProduto.pas">
             <Form>FormEntregaPorProduto</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\Ladder Framework\Forms\Form.ActivityEditor.pas">
             <Form>FormActivityEditor</Form>
@@ -254,11 +224,30 @@
         <DCCReference Include="..\Ladder Framework\Forms\Form.SimpleProcessEditor.pas"/>
         <DCCReference Include="uFormEmailEmbalagens.pas">
             <Form>FormGravaEmbalagens</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="Fontes\uFormEmbalagensClientes.pas">
             <Form>FormEmbalagensClientes</Form>
-            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Fontes\uFormSelecionaEmailCliente.pas">
+            <Form>FormSelecionaEmailCliente</Form>
+        </DCCReference>
+        <DCCReference Include="Fontes\uFormConfigurarEmailEmbalagens.pas">
+            <Form>FormConfigurarEmailEmbalagens</Form>
+        </DCCReference>
+        <DCCReference Include="Fontes\uFormConfiguraTextoEmailEmbalagem.pas">
+            <Form>FormConfiguraTextoEmailEmbalagem</Form>
+        </DCCReference>
+        <DCCReference Include="Fontes\uFormAdicionarImagemEmailEmbalagem.pas">
+            <Form>FormAdicionarImagemEmailEmbalagem</Form>
+        </DCCReference>
+        <DCCReference Include="Fontes\uFormPermissoes.pas">
+            <Form>FormPermissoes</Form>
+        </DCCReference>
+        <DCCReference Include="Fontes\uFormLogin.pas">
+            <Form>FormLogin</Form>
+        </DCCReference>
+        <DCCReference Include="Fontes\uFormInputSenha.pas">
+            <Form>FormInputSenha</Form>
         </DCCReference>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

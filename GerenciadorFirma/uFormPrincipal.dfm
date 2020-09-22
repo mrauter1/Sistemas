@@ -404,6 +404,7 @@ object FormPrincipal: TFormPrincipal
     Height = 405
   end
   object MainMenu: TMainMenu
+    OwnerDraw = True
     Left = 178
     Top = 40
     object Utilidades1: TMenuItem
@@ -420,17 +421,17 @@ object FormPrincipal: TFormPrincipal
         Caption = 'Detalhe dos Produtos'
         OnClick = DetalhedosProdutos1Click
       end
-      object MenuItemProInfo: TMenuItem
-        Caption = 'Cofig. dos Produtos'
-        OnClick = MenuItemProInfoClick
-      end
-      object DadosGruposdeProdutos1: TMenuItem
-        Caption = 'Dados Grupos de Produtos'
-        OnClick = DadosGruposdeProdutos1Click
-      end
       object ControleLogistica1: TMenuItem
         Caption = 'Controle Logistica'
         OnClick = ControleLogistica1Click
+      end
+      object MenuCicloVendas: TMenuItem
+        Caption = 'Ciclos de Vendas'
+        OnClick = MenuCicloVendasClick
+      end
+      object EmailEmbalagens1: TMenuItem
+        Caption = 'Email Embalagens'
+        OnClick = EmailEmbalagens1Click
       end
     end
     object Extras1: TMenuItem
@@ -456,25 +457,21 @@ object FormPrincipal: TFormPrincipal
         Caption = 'Gerenciar Relat'#243'rios'
         OnClick = CriarConsulta1Click
       end
+    end
+    object Configuraes1: TMenuItem
+      Caption = 'Configura'#231#245'es'
       object Feriados1: TMenuItem
         Caption = 'Feriados'
         OnClick = Feriados1Click
       end
-      object MenuCicloVendas: TMenuItem
-        Caption = 'Ciclos de Vendas'
-        OnClick = MenuCicloVendasClick
+      object MenuItemProInfo: TMenuItem
+        Caption = 'Cofig. dos Produtos'
+        OnClick = MenuItemProInfoClick
       end
-      object AtualizaTodasasListasdePreo1: TMenuItem
-        Caption = 'Atualiza Todas as Listas de Pre'#231'o'
-        OnClick = AtualizaTodasasListasdePreo1Click
+      object DadosGruposdeProdutos1: TMenuItem
+        Caption = 'Dados Grupos de Produtos'
+        OnClick = DadosGruposdeProdutos1Click
       end
-      object EmailEmbalagens1: TMenuItem
-        Caption = 'Email Embalagens'
-        OnClick = EmailEmbalagens1Click
-      end
-    end
-    object Consultas1: TMenuItem
-      Caption = 'Consultas'
     end
     object Atividades1: TMenuItem
       Caption = 'Atividades'
@@ -487,12 +484,28 @@ object FormPrincipal: TFormPrincipal
         OnClick = Agendamentos1Click
       end
     end
-  end
-  object Timer1: TTimer
-    Interval = 210000
-    OnTimer = Timer1Timer
-    Left = 472
-    Top = 56
+    object Sistema1: TMenuItem
+      Caption = 'Sistema'
+      object Usuriosepermisses1: TMenuItem
+        Caption = 'Usu'#225'rios e permiss'#245'es'
+        OnClick = Usuriosepermisses1Click
+      end
+      object AtualizaTodasasListasdePreo1: TMenuItem
+        Caption = 'Atualiza Todas as Listas de Pre'#231'o'
+        OnClick = AtualizaTodasasListasdePreo1Click
+      end
+    end
+    object MenuLogin: TMenuItem
+      Caption = 'Login'
+      object trocardeusurio1: TMenuItem
+        Caption = 'Trocar de usu'#225'rio'
+        OnClick = trocardeusurio1Click
+      end
+      object Sair1: TMenuItem
+        Caption = 'Sair'
+        OnClick = Sair1Click
+      end
+    end
   end
   object QryConsultas: TFDQuery
     Connection = ConSqlServer.FDConnection
@@ -512,9 +525,24 @@ object FormPrincipal: TFormPrincipal
   object QryMenu: TFDQuery
     Connection = ConSqlServer.FDConnection
     SQL.Strings = (
-      'select * from cons.Menu')
-    Left = 264
-    Top = 40
+      'select m.* '
+      'from cons.Menu m'
+      'inner join perm.usuario u on U.userid = :userid '
+      
+        'left join perm.Consultas c on c.ConsultaID = m.ID and c.userid =' +
+        ' U.userid'
+      'where '
+      '  ((U.admin = 1) or (c.Permitido = 1))'
+      '')
+    Left = 248
+    Top = 136
+    ParamData = <
+      item
+        Name = 'USERID'
+        DataType = ftInteger
+        FDDataType = dtInt32
+        ParamType = ptInput
+      end>
     object QryMenuID: TFDAutoIncField
       FieldName = 'ID'
       Origin = 'ID'
@@ -571,6 +599,76 @@ object FormPrincipal: TFormPrincipal
     object Excluir1: TMenuItem
       Caption = 'Excluir'
       OnClick = Excluir1Click
+    end
+  end
+  object QryPermissaoMenu: TFDQuery
+    Connection = ConSqlServer.FDConnection
+    SQL.Strings = (
+      'select * '
+      'from perm.Menus'
+      'where userID = :userID')
+    Left = 464
+    Top = 40
+    ParamData = <
+      item
+        Name = 'USERID'
+        DataType = ftInteger
+        FDDataType = dtInt32
+        ParamType = ptInput
+        Value = '2'
+      end>
+    object QryPermissaoMenuuserid: TIntegerField
+      FieldName = 'userid'
+      Origin = 'userid'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+    end
+    object QryPermissaoMenuMenuName: TStringField
+      FieldName = 'MenuName'
+      Origin = 'MenuName'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+      Size = 255
+    end
+    object QryPermissaoMenuPermitido: TBooleanField
+      FieldName = 'Permitido'
+      Origin = 'Permitido'
+    end
+  end
+  object QryUser: TFDQuery
+    Connection = ConSqlServer.FDConnection
+    SQL.Strings = (
+      'select * '
+      'from perm.Usuario'
+      'where userID =:userID')
+    Left = 360
+    Top = 152
+    ParamData = <
+      item
+        Name = 'USERID'
+        DataType = ftInteger
+        FDDataType = dtInt32
+        ParamType = ptInput
+        Value = '2'
+      end>
+    object QryUseruserid: TFDAutoIncField
+      FieldName = 'userid'
+      Origin = 'userid'
+      ReadOnly = True
+    end
+    object QryUserNome: TStringField
+      FieldName = 'Nome'
+      Origin = 'Nome'
+      Size = 255
+    end
+    object QryUserSenha: TStringField
+      FieldName = 'Senha'
+      Origin = 'Senha'
+      Size = 255
+    end
+    object QryUseradmin: TBooleanField
+      FieldName = 'admin'
+      Origin = 'admin'
     end
   end
 end

@@ -4,7 +4,6 @@ uses
   MidasLib,
   Vcl.Forms,
   uFormPrincipal in 'uFormPrincipal.pas' {FormPrincipal},
-  uDmFilaProducao in 'uDmFilaProducao.pas' {DMFilaProducao: TDataModule},
   uDmEstoqProdutos in 'uDmEstoqProdutos.pas' {DmEstoqProdutos: TDataModule},
   uFuncProbabilidades in 'uFuncProbabilidades.pas',
   uFormPedidos in 'uFormPedidos.pas' {FormPedidos},
@@ -20,7 +19,6 @@ uses
   uFormGlobal in 'uFormGlobal.pas' {FormGlobal},
   uFormDetalheProdutos in 'Fontes\uFormDetalheProdutos.pas' {FormDetalheProdutos},
   Utils in '..\utils\Utils.pas',
-  uFormPedidos2 in 'Fontes\uFormPedidos2.pas' {FormPedidos2},
   uFormAdicionarSimilaridade in 'Fontes\uFormAdicionarSimilaridade.pas' {FormAdicionarSimilaridade},
   uFormInsumos in 'Fontes\uFormInsumos.pas' {FormInsumos},
   uFormSelecionaModelos in 'Fontes\uFormSelecionaModelos.pas' {FormSelecionaModelo},
@@ -52,7 +50,14 @@ uses
   Form.ProcessActivityEditor in '..\Ladder Framework\Forms\Form.ProcessActivityEditor.pas',
   Form.SimpleProcessEditor in '..\Ladder Framework\Forms\Form.SimpleProcessEditor.pas',
   uFormEmailEmbalagens in 'uFormEmailEmbalagens.pas' {FormGravaEmbalagens},
-  uFormEmbalagensClientes in 'Fontes\uFormEmbalagensClientes.pas' {FormEmbalagensClientes};
+  uFormEmbalagensClientes in 'Fontes\uFormEmbalagensClientes.pas' {FormEmbalagensClientes},
+  uFormSelecionaEmailCliente in 'Fontes\uFormSelecionaEmailCliente.pas' {FormSelecionaEmailCliente},
+  uFormConfigurarEmailEmbalagens in 'Fontes\uFormConfigurarEmailEmbalagens.pas' {FormConfigurarEmailEmbalagens},
+  uFormConfiguraTextoEmailEmbalagem in 'Fontes\uFormConfiguraTextoEmailEmbalagem.pas' {FormConfiguraTextoEmailEmbalagem},
+  uFormAdicionarImagemEmailEmbalagem in 'Fontes\uFormAdicionarImagemEmailEmbalagem.pas' {FormAdicionarImagemEmailEmbalagem},
+  uFormPermissoes in 'Fontes\uFormPermissoes.pas' {FormPermissoes},
+  uFormLogin in 'Fontes\uFormLogin.pas' {FormLogin},
+  uFormInputSenha in 'Fontes\uFormInputSenha.pas' {FormInputSenha};
 
 {$R *.res}
 
@@ -77,24 +82,14 @@ begin
   Application.Initialize;
 //  Application.MainFormOnTaskbar := True;
   Application.CreateForm(TConSqlServer, ConSqlServer);
+  AppConfig.UserID:= TFormLogin.Login;
+  if AppConfig.UserID = 0 then
+    Exit;
   Application.CreateForm(TConFirebird, ConFirebird);
+  Application.CreateForm(TPedidos, Pedidos);
   Application.CreateForm(TFormPrincipal, FormPrincipal);
   Application.CreateForm(TDmEstoqProdutos, DmEstoqProdutos);
-  Application.CreateForm(TDMFilaProducao, DMFilaProducao);
-  Application.CreateForm(TPedidos, Pedidos);
-  Application.CreateForm(TFormFilaProducao, FormFilaProducao);
-  Application.CreateForm(TFormEmbalagensClientes, FormEmbalagensClientes);
-  //  Application.CreateForm(TFormProInfo, FormProInfo);
-//  Application.CreateForm(TDMConsistenciaOPs, DMConsistenciaOPs);
-//  Application.CreateForm(TFormPedidos, FormPedidos);
-//  Application.CreateForm(TFormDensidades, FormDensidades);
-//  Application.CreateForm(TFormConversorLKG, FormConversorLKG);
-//  Application.CreateForm(TFormConsistenciaOPs, FormConsistenciaOPs);
-//  Application.CreateForm(TFormShowMemo, FormShowMemo);
   Application.CreateForm(TFormGlobal, FormGlobal);
-//  Application.CreateForm(TFormDetalheProdutos, FormDetalheProdutos);
-//  Application.CreateForm(TFormSubGrupoExtras, FormSubGrupoExtras);
-//  Application.CreateForm(TFormLogistica, FormLogistica);
-//  Application.CreateForm(TForm2, Form2);
+
   Application.Run;
 end.

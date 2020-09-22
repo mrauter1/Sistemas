@@ -8,7 +8,7 @@ uses
   cxLookAndFeelPainters, cxStyles, dxSkinsCore, dxSkinscxPCPainter,
   cxCustomData, cxFilter, cxData, cxDataStorage, cxEdit, cxNavigator, Data.DB,
   cxDBData, cxGridLevel, cxClasses, cxGridCustomView, cxGridCustomTableView,
-  cxGridTableView, cxGridDBTableView, cxGrid, uFormGlobal, uDmEstoqProdutos,
+  cxGridTableView, cxGridDBTableView, cxGrid, uFormGlobal,
   Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Menus, FireDAC.Stan.Intf, FireDAC.Stan.Option,
   FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf,
   FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet,
@@ -89,6 +89,7 @@ type
     procedure BtnExcelcxGridTarefaClick(Sender: TObject);
   private
     function GetCodProSelecionado: String;
+    function GetApresentacaoProSelecionado: String;
     { Private declarations }
   public
     procedure RefreshProduto(pCodProFoco: String = '');
@@ -131,7 +132,7 @@ procedure TFormDetalheProdutos.cxGridDBTableViewCellDblClick(
   Sender: TcxCustomGridTableView; ACellViewInfo: TcxGridTableDataCellViewInfo;
   AButton: TMouseButton; AShift: TShiftState; var AHandled: Boolean);
 begin
-  TFormInsumos.AbrirInsumos(GetCodProSelecionado, DmEstoqProdutos.QryEstoqAPRESENTACAO.AsString);
+  TFormInsumos.AbrirInsumos(GetCodProSelecionado, GetApresentacaoProSelecionado);
 end;
 
 procedure TFormDetalheProdutos.cxGridDBTableViewPercentDiasGetDisplayText(
@@ -181,14 +182,20 @@ begin
                                                                 cxGridDBTableViewCODPRODUTO.Index], '');
 end;
 
+function TFormDetalheProdutos.GetApresentacaoProSelecionado: String;
+begin
+  Result:= VarToStrDef(cxGridDBTableView.DataController.Values[cxGridDBTableView.DataController.FocusedRecordIndex,
+                                                                cxGridDBTableViewApresentacao.Index], '');
+end;
+
 procedure TFormDetalheProdutos.VerInsumos1Click(Sender: TObject);
 begin
-  TFormInsumos.AbrirInsumos(GetCodProSelecionado, DmEstoqProdutos.QryEstoqAPRESENTACAO.AsString);
+  TFormInsumos.AbrirInsumos(GetCodProSelecionado, GetApresentacaoProSelecionado);
 end;
 
 procedure TFormDetalheProdutos.VerSimilares1Click(Sender: TObject);
 begin
-  TFormAdicionarSimilaridade.AbrirSimilares(GetCodProSelecionado, DmEstoqProdutos.QryEstoqAPRESENTACAO.AsString);
+  TFormAdicionarSimilaridade.AbrirSimilares(GetCodProSelecionado, GetApresentacaoProSelecionado);
 end;
 
 procedure TFormDetalheProdutos.cxColumnProbabilidadeGetDataText(

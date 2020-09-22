@@ -130,7 +130,7 @@ begin
     QryImagemEmailext.AsString:= ExtractFileExt(OpenPictureDialog1.FileName);
 
     QryImagemEmailidentificador.AsString:= 'EMBALAGEM';
-    QryImagemEmailIdImagem.AsString:= ExtractFileName(OpenPictureDialog1.FileName);
+    QryImagemEmailIdImagem.AsString:= ExtractFileName(StringReplace(OpenPictureDialog1.FileName, ' ', '', [rfReplaceAll]));
     LoadImageFromDB;
     QryImagemEmail.Post;
   except

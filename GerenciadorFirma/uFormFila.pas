@@ -4,13 +4,14 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uDmFilaProducao, Data.DB, Vcl.Grids,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, Vcl.Grids,
   Vcl.DBGrids, Vcl.StdCtrls, cxGraphics, cxControls, cxLookAndFeels,
   cxLookAndFeelPainters, cxStyles, dxSkinsCore, dxSkinscxPCPainter,
   cxCustomData, cxFilter, cxData, cxDataStorage, cxEdit, cxNavigator, cxDBData,
   Vcl.ExtCtrls, cxGridLevel, cxClasses, cxGridCustomView, cxGridCustomTableView,
   cxGridTableView, cxGridDBTableView, cxGrid, uFormGlobal, uPedidos, cxTextEdit,
-  Vcl.Buttons, Vcl.Menus, uDmEstoqProdutos, cxSpinEdit, System.Generics.Collections;
+  Vcl.Buttons, Vcl.Menus, uDmEstoqProdutos, cxSpinEdit, System.Generics.Collections,
+  uFrmShowMemo;
 
 type
   TViewState = record
@@ -61,6 +62,7 @@ type
     cxGridDBTableViewRank: TcxGridDBColumn;
     BtnExcelcxGridTarefa: TBitBtn;
     SaveDialog: TSaveDialog;
+    Timer1: TTimer;
     procedure BtnAtualizaClick(Sender: TObject);
     procedure BtnOpcoesClick(Sender: TObject);
     procedure AbrirConfigProClick(Sender: TObject);
@@ -72,7 +74,11 @@ type
       Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord;
       var AText: string);
     procedure BtnExcelcxGridTarefaClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure Timer1Timer(Sender: TObject);
   private
+
+    FormShowMemo: TFormShowMemo;
     procedure AtualizaGrid;
     function GetCodProSelecionado: String;
     function SaveExpandedState(pView: TcxGridDBTableView;
@@ -81,10 +87,8 @@ type
     { Private declarations }
   public
     { Public declarations }
+    procedure AtualizaFilaProducao;
   end;
-
-var
-  FormFilaProducao: TFormFilaProducao;
 
 implementation
 
@@ -93,6 +97,24 @@ uses
   cxGridExportLink, WinApi.ShellApi;
 
 {$R *.dfm}
+
+procedure TFormFilaProducao.AtualizaFilaProducao;
+begin
+  if Self.Visible then
+    FormShowMemo.Parent:= Self
+  else
+    FormShowMemo.Parent:= nil;
+
+  FormShowMemo.Show;
+  try
+    FormShowMemo.SetText('Iniciando atualização das informações dos produtos...');
+
+    FormShowMemo.SetText('Atualizando fila de produção...');
+    DmEstoqProdutos.AtualizaEstoqueNew;
+  finally
+    FormShowMemo.Hide;
+  end;
+end;
 
 procedure TFormFilaProducao.AbrirDetalheProClick(Sender: TObject);
 begin
@@ -126,6 +148,11 @@ begin
       Result.ExpandedRows[High(Result.ExpandedRows)]:= FChave;
     end;
   end;
+end;
+
+procedure TFormFilaProducao.Timer1Timer(Sender: TObject);
+begin
+  AtualizaFilaProducao;
 end;
 
 procedure TFormFilaProducao.LoadExpandedState(pView: TcxGridDBTableView; pViewState: TViewState);
@@ -162,7 +189,7 @@ var
 begin
   FState:= SaveExpandedState(cxGridDBTableView, 'CODPRODUTO');
 
-  DMFilaProducao.AtualizaFilaProducao;
+  AtualizaFilaProducao;
 
   LoadExpandedState(cxGridDBTableView, fState);
 end;
@@ -218,6 +245,12 @@ end;
 procedure TFormFilaProducao.cxGridDBTableViewDblClick(Sender: TObject);
 begin
   TFormInsumos.AbrirInsumos(GetCodProSelecionado, DmEstoqProdutos.QryEstoqAPRESENTACAO.AsString);
+end;
+
+procedure TFormFilaProducao.FormCreate(Sender: TObject);
+begin
+  FormShowMemo:= TFormShowMemo.Create(Self);
+  AtualizaFilaProducao;
 end;
 
 procedure TFormFilaProducao.VerInsumos1Click(Sender: TObject);

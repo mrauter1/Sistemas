@@ -32,8 +32,6 @@ object FormAdicionarImagemEmailEmbalagem: TFormAdicionarImagemEmailEmbalagem
     Height = 41
     Align = alBottom
     TabOrder = 0
-    ExplicitTop = 339
-    ExplicitWidth = 601
     DesignSize = (
       632
       41)
@@ -46,7 +44,6 @@ object FormAdicionarImagemEmailEmbalagem: TFormAdicionarImagemEmailEmbalagem
       Caption = 'OK'
       TabOrder = 0
       OnClick = BtnOKClick
-      ExplicitLeft = 260
     end
   end
   object PanelLeft: TPanel
@@ -90,6 +87,7 @@ object FormAdicionarImagemEmailEmbalagem: TFormAdicionarImagemEmailEmbalagem
         item
           Expanded = False
           FieldName = 'ext'
+          ReadOnly = True
           Width = 55
           Visible = True
         end>
@@ -103,13 +101,9 @@ object FormAdicionarImagemEmailEmbalagem: TFormAdicionarImagemEmailEmbalagem
       VisibleButtons = [nbInsert, nbDelete, nbPost, nbCancel]
       Align = alBottom
       TabOrder = 1
-      ExplicitLeft = -55
-      ExplicitTop = 159
-      ExplicitWidth = 240
     end
   end
   object DsImagemEmail: TDataSource
-    AutoEdit = False
     DataSet = QryImagemEmail
     Left = 328
     Top = 159

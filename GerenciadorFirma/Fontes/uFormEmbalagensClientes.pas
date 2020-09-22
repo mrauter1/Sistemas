@@ -101,6 +101,8 @@ type
     QryImagemEmailImagem: TBlobField;
     QryImagemEmailext: TStringField;
     DsImagemEmail: TDataSource;
+    QryEmbalagensCliValorPendente: TFMTBCDField;
+    cxGridViewEmbalagensValorPendente: TcxGridDBColumn;
     procedure Ignorarembalagem1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure BtnAtualizarClick(Sender: TObject);
@@ -125,6 +127,7 @@ type
     procedure MarcarEmbalagensComoEnviadas;
     procedure EviarEmailCliente;
     procedure AtualizaEmails;
+    function ReplaceWildcards(AText: String): String;
   public
     procedure EnviaEmail;
     procedure CarregaEmbalagensCliente(ACodCliente: String);
@@ -271,23 +274,34 @@ var
 
   function AddTH(Text: String): String;
   begin
-    Result:= '<th align="center" style="border: 1px solid; padding-left: 2px; padding-right: 2px; font-weight: bold;">'+Text+'</th>';
+    Result:= '<th style="text-align:center;font-family:arial;font-size:12px;border:1px solid;padding-left:2px;padding-right:2px;font-weight: bold;">'+Text+'</th>';
   end;
 
-  function AddTD(Text: String): String;
+  function AddTD(Text: String; AAlignment: TAlignment): String;
+  var
+    FAlignment: String; FPaddingLeft: String;
   begin
-    Result:= '<td align="center" style="border: 1px solid; padding-left: 10px; padding-right: 10px;">'+Text+'</td>';
+    case AAlignment of
+      taLeftJustify: FAlignment:= 'left';
+      taRightJustify: FAlignment:= 'right';
+      else
+        FAlignment:= 'center';
+    end;
+    FAlignment:= 'text-align:'+FAlignment;
+    Result:= '<td style="font-family:arial;font-size:12px;border:1px solid;padding-left:10px;padding-right:10px;'+FAlignment+'">'+Text+'</td>';
   end;
 
   function GetHtml: String;
   begin
-    Result:= '<HTML>'+QryTextoEmailIntroducao.AsString+'<br><br> '
+    Result:= '<HTML>'+ReplaceWildcards(QryTextoEmailIntroducao.AsString)
             +'<table style="border:1px solid; border-collapse: collapse"><tr>'
             +AddTH('Data Emissão')
             +AddTH('NFe')
             +AddTH('Embalagem')
-            +AddTH('Qtd. Pendente')
-            +AddTH('Qtd. Devolvida')
+            +AddTH('Qtd.Enviada')
+            +AddTH('Qtd.Retornada')
+            +AddTH('Qtd.Pendente')
+            +AddTH('Valor Pendente')
             +AddTH('Data Vencimento')
             +AddTH('Situação')
             +'</tr> ';
@@ -297,19 +311,21 @@ var
     begin
       if QryEmbalagensCliQuantPendente.AsInteger > 0 then
         Result:= Result+'<tr> '
-             +AddTD(DateToStr(QryEmbalagensCliDATACOMPROVANTE.AsDateTime))
-             +AddTD(QryEmbalagensCliNumero.AsString+'-'+QryEmbalagensCliSerie.AsString)
-             +AddTD(QryEmbalagensCliApresentacao.AsString)
-             +AddTD(QryEmbalagensCliQuantPendente.AsString)
-             +AddTD(IntToStr(QryEmbalagensCliQuantDevolvida.AsInteger))
-             +AddTD(DateToStr(QryEmbalagensCliDataVencimento.AsDateTime))
-             +AddTD(GetSituacao)+'</tr>';
+             +AddTD(DateToStr(QryEmbalagensCliDATACOMPROVANTE.AsDateTime), taCenter)
+             +AddTD(QryEmbalagensCliNumero.AsString+'-'+QryEmbalagensCliSerie.AsString,taLeftJustify)
+             +AddTD(QryEmbalagensCliApresentacao.AsString,taLeftJustify)
+             +AddTD(QryEmbalagensCliQUANTATENDIDA.AsString,taCenter)
+             +AddTD(IntToStr(QryEmbalagensCliQuantDevolvida.AsInteger),taCenter)
+             +AddTD(QryEmbalagensCliQuantPendente.AsString, taCenter)
+             +AddTD(QryEmbalagensCliValorPendente.DisplayText, taCenter)
+             +AddTD(DateToStr(QryEmbalagensCliDataVencimento.AsDateTime), taCenter)
+             +AddTD(GetSituacao, taLeftJustify)+'</tr>';
 
       QryEmbalagensCli.Next;
     end;
     Result:= Result+'</table>'+
-    '<br>'+QryTextoEmailPoliticaDevolucao.AsString+
-    '<br><br>'+QryTextoEmailAssinatura.AsString+
+    '<br>'+ReplaceWildcards(QryTextoEmailPoliticaDevolucao.AsString)+
+    '<br>'+ReplaceWildcards(QryTextoEmailAssinatura.AsString)+
     '</HTML>';
   end;
 
@@ -469,6 +485,11 @@ begin
 
   Ignorarembalagem1.Visible:=  QryEmbalagensCliSTATUS.AsInteger <> 2;
   DeixardeIgnorarEmbalagem1.Visible:= QryEmbalagensCliSTATUS.AsInteger = 2;
+end;
+
+function TFormEmbalagensClientes.ReplaceWildcards(AText: String): String;
+begin
+  Result:= StringReplace(AText, '%NOMECLIENTE%', QryEmbalagensCliRAZAOSOCIAL.AsString, [rfReplaceAll, rfIgnoreCase]);
 end;
 
 end.

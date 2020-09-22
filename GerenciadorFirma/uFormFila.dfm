@@ -11,6 +11,7 @@ object FormFilaProducao: TFormFilaProducao
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   object cxGrid: TcxGrid
@@ -263,5 +264,11 @@ object FormFilaProducao: TFormFilaProducao
     Title = 'Definir o Caminho e o Nome do Arquivo para Exporta'#231#227'o'
     Left = 75
     Top = 200
+  end
+  object Timer1: TTimer
+    Interval = 210000
+    OnTimer = Timer1Timer
+    Left = 149
+    Top = 80
   end
 end

@@ -366,8 +366,6 @@ object FormPrincipal: TFormPrincipal
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 1
-      ExplicitLeft = -2
-      ExplicitTop = 38
     end
   end
   object TreeViewMenu: TdxDBTreeView
@@ -456,6 +454,28 @@ object FormPrincipal: TFormPrincipal
       object CriarConsulta1: TMenuItem
         Caption = 'Gerenciar Relat'#243'rios'
         OnClick = CriarConsulta1Click
+      end
+    end
+    object Fretes1: TMenuItem
+      Caption = 'Frete'
+      object CalculadoradeFretes1: TMenuItem
+        Caption = 'Calculadora de Fretes'
+        OnClick = CalculadoradeFretes1Click
+      end
+      object ConfernciadosFretesdosMovimentos1: TMenuItem
+        Caption = 'Confer'#234'ncia dos Fretes dos Movimentos'
+        OnClick = ConfernciadosFretesdosMovimentos1Click
+      end
+      object ConfiguraCidadesdaNegociaodeFretes1: TMenuItem
+        Caption = 'Configura Cidades da Negocia'#231#227'o de Fretes'
+        OnClick = ConfiguraCidadesdaNegociaodeFretes1Click
+      end
+      object N2: TMenuItem
+        Caption = '-'
+      end
+      object AtualizarDadosNegociaes1: TMenuItem
+        Caption = 'Atualizar Dados Negocia'#231#245'es'
+        OnClick = AtualizarDadosNegociaes1Click
       end
     end
     object Configuraes1: TMenuItem
@@ -641,7 +661,7 @@ object FormPrincipal: TFormPrincipal
       'select * '
       'from perm.Usuario'
       'where userID =:userID')
-    Left = 360
+    Left = 368
     Top = 152
     ParamData = <
       item
@@ -669,6 +689,12 @@ object FormPrincipal: TFormPrincipal
     object QryUseradmin: TBooleanField
       FieldName = 'admin'
       Origin = 'admin'
+    end
+    object QryUserDefaultMenu: TMemoField
+      FieldName = 'DefaultMenu'
+      Origin = 'DefaultMenu'
+      BlobType = ftMemo
+      Size = 2147483647
     end
   end
 end

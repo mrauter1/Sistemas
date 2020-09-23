@@ -55,29 +55,14 @@ object FormPermissoes: TFormPermissoes
     Align = alTop
     TabOrder = 1
     ExplicitWidth = 512
-    object DBNavigator1: TDBNavigator
-      Left = 1
-      Top = 127
-      Width = 607
-      Height = 25
-      DataSource = DsUsuarios
-      VisibleButtons = [nbInsert, nbDelete, nbEdit, nbPost, nbCancel]
-      Align = alBottom
-      TabOrder = 0
-      ExplicitLeft = 56
-      ExplicitTop = 224
-      ExplicitWidth = 240
-    end
     object cxGridUsuarios: TcxGrid
       Left = 1
       Top = 1
       Width = 607
-      Height = 126
+      Height = 119
       Align = alClient
-      TabOrder = 1
-      ExplicitLeft = 2
-      ExplicitTop = 9
-      ExplicitWidth = 510
+      TabOrder = 0
+      ExplicitHeight = 120
       object cxGridDBTableView1: TcxGridDBTableView
         Navigator.Buttons.CustomButtons = <>
         FilterBox.Visible = fvNever
@@ -134,9 +119,40 @@ object FormPermissoes: TFormPermissoes
       Height = 21
       DataField = 'userid'
       DataSource = DsUsuarios
-      TabOrder = 2
+      TabOrder = 1
       Visible = False
       OnChange = DBEditIDChange
+    end
+    object Panel3: TPanel
+      Left = 1
+      Top = 120
+      Width = 607
+      Height = 32
+      Align = alBottom
+      TabOrder = 2
+      object DBNavigator1: TDBNavigator
+        Left = 1
+        Top = 1
+        Width = 527
+        Height = 30
+        DataSource = DsUsuarios
+        VisibleButtons = [nbInsert, nbDelete, nbEdit, nbPost, nbCancel]
+        Align = alClient
+        TabOrder = 0
+        ExplicitLeft = -5
+        ExplicitTop = -2
+      end
+      object BtnAlterarSenha: TButton
+        Left = 528
+        Top = 1
+        Width = 78
+        Height = 30
+        Align = alRight
+        Caption = 'Alterar a Senha'
+        TabOrder = 1
+        WordWrap = True
+        OnClick = BtnAlterarSenhaClick
+      end
     end
   end
   object Panel2: TPanel
@@ -166,7 +182,7 @@ object FormPermissoes: TFormPermissoes
         Top = 15
         Width = 603
         Height = 295
-        ActivePage = TabSheetConsultas
+        ActivePage = TabMenus
         Align = alClient
         TabOrder = 0
         ExplicitLeft = 15
@@ -188,7 +204,6 @@ object FormPermissoes: TFormPermissoes
             object cxGridDBTableView2: TcxGridDBTableView
               Navigator.Buttons.CustomButtons = <>
               FilterBox.Visible = fvNever
-              OnCellClick = cxGridDBTableView2CellClick
               DataController.DataSource = DsPermissaoConsultas
               DataController.Summary.DefaultGroupSummaryItems = <>
               DataController.Summary.FooterSummaryItems = <>
@@ -250,10 +265,10 @@ object FormPermissoes: TFormPermissoes
             TabOrder = 0
             ExplicitTop = 1
             ExplicitWidth = 579
-            object cxGridDBTableView5: TcxGridDBTableView
+            object cxGridDBTableViewMenus: TcxGridDBTableView
               Navigator.Buttons.CustomButtons = <>
               FilterBox.Visible = fvNever
-              OnCellClick = cxGridDBTableView2CellClick
+              OnCellClick = cxGridDBTableViewMenusCellClick
               DataController.DataSource = DsPermissaoMenus
               DataController.Summary.DefaultGroupSummaryItems = <>
               DataController.Summary.FooterSummaryItems = <>
@@ -266,28 +281,34 @@ object FormPermissoes: TFormPermissoes
               OptionsView.GroupByBox = False
               OptionsView.HeaderAutoHeight = True
               Styles.StyleSheet = FormGlobal.cxGridTableViewStyleSheet1
-              object cxGridDBTableView5MenuName: TcxGridDBColumn
+              object cxGridDBTableViewMenusMenuName: TcxGridDBColumn
                 DataBinding.FieldName = 'MenuName'
                 Visible = False
                 Options.Sorting = False
               end
-              object cxGridDBTableView5Descricao: TcxGridDBColumn
+              object cxGridDBTableViewMenusDescricao: TcxGridDBColumn
                 DataBinding.FieldName = 'Descricao'
                 Options.Editing = False
                 Options.Sorting = False
                 Width = 417
               end
-              object cxGridDBTableView5Permitido: TcxGridDBColumn
+              object cxGridDBTableViewMenusPermitido: TcxGridDBColumn
                 DataBinding.FieldName = 'Permitido'
                 PropertiesClassName = 'TcxCheckBoxProperties'
                 Properties.OnChange = cxGridDBTableView5PermitidoPropertiesChange
                 Options.Sorting = False
                 Width = 80
               end
-              object cxGridDBTableView5NomePai: TcxGridDBColumn
+              object cxGridDBTableViewMenusNomePai: TcxGridDBColumn
                 DataBinding.FieldName = 'NomePai'
                 Visible = False
                 Options.Sorting = False
+              end
+              object cxGridDBTableViewMenusDefaultMenu: TcxGridDBColumn
+                DataBinding.FieldName = 'DefaultMenu'
+                PropertiesClassName = 'TcxCheckBoxProperties'
+                Properties.OnChange = cxGridDBTableViewMenusDefaultMenuPropertiesChange
+                Width = 45
               end
             end
             object cxGridDBTableView6: TcxGridDBTableView
@@ -303,7 +324,7 @@ object FormPermissoes: TFormPermissoes
               Styles.StyleSheet = FormGlobal.cxGridTableViewStyleSheet1
             end
             object cxGridLevel3: TcxGridLevel
-              GridView = cxGridDBTableView5
+              GridView = cxGridDBTableViewMenus
             end
           end
         end
@@ -317,8 +338,8 @@ object FormPermissoes: TFormPermissoes
     SQL.Strings = (
       'select * '
       'from perm.Usuario')
-    Left = 384
-    Top = 80
+    Left = 368
+    Top = 64
     object QryUsuariosuserid: TFDAutoIncField
       DisplayLabel = 'ID'
       FieldName = 'userid'
@@ -341,11 +362,17 @@ object FormPermissoes: TFormPermissoes
       FieldName = 'admin'
       Origin = 'admin'
     end
+    object QryUsuariosDefaultMenu: TMemoField
+      FieldName = 'DefaultMenu'
+      Origin = 'DefaultMenu'
+      BlobType = ftMemo
+      Size = 2147483647
+    end
   end
   object DsUsuarios: TDataSource
     DataSet = QryUsuarios
     Left = 296
-    Top = 80
+    Top = 64
   end
   object DsPermissaoConsultas: TDataSource
     DataSet = TablePermissaoConsulta
@@ -438,6 +465,7 @@ object FormPermissoes: TFormPermissoes
     Top = 216
   end
   object TablePermissaoMenus: TFDMemTable
+    OnCalcFields = TablePermissaoMenusCalcFields
     FetchOptions.AssignedValues = [evMode]
     FetchOptions.Mode = fmAll
     ResourceOptions.AssignedValues = [rvSilentMode]
@@ -461,6 +489,11 @@ object FormPermissoes: TFormPermissoes
     object TablePermissaoMenusNomePai: TStringField
       FieldName = 'NomePai'
       Size = 255
+    end
+    object TablePermissaoMenusDefaultMenu: TBooleanField
+      DisplayLabel = 'Padr'#227'o'
+      FieldKind = fkInternalCalc
+      FieldName = 'DefaultMenu'
     end
   end
   object DsPermissaoMenus: TDataSource

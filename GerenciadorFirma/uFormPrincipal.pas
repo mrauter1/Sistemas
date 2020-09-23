@@ -98,6 +98,13 @@ type
     MenuLogin: TMenuItem;
     trocardeusurio1: TMenuItem;
     Sair1: TMenuItem;
+    QryUserDefaultMenu: TMemoField;
+    Fretes1: TMenuItem;
+    ConfiguraCidadesdaNegociaodeFretes1: TMenuItem;
+    CalculadoradeFretes1: TMenuItem;
+    ConfernciadosFretesdosMovimentos1: TMenuItem;
+    N2: TMenuItem;
+    AtualizarDadosNegociaes1: TMenuItem;
     procedure Pedidos1Click(Sender: TObject);
     procedure Fila1Click(Sender: TObject);
     procedure Densidade1Click(Sender: TObject);
@@ -144,6 +151,11 @@ type
     procedure Usuriosepermisses1Click(Sender: TObject);
     procedure Sair1Click(Sender: TObject);
     procedure trocardeusurio1Click(Sender: TObject);
+    procedure ConfiguraCidadesdaNegociaodeFretes1Click(Sender: TObject);
+    procedure CalculadoradeFretes1Click(Sender: TObject);
+    procedure ConfernciadosFretesdosMovimentos1Click(Sender: TObject);
+    procedure ClculodosFretesdosMovimentos1Click(Sender: TObject);
+    procedure AtualizarDadosNegociaes1Click(Sender: TObject);
   private
     FDmGeradorConsultas: TDmGeradorConsultas;
     FPopupActive: Boolean;
@@ -164,6 +176,7 @@ type
     procedure AoEditarConsulta(Sender: TObject);
     procedure CarregaMenusPermissoes(AUserID: Integer);
     function IsAdmin: Boolean;
+    procedure CloseAllTabs;
     { Private declarations }
   public
     { Public declarations }
@@ -182,7 +195,8 @@ implementation
 uses
   Utils, uFormDetalheProdutos, uFormValidaModelos, uFormExecSql,
   uFormRelatoriosPersonalizados, uFormSubGrupoExtras, uFormFeriados, uPython, uFormCiclosVenda,
-  uDmGravaLista, uFormEmailEmbalagens, uFormPermissoes, uFormLogin;
+  uDmGravaLista, uFormEmailEmbalagens, uFormPermissoes, uFormLogin, uFrmAjustaNeg,
+  uFrmCalculadoraDeFretes;
 
 function TFormPrincipal.IsAdmin: Boolean;
 begin
@@ -192,7 +206,26 @@ end;
 procedure TFormPrincipal.CarregaMenusPermissoes(AUserID: Integer);
 var
   I: Integer;
-  FMenuItem: TMenuItem;
+  FMenuItem, FMenuDefault: TMenuItem;
+
+  function FindMenu(AMenuBase: TMenuItem; AMenuName: String): TMenuItem;
+  var
+    I: Integer;
+  begin
+    Result:= nil;
+    if UpperCase(AMenuBase.Name) = UpperCase(AMenuName) then
+    begin
+      Result:= AMenuBase;
+      Exit;
+    end;
+    for I := 0 to AMenuBase.Count-1 do
+    begin
+      Result:= FindMenu(AMenuBase.Items[I], AMenuName);
+      if Assigned(Result) then
+        Exit;
+    end;
+
+  end;
 
   procedure SetMenuVisible(AMenuItem: TMenuItem; AIsAdmin: Boolean);
   var
@@ -210,6 +243,8 @@ var
         SetMenuVisible(AMenuItem.Items[I], AIsAdmin);
   end;
 begin
+  CloseAllTabs;
+
   QryUser.Close;
   QryUser.ParamByName('userID').AsInteger:= AUserID;
   QryUser.Open;
@@ -226,6 +261,16 @@ begin
     SetMenuVisible(Menu.Items[I], IsAdmin);
 
   SetMenuVisible(MenuLogin, True); // Menu login é sempre visível
+
+  for I := 0 to Menu.Items.Count-1 do
+  begin
+    FMenuDefault:= FindMenu(Menu.Items[I], QryUserDefaultMenu.AsString);
+    if Assigned(FMenuDefault) then
+      Break;
+  end;
+
+  if Assigned(FMenuDefault) then
+    FMenuDefault.Click; 
 end;
 
 procedure TFormPrincipal.RemoveTab(pTab: TChromeTab);
@@ -248,6 +293,22 @@ begin
 
   if Assigned(vForm) then
     AbrirFormEmNovaAba(vForm);
+end;
+
+procedure TFormPrincipal.ConfernciadosFretesdosMovimentos1Click(
+  Sender: TObject);
+var
+  FForm: TFrmConsultaPersonalizada;
+begin
+  FForm:= TFrmConsultaPersonalizada.AbreConsultaPersonalizadaByName('FreteConf');
+  if Assigned(FForm) then
+    AbrirFormEmNovaAba(FForm);
+end;
+
+procedure TFormPrincipal.ConfiguraCidadesdaNegociaodeFretes1Click(
+  Sender: TObject);
+begin
+  AbrirFormEmNovaAba(TFrmAjusteNeg.Create(Self), True);
 end;
 
 procedure TFormPrincipal.ControleLogistica1Click(Sender: TObject);
@@ -316,9 +377,8 @@ procedure TFormPrincipal.FormShow(Sender: TObject);
 begin
   Atividades1.Visible:= (puDesenvolvedor in AppConfig.GruposUsuario);
 
-  if Application.MainForm = Self then
-    AbrirFormEmNovaAba(TFormPedidos.Create(Self), True);
-
+{  if Application.MainForm = Self then
+    AbrirFormEmNovaAba(TFormPedidos.Create(Self), True);   }
 end;
 
 procedure TFormPrincipal.MenuCicloVendasClick(Sender: TObject);
@@ -612,6 +672,11 @@ begin
   TFormPesquisaAviso.AbrirPesquisa;
 end;
 
+procedure TFormPrincipal.CalculadoradeFretes1Click(Sender: TObject);
+begin
+  AbrirFormEmNovaAba(TFrmCalculadoraDeFretes.Create(Self), True);
+end;
+
 procedure TFormPrincipal.CarregaConsultas;
 begin
 {var
@@ -644,6 +709,27 @@ procedure TFormPrincipal.ChromeTabs1ButtonAddClick(Sender: TObject;
   var Handled: Boolean);
 begin
   Handled:= True;
+end;
+
+procedure TFormPrincipal.ClculodosFretesdosMovimentos1Click(Sender: TObject);
+var
+  FForm: TFrmConsultaPersonalizada;
+begin
+  FForm:= TFrmConsultaPersonalizada.AbreConsultaPersonalizadaByName('ConferenciaFreteMovs');
+  if Assigned(FForm) then
+    AbrirFormEmNovaAba(FForm);
+end;
+
+procedure TFormPrincipal.CloseAllTabs;
+var
+  I: Integer;
+  FTab: TChromeTab;
+begin
+  for I:= 0 to ChromeTabs1.Tabs.Count-1 do
+  begin
+    FTab:= ChromeTabs1.Tabs[I];
+    RemoveTab(FTab);
+  end;
 end;
 
 procedure TFormPrincipal.ChromeTabs1ButtonCloseTabClick(Sender: TObject;
@@ -772,6 +858,11 @@ begin
   if FFormExiste then
     FPanelTab.Visible:= True;
 
+end;
+
+procedure TFormPrincipal.AtualizarDadosNegociaes1Click(Sender: TObject);
+begin
+  ConSqlServer.ExecutaComando('exec AtzNegociacao');
 end;
 
 procedure TFormPrincipal.AtualizaTodasasListasdePreo1Click(Sender: TObject);

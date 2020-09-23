@@ -20,7 +20,6 @@ type
     Panel1: TPanel;
     BtnOK: TBitBtn;
     PanelLeft: TPanel;
-    DBNavigator1: TDBNavigator;
     QryUsuarios: TFDQuery;
     DsUsuarios: TDataSource;
     QryUsuariosuserid: TFDAutoIncField;
@@ -68,30 +67,40 @@ type
     TablePermissaoMenusNomePai: TStringField;
     TablePermissaoMenusDescricao: TStringField;
     cxGrid1: TcxGrid;
-    cxGridDBTableView5: TcxGridDBTableView;
+    cxGridDBTableViewMenus: TcxGridDBTableView;
     cxGridDBTableView6: TcxGridDBTableView;
     cxGridLevel3: TcxGridLevel;
-    cxGridDBTableView5Descricao: TcxGridDBColumn;
-    cxGridDBTableView5Permitido: TcxGridDBColumn;
+    cxGridDBTableViewMenusDescricao: TcxGridDBColumn;
+    cxGridDBTableViewMenusPermitido: TcxGridDBColumn;
     TablePermissaoMenusMenuName: TStringField;
-    cxGridDBTableView5NomePai: TcxGridDBColumn;
-    cxGridDBTableView5MenuName: TcxGridDBColumn;
+    cxGridDBTableViewMenusNomePai: TcxGridDBColumn;
+    cxGridDBTableViewMenusMenuName: TcxGridDBColumn;
     TablePermissaoMenusPermitido: TBooleanField;
     QryMenus: TFDQuery;
     DsMenus: TDataSource;
     QryMenususerid: TIntegerField;
     QryMenusMenuName: TStringField;
     QryMenusPermitido: TBooleanField;
+    Panel3: TPanel;
+    DBNavigator1: TDBNavigator;
+    BtnAlterarSenha: TButton;
+    TablePermissaoMenusDefaultMenu: TBooleanField;
+    QryUsuariosDefaultMenu: TMemoField;
+    cxGridDBTableViewMenusDefaultMenu: TcxGridDBColumn;
     procedure QryUsuariosAfterInsert(DataSet: TDataSet);
     procedure FormCreate(Sender: TObject);
     procedure BtnOKClick(Sender: TObject);
     procedure QryUsuariosBeforePost(DataSet: TDataSet);
     procedure DBEditIDChange(Sender: TObject);
-    procedure cxGridDBTableView2CellClick(Sender: TcxCustomGridTableView;
-      ACellViewInfo: TcxGridTableDataCellViewInfo; AButton: TMouseButton;
-      AShift: TShiftState; var AHandled: Boolean);
     procedure cxGridDBTableView2PermitidoPropertiesChange(Sender: TObject);
     procedure cxGridDBTableView5PermitidoPropertiesChange(Sender: TObject);
+    procedure BtnAlterarSenhaClick(Sender: TObject);
+    procedure TablePermissaoMenusCalcFields(DataSet: TDataSet);
+    procedure cxGridDBTableViewMenusCellClick(Sender: TcxCustomGridTableView;
+      ACellViewInfo: TcxGridTableDataCellViewInfo; AButton: TMouseButton;
+      AShift: TShiftState; var AHandled: Boolean);
+    procedure cxGridDBTableViewMenusDefaultMenuPropertiesChange(
+      Sender: TObject);
   private
     FMainMenu: TMainMenu;
     procedure CarregaPermissoesConsulta(AUserID: Integer);
@@ -99,6 +108,7 @@ type
     procedure CarregaPermissoesMenu(AUserID: Integer);
     procedure SetPermissaoMenu(ANomeMenu: String; Permitido,
       pEditField: Boolean);
+    function AlteraSenha: Boolean;
     { Private declarations }
   public
     constructor Create(AOWner: TComponent; AMainMenu: TMainMenu);
@@ -119,6 +129,18 @@ begin
   Result:= '';
   for I := 0 to ATimes-1 do
     Result:= Result+AStr;
+
+end;
+
+procedure TFormPermissoes.BtnAlterarSenhaClick(Sender: TObject);
+begin
+  if QryUsuarios.State = dsInsert then
+    Exit;
+  if QryUsuarios.State <> dsEdit then
+    QryUsuarios.Edit;
+
+  AlteraSenha;
+  QryUsuarios.Post;
 
 end;
 
@@ -208,28 +230,6 @@ begin
   inherited Create(AOwner);
 end;
 
-procedure TFormPermissoes.cxGridDBTableView2CellClick(
-  Sender: TcxCustomGridTableView; ACellViewInfo: TcxGridTableDataCellViewInfo;
-  AButton: TMouseButton; AShift: TShiftState; var AHandled: Boolean);
-begin
-{var
-  FIDCol, FCurCol: TCxGridDBColumn;
-  FID: Integer;
-  FPermitido: Boolean;
-begin
-  FIDCol:= TcxGridDBTableView(Sender).GetColumnByFieldName('ID');
-  FCurCol:= TcxGridDBColumn(ACellViewInfo.Item);
-  if (Assigned(FIDCol)) and (Assigned(FCurCol))= False  then
-    Exit;
-
-  FID:= ACellViewInfo.GridRecord.Values[FIDCol.Index];
-  if UpperCase(FCurCol.DataBinding.Field.FieldName) = 'PERMITIDO' then
-  begin
-    FPermitido:= ACellViewInfo.GridRecord.Values[TcxGridDBTableView(Sender).GetColumnByFieldName('PERMITIDO').Index];
-    SetPermissaoConsulta(FID, not FPermitido);
-  end;             }
-end;
-
 procedure TFormPermissoes.cxGridDBTableView2PermitidoPropertiesChange(
   Sender: TObject);
 var
@@ -264,6 +264,48 @@ begin
   finally
     TablePermissaoMenus.EnableControls;
   end;
+end;
+
+procedure TFormPermissoes.cxGridDBTableViewMenusCellClick(
+  Sender: TcxCustomGridTableView; ACellViewInfo: TcxGridTableDataCellViewInfo;
+  AButton: TMouseButton; AShift: TShiftState; var AHandled: Boolean);
+begin   {
+var
+  FMenuNameCol, FCurCol: TCxGridDBColumn;
+  FMenuName: String;
+  FDefault: Boolean;
+begin
+  FMenuNameCol:= TcxGridDBTableView(Sender).GetColumnByFieldName('MenuName');
+  FCurCol:= TcxGridDBColumn(ACellViewInfo.Item);
+  if (Assigned(FMenuNameCol)) and (Assigned(FCurCol))= False  then
+    Exit;
+
+  FMenuName:= ACellViewInfo.GridRecord.Values[FMenuNameCol.Index];
+  if UpperCase(FCurCol.DataBinding.Field.FieldName) = 'DefaultMenu' then
+  begin
+    FDefault:= ACellViewInfo.GridRecord.Values[TcxGridDBTableView(Sender).GetColumnByFieldName('DefaultMenu').Index];
+    QryUsuarios.Edit;
+    QryUsuariosDefaultMenu.AsString:= FMenuName;
+    QryUsuarios.Post;
+  end;    }
+end;
+
+procedure TFormPermissoes.cxGridDBTableViewMenusDefaultMenuPropertiesChange(
+  Sender: TObject);
+var
+  FNome: String;
+begin
+  if TablePermissaoMenus.State <> dsEdit then
+    Exit;
+
+  QryUsuarios.Edit;
+  if TCxCheckBox(Sender).EditingValue then
+    QryUsuariosDefaultMenu.AsString:= TablePermissaoMenusMenuName.AsString
+  else
+    QryUsuariosDefaultMenu.AsString:= '';
+
+  QryUsuarios.Post;
+  TablePermissaoMenus.Post;
 end;
 
 procedure TFormPermissoes.DBEditIDChange(Sender: TObject);
@@ -311,6 +353,11 @@ begin
     TablePermissaoMenus.Prior;
 end;
 
+procedure TFormPermissoes.TablePermissaoMenusCalcFields(DataSet: TDataSet);
+begin
+  TablePermissaoMenusDefaultMenu.AsBoolean:= (TablePermissaoMenusMenuName.AsString = QryUsuariosDefaultMenu.AsString);
+end;
+
 procedure TFormPermissoes.SetPermissaoConsulta(AIDConsulta: Integer; Permitido: Boolean; pEditField: Boolean);
 var
   FCurID: Integer;
@@ -355,26 +402,31 @@ begin
   QryUsuariosadmin.AsBoolean:= False;
 end;
 
+function TFormPermissoes.AlteraSenha: Boolean;
+var
+  FMD5NovaSenha: String;
+begin
+ FMD5NovaSenha:= TFormInputSenha.RetornaMD5Senha;
+
+ Result:= FMD5NovaSenha <> '';
+
+ if Result then
+   QryUsuariosSenha.AsString:= FMD5NovaSenha;
+end;
+
 procedure TFormPermissoes.QryUsuariosBeforePost(DataSet: TDataSet);
-
-  function VerificaSenha: Boolean;
-  begin
-    if Trim(QryUsuariosSenha.AsString) = '' then
-     QryUsuariosSenha.AsString:= TFormInputSenha.RetornaMD5Senha;
-
-   Result:= QryUsuariosSenha.AsString <> '';
-  end;
 begin
   if QryUsuariosNome.AsString = '' then
   begin
     ShowMessage('Usuário inválido.');
     Abort;
   end;
-  if not VerificaSenha then
-  begin
-    ShowMessage('Senha inválida!');
-    Abort;
-  end;
+  if Trim(QryUsuariosSenha.AsString) = '' then
+    if not AlteraSenha then
+    begin
+      ShowMessage('Senha inválida!');
+      Abort;
+    end;
 {  if QryUsuarios.State = dsEdit then
     if QryUsuariosNome.OldValue <> QryUsuariosNome.NewValue then
       if Application.MessageBox('Nome do usuário foi modificado! O usuário em questão pode perder o acesso. Continuar com esta modificação?', 'Atenção', MB_YESNO) = ID_NO then

@@ -57,7 +57,11 @@ uses
   uFormAdicionarImagemEmailEmbalagem in 'Fontes\uFormAdicionarImagemEmailEmbalagem.pas' {FormAdicionarImagemEmailEmbalagem},
   uFormPermissoes in 'Fontes\uFormPermissoes.pas' {FormPermissoes},
   uFormLogin in 'Fontes\uFormLogin.pas' {FormLogin},
-  uFormInputSenha in 'Fontes\uFormInputSenha.pas' {FormInputSenha};
+  uFormInputSenha in 'Fontes\uFormInputSenha.pas' {FormInputSenha},
+  uFrmAjustaNeg in 'Fontes\Fretes\uFrmAjustaNeg.pas' {FrmAjusteNeg},
+  uFrmCalculadoraDeFretes in 'Fontes\Fretes\uFrmCalculadoraDeFretes.pas' {FrmCalculadoraDeFretes},
+  uFrmPesquisaNeg in 'Fontes\Fretes\uFrmPesquisaNeg.pas' {FrmPesquisaNeg},
+  uFrmPesquisaTransp in 'Fontes\Fretes\uFrmPesquisaTransp.pas' {FrmPesquisaTransp};
 
 {$R *.res}
 

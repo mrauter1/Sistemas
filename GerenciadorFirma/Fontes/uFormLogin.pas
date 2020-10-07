@@ -6,7 +6,10 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Mask, Vcl.Buttons,
-  IdGlobal, IdHash, IdHashMessageDigest, uConSqlServer;
+  IdGlobal, IdHash, IdHashMessageDigest, uConSqlServer, FireDAC.Stan.Intf,
+  FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS,
+  FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
+  Data.DB, FireDAC.Comp.DataSet, FireDAC.Comp.Client;
 
 type
   TFormLogin = class(TForm)
@@ -24,12 +27,13 @@ type
     function RetornaIDUser(AUserName: String; ASenha: String): Integer;
     class function DecryptStringAES(AString: RawByteString; AKey: String)
       : RawByteString; static;
-    class function EncryptStringAES(AString: RawByteString; AKey: String)
+    class function EncryptStringAES(AString: RawByteString; AKey: RawByteString)
       : RawByteString; static;
     { Private declarations }
   public
     { Public declarations }
     UserID: Integer;
+    class function GetKey: String;
     class function getMd5HashString(value: string): string; static;
     class function EncryptDecryptString(value: String): String;
 
@@ -46,10 +50,7 @@ implementation
 uses
   SynCrypto, uAppConfig;
 
-const
-  cDireStraits = 'DIRESTRAITSSULTANSOFSWINGc8as8(*@#MARKKNOPFLER@#';
-
-class function TFormLogin.EncryptStringAES(AString: RawByteString; AKey: String)
+class function TFormLogin.EncryptStringAES(AString: RawByteString; AKey: RawByteString)
   : RawByteString;
 begin
   Result := TAESCFB.SimpleEncrypt(AString, AKey, true, true);
@@ -58,6 +59,11 @@ end;
 procedure TFormLogin.FormCreate(Sender: TObject);
 begin
   UserID:= 0;
+end;
+
+class function TFormLogin.GetKey: String;
+begin
+  Result:= AppConfig.GetAppDataFolder;
 end;
 
 class function TFormLogin.Login: Integer;
@@ -69,8 +75,8 @@ begin
     AppConfig.LerConfig;
     if AppConfig.UserName <> '' then
     begin
-      Result:= FFrm.RetornaIDUser(AppConfig.UserName,
-            DecryptStringAES(AppConfig.EncryptedPassword, cDireStraits));
+      Result:= FFrm.RetornaIDUser(String(AppConfig.UserName),
+            String(DecryptStringAES(AppConfig.EncryptedPassword, GetKey)));
       if Result > 0 then
         Exit;
     end;
@@ -101,6 +107,9 @@ const
 begin
   Result := ConSqlServer.RetornaInteiro(Format(cSql,
               [AUserName, getMd5HashString(ASenha)]), 0);
+
+  if Result = 0 then
+    Exit;
 end;
 
 procedure TFormLogin.BtnCancelarClick(Sender: TObject);
@@ -120,7 +129,7 @@ begin
 
   if CbxLoginAutomatico.Checked then
     AppConfig.SalvarUsuarioESenha(EditUser.Text,
-      EncryptStringAES(EditSenha.Text, cDireStraits));
+      EncryptStringAES(EditSenha.Text, GetKey));
 
   Close;
 end;

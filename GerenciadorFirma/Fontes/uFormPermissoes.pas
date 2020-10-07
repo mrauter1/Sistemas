@@ -87,6 +87,10 @@ type
     TablePermissaoMenusDefaultMenu: TBooleanField;
     QryUsuariosDefaultMenu: TMemoField;
     cxGridDBTableViewMenusDefaultMenu: TcxGridDBColumn;
+    QryUsuariosProducao: TBooleanField;
+    QryUsuariosDesenvolvedor: TBooleanField;
+    cxGridDBTableView1Desenvolvedor: TcxGridDBColumn;
+    cxGridDBTableView1Producao: TcxGridDBColumn;
     procedure QryUsuariosAfterInsert(DataSet: TDataSet);
     procedure FormCreate(Sender: TObject);
     procedure BtnOKClick(Sender: TObject);

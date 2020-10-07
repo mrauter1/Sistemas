@@ -30,7 +30,6 @@ uses
   uFormRelatoriosPersonalizados in 'Fontes\uFormRelatoriosPersonalizados.pas' {FormRelatoriosPersonalizados},
   uConsultaPersonalizada in '..\utils\uConsultaPersonalizada.pas' {FrmConsultaPersonalizada},
   UCopyFolder3Test in 'Fontes\UCopyFolder3Test.pas',
-  uAtualiza in 'Fontes\uAtualiza.pas',
   uSendMail in '..\utils\uSendMail.pas',
   uDmGeradorConsultas in '..\utils\uDmGeradorConsultas.pas' {DmGeradorConsultas: TDataModule},
   uConFirebird in '..\utils\uConFirebird.pas' {ConFirebird: TDataModule},
@@ -61,7 +60,9 @@ uses
   uFrmAjustaNeg in 'Fontes\Fretes\uFrmAjustaNeg.pas' {FrmAjusteNeg},
   uFrmCalculadoraDeFretes in 'Fontes\Fretes\uFrmCalculadoraDeFretes.pas' {FrmCalculadoraDeFretes},
   uFrmPesquisaNeg in 'Fontes\Fretes\uFrmPesquisaNeg.pas' {FrmPesquisaNeg},
-  uFrmPesquisaTransp in 'Fontes\Fretes\uFrmPesquisaTransp.pas' {FrmPesquisaTransp};
+  uFrmPesquisaTransp in 'Fontes\Fretes\uFrmPesquisaTransp.pas' {FrmPesquisaTransp},
+  uUpdater in 'Fontes\uUpdater.pas',
+  cxUtils in '..\utils\cxUtils.pas';
 
 {$R *.res}
 
@@ -69,9 +70,9 @@ var
   FRootClass: TRootClass;
 
 begin
-  with TAtualiza.Create(AppConfig.PastaUpdate) do
+  with TUpdater.Create(AppConfig.PastaUpdate) do
   try
-    VerificaEAtualiza;
+    CheckAndUpdate;
   finally
     Free;
   end;

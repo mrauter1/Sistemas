@@ -105,6 +105,9 @@ type
     ConfernciadosFretesdosMovimentos1: TMenuItem;
     N2: TMenuItem;
     AtualizarDadosNegociaes1: TMenuItem;
+    QryUserProducao: TBooleanField;
+    QryUserDesenvolvedor: TBooleanField;
+    StatusBar1: TStatusBar;
     procedure Pedidos1Click(Sender: TObject);
     procedure Fila1Click(Sender: TObject);
     procedure Densidade1Click(Sender: TObject);
@@ -245,9 +248,16 @@ var
 begin
   CloseAllTabs;
 
+  AppConfig.GruposUsuario:= [];
   QryUser.Close;
   QryUser.ParamByName('userID').AsInteger:= AUserID;
   QryUser.Open;
+
+  if QryUserProducao.AsBoolean then
+    AppConfig.GruposUsuario:= [puGerenteProducao];
+
+  if QryUserDesenvolvedor.AsBoolean then
+    AppConfig.GruposUsuario:= [puDesenvolvedor];
 
   QryPermissaoMenu.Close;
   QryPermissaoMenu.ParamByName('userID').AsInteger:= AUserID;
@@ -270,7 +280,9 @@ begin
   end;
 
   if Assigned(FMenuDefault) then
-    FMenuDefault.Click; 
+    FMenuDefault.Click;
+
+  StatusBar1.SimpleText:= 'Usuário: '+QryUserNome.AsString;
 end;
 
 procedure TFormPrincipal.RemoveTab(pTab: TChromeTab);

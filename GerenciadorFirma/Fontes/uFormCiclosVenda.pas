@@ -179,6 +179,7 @@ type
     procedure Relembrarem30dias1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure Deixardeignorar1Click(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     procedure SaveParaComprar(pCxGrid: TcxGrid; pNomeArquivo: String);
     procedure GravaLembreteCiclo(pCodCliente, pCodProduto: String; pData: TDate; pCodMotivo: Integer; pObs: String);
@@ -272,6 +273,11 @@ begin
 
   if not QryRecuperar.Active then
     QryRecuperar.Open;
+end;
+
+procedure TFormCiclosVenda.FormShow(Sender: TObject);
+begin
+  PageControl1.ActivePage:= TabParaComprar;
 end;
 
 procedure TFormCiclosVenda.RefreshCiclos;

@@ -128,7 +128,7 @@ class function TFormRelatoriosPersonalizados.AbreConsulta(pCodConsulta: Integer;
 begin
   Result:= TFormRelatoriosPersonalizados.Create(Application);
   Result.CarregaConsulta(pCodConsulta);
-  if Result.Dm.QryCamposID.AsInteger = 0 then
+  if Result.Dm.QryConsultasID.AsInteger = 0 then
     Exit;
 
   Result.AoFecharForm:= FAoFecharForm;

@@ -71,7 +71,6 @@ object FormLogin: TFormLogin
     Height = 21
     Anchors = [akLeft, akTop, akRight]
     TabOrder = 0
-    ExplicitWidth = 183
   end
   object CbxLoginAutomatico: TCheckBox
     Left = 24
@@ -89,7 +88,6 @@ object FormLogin: TFormLogin
     Anchors = [akLeft, akTop, akRight]
     PasswordChar = '*'
     TabOrder = 1
-    ExplicitWidth = 210
   end
   object BtnCancelar: TBitBtn
     Left = 206
@@ -143,6 +141,5 @@ object FormLogin: TFormLogin
       0000000000000000000000000000000000000000000000000000}
     TabOrder = 4
     OnClick = BtnCancelarClick
-    ExplicitLeft = 200
   end
 end

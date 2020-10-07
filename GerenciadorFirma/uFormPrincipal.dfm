@@ -21,10 +21,11 @@ object FormPrincipal: TFormPrincipal
     Left = 233
     Top = 0
     Width = 606
-    Height = 405
+    Height = 386
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
+    ExplicitHeight = 405
     object ChromeTabs1: TChromeTabs
       Left = 0
       Top = 0
@@ -362,17 +363,18 @@ object FormPrincipal: TFormPrincipal
       Left = 0
       Top = 32
       Width = 606
-      Height = 373
+      Height = 354
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 1
+      ExplicitHeight = 373
     end
   end
   object TreeViewMenu: TdxDBTreeView
     Left = 0
     Top = 0
     Width = 225
-    Height = 405
+    Height = 386
     RightClickSelect = True
     ShowNodeHint = True
     DataSource = DsMenu
@@ -394,12 +396,25 @@ object FormPrincipal: TFormPrincipal
     OnDblClick = TreeViewMenuDblClick
     OnKeyDown = TreeViewMenuKeyDown
     PopupMenu = PopupMenuTreeView
+    ExplicitHeight = 405
   end
   object cxSplitter1: TcxSplitter
     Left = 225
     Top = 0
     Width = 8
-    Height = 405
+    Height = 386
+    ExplicitHeight = 405
+  end
+  object StatusBar1: TStatusBar
+    Left = 0
+    Top = 386
+    Width = 839
+    Height = 19
+    Panels = <>
+    SimplePanel = True
+    ExplicitLeft = 424
+    ExplicitTop = 224
+    ExplicitWidth = 0
   end
   object MainMenu: TMainMenu
     OwnerDraw = True
@@ -695,6 +710,14 @@ object FormPrincipal: TFormPrincipal
       Origin = 'DefaultMenu'
       BlobType = ftMemo
       Size = 2147483647
+    end
+    object QryUserProducao: TBooleanField
+      FieldName = 'Producao'
+      Origin = 'Producao'
+    end
+    object QryUserDesenvolvedor: TBooleanField
+      FieldName = 'Desenvolvedor'
+      Origin = 'Desenvolvedor'
     end
   end
 end

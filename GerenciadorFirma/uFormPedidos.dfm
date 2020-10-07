@@ -137,7 +137,7 @@ object FormPedidos: TFormPedidos
       31)
     object BtnAtualiza: TButton
       Left = 492
-      Top = 6
+      Top = 3
       Width = 88
       Height = 25
       Anchors = [akBottom]

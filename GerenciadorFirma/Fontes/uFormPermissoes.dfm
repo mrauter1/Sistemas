@@ -21,9 +21,6 @@ object FormPermissoes: TFormPermissoes
     Height = 41
     Align = alBottom
     TabOrder = 0
-    ExplicitLeft = 144
-    ExplicitTop = 120
-    ExplicitWidth = 185
     DesignSize = (
       609
       41)
@@ -44,7 +41,6 @@ object FormPermissoes: TFormPermissoes
       Anchors = [akTop, akRight]
       Caption = 'Atualizar'
       TabOrder = 1
-      ExplicitLeft = 448
     end
   end
   object PanelLeft: TPanel
@@ -54,7 +50,6 @@ object FormPermissoes: TFormPermissoes
     Height = 153
     Align = alTop
     TabOrder = 1
-    ExplicitWidth = 512
     object cxGridUsuarios: TcxGrid
       Left = 1
       Top = 1
@@ -62,7 +57,8 @@ object FormPermissoes: TFormPermissoes
       Height = 119
       Align = alClient
       TabOrder = 0
-      ExplicitHeight = 120
+      ExplicitLeft = 0
+      ExplicitTop = -4
       object cxGridDBTableView1: TcxGridDBTableView
         Navigator.Buttons.CustomButtons = <>
         FilterBox.Visible = fvNever
@@ -94,6 +90,14 @@ object FormPermissoes: TFormPermissoes
           PropertiesClassName = 'TcxCheckBoxProperties'
           Options.Sorting = False
           Width = 84
+        end
+        object cxGridDBTableView1Producao: TcxGridDBColumn
+          DataBinding.FieldName = 'Producao'
+          Width = 67
+        end
+        object cxGridDBTableView1Desenvolvedor: TcxGridDBColumn
+          DataBinding.FieldName = 'Desenvolvedor'
+          Width = 80
         end
       end
       object cxGridDBTableView4: TcxGridDBTableView
@@ -139,8 +143,6 @@ object FormPermissoes: TFormPermissoes
         VisibleButtons = [nbInsert, nbDelete, nbEdit, nbPost, nbCancel]
         Align = alClient
         TabOrder = 0
-        ExplicitLeft = -5
-        ExplicitTop = -2
       end
       object BtnAlterarSenha: TButton
         Left = 528
@@ -162,9 +164,6 @@ object FormPermissoes: TFormPermissoes
     Height = 314
     Align = alClient
     TabOrder = 2
-    ExplicitTop = 224
-    ExplicitWidth = 512
-    ExplicitHeight = 181
     object GroupBox1: TGroupBox
       Left = 1
       Top = 1
@@ -173,10 +172,6 @@ object FormPermissoes: TFormPermissoes
       Align = alClient
       Caption = 'Permiss'#245'es'
       TabOrder = 0
-      ExplicitLeft = 32
-      ExplicitTop = 16
-      ExplicitWidth = 465
-      ExplicitHeight = 169
       object PageControlPermissoes: TPageControl
         Left = 2
         Top = 15
@@ -185,13 +180,8 @@ object FormPermissoes: TFormPermissoes
         ActivePage = TabMenus
         Align = alClient
         TabOrder = 0
-        ExplicitLeft = 15
-        ExplicitTop = 18
-        ExplicitWidth = 587
         object TabSheetConsultas: TTabSheet
           Caption = 'Consultas'
-          ExplicitWidth = 453
-          ExplicitHeight = 87
           object cxGridPermissaoConsulta: TcxGrid
             Left = 0
             Top = 0
@@ -199,8 +189,6 @@ object FormPermissoes: TFormPermissoes
             Height = 267
             Align = alClient
             TabOrder = 0
-            ExplicitTop = 1
-            ExplicitWidth = 579
             object cxGridDBTableView2: TcxGridDBTableView
               Navigator.Buttons.CustomButtons = <>
               FilterBox.Visible = fvNever
@@ -255,7 +243,6 @@ object FormPermissoes: TFormPermissoes
         object TabMenus: TTabSheet
           Caption = 'Menus'
           ImageIndex = 1
-          ExplicitWidth = 563
           object cxGrid1: TcxGrid
             Left = 0
             Top = 0
@@ -263,8 +250,6 @@ object FormPermissoes: TFormPermissoes
             Height = 267
             Align = alClient
             TabOrder = 0
-            ExplicitTop = 1
-            ExplicitWidth = 579
             object cxGridDBTableViewMenus: TcxGridDBTableView
               Navigator.Buttons.CustomButtons = <>
               FilterBox.Visible = fvNever
@@ -367,6 +352,15 @@ object FormPermissoes: TFormPermissoes
       Origin = 'DefaultMenu'
       BlobType = ftMemo
       Size = 2147483647
+    end
+    object QryUsuariosProducao: TBooleanField
+      DisplayLabel = 'Produ'#231#227'o'
+      FieldName = 'Producao'
+      Origin = 'Producao'
+    end
+    object QryUsuariosDesenvolvedor: TBooleanField
+      FieldName = 'Desenvolvedor'
+      Origin = 'Desenvolvedor'
     end
   end
   object DsUsuarios: TDataSource

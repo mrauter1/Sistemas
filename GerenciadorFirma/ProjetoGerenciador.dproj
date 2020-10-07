@@ -179,7 +179,6 @@
             <Form>FrmConsultaPersonalizada</Form>
         </DCCReference>
         <DCCReference Include="Fontes\UCopyFolder3Test.pas"/>
-        <DCCReference Include="Fontes\uAtualiza.pas"/>
         <DCCReference Include="..\utils\uSendMail.pas"/>
         <DCCReference Include="..\utils\uDmGeradorConsultas.pas">
             <Form>DmGeradorConsultas</Form>
@@ -265,6 +264,8 @@
             <Form>FrmPesquisaTransp</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="Fontes\uUpdater.pas"/>
+        <DCCReference Include="..\utils\cxUtils.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

@@ -189,28 +189,29 @@ end;
 class procedure TLadderVarToSql.SetNewFieldType(pValue: PVAriant; var pFieldType: TSQLDBFieldType);
 var
   FNewFieldType: TSQLDBFieldType;
+  FFloatValue: Extended;
 begin
   if pFieldType = SynTable.ftUTF8 then Exit; // If it is a string it does not need to be changed
 
   FNewFieldType:= VariantVTypeToSQLDBFieldType(VarType(pValue^));
+  if LadderVarIsIso8601(pValue^) then
+    FNewFieldType:= SynTable.ftDate
+  else if (FNewFieldType <> ftInt64) and LadderVarIsFloat(pValue^, FFloatValue) then
+    FNewFieldType:= SynTable.ftDouble;
 
   if FNewFieldType <= SynTable.ftNull then  // if current col FieldType is ftnull or ftUnknown does not need to change
     Exit;
 
+    //TODO: A value such as 840398.045454545 should be translated to ftDouble, now it is translating to utf8
+
   if pFieldType <= ftNull then
   begin
-    if (FNewFieldType = SynTable.ftUTF8) and (LadderVarIsIso8601(pValue^)) then // Check special case when date is stored as string
-      pFieldType:= SynTable.ftDate
-    else
-      pFieldType:= FNewFieldType;
-
+    pFieldType:= FNewFieldType;
     Exit;
   end;
 
   if FNewFieldType = pFieldType then
     Exit
-  else if ((FNewFieldType = SynTable.ftUTF8) and (LadderVarIsIso8601(pValue^))) then // Check special case when date is stored as string
-    pFieldType:= SynTable.ftDate
   else if Ord(FNewFieldType) > Ord(pFieldType) then
     pFieldType:= FNewFieldType
   else // Ord(FFieldType) < Ord(FieldTypes[Col]

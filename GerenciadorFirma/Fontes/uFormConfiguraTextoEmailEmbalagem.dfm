@@ -45,6 +45,16 @@ object FormConfiguraTextoEmailEmbalagem: TFormConfiguraTextoEmailEmbalagem
       TabOrder = 1
       OnClick = BtnAddImageClick
     end
+    object BtnTeste: TButton
+      Left = 25
+      Top = 6
+      Width = 75
+      Height = 25
+      Anchors = [akTop]
+      Caption = 'Email Teste'
+      TabOrder = 2
+      OnClick = BtnTesteClick
+    end
   end
   object ScrollBox1: TScrollBox
     Left = 0
@@ -73,12 +83,12 @@ object FormConfiguraTextoEmailEmbalagem: TFormConfiguraTextoEmailEmbalagem
       Caption = 'Introdu'#231#227'o'
     end
     object Label2: TLabel
-      Left = 23
+      Left = 27
       Top = 152
-      Width = 51
+      Width = 47
       Height = 26
       Alignment = taRightJustify
-      Caption = 'Pol'#237'tica de devolu'#231#227'o'
+      Caption = 'Corpo do Email'
       WordWrap = True
     end
     object Label4: TLabel
@@ -93,7 +103,7 @@ object FormConfiguraTextoEmailEmbalagem: TFormConfiguraTextoEmailEmbalagem
     object DBEditUser: TDBEdit
       Left = 80
       Top = 19
-      Width = 480
+      Width = 468
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       DataField = 'Titulo'
@@ -103,7 +113,7 @@ object FormConfiguraTextoEmailEmbalagem: TFormConfiguraTextoEmailEmbalagem
     object DBMemoIntroducao: TDBMemo
       Left = 80
       Top = 54
-      Width = 480
+      Width = 468
       Height = 89
       Anchors = [akLeft, akTop, akRight]
       DataField = 'Introducao'
@@ -114,10 +124,10 @@ object FormConfiguraTextoEmailEmbalagem: TFormConfiguraTextoEmailEmbalagem
     object DBMemoPolitica: TDBMemo
       Left = 80
       Top = 149
-      Width = 480
+      Width = 468
       Height = 123
       Anchors = [akLeft, akTop, akRight]
-      DataField = 'PoliticaDevolucao'
+      DataField = 'Corpo'
       DataSource = DsTextoEmail
       ScrollBars = ssVertical
       TabOrder = 2
@@ -125,7 +135,7 @@ object FormConfiguraTextoEmailEmbalagem: TFormConfiguraTextoEmailEmbalagem
     object DBMemoAssinatura: TDBMemo
       Left = 80
       Top = 289
-      Width = 480
+      Width = 468
       Height = 101
       Anchors = [akLeft, akTop, akRight]
       DataField = 'Assinatura'
@@ -135,14 +145,22 @@ object FormConfiguraTextoEmailEmbalagem: TFormConfiguraTextoEmailEmbalagem
     end
   end
   object QryTextoEmail: TFDQuery
+    AfterInsert = QryTextoEmailAfterInsert
     Connection = ConSqlServer.FDConnection
     SQL.Strings = (
       'select *'
       'from ModeloEmailEmbalagem'
       'where'
-      '  Identificador = '#39'EMBALAGEM'#39)
+      '  Identificador = :Identificador')
     Left = 240
     Top = 111
+    ParamData = <
+      item
+        Name = 'IDENTIFICADOR'
+        DataType = ftString
+        FDDataType = dtWideString
+        ParamType = ptInput
+      end>
     object QryTextoEmailIdentificador: TStringField
       FieldName = 'Identificador'
       Required = True
@@ -159,13 +177,14 @@ object FormConfiguraTextoEmailEmbalagem: TFormConfiguraTextoEmailEmbalagem
       BlobType = ftMemo
       Size = 2147483647
     end
-    object QryTextoEmailPoliticaDevolucao: TMemoField
-      FieldName = 'PoliticaDevolucao'
+    object QryTextoEmailAssinatura: TMemoField
+      FieldName = 'Assinatura'
       BlobType = ftMemo
       Size = 2147483647
     end
-    object QryTextoEmailAssinatura: TMemoField
-      FieldName = 'Assinatura'
+    object QryTextoEmailCorpo: TMemoField
+      FieldName = 'Corpo'
+      Origin = 'Corpo'
       BlobType = ftMemo
       Size = 2147483647
     end

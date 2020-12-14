@@ -54,8 +54,6 @@ object FormConfigurarEmailEmbalagens: TFormConfigurarEmailEmbalagens
     Height = 35
     Align = alBottom
     TabOrder = 0
-    ExplicitTop = 216
-    ExplicitWidth = 495
     DesignSize = (
       494
       35)
@@ -97,6 +95,7 @@ object FormConfigurarEmailEmbalagens: TFormConfigurarEmailEmbalagens
     Height = 21
     DataField = 'Password'
     DataSource = DsEmail
+    PasswordChar = '*'
     TabOrder = 3
   end
   object DBEditServidor: TDBEdit

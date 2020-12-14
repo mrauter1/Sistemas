@@ -20,13 +20,12 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
     Top = 0
     Width = 955
     Height = 529
-    ActivePage = TabSheetAVencer
+    ActivePage = TabPendentes
     Align = alClient
     TabOrder = 0
     OnChange = PageControl1Change
     object TabPendentes: TTabSheet
       Caption = 'Pendentes'
-      ExplicitHeight = 394
       object PanelBotPendentes: TPanel
         Left = 0
         Top = 459
@@ -34,8 +33,6 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
         Height = 42
         Align = alBottom
         TabOrder = 0
-        ExplicitTop = 487
-        ExplicitWidth = 955
         object BtnSeleciona: TBitBtn
           Left = 8
           Top = 6
@@ -60,8 +57,6 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
         Align = alClient
         Caption = 'PanelPendentes'
         TabOrder = 1
-        ExplicitTop = 8
-        ExplicitHeight = 459
         object cxGridEmbalagens: TcxGrid
           Left = 1
           Top = 1
@@ -69,7 +64,7 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
           Height = 392
           Align = alClient
           TabOrder = 0
-          ExplicitHeight = 457
+          ExplicitLeft = 0
           object cxGridViewClientes: TcxGridDBTableView
             PopupMenu = PopupMenu
             Navigator.Buttons.CustomButtons = <>
@@ -85,6 +80,7 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
             OptionsData.Editing = False
             OptionsData.Inserting = False
             OptionsSelection.CellSelect = False
+            OptionsView.GroupByBox = False
             OptionsView.HeaderAutoHeight = True
             Styles.OnGetContentStyle = cxGridViewClientesStylesGetContentStyle
             Styles.StyleSheet = FormGlobal.cxGridTableViewStyleSheet1
@@ -261,7 +257,6 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
         Height = 65
         Align = alTop
         TabOrder = 2
-        ExplicitTop = 8
         object Label1: TLabel
           Left = 230
           Top = 41
@@ -362,8 +357,6 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
     object TabSheetAVencer: TTabSheet
       Caption = 'Prestes A Vencer'
       ImageIndex = 1
-      ExplicitLeft = 8
-      ExplicitTop = 28
       object PanelTopAVencer: TPanel
         Left = 0
         Top = 0
@@ -371,7 +364,6 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
         Height = 65
         Align = alTop
         TabOrder = 0
-        ExplicitTop = 8
         object Label4: TLabel
           Left = 195
           Top = 41
@@ -381,8 +373,8 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
           Caption = 'Data Vencimento de'
         end
         object Label5: TLabel
-          Left = 451
-          Top = 41
+          Left = 450
+          Top = 42
           Width = 16
           Height = 13
           Alignment = taRightJustify
@@ -396,14 +388,14 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
           Alignment = taRightJustify
           Caption = 'Cliente'
         end
-        object Button1: TButton
+        object BtnAtualizaAVencer: TButton
           Left = 656
           Top = 35
           Width = 75
           Height = 25
           Caption = 'Atualizar'
           TabOrder = 0
-          OnClick = Button1Click
+          OnClick = BtnAtualizaAVencerClick
         end
         object DataIniAVencer: TDateTimePicker
           Left = 297
@@ -423,14 +415,14 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
           Time = 44071.444021122680000000
           TabOrder = 2
         end
-        object CheckBox1: TCheckBox
+        object CbxIgnoradasAVencer: TCheckBox
           Left = 16
           Top = 42
           Width = 169
           Height = 17
           Caption = 'Mostrar Embalagens Ignoradas'
           TabOrder = 3
-          OnClick = CheckBoxMostrarIgnoradosClick
+          OnClick = CbxEnviadasAVencerClick
         end
         object EditAVencerCli: TEdit
           Left = 297
@@ -440,22 +432,23 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
           TabOrder = 4
           OnKeyDown = EditClienteKeyDown
         end
-        object CheckBox2: TCheckBox
+        object CbxEnviadasAVencer: TCheckBox
           Left = 16
           Top = 15
           Width = 169
           Height = 17
           Caption = 'Mostrar Embalagens Enviadas'
           TabOrder = 5
-          OnClick = CheckBoxMostrarIgnoradosClick
+          OnClick = CbxEnviadasAVencerClick
         end
-        object Button2: TButton
+        object BtnEnviarEmailPrestesAVencer: TButton
           Left = 752
           Top = 35
           Width = 75
           Height = 25
           Caption = 'Enviar Email'
           TabOrder = 6
+          OnClick = BtnEnviarEmailPrestesAVencerClick
         end
         object Button3: TButton
           Left = 656
@@ -464,6 +457,7 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
           Height = 25
           Caption = 'Op'#231#245'es'
           TabOrder = 7
+          OnClick = BtnOpcoesClick
         end
       end
       object PanelBotAVencer: TPanel
@@ -473,8 +467,6 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
         Height = 42
         Align = alBottom
         TabOrder = 1
-        ExplicitTop = 487
-        ExplicitWidth = 955
         object BtnSelecionaAVencer: TBitBtn
           Left = 8
           Top = 6
@@ -499,9 +491,7 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
         Align = alClient
         Caption = 'PanelAVencer'
         TabOrder = 2
-        ExplicitLeft = -272
-        ExplicitTop = 59
-        object cxGridAVencer: TcxGrid
+        object cxGrid1: TcxGrid
           Left = 1
           Top = 1
           Width = 945
@@ -509,7 +499,8 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
           Align = alClient
           TabOrder = 0
           ExplicitLeft = 0
-          object cxGridDBTableViewAVencer: TcxGridDBTableView
+          ExplicitTop = 33
+          object cxGrid1DBTableView1: TcxGridDBTableView
             PopupMenu = PopupMenu
             Navigator.Buttons.CustomButtons = <>
             OnCellClick = cxGridDBTableViewAVencerCellClick
@@ -517,160 +508,100 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
             DataController.Summary.DefaultGroupSummaryItems = <>
             DataController.Summary.FooterSummaryItems = <>
             DataController.Summary.SummaryGroups = <>
-            FilterRow.Visible = True
             OptionsData.CancelOnExit = False
             OptionsData.Deleting = False
             OptionsData.DeletingConfirmation = False
             OptionsData.Editing = False
             OptionsData.Inserting = False
             OptionsSelection.CellSelect = False
+            OptionsView.GroupByBox = False
             OptionsView.HeaderAutoHeight = True
-            Styles.OnGetContentStyle = cxGridViewClientesStylesGetContentStyle
-            Styles.StyleSheet = FormGlobal.cxGridTableViewStyleSheet1
-            object cxGridDBTableViewAVencerSelecionado: TcxGridDBColumn
+            Styles.ContentEven = FormGlobal.cxStyleLinhaPar
+            Styles.ContentOdd = FormGlobal.cxStyleLinhaImpar
+            Styles.Group = FormGlobal.cxStyleGroup
+            object cxGrid1DBTableView1Selecionado: TcxGridDBColumn
               DataBinding.FieldName = 'Selecionado'
               PropertiesClassName = 'TcxCheckBoxProperties'
-              Width = 26
+              Width = 37
             end
-            object cxGridDBTableViewAVencerDESCSTATUS: TcxGridDBColumn
-              DataBinding.FieldName = 'DESCSTATUS'
-              Width = 76
+            object cxGrid1DBTableView1chavenfpro: TcxGridDBColumn
+              DataBinding.FieldName = 'chavenfpro'
+              Visible = False
             end
-            object cxGridDBTableViewAVencercodcliente: TcxGridDBColumn
+            object cxGrid1DBTableView1codcliente: TcxGridDBColumn
               DataBinding.FieldName = 'codcliente'
               Visible = False
             end
-            object cxGridDBTableViewAVencerRAZAOSOCIAL: TcxGridDBColumn
-              DataBinding.FieldName = 'RAZAOSOCIAL'
-              Width = 140
+            object cxGrid1DBTableView1SATUSAVENCER: TcxGridDBColumn
+              DataBinding.FieldName = 'SATUSAVENCER'
+              Width = 61
             end
-            object cxGridDBTableViewAVencerCIDADE: TcxGridDBColumn
+            object cxGrid1DBTableView1status: TcxGridDBColumn
+              DataBinding.FieldName = 'status'
+              Visible = False
+            end
+            object cxGrid1DBTableView1RAZAOSOCIAL: TcxGridDBColumn
+              DataBinding.FieldName = 'RAZAOSOCIAL'
+              Width = 109
+            end
+            object cxGrid1DBTableView1CIDADE: TcxGridDBColumn
               DataBinding.FieldName = 'CIDADE'
               Visible = False
             end
-            object cxGridDBTableViewAVencerdatacomprovante: TcxGridDBColumn
+            object cxGrid1DBTableView1datacomprovante: TcxGridDBColumn
               DataBinding.FieldName = 'datacomprovante'
             end
-            object cxGridDBTableViewAVencerDataVencimento: TcxGridDBColumn
+            object cxGrid1DBTableView1DataVencimento: TcxGridDBColumn
               DataBinding.FieldName = 'DataVencimento'
+              Width = 71
             end
-            object cxGridDBTableViewAVencerDiasParaVencimento: TcxGridDBColumn
+            object cxGrid1DBTableView1DiasParaVencimento: TcxGridDBColumn
               DataBinding.FieldName = 'DiasParaVencimento'
+              Width = 46
             end
-            object cxGridDBTableViewAVencernumero: TcxGridDBColumn
+            object cxGrid1DBTableView1numero: TcxGridDBColumn
               DataBinding.FieldName = 'numero'
-              Width = 43
+              Width = 47
             end
-            object cxGridDBTableViewAVencerserie: TcxGridDBColumn
+            object cxGrid1DBTableView1serie: TcxGridDBColumn
               DataBinding.FieldName = 'serie'
-              Width = 37
+              Width = 35
             end
-            object cxGridDBTableViewAVencerapresentacao: TcxGridDBColumn
+            object cxGrid1DBTableView1codproduto: TcxGridDBColumn
+              DataBinding.FieldName = 'codproduto'
+              Visible = False
+            end
+            object cxGrid1DBTableView1apresentacao: TcxGridDBColumn
               DataBinding.FieldName = 'apresentacao'
-              Width = 108
+              Width = 102
             end
-            object cxGridDBTableViewAVencerCHAVENF: TcxGridDBColumn
+            object cxGrid1DBTableView1CHAVENF: TcxGridDBColumn
               DataBinding.FieldName = 'CHAVENF'
               Visible = False
             end
-            object cxGridDBTableViewAVencerQuantAtendida: TcxGridDBColumn
-              DataBinding.FieldName = 'QuantAtendida'
-              Width = 41
-            end
-            object cxGridDBTableViewAVencerValorPendente: TcxGridDBColumn
-              DataBinding.FieldName = 'ValorPendente'
-              Width = 56
-            end
-            object cxGridDBTableViewAVencerTOTPAGO: TcxGridDBColumn
-              DataBinding.FieldName = 'TOTPAGO'
-              Width = 67
-            end
-            object cxGridDBTableViewAVencerVALTOTAL: TcxGridDBColumn
+            object cxGrid1DBTableView1VALTOTAL: TcxGridDBColumn
               DataBinding.FieldName = 'VALTOTAL'
-              Width = 71
+              Width = 65
             end
-            object cxGridDBTableViewAVencerchavenfpro: TcxGridDBColumn
-              DataBinding.FieldName = 'chavenfpro'
-              Visible = False
-              VisibleForCustomization = False
+            object cxGrid1DBTableView1ValorPendente: TcxGridDBColumn
+              DataBinding.FieldName = 'ValorPendente'
+              Width = 54
             end
-          end
-          object cxGridDBTableView2: TcxGridDBTableView
-            Navigator.Buttons.CustomButtons = <>
-            DataController.DetailKeyFieldNames = 'CODPRODUTO'
-            DataController.KeyFieldNames = 'CODPRODUTO'
-            DataController.MasterKeyFieldNames = 'CODPRODUTO'
-            DataController.Summary.DefaultGroupSummaryItems = <>
-            DataController.Summary.FooterSummaryItems = <>
-            DataController.Summary.SummaryGroups = <>
-            OptionsSelection.CellSelect = False
-            OptionsView.GroupByBox = False
-            Styles.StyleSheet = FormGlobal.cxGridTableViewStyleSheet1
-          end
-          object cxGridDBTableView3: TcxGridDBTableView
-            Navigator.Buttons.CustomButtons = <>
-            FilterBox.Visible = fvNever
-            DataController.DataSource = DsEmbalagens
-            DataController.DetailKeyFieldNames = 'codcliente'
-            DataController.KeyFieldNames = 'codcliente'
-            DataController.MasterKeyFieldNames = 'CODCLIENTE'
-            DataController.Summary.DefaultGroupSummaryItems = <>
-            DataController.Summary.FooterSummaryItems = <>
-            DataController.Summary.SummaryGroups = <>
-            OptionsData.CancelOnExit = False
-            OptionsData.Deleting = False
-            OptionsData.DeletingConfirmation = False
-            OptionsData.Editing = False
-            OptionsData.Inserting = False
-            OptionsView.GroupByBox = False
-            OptionsView.HeaderAutoHeight = True
-            object cxGridDBColumn21: TcxGridDBColumn
-              DataBinding.FieldName = 'Selecionado'
-              PropertiesClassName = 'TcxCheckBoxProperties'
-              Width = 41
+            object cxGrid1DBTableView1QuantAtendida: TcxGridDBColumn
+              DataBinding.FieldName = 'QuantAtendida'
+              Width = 45
             end
-            object cxGridDBColumn22: TcxGridDBColumn
-              DataBinding.FieldName = 'chavenfpro'
+            object cxGrid1DBTableView1QuantDevolvida: TcxGridDBColumn
+              DataBinding.FieldName = 'QuantDevolvida'
+              Width = 53
             end
-            object cxGridDBColumn23: TcxGridDBColumn
-              DataBinding.FieldName = 'codcliente'
-              Visible = False
-              Options.Editing = False
-            end
-            object cxGridDBColumn24: TcxGridDBColumn
-              DataBinding.FieldName = 'numero'
-              Options.Editing = False
-              Width = 62
-            end
-            object cxGridDBColumn25: TcxGridDBColumn
-              DataBinding.FieldName = 'serie'
-              Options.Editing = False
-              Width = 49
-            end
-            object cxGridDBColumn26: TcxGridDBColumn
-              Caption = 'Data Nota'
-              DataBinding.FieldName = 'datacomprovante'
-              Options.Editing = False
-              Width = 90
-            end
-            object cxGridDBColumn27: TcxGridDBColumn
-              DataBinding.FieldName = 'codproduto'
-              Options.Editing = False
-              Width = 62
-            end
-            object cxGridDBColumn28: TcxGridDBColumn
-              DataBinding.FieldName = 'apresentacao'
-              Options.Editing = False
-              Width = 196
-            end
-            object cxGridDBColumn29: TcxGridDBColumn
-              DataBinding.FieldName = 'NOMECLIENTE'
-              Visible = False
-              Options.Editing = False
+            object cxGrid1DBTableView1QuantPendente: TcxGridDBColumn
+              DataBinding.FieldName = 'QuantPendente'
+              Width = 52
             end
           end
-          object cxGridLevelAVencer: TcxGridLevel
-            GridView = cxGridDBTableViewAVencer
+          object cxGrid1Level1: TcxGridLevel
+            GridView = cxGrid1DBTableView1
           end
         end
       end
@@ -855,8 +786,8 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
   end
   object PopupMenu: TPopupMenu
     OnPopup = PopupMenuPopup
-    Left = 496
-    Top = 248
+    Left = 488
+    Top = 240
     object EmbalagensCli1: TMenuItem
       Caption = 'Abrir Embalagens do Cliente'
       OnClick = EmbalagensCli1Click
@@ -871,6 +802,10 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
     object DeixardeIgnorarEmbalagem1: TMenuItem
       Caption = 'Deixar de Ignorar Embalagem'
       OnClick = DeixardeIgnorarEmbalagem1Click
+    end
+    object AjustarEmbalagens1: TMenuItem
+      Caption = 'Ajustar Embalagens'
+      OnClick = AjustarEmbalagens1Click
     end
   end
   object cxStyleRepository1: TcxStyleRepository
@@ -906,16 +841,19 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
   end
   object DSAVencer: TDataSource
     DataSet = QryAVencer
-    Left = 120
-    Top = 296
+    Left = 112
+    Top = 304
   end
   object QryAVencer: TFDQuery
     OnCalcFields = QryAVencerCalcFields
     Connection = ConSqlServer.FDConnection
     SQL.Strings = (
+      'SELECT CASE WHEN ENVIADOAVENCER=1 THEN '#39'ENVIADO'#39
+      #9' WHEN ISNULL(STATUS,0) = 2 THEN '#39'IGNORADO'#39
+      #9' ELSE '#39'N'#195'O ENVIADO'#39' END AS SATUSAVENCER,'
       
-        'SELECT *, DateDiff(Day, getdate(), DataVencimento) as DiasParaVe' +
-        'ncimento'
+        '*, DateDiff(Day, getdate(), DataVencimento) as DiasParaVenciment' +
+        'o'
       'from vwEmbalagemPendente'
       'where'
       '  DataVencimento between :DataIni and :DataFim'
@@ -932,7 +870,7 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
         DataType = ftDate
         FDDataType = dtDate
         ParamType = ptInput
-        Value = '2020/10/07'
+        Value = '2020/10/01'
       end
       item
         Name = 'DATAFIM'
@@ -953,14 +891,6 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
       Required = True
       FixedChar = True
       Size = 21
-    end
-    object QryAVencerDESCSTATUS: TStringField
-      DisplayLabel = 'Status'
-      FieldName = 'DESCSTATUS'
-      Origin = 'DESCSTATUS'
-      ReadOnly = True
-      Required = True
-      Size = 11
     end
     object QryAVencercodcliente: TStringField
       DisplayLabel = 'Cod. Cliente'
@@ -996,7 +926,7 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
       Origin = 'datacomprovante'
     end
     object QryAVencerDataVencimento: TDateField
-      DisplayLabel = 'Data Vencimento'
+      DisplayLabel = 'Data Vcto.'
       FieldName = 'DataVencimento'
       Origin = 'DataVencimento'
     end
@@ -1098,10 +1028,23 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
       Size = 6
     end
     object QryAVencerDiasParaVencimento: TIntegerField
-      DisplayLabel = 'Dias Para o Vencimento'
+      DisplayLabel = 'Dias at'#233' Vcto.'
       FieldName = 'DiasParaVencimento'
       Origin = 'DiasParaVencimento'
       ReadOnly = True
+    end
+    object QryAVencerENVIADOAVENCER: TBooleanField
+      FieldName = 'ENVIADOAVENCER'
+      Origin = 'ENVIADOAVENCER'
+      Required = True
+    end
+    object QryAVencerSATUSAVENCER: TStringField
+      DisplayLabel = 'Status'
+      FieldName = 'SATUSAVENCER'
+      Origin = 'SATUSAVENCER'
+      ReadOnly = True
+      Required = True
+      Size = 11
     end
   end
 end

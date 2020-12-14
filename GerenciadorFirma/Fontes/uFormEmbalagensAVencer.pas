@@ -1,4 +1,4 @@
-unit uFormEmbalagensClientes;
+unit uFormEmbalagensAVencer;
 
 interface
 
@@ -19,26 +19,10 @@ uses
 type
   TStatusNota = (snRecemEmitido, snPendente, snAVencer, snVencido);
 
-  TFormEmbalagensClientes = class(TForm)
+  TFormEmbalagensAVencer = class(TForm)
     cxGridEmbalagens: TcxGrid;
     cxGridViewEmbalagens: TcxGridDBTableView;
     cxGridEmbalagensLevel: TcxGridLevel;
-    DsEmbalagensCli: TDataSource;
-    QryEmbalagensCli: TFDQuery;
-    QryEmbalagensCliCHAVENF: TStringField;
-    QryEmbalagensCliCODCLIENTE: TStringField;
-    QryEmbalagensCliRAZAOSOCIAL: TStringField;
-    QryEmbalagensCliCIDADE: TStringField;
-    QryEmbalagensCliENTREGAPARCIAL: TStringField;
-    QryEmbalagensCliCODPRODUTO: TStringField;
-    QryEmbalagensCliAPRESENTACAO: TStringField;
-    QryEmbalagensCliDATACOMPROVANTE: TDateField;
-    QryEmbalagensCliNUMERO: TStringField;
-    QryEmbalagensCliSERIE: TStringField;
-    QryEmbalagensCliQUANTATENDIDA: TBCDField;
-    QryEmbalagensCliTOTPAGO: TFMTBCDField;
-    QryEmbalagensCliSTATUS: TIntegerField;
-    QryEmbalagensCliCHAVENFPRO: TStringField;
 
     cxGridViewEmbalagensCHAVENF: TcxGridDBColumn;
     cxGridViewEmbalagensCODCLIENTE: TcxGridDBColumn;
@@ -52,7 +36,6 @@ type
     cxGridViewEmbalagensCODPRODUTO: TcxGridDBColumn;
     cxGridViewEmbalagensAPRESENTACAO: TcxGridDBColumn;
     cxGridViewEmbalagensQUANTATENDIDA: TcxGridDBColumn;
-    cxGridViewEmbalagensSTATUS: TcxGridDBColumn;
     cxGridViewEmbalagensCHAVENFPRO: TcxGridDBColumn;
 
     PopupMenu: TPopupMenu;
@@ -66,14 +49,8 @@ type
     cxStyleVermelho: TcxStyle;
     cxStyleAmarelo: TcxStyle;
     DeixardeIgnorarEmbalagem1: TMenuItem;
-    QryEmbalagensCliDataVencimento: TDateField;
     cxGridViewEmbalagensDataVencimento: TcxGridDBColumn;
-    QryEmbalagensCliDESCSTATUS: TStringField;
-    cxGridViewEmbalagensDESCSTATUS: TcxGridDBColumn;
     BtnEnviarEmail: TButton;
-    QryEmbalagensCliVALUNIDADE: TFMTBCDField;
-    QryEmbalagensCliQuantDevolvida: TFMTBCDField;
-    QryEmbalagensCliVALTOTAL: TBCDField;
     cxGridViewEmbalagensVALTOTAL: TcxGridDBColumn;
     cxGridViewEmbalagensVALUNIDADE: TcxGridDBColumn;
     cxGridViewEmbalagensQuantDevolvida: TcxGridDBColumn;
@@ -81,7 +58,6 @@ type
     EditEmails: TEdit;
     Label2: TLabel;
     BtnContatos: TButton;
-    QryEmbalagensCliQuantPendente: TFMTBCDField;
     cxGridViewEmbalagensQuantPendente: TcxGridDBColumn;
     DsEmail: TDataSource;
     QryEmail: TFDQuery;
@@ -103,9 +79,36 @@ type
     QryImagemEmailImagem: TBlobField;
     QryImagemEmailext: TStringField;
     DsImagemEmail: TDataSource;
-    QryEmbalagensCliValorPendente: TFMTBCDField;
     cxGridViewEmbalagensValorPendente: TcxGridDBColumn;
     QryTextoEmailCorpo: TMemoField;
+    QryAVencer: TFDQuery;
+    QryAVencerchavenfpro: TStringField;
+    QryAVencerDESCSTATUS: TStringField;
+    QryAVencercodcliente: TStringField;
+    QryAVencerstatus: TIntegerField;
+    QryAVencerRAZAOSOCIAL: TStringField;
+    QryAVencerCIDADE: TStringField;
+    QryAVencerdatacomprovante: TDateField;
+    QryAVencerDataVencimento: TDateField;
+    QryAVencernumero: TStringField;
+    QryAVencerserie: TStringField;
+    QryAVencercodproduto: TStringField;
+    QryAVencerapresentacao: TStringField;
+    QryAVencerQuantAtendida: TBCDField;
+    QryAVencerCHAVENF: TStringField;
+    QryAVencerTOTPAGO: TFMTBCDField;
+    QryAVencerVALTOTAL: TBCDField;
+    QryAVencerEntregaParcial: TStringField;
+    QryAVencerVALUNIDADE: TFMTBCDField;
+    QryAVencerQuantDevolvida: TFMTBCDField;
+    QryAVencerQuantPendente: TFMTBCDField;
+    QryAVencerValorPendente: TFMTBCDField;
+    QryAVencerDiasParaVencimento: TIntegerField;
+    DSAVencer: TDataSource;
+    QryAVencerENVIADOAVENCER: TBooleanField;
+    QryAVencerSATUSAVENCER: TStringField;
+    cxGridViewEmbalagensSATUSAVENCER: TcxGridDBColumn;
+    cxGridViewEmbalagensstatus: TcxGridDBColumn;
     procedure Ignorarembalagem1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure BtnAtualizarClick(Sender: TObject);
@@ -122,30 +125,30 @@ type
   private
     { Private declarations }
     FCodCliente: string;
-    FSqlQryEmbalagensCli: String;
+    FDataMaxVencimento: TDateTime;
+    FSqlQryAVencer: String;
     FListaEmbalagensRecentes: TList<String>;
     FMailSender: TMailSender;
     FormShowMemo: TFormShowMemo;
     FIdentificador: String;
-    function EmbalagemRecenteENaoEnviada: Boolean;
-    procedure MarcarEmbalagensComoEnviadas;
     procedure EviarEmailCliente(AEmailDestino: String; ACopyToSelf: Boolean = True);
     procedure AtualizaEmails;
     function ReplaceWildcards(AText: String): String;
-    function GetStatusNota: TStatusNota; overload;
-    function GetStatusNota(ADataVencimento: TDateTime): TStatusNota; overload;
+    function GetStatusNota(ADataVencimento: TDateTime): TStatusNota;
     function StatusNotaAsString(AStatus: TStatusNota): string;
+    procedure MarcarEmbalagensAVencerComoEnviadas;
     function VerificarConsistenciaDevolucao: Boolean;
   public
-    function EnviaEmail: Boolean;
+    EmailEnviado: Boolean;
+    function EnviaEmailAVencer: Boolean;
     procedure EnviaEmailTeste(AEmailDestino: String);
-    procedure CarregaEmbalagensCliente(ACodCliente: String; AIdentificador: String);
-    class procedure AbreEmbalagensCliente(ACodCliente: String; AIdentificador: String);
+    procedure CarregaEmbalagensAVencer(ACodCliente: string; ADataMaxVencimento: TDateTime);
+    class procedure AbreEmbalagensAVencer(ACodCliente: String; AIdentificador: String; ADataMaxVencimento: TDate);
     class procedure IgnoraEmbalagem(AChaveNFPRo: String); static;
   end;
 
 var
-  FormEmbalagensClientes: TFormEmbalagensClientes;
+  FormEmbalagensAVencer: TFormEmbalagensAVencer;
 
 implementation
 
@@ -154,26 +157,26 @@ uses
 
 {$R *.dfm}
 
-class procedure TFormEmbalagensClientes.AbreEmbalagensCliente(
-  ACodCliente: String; AIdentificador: String);
+class procedure TFormEmbalagensAVencer.AbreEmbalagensAVencer(
+  ACodCliente: String; AIdentificador: String; ADataMaxVencimento: TDate);
 var
-  FFrm: TFormEmbalagensClientes;
+  FFrm: TFormEmbalagensAVencer;
 begin
-  FFrm:= TFormEmbalagensClientes.Create(nil);
+  FFrm:= TFormEmbalagensAVencer.Create(nil);
   try
-    FFrm.CarregaEmbalagensCliente(ACodCliente, AIdentificador);
+    FFrm.CarregaEmbalagensAVencer(ACodCliente, ADataMaxVencimento);
     FFrm.ShowModal;
   finally
     FFrm.Free;
   end;
 end;
 
-procedure TFormEmbalagensClientes.BtnAtualizarClick(Sender: TObject);
+procedure TFormEmbalagensAVencer.BtnAtualizarClick(Sender: TObject);
 begin
-  CarregaEmbalagensCliente(FCodCliente, FIdentificador);
+  CarregaEmbalagensAVencer(FCodCliente, FDataMaxVencimento);
 end;
 
-procedure TFormEmbalagensClientes.AtualizaEmails;
+procedure TFormEmbalagensAVencer.AtualizaEmails;
   function getSql(ACodCliente, EmailEmbalagem: String): String;
   begin
     Result:= 'IF EXISTS(SELECT * FROM CLIENTEEMBALAGEM WHERE CODCLIENTE = '''+ACodCliente+''') '
@@ -182,36 +185,16 @@ procedure TFormEmbalagensClientes.AtualizaEmails;
             +Format('INSERT INTO ClienteEmbalagem (CodCliente, EmailEmbalagem) values (''%s'', ''%s'') ', [ACodCliente, EmailEmbalagem]);
   end;
 begin
-  ConSqlServer.ExecutaComando(getSql(QryEmbalagensCliCodCliente.AsString, EditEmails.Text));
+  ConSqlServer.ExecutaComando(getSql(QryAVencercodcliente.AsString, EditEmails.Text));
 end;
 
-procedure TFormEmbalagensClientes.BtnContatosClick(Sender: TObject);
+procedure TFormEmbalagensAVencer.BtnContatosClick(Sender: TObject);
 begin
-  EditEmails.Text:= TFormSelecionaEmailCliente.SelecionaEmailContatos(QryEmbalagensCliCodCliente.AsString, EditEmails.Text);
+  EditEmails.Text:= TFormSelecionaEmailCliente.SelecionaEmailContatos(QryAVencercodcliente.AsString, EditEmails.Text);
   AtualizaEmails;
 end;
 
-function TFormEmbalagensClientes.VerificarConsistenciaDevolucao: Boolean;
-begin
-  Result:= False;
-  QryEmbalagensCli.First;
-  while not QryEmbalagensCli.Eof do
-  begin
-    TFormAjustaInconsistencias.VerificaEAjustaInconsistenciaEmbalagem(QryEmbalagensCliChaveNF.AsString);
-    if TFormAjustaInconsistencias.NotaEmbalagemInconsistente(QryEmbalagensCliChaveNF.AsString) then
-    begin
-      ShowMessage(Format('Inconsistência ainda existe, email para o cliente %s não será enviado até as inconsistências serem resolvidas.',
-                            [QryEmbalagensCliRazaoSocial.AsString]));
-      Exit;
-    end;
-
-    QryEmbalagensCli.Next;
-  end;
-  QryEmbalagensCli.Refresh;
-  Result:= True;
-end;
-
-procedure TFormEmbalagensClientes.BtnEnviarEmailClick(Sender: TObject);
+procedure TFormEmbalagensAVencer.BtnEnviarEmailClick(Sender: TObject);
 begin
   if Trim(EditEmails.Text) = '' then
   begin
@@ -219,44 +202,50 @@ begin
     EditEmails.SetFocus;
     Exit;
   end;
-  EnviaEmail;
+  EnviaEmailAVencer;
 end;
 
-procedure TFormEmbalagensClientes.CarregaEmbalagensCliente(ACodCliente: String; AIdentificador: String);
+procedure TFormEmbalagensAVencer.CarregaEmbalagensAVencer(ACodCliente: string; ADataMaxVencimento: TDateTime);
 var
-  FSql: String;
+  FSql: string;
+
+  function GetFiltro: String;
+  begin
+    Result:= ' ';
+    if CheckBoxMostrarIgnorados.Checked = False then
+      Result:= ' AND IsNull(Status,0) <> 2 ';
+  end;
+
 begin
-  FIdentificador:= AIdentificador;
+  FIdentificador:= 'AVENCER';
   FCodCliente:= ACodCliente;
+  FDataMaxVencimento:= ADataMaxVencimento;
 
-  QryEmbalagensCli.Close;
-
-  FSql:= FSqlQryEmbalagensCli;
+  FSql:= FSqlQryAVencer;
   if CheckBoxMostrarIgnorados.Checked = False then
-    FSql:= FSql.Replace('/*Ignorados*/', ' AND IsNull(STATUS,0) < 2');
+    FSql:= FSql.Replace('/*Ignorados*/', GetFiltro);
 
-  QryEmbalagensCli.Close;
-  QryEmbalagensCli.SQL.Text:= FSql;
-  QryEmbalagensCli.ParamByName('CodCliente').AsString:= ACodCliente;
-  QryEmbalagensCli.ParamByName('DataIni').AsDate:= DataIniPicker.Date;
-  QryEmbalagensCli.Open;
+  QryAVencer.Close;
+  QryAVencer.SQL.Text:= FSql;
+  QryAVencer.ParamByName('CodCliente').AsString:= FCodCliente;
+  QryAVencer.ParamByName('DataFim').AsDate:= ADataMaxVencimento;
+  QryAVencer.Open;
 
   QryTextoEmail.Close;
-  QryTextoEmail.ParamByName('Identificador').AsString:= AIdentificador;
+  QryTextoEmail.ParamByName('Identificador').AsString:= FIdentificador;
   QryTextoEmail.Open;
 
-  Self.Caption:= 'Embalagens pendentes do cliente '+QryEmbalagensCliRAZAOSOCIAL.AsString;
-
+  Self.Caption:= 'Embalagens a vencer do cliente '+QryAVencerRAZAOSOCIAL.AsString;
   EditEmails.Text:= ConSqlServer.RetornaValor(Format('SELECT EmailEmbalagem from ClienteEmbalagem where CodCliente = ''%s'' ',[ACodCliente]), '');
 end;
 
-procedure TFormEmbalagensClientes.CheckBoxMostrarIgnoradosClick(
+procedure TFormEmbalagensAVencer.CheckBoxMostrarIgnoradosClick(
   Sender: TObject);
 begin
-  CarregaEmbalagensCliente(FCodCliente, FIdentificador);
+  CarregaEmbalagensAVencer(FCodCliente, FDataMaxVencimento);
 end;
 
-procedure TFormEmbalagensClientes.cxGridViewClientesStylesGetContentStyle(
+procedure TFormEmbalagensAVencer.cxGridViewClientesStylesGetContentStyle(
   Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;
   AItem: TcxCustomGridTableItem; var AStyle: TcxStyle);
 begin
@@ -264,35 +253,16 @@ begin
     AStyle := cxStyleAmarelo;
 end;
 
-procedure TFormEmbalagensClientes.DeixardeIgnorarEmbalagem1Click(
+procedure TFormEmbalagensAVencer.DeixardeIgnorarEmbalagem1Click(
   Sender: TObject);
 const
   cSqlDelete = 'DELETE FROM MCLIPROSTATUSRECB WHERE CHAVENFPRO= ''%s'' ';
 begin
-  ConSqlServer.ExecutaComando(Format(cSqlDelete, [QryEmbalagensCliChaveNFPRo.AsString]));
-  QryEmbalagensCli.Refresh;
+  ConSqlServer.ExecutaComando(Format(cSqlDelete, [QryAVencerChaveNFPro.AsString]));
+  QryAVencer.Refresh;
 end;
 
-// Considera como embalagem pendente notas de embalagem tiradas a no máximo um dia útil e que ainda não tiveram o email enviado
-function TFormEmbalagensClientes.EmbalagemRecenteENaoEnviada: Boolean;
-var
-  FDecDias: Integer;
-begin
-  if QryEmbalagensCliSTATUS.AsInteger > 0 then // Status = 0 quer dizer que email da embalagem ainda não foi enviado
-   Exit(False);
-
-  if DayOfWeek(Now) = 2 then // Se for segunda considera as notas de sexta
-    FDecDias:= 3
-  else
-    FDecDias:= 1;
-
-  if QryEmbalagensCliDATACOMPROVANTE.AsDateTime >= Trunc(Now-FDecDias) then // Se nota foi tirada ontem ou hoje
-    Result:= True
-  else
-    Result:= False; // Nota foi tirada a mais de um dia útil, considera como embalagem pendente
-end;
-
-procedure TFormEmbalagensClientes.EviarEmailCliente(AEmailDestino: String; ACopyToSelf: Boolean = True);
+procedure TFormEmbalagensAVencer.EviarEmailCliente(AEmailDestino: String; ACopyToSelf: Boolean = True);
 var
   FIdMessageBuilder: TIdMessageBuilderHtml;
   FHtml: String;
@@ -342,7 +312,7 @@ var
 begin
   FormShowMemo.Show;
   try
-    FormShowMemo.SetText('Enviando email para o cliente '+QryEmbalagensCliRAZAOSOCIAL.AsString);
+    FormShowMemo.SetText('Enviando email para o cliente '+QryAVencerRAZAOSOCIAL.AsString);
 
 //    FIdMessage := FMailSender.PrepareMessage(QryTextoEmailTitulo.AsString, GetHtml, EditEmails.Text, QryEmailUsuario.AsString);
     FHtml:= GetHtml;
@@ -368,60 +338,69 @@ begin
   end;
 end;
 
-function TFormEmbalagensClientes.EnviaEmail: Boolean;
+function TFormEmbalagensAVencer.VerificarConsistenciaDevolucao: Boolean;
 begin
   Result:= False;
-  if QryEmbalagensCli.RecordCount = 0 then
+  QryAVencer.First;
+  while not QryAVencer.Eof do
+  begin
+    TFormAjustaInconsistencias.VerificaEAjustaInconsistenciaEmbalagem(QryAVencerChaveNF.AsString);
+    if TFormAjustaInconsistencias.NotaEmbalagemInconsistente(QryAVencerChaveNF.AsString) then
+    begin
+      ShowMessage(Format('Inconsistência ainda existe, email para o cliente %s não será enviado até as inconsistências serem resolvidas.',
+                            [QryAVencerRazaoSocial.AsString]));
+      Exit;
+    end;
+
+    QryAVencer.Next;
+  end;
+  QryAVencer.Refresh;
+  Result:= True;
+end;
+
+function TFormEmbalagensAVencer.EnviaEmailAVencer: Boolean;
+begin
+  Result:= False;
+  if QryAVencer.RecordCount = 0 then
     Exit;
 
   if VerificarConsistenciaDevolucao = False then
     Exit;
 
-  FListaEmbalagensRecentes.Clear;
-  QryEmbalagensCli.First;
-  while not QryEmbalagensCli.Eof do
-  begin
-    if EmbalagemRecenteENaoEnviada then
-      FListaEmbalagensRecentes.Add(QryEmbalagensCliCHAVENFPRO.AsString)
-    else
-      Break;
-
-    QryEmbalagensCli.Next;
-  end;
-
+//  EviarEmailCliente('marcelo@rauter.com.br', False);
   EviarEmailCliente(EditEmails.Text, True);
 
-  MarcarEmbalagensComoEnviadas;
-  QryEmbalagensCli.Refresh;
+  MarcarEmbalagensAVencerComoEnviadas;
+  EmailEnviado:= True;
   Result:= True;
-  //raise exception.Create('Error Message');
 end;
 
-procedure TFormEmbalagensClientes.EnviaEmailTeste(AEmailDestino: String);
+procedure TFormEmbalagensAVencer.EnviaEmailTeste(AEmailDestino: String);
 begin
   EviarEmailCliente(AEmailDestino, False);
 end;
 
-procedure TFormEmbalagensClientes.MarcarEmbalagensComoEnviadas;
+procedure TFormEmbalagensAVencer.MarcarEmbalagensAVencerComoEnviadas;
 const
-  cSqlStatus = 'exec AlteraMCLIPROSTATUSRECB ''%s'', %d, ''%s'' ';
+  cSqlStatus = 'exec SetAVencerMCLIPROSTATUSRECB ''%s'', %d';
 begin
-  QryEmbalagensCli.First;
-  while not QryEmbalagensCli.Eof do
+  QryAVencer.First;
+  while not QryAVencer.Eof do
   begin
-    ConSqlServer.ExecutaComando(Format(cSqlStatus, [QryEmbalagensCliChaveNFPro.AsString, 1, 'Email enviado']));
-    QryEmbalagensCli.Next;
+    ConSqlServer.ExecutaComando(Format(cSqlStatus, [QryAVencerChaveNFPro.AsString, 1]));
+    QryAVencer.Next;
   end;
 end;
 
-procedure TFormEmbalagensClientes.FormClose(Sender: TObject;
+procedure TFormEmbalagensAVencer.FormClose(Sender: TObject;
   var Action: TCloseAction);
 begin
   AtualizaEmails;
 end;
 
-procedure TFormEmbalagensClientes.FormCreate(Sender: TObject);
+procedure TFormEmbalagensAVencer.FormCreate(Sender: TObject);
 begin
+  EmailEnviado:= False;
   FormShowMemo:= TFormShowMemo.Create(Self);
 
   QryEmail.Open;
@@ -429,15 +408,15 @@ begin
   FMailSender:= TMailSender.Create(Self, QryEmailSMTPServer.AsString, QryEmailPort.AsInteger, QryEmailUsuario.AsString,
                   QryEmailPassword.AsString, QryEmailrequireAuth.AsBoolean, QryEmailUsuario.AsString);
   FListaEmbalagensRecentes:= TList<String>.Create;
-  FSqlQryEmbalagensCli:= QryEmbalagensCli.SQL.Text;
+  FSqlQryAVencer:= QryAVencer.SQL.Text;
 end;
 
-procedure TFormEmbalagensClientes.FormDestroy(Sender: TObject);
+procedure TFormEmbalagensAVencer.FormDestroy(Sender: TObject);
 begin
   FListaEmbalagensRecentes.Free;
 end;
 
-class procedure TFormEmbalagensClientes.IgnoraEmbalagem(AChaveNFPRo: String);
+class procedure TFormEmbalagensAVencer.IgnoraEmbalagem(AChaveNFPRo: String);
 const
   cSqlInsert = 'exec AlteraMCLIPROSTATUSRECB ''%s'', %d, ''%s'' ';
 var
@@ -462,22 +441,22 @@ begin
   ConSqlServer.ExecutaComando(Format(cSqlInsert, [AChaveNFPRo, 2, FMensagem]));
 end;
 
-procedure TFormEmbalagensClientes.Ignorarembalagem1Click(Sender: TObject);
+procedure TFormEmbalagensAVencer.Ignorarembalagem1Click(Sender: TObject);
 begin
-  TFormEmbalagensClientes.IgnoraEmbalagem(QryEmbalagensCliCHAVENFPRO.AsString);
-  QryEmbalagensCli.Refresh;
+  IgnoraEmbalagem(QryAVencerCHAVENFPRO.AsString);
+  QryAVencer.Refresh;
 end;
 
-procedure TFormEmbalagensClientes.PopupMenuPopup(Sender: TObject);
+procedure TFormEmbalagensAVencer.PopupMenuPopup(Sender: TObject);
 begin
-  if QryEmbalagensCliCHAVENFPRO.AsString = '' then
+  if QryAVencerCHAVENFPRO.AsString = '' then
     Exit;
 
-  Ignorarembalagem1.Visible:=  QryEmbalagensCliSTATUS.AsInteger <> 2;
-  DeixardeIgnorarEmbalagem1.Visible:= QryEmbalagensCliSTATUS.AsInteger = 2;
+  Ignorarembalagem1.Visible:=  QryAVencerSTATUS.AsInteger <> 2;
+  DeixardeIgnorarEmbalagem1.Visible:= QryAVencerSTATUS.AsInteger = 2;
 end;
 
-function TFormEmbalagensClientes.GetStatusNota(ADataVencimento: TDateTime): TStatusNota;
+function TFormEmbalagensAVencer.GetStatusNota(ADataVencimento: TDateTime): TStatusNota;
 begin
   if ADataVencimento >= Trunc(Now)+14 then
     Result:= snPendente
@@ -487,14 +466,7 @@ begin
     Result:= snVencido;
 end;
 
-function TFormEmbalagensClientes.GetStatusNota: TStatusNota;
-begin
-  if FListaEmbalagensRecentes.Contains(QryEmbalagensCliCHAVENFPRO.AsString) then
-    Result:= snRecemEmitido
-  else Result:= GetStatusNota(QryEmbalagensCliDataVencimento.AsDateTime);
-end;
-
-function TFormEmbalagensClientes.StatusNotaAsString(AStatus: TStatusNota): string;
+function TFormEmbalagensAVencer.StatusNotaAsString(AStatus: TStatusNota): string;
 begin
   case AStatus of
     snRecemEmitido: Result:= 'Enviado na última compra';
@@ -505,7 +477,7 @@ begin
   end;
 end;
 
-function TFormEmbalagensClientes.ReplaceWildcards(AText: String): String;
+function TFormEmbalagensAVencer.ReplaceWildcards(AText: String): String;
   function AddTH(Text: String): String;
   begin
     Result:= '<th style="text-align:center;font-family:arial;font-size:12px;border:1px solid;padding-left:2px;padding-right:2px;font-weight: bold;">'+Text+'</th>';
@@ -525,8 +497,13 @@ function TFormEmbalagensClientes.ReplaceWildcards(AText: String): String;
     Result:= '<td style="font-family:arial;font-size:12px;border:1px solid;padding-left:10px;padding-right:10px;'+FAlignment+'">'+Text+'</td>';
   end;
 
-  function GetTabelaEmbalagensPendentes: String;
+  function GetTabelaEmbalagensAVencer: String;
   begin
+    Result:= '';
+    if (QryAVencer.Active = False) or (QryAVencer.IsEmpty) then
+      Exit;
+//      raise Exception.Create(Format('Não existem notas a vencer para o cliente cod. %s', [FCodCliente]));
+
     Result:= '<table style="border:1px solid; border-collapse: collapse"><tr>'
             +AddTH('Data Emissão')
             +AddTH('Data Vencimento')
@@ -539,42 +516,42 @@ function TFormEmbalagensClientes.ReplaceWildcards(AText: String): String;
             +AddTH('Situação')
             +'</tr> ';
 
-    QryEmbalagensCli.First;
-    while not QryEmbalagensCli.Eof do
+    QryAVencer.First;
+    while not QryAVencer.Eof do
     begin
-      if QryEmbalagensCliValorPendente.AsFloat = 0 then
+      if QryAVencerValorPendente.AsFloat = 0 then
       begin
-        QryEmbalagensCli.Next;
+        QryAVencer.Next;
         Continue;
       end;
 
-      if GetStatusNota = snAVencer then
+      if GetStatusNota(QryAVencerDataVencimento.AsDateTime) = snAVencer then
         Result:= Result+'<tr style="font-weight:bold">'
-      else if GetStatusNota = snVencido then
+      else if GetStatusNota(QryAVencerDataVencimento.AsDateTime) = snVencido then
         Result:= Result+'<tr style="background-color:yellow;font-weight:bold">'
       else
         Result:= Result+'<tr> ';
 
       Result:= Result
-           +AddTD(DateToStr(QryEmbalagensCliDATACOMPROVANTE.AsDateTime), taCenter)
-           +AddTD(DateToStr(QryEmbalagensCliDataVencimento.AsDateTime), taCenter)
-           +AddTD(QryEmbalagensCliNumero.AsString+'-'+QryEmbalagensCliSerie.AsString,taLeftJustify)
-           +AddTD(QryEmbalagensCliApresentacao.AsString,taLeftJustify)
-           +AddTD(QryEmbalagensCliQUANTATENDIDA.AsString,taCenter)
-           +AddTD(IntToStr(QryEmbalagensCliQuantDevolvida.AsInteger),taCenter)
-           +AddTD(QryEmbalagensCliQuantPendente.AsString, taCenter)
-           +AddTD(QryEmbalagensCliValorPendente.DisplayText, taCenter)
-           +AddTD(StatusNotaAsString(GetStatusNota), taLeftJustify)+'</tr>';
+           +AddTD(DateToStr(QryAVencerDATACOMPROVANTE.AsDateTime), taCenter)
+           +AddTD(DateToStr(QryAVencerDataVencimento.AsDateTime), taCenter)
+           +AddTD(QryAVencerNumero.AsString+'-'+QryAVencerSerie.AsString,taLeftJustify)
+           +AddTD(QryAVencerApresentacao.AsString,taLeftJustify)
+           +AddTD(QryAVencerQuantAtendida.AsString,taCenter)
+           +AddTD(IntToStr(QryAVencerQuantDevolvida.AsInteger),taCenter)
+           +AddTD(QryAVencerQuantPendente.AsString, taCenter)
+           +AddTD(QryAVencerValorPendente.DisplayText, taCenter)
+           +AddTD(StatusNotaAsString(GetStatusNota(QryAVencerDataVencimento.AsDateTime)), taLeftJustify)+'</tr>';
 
-      QryEmbalagensCli.Next;
+      QryAVencer.Next;
     end;
     Result:= Result+'</table>';
   end;
 
 begin
-  Result:= StringReplace(AText, '%NOMECLIENTE%', QryEmbalagensCliRAZAOSOCIAL.AsString, [rfReplaceAll, rfIgnoreCase]);
-  Result:= StringReplace(Result, '%EMBALAGENSPENDENTES%', GetTabelaEmbalagensPendentes, [rfReplaceAll, rfIgnoreCase]);
-//  Result:= StringReplace(Result, '%EMBALAGENSAVENCER%', GetTabelaEmbalagensAVencer, [rfReplaceAll, rfIgnoreCase]);
+  Result:= StringReplace(AText, '%NOMECLIENTE%', QryAVencerRAZAOSOCIAL.AsString, [rfReplaceAll, rfIgnoreCase]);
+//  Result:= StringReplace(Result, '%EMBALAGENSPENDENTES%', GetTabelaEmbalagensPendentes, [rfReplaceAll, rfIgnoreCase]);
+  Result:= StringReplace(Result, '%EMBALAGENSAVENCER%', GetTabelaEmbalagensAVencer, [rfReplaceAll, rfIgnoreCase]);
 end;
 
 end.

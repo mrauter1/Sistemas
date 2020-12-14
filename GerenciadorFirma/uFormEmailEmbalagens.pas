@@ -3,7 +3,8 @@ unit uFormEmailEmbalagens;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, cxGraphics, cxControls, cxLookAndFeels,
   cxLookAndFeelPainters, cxStyles, dxSkinsCore, dxSkinscxPCPainter,
   cxCustomData, cxFilter, cxData, cxDataStorage, cxEdit, cxNavigator, Data.DB,
@@ -12,7 +13,8 @@ uses
   FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS,
   FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
   FireDAC.Comp.DataSet, FireDAC.Comp.Client, Vcl.ComCtrls, Vcl.StdCtrls,
-  system.Generics.Collections, cxCheckBox, Vcl.Buttons, Vcl.Menus, uConSqlServer;
+  System.Generics.Collections, cxCheckBox, Vcl.Buttons, Vcl.Menus,
+  uConSqlServer, Vcl.Grids, Vcl.DBGrids, uFormGlobal, uFormEmbalagensAVencer;
 
 type
   TFormGravaEmbalagens = class(TForm)
@@ -105,35 +107,20 @@ type
     Label4: TLabel;
     Label5: TLabel;
     Label6: TLabel;
-    Button1: TButton;
+    BtnAtualizaAVencer: TButton;
     DataIniAVencer: TDateTimePicker;
     DataFimAVencer: TDateTimePicker;
-    CheckBox1: TCheckBox;
+    CbxIgnoradasAVencer: TCheckBox;
     EditAVencerCli: TEdit;
-    CheckBox2: TCheckBox;
-    Button2: TButton;
+    CbxEnviadasAVencer: TCheckBox;
+    BtnEnviarEmailPrestesAVencer: TButton;
     Button3: TButton;
     PanelBotAVencer: TPanel;
     BtnSelecionaAVencer: TBitBtn;
     DSAVencer: TDataSource;
     QryAVencer: TFDQuery;
     Panel1: TPanel;
-    cxGridAVencer: TcxGrid;
-    cxGridDBTableViewAVencer: TcxGridDBTableView;
-    cxGridDBTableView2: TcxGridDBTableView;
-    cxGridDBTableView3: TcxGridDBTableView;
-    cxGridDBColumn21: TcxGridDBColumn;
-    cxGridDBColumn22: TcxGridDBColumn;
-    cxGridDBColumn23: TcxGridDBColumn;
-    cxGridDBColumn24: TcxGridDBColumn;
-    cxGridDBColumn25: TcxGridDBColumn;
-    cxGridDBColumn26: TcxGridDBColumn;
-    cxGridDBColumn27: TcxGridDBColumn;
-    cxGridDBColumn28: TcxGridDBColumn;
-    cxGridDBColumn29: TcxGridDBColumn;
-    cxGridLevelAVencer: TcxGridLevel;
     QryAVencerSelecionado: TBooleanField;
-    QryAVencerDESCSTATUS: TStringField;
     QryAVencercodcliente: TStringField;
     QryAVencerstatus: TIntegerField;
     QryAVencerRAZAOSOCIAL: TStringField;
@@ -155,23 +142,32 @@ type
     QryAVencerDataVencimento: TDateField;
     QryAVencerValorPendente: TFMTBCDField;
     QryAVencerDiasParaVencimento: TIntegerField;
-    cxGridDBTableViewAVencerSelecionado: TcxGridDBColumn;
-    cxGridDBTableViewAVencerDESCSTATUS: TcxGridDBColumn;
-    cxGridDBTableViewAVencercodcliente: TcxGridDBColumn;
-    cxGridDBTableViewAVencerRAZAOSOCIAL: TcxGridDBColumn;
-    cxGridDBTableViewAVencerCIDADE: TcxGridDBColumn;
-    cxGridDBTableViewAVencerdatacomprovante: TcxGridDBColumn;
-    cxGridDBTableViewAVencerDataVencimento: TcxGridDBColumn;
-    cxGridDBTableViewAVencernumero: TcxGridDBColumn;
-    cxGridDBTableViewAVencerserie: TcxGridDBColumn;
-    cxGridDBTableViewAVencerapresentacao: TcxGridDBColumn;
-    cxGridDBTableViewAVencerQuantAtendida: TcxGridDBColumn;
-    cxGridDBTableViewAVencerCHAVENF: TcxGridDBColumn;
-    cxGridDBTableViewAVencerValorPendente: TcxGridDBColumn;
-    cxGridDBTableViewAVencerDiasParaVencimento: TcxGridDBColumn;
-    cxGridDBTableViewAVencerchavenfpro: TcxGridDBColumn;
-    cxGridDBTableViewAVencerTOTPAGO: TcxGridDBColumn;
-    cxGridDBTableViewAVencerVALTOTAL: TcxGridDBColumn;
+    QryAVencerSATUSAVENCER: TStringField;
+    QryAVencerENVIADOAVENCER: TBooleanField;
+    cxGrid1DBTableView1: TcxGridDBTableView;
+    cxGrid1Level1: TcxGridLevel;
+    cxGrid1: TcxGrid;
+    cxGrid1DBTableView1Selecionado: TcxGridDBColumn;
+    cxGrid1DBTableView1chavenfpro: TcxGridDBColumn;
+    cxGrid1DBTableView1codcliente: TcxGridDBColumn;
+    cxGrid1DBTableView1status: TcxGridDBColumn;
+    cxGrid1DBTableView1RAZAOSOCIAL: TcxGridDBColumn;
+    cxGrid1DBTableView1CIDADE: TcxGridDBColumn;
+    cxGrid1DBTableView1datacomprovante: TcxGridDBColumn;
+    cxGrid1DBTableView1DataVencimento: TcxGridDBColumn;
+    cxGrid1DBTableView1numero: TcxGridDBColumn;
+    cxGrid1DBTableView1serie: TcxGridDBColumn;
+    cxGrid1DBTableView1codproduto: TcxGridDBColumn;
+    cxGrid1DBTableView1apresentacao: TcxGridDBColumn;
+    cxGrid1DBTableView1QuantAtendida: TcxGridDBColumn;
+    cxGrid1DBTableView1CHAVENF: TcxGridDBColumn;
+    cxGrid1DBTableView1VALTOTAL: TcxGridDBColumn;
+    cxGrid1DBTableView1QuantDevolvida: TcxGridDBColumn;
+    cxGrid1DBTableView1QuantPendente: TcxGridDBColumn;
+    cxGrid1DBTableView1ValorPendente: TcxGridDBColumn;
+    cxGrid1DBTableView1DiasParaVencimento: TcxGridDBColumn;
+    cxGrid1DBTableView1SATUSAVENCER: TcxGridDBColumn;
+    AjustarEmbalagens1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure QryEmbalagensCalcFields(DataSet: TDataSet);
@@ -183,8 +179,8 @@ type
     procedure QryEmbalagensAfterClose(DataSet: TDataSet);
     procedure BtnSelecionaClick(Sender: TObject);
     procedure EmbalagensCli1Click(Sender: TObject);
-    procedure cxGridViewClientesStylesGetContentStyle(
-      Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;
+    procedure cxGridViewClientesStylesGetContentStyle
+      (Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;
       AItem: TcxCustomGridTableItem; var AStyle: TcxStyle);
     procedure CheckBoxMostrarIgnoradosClick(Sender: TObject);
     procedure PopupMenuPopup(Sender: TObject);
@@ -197,12 +193,15 @@ type
     procedure BtnOpcoesClick(Sender: TObject);
     procedure ConfigurarTextodoEmail1Click(Sender: TObject);
     procedure PageControl1Change(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
+    procedure BtnAtualizaAVencerClick(Sender: TObject);
     procedure cxGridDBTableViewAVencerCellClick(Sender: TcxCustomGridTableView;
       ACellViewInfo: TcxGridTableDataCellViewInfo; AButton: TMouseButton;
       AShift: TShiftState; var AHandled: Boolean);
     procedure QryAVencerCalcFields(DataSet: TDataSet);
     procedure BtnSelecionaAVencerClick(Sender: TObject);
+    procedure BtnEnviarEmailPrestesAVencerClick(Sender: TObject);
+    procedure AjustarEmbalagens1Click(Sender: TObject);
+    procedure CbxEnviadasAVencerClick(Sender: TObject);
   private
     { Private declarations }
     fSelecionados: TDictionary<String, Boolean>;
@@ -211,12 +210,15 @@ type
     fCloneDataSet: TFDMemTable;
     FSqlQryEmbalagens: String;
     FSqlQryAVencer: String;
-    function GetChaveSelecionada(ADictionary: TDictionary<String, Boolean>; AChaveNFPro: String; pDefault: Boolean = False): Boolean;
+    function GetChaveSelecionada(ADictionary: TDictionary<String, Boolean>;
+      AChaveNFPro: String; pDefault: Boolean = False): Boolean;
     procedure SelecionaDeselecionaTodos(pSeleciona: Boolean);
     procedure VerificaEEnviaEmail;
     procedure CarregaAVencer(ADataIni, ADataFim: TDate);
     procedure SelecionaDeselecionaTodosAVencer(pSeleciona: Boolean);
     function GetActiveQuery: TFDQuery;
+    function GetIdentificadorTextoEmail: String;
+    function VerificaEEnviaEmailAVencer: Boolean;
 
   public
     { Public declarations }
@@ -233,16 +235,19 @@ implementation
 {$R *.dfm}
 
 uses
-  uFormEmbalagensClientes, uFormConfigurarEmailEmbalagens, uFormConfiguraTextoEmailEmbalagem, cxUtils;
+  uFormEmbalagensClientes, uFormConfigurarEmailEmbalagens,
+  uFormConfiguraTextoEmailEmbalagem, cxUtils, Utils, uFormAjustaInconsistencias;
 
-procedure TFormGravaEmbalagens.SelecionaDeselecionaTodosAVencer(pSeleciona: Boolean);
+procedure TFormGravaEmbalagens.SelecionaDeselecionaTodosAVencer
+  (pSeleciona: Boolean);
 begin
   QryAVencer.DisableControls;
   try
     QryAVencer.First;
     while not QryAVencer.Eof do
     begin
-      fAVencerSelecionados.AddOrSetValue(QryAVencerchavenfpro.AsString, pSeleciona);
+      fAVencerSelecionados.AddOrSetValue(QryAVencerchavenfpro.AsString,
+        pSeleciona);
       QryAVencer.Edit;
       QryAVencer.Post;
       QryAVencer.Next;
@@ -269,30 +274,65 @@ begin
   end;
 end;
 
+function TFormGravaEmbalagens.VerificaEEnviaEmailAVencer: Boolean;
+var
+  FFrm: TFormEmbalagensAVencer;
+begin
+  Result:= False;// TODO: Retornar verdadeiro somente quando o email for enviado
+  FFrm := TFormEmbalagensAVencer.Create(nil);
+  try
+    FFrm.CarregaEmbalagensAVencer(QryAVencercodcliente.AsString, DataFimAVencer.Date);
+    if FFrm.QryAVencer.IsEmpty then
+    begin
+      ShowMessage(Format('Sem embalagens à vencer para o cliente %s.',
+        [QryAVencerRAZAOSOCIAL.AsString]));
+      Exit;
+    end;
+    if Trim(FFrm.EditEmails.Text) = '' then
+    begin
+      ShowMessage
+        (Format('É preciso indicar o email para envio de embalagens pendentes para o cliente %s.',
+        [QryAVencerRAZAOSOCIAL.AsString]));
+      FFrm.ShowModal;
+      Result:= FFrm.EmailEnviado;
+    end
+    else
+      Result:= FFrm.EnviaEmailAVencer;
+  finally
+    FFrm.Free;
+  end;
+end;
+
 procedure TFormGravaEmbalagens.VerificaEEnviaEmail;
 var
   FFrm: TFormEmbalagensClientes;
 begin
-  FFrm:= TFormEmbalagensClientes.Create(nil);
+  FFrm := TFormEmbalagensClientes.Create(nil);
   try
-    FFrm.CarregaEmbalagensCliente(QryEmbalagensCodCliente.AsString);
+    FFrm.CarregaEmbalagensCliente(QryEmbalagenscodcliente.AsString,
+      GetIdentificadorTextoEmail);
     if FFrm.QryEmbalagensCli.IsEmpty then
     begin
-      ShowMessage(Format('Sem embalagens para enviar email para o cliente %s.', [QryEmbalagensRazaoSocial.AsString]));
+      ShowMessage(Format('Sem embalagens para enviar email para o cliente %s.',
+        [QryEmbalagensRAZAOSOCIAL.AsString]));
       Exit;
     end;
     if FFrm.QryEmbalagensCli.RecordCount > 1 then
     begin
-      ShowMessage(Format('Existem outras embalagens pendentes para o cliente %s.',[QryEmbalagensRazaoSocial.AsString]));
+      ShowMessage
+        (Format('Existem outras embalagens pendentes para o cliente %s.',
+        [QryEmbalagensRAZAOSOCIAL.AsString]));
       FFrm.ShowModal;
     end
-   else if Trim(FFrm.EditEmails.Text) = '' then
-   begin
-     ShowMessage(Format('É preciso indicar o email para envio de embalagens pendentes para o cliente %s.',[QryEmbalagensRazaoSocial.AsString]));
-     FFrm.ShowModal;
-   end
-   else
-    FFrm.EnviaEmail;
+    else if Trim(FFrm.EditEmails.Text) = '' then
+    begin
+      ShowMessage
+        (Format('É preciso indicar o email para envio de embalagens pendentes para o cliente %s.',
+        [QryEmbalagensRAZAOSOCIAL.AsString]));
+      FFrm.ShowModal;
+    end
+    else
+      FFrm.EnviaEmaiL;
   finally
     FFrm.Free;
   end;
@@ -304,8 +344,10 @@ begin
   QryEmbalagens.First;
   while not QryEmbalagens.Eof do
   begin
-    if (QryEmbalagensSelecionado.AsBoolean) and (FCliEnviados.Contains(QryEmbalagensCodCliente.AsString) = False) then
+    if (QryEmbalagensSelecionado.AsBoolean) and
+      (FCliEnviados.Contains(QryEmbalagenscodcliente.AsString) = False) then
     begin
+      //TODO:
       VerificaEEnviaEmail;
       FCliEnviados.Add(QryEmbalagenscodcliente.AsString);
     end;
@@ -321,7 +363,7 @@ var
   pnt: TPoint;
 begin
   GetCursorPos(pnt);
-  PopupOpcoes.Popup(pnt.X-20, pnt.Y-8);
+  PopupOpcoes.Popup(pnt.X - 20, pnt.Y - 8);
 end;
 
 procedure TFormGravaEmbalagens.BtnSelecionaClick(Sender: TObject);
@@ -329,18 +371,38 @@ begin
   if BtnSeleciona.Caption = '[V]' then
   begin
     SelecionaDeselecionaTodos(True);
-    BtnSeleciona.Caption:= '[X]';
+    BtnSeleciona.Caption := '[X]';
   end
- else
+  else
   begin
     SelecionaDeselecionaTodos(False);
-    BtnSeleciona.Caption:= '[V]';
+    BtnSeleciona.Caption := '[V]';
   end;
 end;
 
-procedure TFormGravaEmbalagens.Button1Click(Sender: TObject);
+procedure TFormGravaEmbalagens.BtnAtualizaAVencerClick(Sender: TObject);
 begin
   CarregaAVencer(DataIniAVencer.Date, DataFimAVencer.Date);
+end;
+
+procedure TFormGravaEmbalagens.BtnEnviarEmailPrestesAVencerClick
+  (Sender: TObject);
+begin
+  FCliEnviados.Clear;
+  QryAVencer.First;
+  while not QryAVencer.Eof do
+  begin
+    if (QryAVencerSelecionado.AsBoolean) and
+      (FCliEnviados.Contains(QryAVencercodcliente.AsString) = False) then
+    begin
+       VerificaEEnviaEmailAVencer;
+       FCliEnviados.Add(QryAVencercodcliente.AsString);
+    end;
+
+    QryAVencer.Next;
+  end;
+
+  QryAVencer.Refresh;
 end;
 
 procedure TFormGravaEmbalagens.BtnSelecionaAVencerClick(Sender: TObject);
@@ -348,13 +410,22 @@ begin
   if BtnSelecionaAVencer.Caption = '[V]' then
   begin
     SelecionaDeselecionaTodosAVencer(True);
-    BtnSelecionaAVencer.Caption:= '[X]';
+    BtnSelecionaAVencer.Caption := '[X]';
   end
- else
+  else
   begin
     SelecionaDeselecionaTodosAVencer(False);
-    BtnSelecionaAVencer.Caption:= '[V]';
+    BtnSelecionaAVencer.Caption := '[V]';
   end;
+end;
+
+procedure TFormGravaEmbalagens.AjustarEmbalagens1Click(Sender: TObject);
+var
+  FQry: TFDQuery;
+begin
+  FQry := GetActiveQuery;
+  if TFormAjustaInconsistencias.AjustaEmbalagem(FQry.FieldByName('ChaveNF').AsString) then
+    FQry.Refresh;
 end;
 
 procedure TFormGravaEmbalagens.BtnAtualizarClick(Sender: TObject);
@@ -368,36 +439,51 @@ var
 
   function GetFiltroStatus: String;
   begin
-    Result:= ' AND IsNull(Status,0) in (0';
+    Result := ' AND IsNull(Status,0) in (0';
     if CheckBoxMostrarEnviados.Checked then
-      Result:= Result+',1';
+      Result := Result + ',1';
     if CheckBoxMostrarIgnorados.Checked then
-      Result:= Result+',2';
+      Result := Result + ',2';
 
-    Result:= Result+') ';
+    Result := Result + ') ';
   end;
+
 begin
   fCloneDataSet.Close;
   QryEmbalagens.Close;
 
-  FSql:= FSqlQryEmbalagens;
-  FSql:= FSql.Replace('/*Ignorados*/', GetFiltroStatus);
+  FSql := FSqlQryEmbalagens;
+  FSql := FSql.Replace('/*Ignorados*/', GetFiltroStatus);
 
-  if Trim(EditCliente.Text)<>'' then
-    FSql:= FSql.Replace('/*Cliente*/', ' AND RAZAOSOCIAL LIKE ''%'+Trim(EditCliente.Text)+'%'' ');
+  if Trim(EditCliente.Text) <> '' then
+    FSql := FSql.Replace('/*Cliente*/', ' AND RAZAOSOCIAL LIKE ''%' +
+      Trim(EditCliente.Text) + '%'' ');
 
-  QryEmbalagens.SQL.Text:= FSql;
-  QryEmbalagens.ParamByName('DataIni').AsDate:= ADataIni;
-  QryEmbalagens.ParamByName('DataFim').AsDate:= ADataFim;
+  QryEmbalagens.SQL.Text := FSql;
+  QryEmbalagens.ParamByName('DataIni').AsDate := ADataIni;
+  QryEmbalagens.ParamByName('DataFim').AsDate := ADataFim;
   QryEmbalagens.Open;
   fCloneDataSet.CloneCursor(QryEmbalagens);
 
   cxGridViewClientes.ViewData.Expand(True);
 end;
 
+procedure TFormGravaEmbalagens.CbxEnviadasAVencerClick(Sender: TObject);
+begin
+  BtnAtualizaAVencer.Click;
+end;
+
 procedure TFormGravaEmbalagens.CheckBoxMostrarIgnoradosClick(Sender: TObject);
 begin
   CarregaEmbalagens(DataIniPicker.Date, DataFimPicker.Date);
+end;
+
+function TFormGravaEmbalagens.GetIdentificadorTextoEmail: String;
+begin
+  if PageControl1.ActivePage = TabSheetAVencer then
+    Result := 'AVENCER'
+  else
+    Result := 'EMBALAGEM';
 end;
 
 procedure TFormGravaEmbalagens.ConfiguarEmaildeEnvio1Click(Sender: TObject);
@@ -407,58 +493,69 @@ end;
 
 procedure TFormGravaEmbalagens.ConfigurarTextodoEmail1Click(Sender: TObject);
 begin
-  if PageControl1.ActivePage = TabSheetAVencer then
-    ShowMessage('A Implementar.')
-  else
-    TFormConfiguraTextoEmailEmbalagem.ConfiguraTexto;
+  TFormConfiguraTextoEmailEmbalagem.ConfiguraTexto(GetIdentificadorTextoEmail);
 end;
 
 constructor TFormGravaEmbalagens.Create(AOwner: TComponent);
 begin
-  fSelecionados:= TDictionary<String, Boolean>.Create;
-  fAVencerSelecionados:= TDictionary<String, Boolean>.Create;
+  fSelecionados := TDictionary<String, Boolean>.Create;
+  fAVencerSelecionados := TDictionary<String, Boolean>.Create;
 
-  FCliEnviados:= TList<String>.Create;
-  fCloneDataSet:= TFDMemTable.Create(Self);
+  FCliEnviados := TList<String>.Create;
+  fCloneDataSet := TFDMemTable.Create(Self);
   inherited;
 end;
 
-function TFormGravaEmbalagens.GetChaveSelecionada(ADictionary: TDictionary<String, Boolean>; AChaveNFPro: String; pDefault: Boolean = False): Boolean;
+function TFormGravaEmbalagens.GetChaveSelecionada
+  (ADictionary: TDictionary<String, Boolean>; AChaveNFPro: String;
+  pDefault: Boolean = False): Boolean;
 begin
   if not ADictionary.TryGetValue(AChaveNFPro, Result) then
-    Result:= pDefault;
+    Result := pDefault;
 end;
 
 procedure TFormGravaEmbalagens.IgnorarEmbalagem1Click(Sender: TObject);
 var
   FQry: TFDQuery;
 begin
-  FQry:= GetActiveQuery;
+  FQry := GetActiveQuery;
 
   if FQry.FieldByName('ChaveNFPro').AsString = '' then
     Exit;
 
-  TFormEmbalagensClientes.IgnoraEmbalagem(FQry.FieldByName('ChaveNFPro').AsString);
+  TFormEmbalagensClientes.IgnoraEmbalagem(FQry.FieldByName('ChaveNFPro')
+    .AsString);
   FQry.Refresh;
 end;
 
 procedure TFormGravaEmbalagens.CarregaAVencer(ADataIni, ADataFim: TDate);
 var
   FSql: String;
+
+  function GetFiltro: String;
+  begin
+    Result:= ' ';
+    if CbxIgnoradasAVencer.Checked = False then
+      Result:= ' AND IsNull(Status,0) <> 2 ';
+
+   if CbxEnviadasAVencer.Checked = False then
+     Result:= Result+' AND IsNull(EnviadoAVencer,0) <> 1 ';
+  end;
 begin
   QryAVencer.Close;
 
-  FSql:= FSqlQryAVencer;
-//  FSql:= FSql.Replace('/*Ignorados*/', GetFiltroStatus);
+  FSql := FSqlQryAVencer;
+  FSql:= FSql.Replace('/*Ignorados*/', GetFiltro);
 
-  if Trim(EditAVencerCli.Text)<>'' then
-    FSql:= FSql.Replace('/*Cliente*/', ' AND RAZAOSOCIAL LIKE ''%'+Trim(EditAVencerCli.Text)+'%'' ');
+  if Trim(EditAVencerCli.Text) <> '' then
+    FSql := FSql.Replace('/*Cliente*/', ' AND RAZAOSOCIAL LIKE ''%' +
+      Trim(EditAVencerCli.Text) + '%'' ');
 
-  QryAVencer.SQL.Text:= FSql;
+  QryAVencer.SQL.Text := FSql;
 
   QryAVencer.Close;
-  QryAVencer.ParamByName('DataIni').AsDate:= ADataIni;
-  QryAVencer.ParamByName('DataFim').AsDate:= ADataFim;
+  QryAVencer.ParamByName('DataIni').AsDate := ADataIni;
+  QryAVencer.ParamByName('DataFim').AsDate := ADataFim;
   QryAVencer.Open;
 end;
 
@@ -469,64 +566,69 @@ begin
     if (QryAVencer.ParamByName('DataIni').AsDate <> DataIniAVencer.Date) or
       (QryAVencer.ParamByName('DataFim').AsDate <> DataFimAVencer.Date) then
 
-    CarregaAVencer(DataIniAVencer.Date, DataFimAVencer.Date);
+      CarregaAVencer(DataIniAVencer.Date, DataFimAVencer.Date);
   end;
 end;
 
 procedure TFormGravaEmbalagens.PopupMenuPopup(Sender: TObject);
 begin
-  if QryEmbalagensCHAVENFPRO.AsString = '' then
+  if QryEmbalagenschavenfpro.AsString = '' then
     Exit;
 
-  Ignorarembalagem1.Visible:= QryEmbalagensSTATUS.AsInteger <> 2;
-  DeixardeIgnorarEmbalagem1.Visible:= QryEmbalagensSTATUS.AsInteger = 2;
+  IgnorarEmbalagem1.Visible := QryEmbalagensstatus.AsInteger <> 2;
+  DeixardeIgnorarEmbalagem1.Visible := QryEmbalagensstatus.AsInteger = 2;
 end;
 
-procedure TFormGravaEmbalagens.cxGridDBTableViewAVencerCellClick(
-  Sender: TcxCustomGridTableView; ACellViewInfo: TcxGridTableDataCellViewInfo;
+procedure TFormGravaEmbalagens.cxGridDBTableViewAVencerCellClick
+  (Sender: TcxCustomGridTableView; ACellViewInfo: TcxGridTableDataCellViewInfo;
   AButton: TMouseButton; AShift: TShiftState; var AHandled: Boolean);
 var
-  FColChave, FCurCol: TCxGridDBColumn;
+  FColChave, FCurCol: TcxGridDBColumn;
   FChaveNFPro: String;
 begin
-  FChaveNFPro:= VarToStrDef(GetColumnValueByFieldName(TcxGridDBTableView(Sender), 'ChaveNFPro'), '');
-  FCurCol:= TcxGridDBColumn(ACellViewInfo.Item);
-  if (FChaveNFPro='') or (not Assigned(FCurCol)) then
+  FChaveNFPro := VarToStrDef
+    (GetColumnValueByFieldName(TcxGridDBTableView(Sender), 'ChaveNFPro'), '');
+  FCurCol := TcxGridDBColumn(ACellViewInfo.Item);
+  if (FChaveNFPro = '') or (not Assigned(FCurCol)) then
     Exit;
 
   if UpperCase(FCurCol.DataBinding.Field.FieldName) = 'SELECIONADO' then
   begin
-    fAVencerSelecionados.AddOrSetValue(FChaveNFPro, not GetChaveSelecionada(fAVencerSelecionados, FChaveNFPro));
+    fAVencerSelecionados.AddOrSetValue(FChaveNFPro,
+      not GetChaveSelecionada(fAVencerSelecionados, FChaveNFPro));
     QryAVencer.Edit;
     QryAVencer.Post;
   end;
 end;
 
-procedure TFormGravaEmbalagens.cxGridViewClientesCellClick(
-  Sender: TcxCustomGridTableView; ACellViewInfo: TcxGridTableDataCellViewInfo;
+procedure TFormGravaEmbalagens.cxGridViewClientesCellClick
+  (Sender: TcxCustomGridTableView; ACellViewInfo: TcxGridTableDataCellViewInfo;
   AButton: TMouseButton; AShift: TShiftState; var AHandled: Boolean);
 var
-  FColChave, FCurCol: TCxGridDBColumn;
+  FCurCol: TcxGridDBColumn;
   FChaveNFPro: String;
 begin
-  FChaveNFPro:= VarToStrDef(GetColumnValueByFieldName(TcxGridDBTableView(Sender), 'ChaveNFPro'), '');
-  FCurCol:= TcxGridDBColumn(ACellViewInfo.Item);
-  if (FChaveNFPro='') or (not Assigned(FCurCol)) then
+  FChaveNFPro := VarToStrDef
+    (GetColumnValueByFieldName(TcxGridDBTableView(Sender), 'ChaveNFPro'), '');
+  FCurCol := TcxGridDBColumn(ACellViewInfo.Item);
+  if (FChaveNFPro = '') or (not Assigned(FCurCol)) then
     Exit;
 
   if UpperCase(FCurCol.DataBinding.Field.FieldName) = 'SELECIONADO' then
   begin
-    fSelecionados.AddOrSetValue(FChaveNFPro, not GetChaveSelecionada(fSelecionados, FChaveNFPro));
+    fSelecionados.AddOrSetValue(FChaveNFPro,
+      not GetChaveSelecionada(fSelecionados, FChaveNFPro));
     QryEmbalagens.Edit;
     QryEmbalagens.Post;
   end;
 end;
 
-procedure TFormGravaEmbalagens.cxGridViewClientesStylesGetContentStyle(
-  Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;
+procedure TFormGravaEmbalagens.cxGridViewClientesStylesGetContentStyle
+  (Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;
   AItem: TcxCustomGridTableItem; var AStyle: TcxStyle);
 begin
-  if Sender.DataController.Values[ARecord.RecordIndex, cxGridViewClientesstatus.Index] = 2 then
+  if Sender.DataController.Values[ARecord.RecordIndex, cxGridViewClientesstatus.
+    Index] = 2 then
     AStyle := cxStyleAmarelo;
 end;
 
@@ -536,19 +638,20 @@ const
 var
   FQry: TFDQuery;
 begin
-  FQry:= GetActiveQuery;
+  FQry := GetActiveQuery;
 
   if FQry.FieldByName('ChaveNFPro').AsString = '' then
     Exit;
 
-  ConSqlServer.ExecutaComando(Format(cSqlDelete, [FQry.FieldByName('ChaveNFPro').AsString]));
+  ConSqlServer.ExecutaComando(Format(cSqlDelete,
+    [FQry.FieldByName('ChaveNFPro').AsString]));
   FQry.Refresh;
 end;
 
 procedure TFormGravaEmbalagens.EditClienteKeyDown(Sender: TObject;
   var Key: Word; Shift: TShiftState);
 begin
-  if KEY = VK_RETURN then
+  if Key = VK_RETURN then
     CarregaEmbalagens(DataIniPicker.Date, DataFimPicker.Date);
 
 end;
@@ -556,34 +659,46 @@ end;
 function TFormGravaEmbalagens.GetActiveQuery: TFDQuery;
 begin
   if PageControl1.ActivePage = TabSheetAVencer then
-    Result:= QryAVencer
+    Result := QryAVencer
   else
-    Result:= QryEmbalagens;
+    Result := QryEmbalagens;
 end;
 
 procedure TFormGravaEmbalagens.EmbalagensCli1Click(Sender: TObject);
 var
   FQry: TFDQuery;
 begin
-  FQry:= GetActiveQuery;
+  FQry := GetActiveQuery;
 
   if FQry.FieldByName('CodCliente').AsString = '' then
     Exit;
 
-  TFormEmbalagensClientes.AbreEmbalagensCliente(FQry.FieldByName('CodCliente').AsString);
+  if PageControl1.ActivePage = TabSheetAVencer then
+    TFormEmbalagensAVencer.AbreEmbalagensAVencer(FQry.FieldByName('CodCliente').AsString, GetIdentificadorTextoEmail, DataFimAVencer.Date)
+  else
+    TFormEmbalagensClientes.AbreEmbalagensCliente(FQry.FieldByName('CodCliente').AsString, GetIdentificadorTextoEmail);
+
   FQry.Refresh;
+end;
+
+function IncDiaUtil(AData: TDateTime; ADias: Integer): TDateTime;
+const
+  cSql = 'select dbo.IncDiaUtil(%s, %d)';
+begin
+  Result := VarToDateTime(ConSqlServer.RetornaValor(Format(cSql,
+    [Func_DateTime_SqlServer(AData), ADias])));
 end;
 
 procedure TFormGravaEmbalagens.FormCreate(Sender: TObject);
 begin
-  FSqlQryEmbalagens:= QryEmbalagens.SQL.Text;
-  FSqlQryAVencer:= QryAVencer.SQL.Text;
-  DataIniPicker.DateTime:= Now;
-  DataFimPicker.DateTime:= Now;
-  DataIniAVencer.DateTime:= Now+2;
-  DataFimAVencer.DateTime:= Now+10;
-  CarregaEmbalagens(Trunc(Now), Trunc(Now));
-  PageControl1.ActivePage:= TabPendentes;
+  FSqlQryEmbalagens := QryEmbalagens.SQL.Text;
+  FSqlQryAVencer := QryAVencer.SQL.Text;
+  DataIniPicker.DateTime := IncDiaUtil(Now, -1);
+  DataFimPicker.DateTime := Now;
+  DataIniAVencer.DateTime := Now + 4;
+  DataFimAVencer.DateTime := Now + 14;
+  CarregaEmbalagens(DataIniPicker.Date, DataFimPicker.Date);
+  PageControl1.ActivePage := TabPendentes;
 end;
 
 procedure TFormGravaEmbalagens.FormDestroy(Sender: TObject);
@@ -595,22 +710,24 @@ end;
 
 procedure TFormGravaEmbalagens.QryAVencerCalcFields(DataSet: TDataSet);
 begin
-  QryAVencerSelecionado.AsBoolean:= GetChaveSelecionada(fAVencerSelecionados, QryAVencerchavenfPro.AsString);
+  QryAVencerSelecionado.AsBoolean := GetChaveSelecionada(fAVencerSelecionados,
+    QryAVencerchavenfpro.AsString);
 end;
 
 procedure TFormGravaEmbalagens.QryClientesCalcFields(DataSet: TDataSet);
 begin
-//  QryClientesSelecionado.AsBoolean:= GetClienteSelecionado(QryClientesCodCliente.AsString);
+  // QryClientesSelecionado.AsBoolean:= GetClienteSelecionado(QryClientesCodCliente.AsString);
 end;
 
 procedure TFormGravaEmbalagens.QryEmbalagensAfterClose(DataSet: TDataSet);
 begin
-//  fSelecionados.Clear;
+  // fSelecionados.Clear;
 end;
 
 procedure TFormGravaEmbalagens.QryEmbalagensCalcFields(DataSet: TDataSet);
 begin
-  QryEmbalagensSelecionado.AsBoolean:= GetChaveSelecionada(fSelecionados, QryEmbalagenschavenfPro.AsString);
+  QryEmbalagensSelecionado.AsBoolean := GetChaveSelecionada(fSelecionados,
+    QryEmbalagenschavenfpro.AsString);
 end;
 
 end.

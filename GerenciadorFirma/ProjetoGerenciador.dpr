@@ -49,7 +49,7 @@ uses
   Form.ProcessActivityEditor in '..\Ladder Framework\Forms\Form.ProcessActivityEditor.pas',
   Form.SimpleProcessEditor in '..\Ladder Framework\Forms\Form.SimpleProcessEditor.pas',
   uFormEmailEmbalagens in 'uFormEmailEmbalagens.pas' {FormGravaEmbalagens},
-  uFormEmbalagensClientes in 'Fontes\uFormEmbalagensClientes.pas' {FormEmbalagensClientes},
+  uFormEmbalagensAVencer in 'Fontes\uFormEmbalagensAVencer.pas' {FormEmbalagensAVencer},
   uFormSelecionaEmailCliente in 'Fontes\uFormSelecionaEmailCliente.pas' {FormSelecionaEmailCliente},
   uFormConfigurarEmailEmbalagens in 'Fontes\uFormConfigurarEmailEmbalagens.pas' {FormConfigurarEmailEmbalagens},
   uFormConfiguraTextoEmailEmbalagem in 'Fontes\uFormConfiguraTextoEmailEmbalagem.pas' {FormConfiguraTextoEmailEmbalagem},
@@ -62,7 +62,9 @@ uses
   uFrmPesquisaNeg in 'Fontes\Fretes\uFrmPesquisaNeg.pas' {FrmPesquisaNeg},
   uFrmPesquisaTransp in 'Fontes\Fretes\uFrmPesquisaTransp.pas' {FrmPesquisaTransp},
   uUpdater in 'Fontes\uUpdater.pas',
-  cxUtils in '..\utils\cxUtils.pas';
+  cxUtils in '..\utils\cxUtils.pas',
+  uFormAjustaInconsistencias in 'Fontes\uFormAjustaInconsistencias.pas' {FormAjustaInconsistencias},
+  uFormEmbalagensClientes in 'Fontes\uFormEmbalagensClientes.pas' {FormEmbalagensClientes};
 
 {$R *.res}
 

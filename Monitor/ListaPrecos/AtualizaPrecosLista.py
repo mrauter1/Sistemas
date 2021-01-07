@@ -23,6 +23,7 @@ class LeitorLista:
     impostoFaturamento=0
     nomeLista='ND'
     conn = None
+    dataLeitura=datetime.datetime.today().strftime('%Y/%m/%d')
     
     def InicializarPlanilha(self):
         creds = None
@@ -147,7 +148,7 @@ class LeitorLista:
               
         sqlLog= """
         insert into lista.loglistapreco (nomeLista, dataleitura, icmPisCofins, lucrobruto, impostofaturamento)  values ('{nomeLista}', '{dataleitura}', {icmPisCofins:.4f}, {lucrobruto:.4f}, {impostofaturamento:.4f})
-        """.format(nomeLista=self.nomeLista, dataleitura=datetime.datetime.today().strftime('%Y/%m/%d %H:%M:%S'), 
+        """.format(nomeLista=self.nomeLista, dataleitura=self.dataLeitura, 
                    icmPisCofins=self.icmPisCofins, lucrobruto=self.lucroBruto, impostofaturamento=self.impostoFaturamento)
         cursor.execute(sqlLog)        
         self.conn.commit()
@@ -180,8 +181,8 @@ class LeitorLista:
 ##            Preco = Preco*(1-self.icmPisCofins) ##Retira os impostos      
                        
             sql= """
-            exec lista.AtualizaPrecoLista @IDLog = {IDLog}, @CodGrupoSub = '{CodGrupo}', @CodAplicacao = '{CodAplicacao}', @ComEmbalagem = {ComEmbalagem}, @Preco = {Preco:.4f}
-            """.format(IDLog=IDLog, CodGrupo=CodGrupo, CodAplicacao=CodAplicacao, ComEmbalagem=ComEmbalagem, Preco=Preco)
+            exec lista.AtualizaPrecoListaNew @Data = '{Data}', @IcmPisCofins={IcmPisCofins}, @CodGrupoSub = '{CodGrupo}', @CodAplicacao = '{CodAplicacao}', @ComEmbalagem = {ComEmbalagem}, @Preco = {Preco:.4f}
+            """.format(Data=self.dataLeitura, IcmPisCofins=self.icmPisCofins, CodGrupo=CodGrupo, CodAplicacao=CodAplicacao, ComEmbalagem=ComEmbalagem, Preco=Preco)
             
             print(sql)
             
@@ -190,18 +191,21 @@ class LeitorLista:
             self.conn.commit()
             
         for row in values:
-            if len(row) >= 12:
-                temIPI = (row[2]!='MP')
-                if row[0]:
-                    CodGrupo = row[0]
-                    GravaPreco(IDLog, CodGrupo, '1030', 0, row[3], temIPI) # Kg
-                    GravaPreco(IDLog, CodGrupo, '1031', 0, row[4], temIPI) # Litro
-                    GravaPreco(IDLog, CodGrupo, '0',    1, row[5], temIPI) # Tambor com Embalagem
-                    GravaPreco(IDLog, CodGrupo, '0',    0, row[6], temIPI) # Tambor sem Embalagem
-                    GravaPreco(IDLog, CodGrupo, '6',    1, row[7], temIPI) # Bombona 50 Litros
-                    GravaPreco(IDLog, CodGrupo, '2',    1, row[8], temIPI) # Lata 18 Litros
-                    GravaPreco(IDLog, CodGrupo, '3',    1, row[9], temIPI) # Galão 5 Litros
-                    GravaPreco(IDLog, CodGrupo, '4',    1, row[10],temIPI) # Lata 900 ml    
+            if len(row) < 12:
+                continue            
+            CodGrupo = row[0]
+            if (CodGrupo=='!PRO!') or (not CodGrupo):
+                continue
+            
+            temIPI = (row[2]!='MP')
+            GravaPreco(IDLog, CodGrupo, '1030', 0, row[3], temIPI) # Kg
+            GravaPreco(IDLog, CodGrupo, '1031', 0, row[4], temIPI) # Litro
+            GravaPreco(IDLog, CodGrupo, '0',    1, row[5], temIPI) # Tambor com Embalagem
+            GravaPreco(IDLog, CodGrupo, '0',    0, row[6], temIPI) # Tambor sem Embalagem
+            GravaPreco(IDLog, CodGrupo, '6',    1, row[7], temIPI) # Bombona 50 Litros
+            GravaPreco(IDLog, CodGrupo, '2',    1, row[8], temIPI) # Lata 18 Litros
+            GravaPreco(IDLog, CodGrupo, '3',    1, row[9], temIPI) # Galão 5 Litros
+            GravaPreco(IDLog, CodGrupo, '4',    1, row[10],temIPI) # Lata 900 ml    
     
         print("Finalizado")            
                 

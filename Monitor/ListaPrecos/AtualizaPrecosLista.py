@@ -16,6 +16,19 @@ SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 SAMPLE_SPREADSHEET_ID = '1S9cYxE87OTKjCSYxSWDsD1Vz3oaHpR9XicMc-S_GSQg'
 #SAMPLE_RANGE_NAME = 'EMBALAGENS'
 
+def valueToFloat(value):
+    return float(value.replace('.', '').replace(',','.'))
+
+def percentToFloat(value):
+    return valueToFloat(value.replace('%', ''))/100.0
+
+def valueToFloatDef(value, default=0.00):
+    try:
+        return valueToFloat(value)
+    except ValueError:
+        return default
+
+
 class LeitorLista:
     sheet = None
     icmPisCofins=0
@@ -79,13 +92,13 @@ class LeitorLista:
         #Grava a data e a hora da ultima leitura
         self.writeCellValue('DATALEITURA', datetime.datetime.today().strftime('%d/%m/%Y %H:%M:%S')) 
         
-        self.icmPisCofins = float(self.readCellValue('IcmPisCofins').replace('%', ''))/100.00
+        self.icmPisCofins = percentToFloat(self.readCellValue('IcmPisCofins'))
         print('IcmPisCofins: '+str(self.icmPisCofins))
         
-        self.lucroBruto = float(self.readCellValue('LucroBruto').replace('%', ''))/100.00
+        self.lucroBruto = percentToFloat(self.readCellValue('LucroBruto'))
         print('LucroBruto: '+str(self.lucroBruto))        
         
-        self.impostoFaturamento = float(self.readCellValue('IMPOSTOFAT').replace('%', ''))/100.00
+        self.impostoFaturamento = percentToFloat(self.readCellValue('IMPOSTOFAT'))
         print('ImpostoFaturamento: '+str(self.impostoFaturamento))           
         
         RangeListaPrecos = self.readCellValue('RANGEPRECOS')
@@ -110,7 +123,7 @@ class LeitorLista:
     def lerFloat(self, cell):
         result = self.readCellValue(cell)            
         try:
-            return float(result)
+            return valueToFloat(result)
         except ValueError:
             return 0.00        
         
@@ -159,17 +172,13 @@ class LeitorLista:
         
         self.GravaValorEmbalagens(IDLog)        
         
-        def GravaPreco(IDLog, CodGrupo, CodAplicacao, ComEmbalagem, Preco, temIPI):     
-            Preco = Preco.replace(',', '')
+        def GravaPreco(nomeLista, CodGrupo, CodAplicacao, ComEmbalagem, Preco, temIPI):     
+            Preco = valueToFloatDef(Preco,0.00)
+            print(Preco)
             
             CodGrupo = CodGrupo.zfill(7)
             CodAplicacao = CodAplicacao.zfill(4)
-            
-            try:
-                Preco=float(Preco)
-            except ValueError:
-                Preco= 0.00
-                
+                           
 #           if (temIPI):
 #               Preco=Preco*1.1                
                 
@@ -181,8 +190,8 @@ class LeitorLista:
 ##            Preco = Preco*(1-self.icmPisCofins) ##Retira os impostos      
                        
             sql= """
-            exec lista.AtualizaPrecoListaNew @Data = '{Data}', @IcmPisCofins={IcmPisCofins}, @CodGrupoSub = '{CodGrupo}', @CodAplicacao = '{CodAplicacao}', @ComEmbalagem = {ComEmbalagem}, @Preco = {Preco:.4f}
-            """.format(Data=self.dataLeitura, IcmPisCofins=self.icmPisCofins, CodGrupo=CodGrupo, CodAplicacao=CodAplicacao, ComEmbalagem=ComEmbalagem, Preco=Preco)
+            exec lista.AtualizaPrecoListaNew @Data = '{Data}', @TabelaImposto='{nomeLista}', @CodGrupoSub = '{CodGrupo}', @CodAplicacao = '{CodAplicacao}', @ComEmbalagem = {ComEmbalagem}, @Preco = {Preco:.4f}
+            """.format(Data=self.dataLeitura, nomeLista=self.nomeLista, CodGrupo=CodGrupo, CodAplicacao=CodAplicacao, ComEmbalagem=ComEmbalagem, Preco=Preco)
             
             print(sql)
             
@@ -198,14 +207,14 @@ class LeitorLista:
                 continue
             
             temIPI = (row[2]!='MP')
-            GravaPreco(IDLog, CodGrupo, '1030', 0, row[3], temIPI) # Kg
-            GravaPreco(IDLog, CodGrupo, '1031', 0, row[4], temIPI) # Litro
-            GravaPreco(IDLog, CodGrupo, '0',    1, row[5], temIPI) # Tambor com Embalagem
-            GravaPreco(IDLog, CodGrupo, '0',    0, row[6], temIPI) # Tambor sem Embalagem
-            GravaPreco(IDLog, CodGrupo, '6',    1, row[7], temIPI) # Bombona 50 Litros
-            GravaPreco(IDLog, CodGrupo, '2',    1, row[8], temIPI) # Lata 18 Litros
-            GravaPreco(IDLog, CodGrupo, '3',    1, row[9], temIPI) # Galão 5 Litros
-            GravaPreco(IDLog, CodGrupo, '4',    1, row[10],temIPI) # Lata 900 ml    
+            GravaPreco(self.nomeLista, CodGrupo, '1030', 0, row[3], temIPI) # Kg
+            GravaPreco(self.nomeLista, CodGrupo, '1031', 0, row[4], temIPI) # Litro
+            GravaPreco(self.nomeLista, CodGrupo, '0',    1, row[5], temIPI) # Tambor com Embalagem
+            GravaPreco(self.nomeLista, CodGrupo, '0',    0, row[6], temIPI) # Tambor sem Embalagem
+            GravaPreco(self.nomeLista, CodGrupo, '6',    1, row[7], temIPI) # Bombona 50 Litros
+            GravaPreco(self.nomeLista, CodGrupo, '2',    1, row[8], temIPI) # Lata 18 Litros
+            GravaPreco(self.nomeLista, CodGrupo, '3',    1, row[9], temIPI) # Galão 5 Litros
+            GravaPreco(self.nomeLista, CodGrupo, '4',    1, row[10],temIPI) # Lata 900 ml    
     
         print("Finalizado")            
                 

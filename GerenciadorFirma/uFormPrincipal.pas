@@ -108,6 +108,9 @@ type
     QryUserProducao: TBooleanField;
     QryUserDesenvolvedor: TBooleanField;
     StatusBar1: TStatusBar;
+    Compras1: TMenuItem;
+    ComprasporGrupo1: TMenuItem;
+    ComprasAgendadas1: TMenuItem;
     procedure Pedidos1Click(Sender: TObject);
     procedure Fila1Click(Sender: TObject);
     procedure Densidade1Click(Sender: TObject);
@@ -159,6 +162,8 @@ type
     procedure ConfernciadosFretesdosMovimentos1Click(Sender: TObject);
     procedure ClculodosFretesdosMovimentos1Click(Sender: TObject);
     procedure AtualizarDadosNegociaes1Click(Sender: TObject);
+    procedure ComprasporGrupo1Click(Sender: TObject);
+    procedure ComprasAgendadas1Click(Sender: TObject);
   private
     FDmGeradorConsultas: TDmGeradorConsultas;
     FPopupActive: Boolean;
@@ -199,7 +204,7 @@ uses
   Utils, uFormDetalheProdutos, uFormValidaModelos, uFormExecSql,
   uFormRelatoriosPersonalizados, uFormSubGrupoExtras, uFormFeriados, uPython, uFormCiclosVenda,
   uDmGravaLista, uFormEmailEmbalagens, uFormPermissoes, uFormLogin, uFrmAjustaNeg,
-  uFrmCalculadoraDeFretes;
+  uFrmCalculadoraDeFretes, uFormCompraProdutos, uFormComprasAgendadas;
 
 function TFormPrincipal.IsAdmin: Boolean;
 begin
@@ -305,6 +310,16 @@ begin
 
   if Assigned(vForm) then
     AbrirFormEmNovaAba(vForm);
+end;
+
+procedure TFormPrincipal.ComprasAgendadas1Click(Sender: TObject);
+begin
+  AbrirFormEmNovaAba(TformComprasAgendadas.Create(Self), True);
+end;
+
+procedure TFormPrincipal.ComprasporGrupo1Click(Sender: TObject);
+begin
+  AbrirFormEmNovaAba(TFormCompraProduto.Create(Self), True);
 end;
 
 procedure TFormPrincipal.ConfernciadosFretesdosMovimentos1Click(

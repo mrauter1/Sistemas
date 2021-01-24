@@ -32,28 +32,30 @@ object FormEntregaPorProduto: TFormEntregaPorProduto
     Align = alTop
     TabOrder = 0
     object PanelRight: TPanel
-      Left = 683
+      Left = 592
       Top = 1
-      Width = 298
+      Width = 389
       Height = 168
       Align = alRight
       TabOrder = 0
       object PanelTitulo: TPanel
         Left = 1
         Top = 1
-        Width = 296
+        Width = 387
         Height = 24
         Align = alTop
         Caption = 'Compras'
         TabOrder = 0
+        ExplicitWidth = 296
       end
       object cxGridCompras: TcxGrid
         Left = 1
         Top = 25
-        Width = 296
-        Height = 142
+        Width = 387
+        Height = 118
         Align = alClient
         TabOrder = 1
+        ExplicitWidth = 296
         object ViewCompras: TcxGridDBTableView
           Navigator.Buttons.CustomButtons = <>
           Navigator.Buttons.First.Visible = False
@@ -70,59 +72,92 @@ object FormEntregaPorProduto: TFormEntregaPorProduto
           Navigator.Buttons.GotoBookmark.Visible = False
           Navigator.Buttons.Filter.Enabled = False
           Navigator.Buttons.Filter.Visible = False
-          Navigator.Visible = True
           DataController.DataSource = DsComprasPrevistas
           DataController.Summary.DefaultGroupSummaryItems = <>
           DataController.Summary.FooterSummaryItems = <>
           DataController.Summary.SummaryGroups = <>
-          OptionsData.Appending = True
           OptionsData.CancelOnExit = False
+          OptionsData.Deleting = False
+          OptionsData.DeletingConfirmation = False
+          OptionsData.Editing = False
+          OptionsData.Inserting = False
           OptionsView.GroupByBox = False
           OptionsView.HeaderAutoHeight = True
           Styles.Content = cxStyle2
           Styles.Header = cxStyle2
-          object ViewComprasData: TcxGridDBColumn
-            DataBinding.FieldName = 'Data'
-            PropertiesClassName = 'TcxDateEditProperties'
-            Width = 114
+          object ViewComprasDataRecebimento: TcxGridDBColumn
+            DataBinding.FieldName = 'DataRecebimento'
+            Width = 99
           end
           object ViewComprasCodGrupoSub: TcxGridDBColumn
             DataBinding.FieldName = 'CodGrupoSub'
             Visible = False
           end
-          object ViewComprasCompraPrevista: TcxGridDBColumn
-            DataBinding.FieldName = 'CompraPrevista'
-            Width = 105
+          object ViewComprasQuant: TcxGridDBColumn
+            DataBinding.FieldName = 'Quant'
+            Width = 97
+          end
+          object ViewComprasObs: TcxGridDBColumn
+            Caption = 'Observa'#231#227'o'
+            DataBinding.FieldName = 'Obs'
+            Width = 173
           end
         end
         object cxGridLevel2: TcxGridLevel
           GridView = ViewCompras
         end
       end
+      object Panel2: TPanel
+        Left = 1
+        Top = 143
+        Width = 387
+        Height = 24
+        Align = alBottom
+        TabOrder = 2
+        ExplicitWidth = 296
+        DesignSize = (
+          387
+          24)
+        object btnGerenciarCompras: TBitBtn
+          Left = 123
+          Top = -2
+          Width = 129
+          Height = 25
+          Anchors = [akTop, akRight]
+          Caption = 'Gerencia Compras'
+          Default = True
+          NumGlyphs = 2
+          TabOrder = 0
+          OnClick = btnGerenciarComprasClick
+        end
+      end
     end
     object PanelLeft: TPanel
       Left = 1
       Top = 1
-      Width = 682
+      Width = 591
       Height = 168
       Align = alClient
       TabOrder = 1
+      ExplicitWidth = 682
       object Panel4: TPanel
         Left = 1
         Top = 1
-        Width = 680
+        Width = 589
         Height = 24
         Align = alTop
         Caption = 'Estoque Previsto na Data'
         TabOrder = 0
+        ExplicitWidth = 680
       end
       object cxGridDatas: TcxGrid
         Left = 1
         Top = 25
-        Width = 680
+        Width = 589
         Height = 142
         Align = alClient
         TabOrder = 1
+        ExplicitWidth = 680
         object ViewEstoquePrevisto: TcxGridDBTableView
           Navigator.Buttons.CustomButtons = <>
           DataController.DataSource = DsEstoquePrevisto
@@ -166,7 +201,7 @@ object FormEntregaPorProduto: TFormEntregaPorProduto
           end
           object ViewEstoquePrevistoQuantPedidos: TcxGridDBColumn
             DataBinding.FieldName = 'QuantPedidos'
-            Width = 84
+            Width = 82
           end
           object ViewEstoquePrevistoPedidosDia: TcxGridDBColumn
             DataBinding.FieldName = 'PedidosDia'
@@ -198,8 +233,6 @@ object FormEntregaPorProduto: TFormEntregaPorProduto
       Height = 216
       Align = alClient
       TabOrder = 0
-      ExplicitLeft = 2
-      ExplicitTop = 97
       object ViewPedidos: TcxGridDBTableView
         OnKeyDown = ViewPedidosKeyDown
         Navigator.Buttons.CustomButtons = <>
@@ -438,7 +471,6 @@ object FormEntregaPorProduto: TFormEntregaPorProduto
     Top = 32
   end
   object QryEstoquePrevisto: TFDQuery
-    Active = True
     Connection = ConSqlServer.FDConnection
     SQL.Strings = (
       'SELECT * '
@@ -482,13 +514,13 @@ object FormEntregaPorProduto: TFormEntregaPorProduto
       DisplayFormat = '#0'
       Precision = 38
     end
-    object QryEstoquePrevistoCompraPrevista2: TBCDField
-      DisplayLabel = 'Compras Previstas na Data'
-      DisplayWidth = 14
+    object QryEstoquePrevistoCompraPrevista: TFMTBCDField
+      DisplayLabel = 'Compras Previstas'
+      DisplayWidth = 10
       FieldName = 'CompraPrevista'
-      Origin = 'CompraPrevista'
       Required = True
-      Precision = 18
+      Precision = 38
+      Size = 4
     end
     object QryEstoquePrevistoSomaCompras: TFMTBCDField
       DisplayLabel = 'Soma Compras'
@@ -534,7 +566,6 @@ object FormEntregaPorProduto: TFormEntregaPorProduto
     end
   end
   object QryComprasPrevistas: TFDQuery
-    Active = True
     BeforePost = QryComprasPrevistasBeforePost
     AfterPost = QryComprasPrevistasAfterPost
     AfterDelete = QryComprasPrevistasAfterDelete
@@ -543,8 +574,9 @@ object FormEntregaPorProduto: TFormEntregaPorProduto
       'SELECT * '
       'FROM log.ComprasPrevistas'
       'where'
+      'Recebido=0 and'
       'CodGrupoSub=:CodGrupoSub'
-      'order by Data')
+      'order by DataRecebimento')
     Left = 616
     Top = 96
     ParamData = <
@@ -555,9 +587,23 @@ object FormEntregaPorProduto: TFormEntregaPorProduto
         ParamType = ptInput
         Value = '0010004'
       end>
-    object DateField1: TDateField
-      FieldName = 'Data'
-      Origin = 'Data'
+    object QryComprasPrevistasID: TFDAutoIncField
+      FieldName = 'ID'
+      Origin = 'ID'
+      ProviderFlags = [pfInWhere, pfInKey]
+      ReadOnly = True
+    end
+    object QryComprasPrevistasDataCompra: TDateField
+      DisplayLabel = 'Data Compra'
+      FieldName = 'DataCompra'
+      Origin = 'DataCompra'
+      Required = True
+    end
+    object QryComprasPrevistasDataRecebimento: TDateField
+      DisplayLabel = 'Data Recebimento'
+      FieldName = 'DataRecebimento'
+      Origin = 'DataRecebimento'
+      Required = True
     end
     object QryComprasPrevistasCodGrupoSub: TStringField
       FieldName = 'CodGrupoSub'
@@ -567,12 +613,26 @@ object FormEntregaPorProduto: TFormEntregaPorProduto
       FixedChar = True
       Size = 7
     end
-    object QryComprasPrevistasCompraPrevista: TBCDField
-      DisplayLabel = 'Compras Previstas'
-      DisplayWidth = 14
-      FieldName = 'CompraPrevista'
-      Origin = 'CompraPrevista'
+    object QryComprasPrevistasQuant: TBCDField
+      DisplayLabel = 'Quant.'
+      FieldName = 'Quant'
+      Origin = 'Quant'
       Precision = 18
+    end
+    object QryComprasPrevistasRecebido: TBooleanField
+      FieldName = 'Recebido'
+      Origin = 'Recebido'
+    end
+    object QryComprasPrevistasPreco: TBCDField
+      FieldName = 'Preco'
+      Origin = 'Preco'
+      Precision = 14
+    end
+    object QryComprasPrevistasObs: TMemoField
+      FieldName = 'Obs'
+      Origin = 'Obs'
+      BlobType = ftMemo
+      Size = 2147483647
     end
   end
   object DsComprasPrevistas: TDataSource
@@ -581,7 +641,6 @@ object FormEntregaPorProduto: TFormEntregaPorProduto
     Top = 96
   end
   object QryPedidos: TFDQuery
-    Active = True
     OnCalcFields = QryPedidosCalcFields
     Connection = ConSqlServer.FDConnection
     SQL.Strings = (

@@ -68,6 +68,7 @@ type
       Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;
       AItem: TcxCustomGridTableItem; var AStyle: TcxStyle);
     procedure MenuGerenciarPedidosClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
   public
@@ -105,6 +106,16 @@ begin
   if Sender.DataController.Values[ARecord.RecordIndex, cxGridDBTableViewTotLitros.Index] >
      Sender.DataController.Values[ARecord.RecordIndex, cxGridDBTableViewLitrosEstoque.Index] then
     AStyle := cxStyleVermelho;
+
+end;
+
+procedure TFormLogistica.FormCreate(Sender: TObject);
+begin
+  if not QryGrupos.Active then
+    QryGrupos.Active;
+
+  if not QryProdutos.Active then
+    QryProdutos.Active;
 
 end;
 

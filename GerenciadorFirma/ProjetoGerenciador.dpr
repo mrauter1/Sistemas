@@ -64,7 +64,10 @@ uses
   uUpdater in 'Fontes\uUpdater.pas',
   cxUtils in '..\utils\cxUtils.pas',
   uFormAjustaInconsistencias in 'Fontes\uFormAjustaInconsistencias.pas' {FormAjustaInconsistencias},
-  uFormEmbalagensClientes in 'Fontes\uFormEmbalagensClientes.pas' {FormEmbalagensClientes};
+  uFormEmbalagensClientes in 'Fontes\uFormEmbalagensClientes.pas' {FormEmbalagensClientes},
+  uFormCompraProdutos in 'Fontes\uFormCompraProdutos.pas' {FormCompraProduto},
+  uFormConsultaDataSet in 'Fontes\uFormConsultaDataSet.pas' {FormConsultaDataSet},
+  uFormComprasAgendadas in 'Fontes\uFormComprasAgendadas.pas' {FormComprasAgendadas};
 
 {$R *.res}
 

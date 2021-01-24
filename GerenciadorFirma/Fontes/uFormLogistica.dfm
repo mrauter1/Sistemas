@@ -11,6 +11,7 @@ object FormLogistica: TFormLogistica
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   object Panel1: TPanel
@@ -55,7 +56,6 @@ object FormLogistica: TFormLogistica
     Height = 541
     Align = alClient
     TabOrder = 1
-    ExplicitTop = -3
     object cxGridDBTableView: TcxGridDBTableView
       PopupMenu = PopupMenuOpcoes
       Navigator.Buttons.CustomButtons = <>
@@ -183,6 +183,7 @@ object FormLogistica: TFormLogistica
       DisplayWidth = 10
       FieldName = 'TotLitros'
       Origin = 'TotLitros'
+      DisplayFormat = '#0'
       Precision = 38
     end
     object QryGruposTotQuilos: TFMTBCDField
@@ -307,6 +308,7 @@ object FormLogistica: TFormLogistica
       DisplayWidth = 12
       FieldName = 'LitrosPedidos'
       Origin = 'LitrosPedidos'
+      DisplayFormat = '#0'
       Precision = 38
     end
     object QryProdutosSomaPedidos: TFMTBCDField
@@ -315,6 +317,7 @@ object FormLogistica: TFormLogistica
       FieldName = 'SomaPedidos'
       Origin = 'SomaPedidos'
       ReadOnly = True
+      DisplayFormat = '#0'
       Precision = 38
     end
     object QryProdutosEstoqueProduto: TFMTBCDField
@@ -323,6 +326,7 @@ object FormLogistica: TFormLogistica
       FieldName = 'EstoqueProduto'
       Origin = 'EstoqueProduto'
       ReadOnly = True
+      DisplayFormat = '#0'
       Precision = 37
     end
   end

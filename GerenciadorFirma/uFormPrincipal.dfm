@@ -25,7 +25,6 @@ object FormPrincipal: TFormPrincipal
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitHeight = 405
     object ChromeTabs1: TChromeTabs
       Left = 0
       Top = 0
@@ -367,7 +366,6 @@ object FormPrincipal: TFormPrincipal
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 1
-      ExplicitHeight = 373
     end
   end
   object TreeViewMenu: TdxDBTreeView
@@ -396,14 +394,12 @@ object FormPrincipal: TFormPrincipal
     OnDblClick = TreeViewMenuDblClick
     OnKeyDown = TreeViewMenuKeyDown
     PopupMenu = PopupMenuTreeView
-    ExplicitHeight = 405
   end
   object cxSplitter1: TcxSplitter
     Left = 225
     Top = 0
     Width = 8
     Height = 386
-    ExplicitHeight = 405
   end
   object StatusBar1: TStatusBar
     Left = 0
@@ -412,9 +408,6 @@ object FormPrincipal: TFormPrincipal
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitLeft = 424
-    ExplicitTop = 224
-    ExplicitWidth = 0
   end
   object MainMenu: TMainMenu
     OwnerDraw = True
@@ -433,10 +426,6 @@ object FormPrincipal: TFormPrincipal
       object DetalhedosProdutos1: TMenuItem
         Caption = 'Detalhe dos Produtos'
         OnClick = DetalhedosProdutos1Click
-      end
-      object ControleLogistica1: TMenuItem
-        Caption = 'Controle Logistica'
-        OnClick = ControleLogistica1Click
       end
       object MenuCicloVendas: TMenuItem
         Caption = 'Ciclos de Vendas'
@@ -469,6 +458,21 @@ object FormPrincipal: TFormPrincipal
       object CriarConsulta1: TMenuItem
         Caption = 'Gerenciar Relat'#243'rios'
         OnClick = CriarConsulta1Click
+      end
+    end
+    object Compras1: TMenuItem
+      Caption = 'Compras'
+      object ComprasAgendadas1: TMenuItem
+        Caption = 'Compras Agendadas'
+        OnClick = ComprasAgendadas1Click
+      end
+      object ComprasporGrupo1: TMenuItem
+        Caption = 'Compras por Grupo'
+        OnClick = ComprasporGrupo1Click
+      end
+      object ControleLogistica1: TMenuItem
+        Caption = 'Controle Logistica'
+        OnClick = ControleLogistica1Click
       end
     end
     object Fretes1: TMenuItem

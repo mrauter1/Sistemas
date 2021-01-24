@@ -31,7 +31,6 @@ type
     QryEstoquePrevistoCodGrupoSub: TStringField;
     QryEstoquePrevistoNOMESUBGRUPO: TStringField;
     QryEstoquePrevistoEstoqueAtual: TFMTBCDField;
-    QryEstoquePrevistoCompraPrevista2: TBCDField;
     QryEstoquePrevistoSomaCompras: TFMTBCDField;
     QryEstoquePrevistoPedidosDia: TFMTBCDField;
     QryEstoquePrevistoSomaPedidos: TFMTBCDField;
@@ -56,13 +55,9 @@ type
     ViewCompras: TcxGridDBTableView;
     cxGridLevel2: TcxGridLevel;
     QryComprasPrevistas: TFDQuery;
-    DateField1: TDateField;
     DsComprasPrevistas: TDataSource;
     QryComprasPrevistasCodGrupoSub: TStringField;
-    QryComprasPrevistasCompraPrevista: TBCDField;
-    ViewComprasData: TcxGridDBColumn;
     ViewComprasCodGrupoSub: TcxGridDBColumn;
-    ViewComprasCompraPrevista: TcxGridDBColumn;
     PanelHeader: TPanel;
     DBTextGrupo: TDBText;
     PanelComandos: TPanel;
@@ -123,6 +118,19 @@ type
     QryPedidosNomeTransporte: TStringField;
     ViewPedidosNomeTransporte: TcxGridDBColumn;
     cxStyleAmarelo: TcxStyle;
+    QryComprasPrevistasQuant: TBCDField;
+    ViewComprasQuant: TcxGridDBColumn;
+    QryEstoquePrevistoCompraPrevista: TFMTBCDField;
+    QryComprasPrevistasID: TFDAutoIncField;
+    QryComprasPrevistasDataCompra: TDateField;
+    QryComprasPrevistasDataRecebimento: TDateField;
+    QryComprasPrevistasRecebido: TBooleanField;
+    QryComprasPrevistasPreco: TBCDField;
+    QryComprasPrevistasObs: TMemoField;
+    ViewComprasDataRecebimento: TcxGridDBColumn;
+    Panel2: TPanel;
+    btnGerenciarCompras: TBitBtn;
+    ViewComprasObs: TcxGridDBColumn;
     procedure QryComprasPrevistasAfterPost(DataSet: TDataSet);
     procedure QryComprasPrevistasAfterDelete(DataSet: TDataSet);
     procedure QryComprasPrevistasBeforePost(DataSet: TDataSet);
@@ -145,6 +153,7 @@ type
     procedure ViewPedidosStylesGetContentStyle(Sender: TcxCustomGridTableView;
       ARecord: TcxCustomGridRecord; AItem: TcxCustomGridTableItem;
       var AStyle: TcxStyle);
+    procedure btnGerenciarComprasClick(Sender: TObject);
   private
     FGrupo: String;
     FChecked: TDictionary<String, Boolean>;
@@ -174,7 +183,7 @@ implementation
 { TFormEntregaPorProduto }
 
 uses
-  uFormPrincipal;
+  uFormPrincipal, uFormCompraProdutos;
 
 class procedure TFormEntregaPorProduto.AbreGrupo(pCodGrupo: String);
 var
@@ -200,7 +209,10 @@ procedure TFormEntregaPorProduto.RefreshQuery(pQuery: TFDQuery);
 begin
   pQuery.DisableControls;
   try
-    pQuery.Refresh;
+    if not pQuery.Active then
+      pQuery.Open
+    else
+      pQuery.Refresh;
   finally
     pQuery.EnableControls;
   end;
@@ -306,14 +318,18 @@ begin
   end;
 end;
 
+procedure TFormEntregaPorProduto.btnGerenciarComprasClick(Sender: TObject);
+begin
+  TFormCompraProduto.AbreComprasDoGrupo(FGrupo);
+  RefreshQueries;
+end;
+
 constructor TFormEntregaPorProduto.Create(AOwner: TComponent);
 begin
   FChecked:= TDictionary<String, Boolean>.Create;
   inherited Create(AOwner);
 
   FClonePedidos:= TFDMemTable.Create(Self);
-  FClonePedidos.FieldDefs.Assign(QryPedidos.FieldDefs);
-  FClonePedidos.CreateDataSet;
 end;
 
 procedure TFormEntregaPorProduto.FormCreate(Sender: TObject);
@@ -394,7 +410,13 @@ begin
   RefreshQryParam(QryComprasPrevistas, 'CODGRUPOSUB', FGrupo);
   RefreshQryParam(QryEstoquePrevisto, 'CODGRUPOSUB', FGrupo);
   RefreshQryParam(QryPedidos, 'CODGRUPOSUB', FGrupo);
-  RefreshQryParam(QryPedidosProgramados, 'CODGRUPOSUB', FGrupo)
+  RefreshQryParam(QryPedidosProgramados, 'CODGRUPOSUB', FGrupo);
+
+  if not FClonePedidos.Active then
+  begin
+    FClonePedidos.FieldDefs.Assign(QryPedidos.FieldDefs);
+    FClonePedidos.CreateDataSet;
+  end;
 end;
 
 procedure TFormEntregaPorProduto.Timer1Timer(Sender: TObject);

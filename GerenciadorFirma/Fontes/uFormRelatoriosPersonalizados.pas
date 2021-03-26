@@ -84,6 +84,8 @@ type
     Label2: TLabel;
     TabSql: TTabSheet;
     MemoSqlGerado: TMemo;
+    cxGridDBTableView1Formula: TcxGridDBColumn;
+    cxGridDBTableView1DisplayFormat: TcxGridDBColumn;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure BtnSalvarClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);

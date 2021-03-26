@@ -286,6 +286,8 @@ object FormCiclosVenda: TFormCiclosVenda
         Height = 474
         Align = alClient
         TabOrder = 0
+        ExplicitLeft = -3
+        ExplicitTop = -2
         object cxGridDBTableView1: TcxGridDBTableView
           PopupMenu = PopupMenuIgnorados
           Navigator.Buttons.CustomButtons = <>

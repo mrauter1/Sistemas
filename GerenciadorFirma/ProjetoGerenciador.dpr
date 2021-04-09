@@ -67,7 +67,8 @@ uses
   uFormEmbalagensClientes in 'Fontes\uFormEmbalagensClientes.pas' {FormEmbalagensClientes},
   uFormCompraProdutos in 'Fontes\uFormCompraProdutos.pas' {FormCompraProduto},
   uFormConsultaDataSet in 'Fontes\uFormConsultaDataSet.pas' {FormConsultaDataSet},
-  uFormComprasAgendadas in 'Fontes\uFormComprasAgendadas.pas' {FormComprasAgendadas};
+  uFormComprasAgendadas in 'Fontes\uFormComprasAgendadas.pas' {FormComprasAgendadas},
+  uFormPropriedadesGrafico in 'Fontes\uFormPropriedadesGrafico.pas' {FormPropriedadesGrafico};
 
 {$R *.res}
 

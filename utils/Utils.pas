@@ -4,7 +4,7 @@ interface
 
 uses
   Winapi.ShellAPI, Winapi.SHLOBJ, Winapi.Windows, Data.DB, Datasnap.DBClient, Controls, Forms, Variants, Dialogs, System.Classes, StdCtrls, CheckLst,
-  Graphics;
+  Graphics, VCL.ExtCtrls;
 
 type
   TValorChave = class(TComponent)
@@ -23,6 +23,10 @@ type
     class function ObterValor(pComboBox: TComboBox): Variant;
     class function ObterValoresSelecionados(pCheckListBox: TCheckListBox; pSeparador: String=','; pQuoteValues: Boolean = False): String;
   end;
+
+TProcedure = reference to procedure;
+
+procedure ExecuteAsync(AProcedure: TProcedure; AInterval: Integer=10);
 
 function ExecAndWait(const pFile, pParametros: String; const ShowCmd: Word; pTimeOut: Integer; WorkDir: String = ''): boolean;
 
@@ -58,10 +62,25 @@ procedure CopyRecord(pSource: TDataSet; pTarget: TDataSet);
 
 procedure CopyRecordsDataSet(pSource: TDataSet; pTarget: TDataSet; pClearTarget: Boolean = False);
 
+type
+  TAsyncTimer = class(TTimer)
+  private
+     FProc: TProcedure;
+     procedure DoOnTimer(Sender: TObject);
+  public
+    constructor Create(AOwner: TComponent); overload; override;
+    constructor Create(AOwner: TComponent; AProcedure: TProcedure; AInterval: Integer); overload;
+  end;
+
 implementation
 
 uses
   SysUtils, System.TypInfo, DateUtils, Vcl.Imaging.pngImage;
+
+procedure ExecuteAsync(AProcedure: TProcedure; AInterval: Integer=10);
+begin
+  TAsyncTimer.Create(nil, AProcedure, AInterval);
+end;
 
 function ExecAndWait(const pFile, pParametros: String; const ShowCmd: Word; pTimeOut: Integer; WorkDir: String = ''): boolean;
 var
@@ -404,6 +423,28 @@ begin
     Result:= TValorChave(StringList.Objects[Index]).Chave
   else
     Result:= null;
+end;
+
+{ TAsyncTimer }
+constructor TAsyncTimer.Create(AOwner: TComponent; AProcedure: TProcedure; AInterval: Integer);
+begin
+  Create(AOwner);
+  Self.FProc:= AProcedure;
+  Self.Interval:= AInterval;
+  Self.OnTimer:= DoOnTimer;
+  Self.Enabled:= True;
+end;
+
+constructor TAsyncTimer.Create(AOwner: TComponent);
+begin
+  inherited;
+end;
+
+procedure TAsyncTimer.DoOnTimer(Sender: TObject);
+begin
+  Self.FProc();
+  Self.Enabled:= False;
+  Self.Free;
 end;
 
 end.

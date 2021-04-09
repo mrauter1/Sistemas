@@ -97,7 +97,7 @@ begin
     FMessageBody := TIdText.Create(Result.MessageParts);
     FMessageBody.Body.Text := pCorpo;
 
-    if pCorpo.ToUpper.Contains('<HTML>') then
+    if pCorpo.ToUpper.Contains('<HTML') then
       FMessageBody.ContentType := 'text/html; charset=ISO-8859-1'
     else
       FMessageBody.ContentType := 'text/plain; charset=ISO-8859-1';
@@ -146,7 +146,7 @@ begin
   Result.HtmlCharSet := 'utf-8';
   Result.PlainTextCharSet := 'utf-8';
 
-  if pCorpo.ToUpper.Contains('<HTML>') then
+  if pCorpo.ToUpper.Contains('<HTML') then
     Result.Html.Text := pCorpo
   else
     Result.PlainText.Text := pCorpo;

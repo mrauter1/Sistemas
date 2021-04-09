@@ -34,7 +34,8 @@ uses
   FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf,
   FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet,
   FireDAC.Comp.Client, uConFirebird, System.Generics.Collections, Vcl.Imaging.pngImage,
-  uConClasses, uDmConnection, Ladder.ServiceLocator, SynCommons;
+  uConClasses, uDmConnection, Ladder.ServiceLocator, SynCommons, ExpressionParser, cxUtils,
+  uFormPropriedadesGrafico;
 
 type
   TPosicaoPanelDinamico = (cMinimizado, cMeio, cMaximizado);
@@ -77,9 +78,6 @@ type
     cxStyleFontes: TcxStyleRepository;
     PanelTsGrafico: TPanel;
     PanelGrafico: TPanel;
-    cxGridGrafico: TcxGrid;
-    cxGridGraficoChartView: TcxGridChartView;
-    cxGridGraficoLevel: TcxGridLevel;
     PanelTabelaDinamica: TPanel;
     DBPivotGrid: TcxDBPivotGrid;
     PanelControlesGrafico: TPanel;
@@ -115,6 +113,11 @@ type
     cxStyleTitulo: TcxStyle;
     BtnSalvaImg: TBitBtn;
     CbxFormatoNativo: TCheckBox;
+    PanelGrafInterno: TPanel;
+    cxGridGrafico: TcxGrid;
+    cxGridGraficoChartView: TcxGridChartView;
+    cxGridGraficoLevel: TcxGridLevel;
+    BtnOpcoesGrafico: TButton;
     procedure BtnFecharClick(Sender: TObject);
     procedure VOLTAR_PARAMETROSClick(Sender: TObject);
     procedure IR_EXECUTANDOCONSULTAClick(Sender: TObject);
@@ -129,7 +132,6 @@ type
     procedure Proc_Go_Para();
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
     procedure BtnExcelcxGridTarefaClick(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
     procedure cxPivotGridChartConnectionGetSeriesDisplayText(
@@ -164,7 +166,9 @@ type
     procedure BtnCarregaFiltroClick(Sender: TObject);
     procedure cxGridGraficoChartViewActiveDiagramChanged(
       Sender: TcxGridChartView; ADiagram: TcxGridChartDiagram);
-
+    procedure Button1Click(Sender: TObject);
+    procedure DBPivotGridLayoutChanged(Sender: TObject);
+    procedure BtnOpcoesGraficoClick(Sender: TObject);
   private
     { Private declarations }
     UpdatingPage: Boolean;
@@ -173,6 +177,8 @@ type
     FPrimeiroShow: Boolean;
     FUltimaConfig: Integer;
     FResultDocVariant: TDocVariantData;
+    FExpressionParser: TExpressionParser;
+    FPivotLayoutChanged: Boolean;
     procedure PageControlAtiva(Pagina:Integer);
     function PopulaParametrosDM: Boolean;
     function Func_GetColorChartView(pAViewInfoDesc: string): Variant;
@@ -200,7 +206,13 @@ type
     function GetParams: TParametros;
     class function Conn: TDmConnection; static;
     procedure AjustaPropriedadesPivoGrid;
-  public
+    procedure AoCalcularFormula(Sender: TcxPivotGridField;
+      ASummary: TcxPivotGridCrossCellSummary);
+    procedure OnGetDisplayTextPivot(Sender: TcxPivotGridField;
+      ACell: TcxPivotGridDataCellViewInfo; var AText: string);
+    function GetFieldisplayText(const AName: String; AValue: Variant): String;
+    procedure RebuildChartConf;
+   public
     { Public declarations }
     function ExecutaConsulta: Boolean;
     function CarregaVisualizacaoByName(pNome: String): Boolean;
@@ -245,6 +257,19 @@ implementation
 uses Utils, System.UITypes, jpeg, Ladder.Activity.LadderVarToSql, Ladder.ORM.DaoUtils, Ladder.Parser, Ladder.Utils;
 
 {$R *.dfm}
+
+function TryVarToFloat(pVar: Variant; var AValor: Double): Boolean;
+begin
+  if VarIsNull(pVar) then
+    Result:= False
+  else
+  try
+    AValor:= pVar;
+    Result:= True;
+  except
+    Result:= False;
+  end;
+end;
 
 function GetDaoUtils: TDaoUtils;
 begin
@@ -387,6 +412,7 @@ begin
    finally
      BmpImg.free;
    end;
+end;
 
 {  B := TBitmap.CREATE;
   try
@@ -396,8 +422,6 @@ begin
     FreeAndNil(b);
   finally
   end;}
-end;
-
 class function TFrmConsultaPersonalizada.AbreConsultaPersonalizada(pIDConsulta: Integer; pExecutar: Boolean = True): TFrmConsultaPersonalizada;
 var
   FFrmConsulta: TFrmConsultaPersonalizada;
@@ -484,6 +508,101 @@ end;
 procedure TFrmConsultaPersonalizada.MaximizaPanelTabela;
 begin
   PanelTabelaDinamica.Height:= TsGrafico.Height-5-cxSplitterResultado.Height;
+end;
+
+procedure TFrmConsultaPersonalizada.AoCalcularFormula(Sender: TcxPivotGridField; ASummary: TcxPivotGridCrossCellSummary);
+var
+  AOwner: TCxPivotGridCrossCell;
+  AColumn: TcxPivotGridGroupItem;
+  FFormula: String;
+  I: Integer;
+  FTokenNames: TArray<String>;
+  FTokenIndexes: TDictionary<String, Integer>;
+  FTokenNull: TDictionary<String, Boolean>;
+  FTokenValues: TDictionary<String, Double>;
+  FToken: String;
+  FValue: Variant;
+
+  procedure InitializeTokens(AFormula: String);
+  var
+    I: Integer;
+    FField: TcxPivotGridField;
+  begin
+    FTokenNames:= FExpressionParser.ExtractTokens(AFormula);
+    for I := 0 to Length(FTokenNames)-1 do
+    begin
+      FField:= FindPivotFieldByFieldName(DBPivotGrid, FTokenNames[I]);
+      if not Assigned(FField) then
+        raise Exception.Create(Format('Field "%s" not found',[FTokenNames[I]]));
+
+      FTokenIndexes.Add(FTokenNames[I], FField.Index);
+      FTokenNull.Add(FTokenNames[I], True);
+      FTokenValues.Add(FTokenNames[I], 0);
+    end;
+  end;
+begin
+  try
+    AOwner:= ASummary.Owner;
+    AColumn := ASummary.Owner.Column;
+
+    if not FDm.QryCampos.Locate('NomeCampo', TcxDBPivotGridFieldDataBinding(Sender.DataBinding).FieldName, [loCaseInsensitive]) then
+      Exit;
+
+    FFormula:= FDm.QryCamposFormula.AsString;
+
+    FTokenIndexes:= TDictionary<String, Integer>.Create;
+    FTokenNull:= TDictionary<String, Boolean>.Create;
+    FTokenValues:= TDictionary<String, Double>.Create;
+    try
+      InitializeTokens(FFormula);
+      for I := 0 to AOwner.Records.Count - 1 do
+        for FToken in FTokenIndexes.Keys do
+        begin
+          FValue:= AOwner.DataController.Values[AOwner.Records.Items[I], FTokenIndexes[FToken]];
+          if FTokenNull[FToken] then
+            FTokenNull[FToken]:= VarIsNull(FValue);
+
+          FTokenValues[FToken]:= FTokenValues[FToken]+VarToFloatDef(FValue);
+        end;
+
+      for FToken in FTokenNull.Keys do
+        if FTokenNull[FToken] then
+        begin
+          ASummary.Custom:= null;
+          Exit;
+        end;
+
+      FExpressionParser.Dictionary:= FTokenValues;
+      ASummary.Custom:= FExpressionParser.Evaluate(FFormula);
+    finally
+      FTokenIndexes.Free;
+      FTokenNull.Free;
+      FTokenValues.Free;
+    end;
+  except
+    ASummary.Custom:= null;
+  end;
+end;
+
+procedure TFrmConsultaPersonalizada.RebuildChartConf;
+var
+  I: Integer;
+begin
+  if not FPivotLayoutChanged then // Check this flag to execute once per change
+    Exit;
+
+  for I := 0 to cxGridGraficoChartView.SeriesCount-1 do
+  begin
+    cxGridGraficoChartView.Series[I].DisplayText:= GetSeriesFullName(cxPivotGridChartConnection, cxGridGraficoChartView.Series[I]);
+    cxGridGraficoChartView.Series[I].OnGetValueDisplayText:= CategoriesGetValueDisplayText;
+  end;
+  FPivotLayoutChanged:= False;
+end;
+
+procedure TFrmConsultaPersonalizada.DBPivotGridLayoutChanged(Sender: TObject);
+begin
+  FPivotLayoutChanged:= True;
+  ExecuteAsync(RebuildChartConf);
 end;
 
 procedure TFrmConsultaPersonalizada.DiminuiPanelTabela;
@@ -612,41 +731,50 @@ begin
     begin
       MemoSqlGerado.Lines.Text:= FDm.SqlGerado;
       TIni:=Now();
-      QryConsulta.Active:=False;
 
-      if FDm.GetFonteDados = fdSqlServer then
-        QryConsulta.Connection:= Conn.FDConnection
-      else
-        QryConsulta.Connection:= ConFirebird.FDConnection;
+      cxGridTabelaDBTableView1.BeginUpdate;
+      DBPivotGrid.BeginUpdate;
+      try
+        QryConsulta.Active:=False;
 
-      QryConsulta.SQL.Text:= FDm.SqlGerado;
-      QryConsulta.Active:=True;
+        if FDm.GetFonteDados = fdSqlServer then
+          QryConsulta.Connection:= Conn.FDConnection
+        else
+          QryConsulta.Connection:= ConFirebird.FDConnection;
 
-      StatusBar1.SimpleText:= 'Sql execution time '+FormatDateTime('HH:MM:SS', Now-TIni);
+        QryConsulta.SQL.Text:= FDm.SqlGerado;
 
-      FDm.SetEstilosCamposQry(QryConsulta);
-      AtualizaCamposGrid;
+        QryConsulta.Active:=True;
 
-      TFim:=Now();
+        StatusBar1.SimpleText:= 'Sql execution time '+FormatDateTime('HH:MM:SS', Now-TIni);
 
-      CarregaVisualizacoes;
+        FDm.SetEstilosCamposQry(QryConsulta);
+        AtualizaCamposGrid;
 
-      case FDm.QryConsultasVisualizacaoPadrao.AsInteger of
-        0: PageControlVisualizacoes.ActivePage:= TsTabela;
-        1: PageControlVisualizacoes.ActivePage:= TsDinamica;
-        2: PageControlVisualizacoes.ActivePage:= TsGrafico;
+        TFim:=Now();
+
+        CarregaVisualizacoes;
+
+        case FDm.QryConsultasVisualizacaoPadrao.AsInteger of
+          0: PageControlVisualizacoes.ActivePage:= TsTabela;
+          1: PageControlVisualizacoes.ActivePage:= TsDinamica;
+          2: PageControlVisualizacoes.ActivePage:= TsGrafico;
+        end;
+
+        PageControlVisualizacoesChange(Self);
+
+        PageControlAtiva(2);
+
+        LabelCount.Caption:='Total de Registros: '+InttoStr(QryConsulta.RecordCount);
+        LbTime.Caption:=FormatDateTime('HH:MM:SS', TFim-TIni);
+
+        FResultDocVariant.Clear;
+
+        Result:= True;
+      finally
+        cxGridTabelaDBTableView1.EndUpdate;
+        DBPivotGrid.EndUpdate;
       end;
-
-      PageControlVisualizacoesChange(Self);
-
-      PageControlAtiva(2);
-
-      LabelCount.Caption:='Total de Registros: '+InttoStr(QryConsulta.RecordCount);
-      LbTime.Caption:=FormatDateTime('HH:MM:SS', TFim-TIni);
-
-      FResultDocVariant.Clear;
-
-      Result:= True;
     end
   except
     on E: Exception do
@@ -924,6 +1052,42 @@ begin
   Result:= True;
 end;
 
+function TFrmConsultaPersonalizada.GetFieldisplayText(const AName: String; AValue: Variant): String;
+var
+  FDisplayMask: String;
+  FVal: Double;
+begin
+  FDisplayMask:= '';
+  if not FDm.FFieldDisplayText.TryGetValue(AName, FDisplayMask) then
+    Exit;
+
+  if Trim(FDisplayMask) = '' then
+    Exit;
+
+  if not TryVarToFloat(AValue, FVal) then
+  begin
+    Result:= '';
+    Exit;
+  end;
+
+  if FDisplayMask = '%' then
+    Result:= FormatFloat('###0.00', FVal*100)+' %'
+  else
+    Result:= FormatFloat(FDisplayMask, FVal);
+end;
+
+procedure TFrmConsultaPersonalizada.OnGetDisplayTextPivot(Sender: TcxPivotGridField;
+  ACell: TcxPivotGridDataCellViewInfo; var AText: string);
+var
+  FDisplay: String;
+begin
+  FDisplay:= GetFieldisplayText(TcxDBPivotGridFieldDataBinding(Sender.DataBinding).FieldName, ACell.Value);
+  if FDisplay='' then
+    Exit;
+
+  AText:= FDisplay;
+end;
+
 procedure TFrmConsultaPersonalizada.AjustaPropriedadesPivoGrid;
 var
   I: Integer;
@@ -942,13 +1106,17 @@ begin
         3: DBPivotGrid.Fields[i].SummaryType:= stMax; //Max
         4: DBPivotGrid.Fields[i].SummaryType:= stMin; //Min
         5: DBPivotGrid.Fields[i].SummaryType:= stStdDev; //Desvio Padrão
+        6: begin
+            DBPivotGrid.Fields[i].SummaryType:= stCustom; //Fórmula customizada
+            DBPivotGrid.Fields[i].OnCalculateCustomSummary:= AoCalcularFormula;
+           end;
       end;
-
+      DBPivotGrid.Fields[i].OnGetDisplayText:= OnGetDisplayTextPivot;
       DBPivotGrid.Fields[I].Visible:= FDm.QryCamposVisivel.AsBoolean;
 
     end;
   //  ShowMessage(TcxDBPivotGridFieldDataBinding(DBPivotGrid.Fields[i].DataBinding).FieldName);
-    DBPivotGrid.Fields[i].ExpandAll;
+//    DBPivotGrid.Fields[i].ExpandAll;
   end;
 end;
 
@@ -962,9 +1130,11 @@ begin
 
   AjustaPropriedadesPivoGrid;
 
-  DBPivotGrid.Refresh;  
+  DBPivotGrid.ApplyBestFit;
 
-  cxPivotGridChartConnection.Refresh;
+  DBPivotGrid.Refresh;
+
+//  cxPivotGridChartConnection.Refresh;
 
  { for I:= 0 to DBPivotGrid.FieldCount-1 do
   begin
@@ -1093,6 +1263,14 @@ begin
 
 end;
 
+procedure TFrmConsultaPersonalizada.BtnOpcoesGraficoClick(Sender: TObject);
+var
+  FFrm: TFormPropriedadesGrafico;
+begin
+  FFrm:= TFormPropriedadesGrafico.Create(Self, cxPivotGridChartConnection);
+  FFrm.ShowModal;
+end;
+
 procedure TFrmConsultaPersonalizada.BtnSalvaImgClick(Sender: TObject);
 begin
 {  SaveDialog.DefaultExt:= '.png';
@@ -1110,6 +1288,94 @@ begin
     showmessage('Arquivo Exportado com Sucesso.');
     ShellExecute(Handle, 'open', pchar(SaveDialog.FileName), nil, nil, SW_SHOW);
   end;          }
+end;
+
+procedure TFrmConsultaPersonalizada.Button1Click(Sender: TObject);
+var
+  sCols, sRows: String;
+  I, F: Integer;
+  FCol: TcxPivotGridViewDataItem;
+
+  function PrintColumn(AColumn: TcxPivotGridViewDataItem): String;
+  begin
+    Result:= TcxDBPivotGridField(AColumn.Field).DataBinding.FieldName
+              +','+IntToStr(AColumn.Level)+','
+              +IntToStr(AColumn.ItemCount)+','
+              +GetViewDataItemFullName(AColumn)+','+
+              sLineBreak;
+  end;
+
+  function PrintRow(ARow: TcxPivotGridViewDataItem): String;
+  begin
+    Result:= TcxDBPivotGridField(ARow.Field).DataBinding.FieldName
+              +','+IntToStr(ARow.Level)+','
+              +IntToStr(ARow.ItemCount)+','
+              +ARow.GroupItem.Parent.DisplayText+
+              ARow.GetDisplayText+
+              sLineBreak;
+  end;
+
+  function PrintGroupItem(AGroup: TcxPivotGridGroupItem): String;
+    function GetFullGroupName(AGroup: TcxPivotGridGroupItem): String;
+    var
+      FParent: TcxPivotGridGroupItem;
+    begin
+      Result:= AGroup.DisplayText;
+
+      FParent:= AGroup.Parent;
+      while Assigned(FParent) do
+      begin
+        Result:= FParent.DisplayText+' - '+Result;
+        FParent:= FParent.Parent;
+      end;
+
+    end;
+  begin
+    Result:= '';
+    if not Assigned(AGroup.Field) then
+      Exit;
+
+    Result:= TcxDBPivotGridField(AGroup.Field).DataBinding.FieldName
+              +','+IntToStr(AGroup.Level)+','
+              +IntToStr(AGroup.ItemCount)+','
+              +GetFullGroupName(AGroup)+
+              sLineBreak;
+  end;
+var
+  FCell: TcxPivotGridCrossCellSummary;
+begin
+{ sRows:= ''
+  sCols:= '';
+
+  if DBPivotGrid.ViewData.RowCount=0 then
+    Exit;
+
+  for I := 0 to DBPivotGrid.ViewData.ColumnCount-1 do
+  begin
+    if (DBPivotGrid.ViewData.Columns[I].IsGrandTotal) or (DBPivotGrid.ViewData.Columns[I].IsTotalItem) then
+      Continue;
+
+    sCols:= sCols+PrintColumn(DBPivotGrid.ViewData.Columns[I]);
+
+//    DBPivotGrid.ViewData.Cells.
+//
+//    FCell:= DBPivotGrid.ViewData.Cells[0,I];
+//    sCols:= sCols+PrintGroupItem(FCell.Owner.Column)+';';
+//    sCols:= sCols+FCell.Owner.Column.Parent.DisplayText;
+//    sCols:= sCols+;
+  end;
+
+//    sRows:= sRows+ PrintRow(DBPivotGrid.ViewData.Rows[I]);
+
+  ShowMessage(sCols);
+{  sCols:= '';
+  I:= 0;
+
+  for I := 0 to DBPivotGrid.FieldCount-1 do
+    sCols:= sCols+ TcxDBPivotGridField(DBPivotGrid.Fields[I]).DataBinding.DBField.FieldName+sLinebreak;
+
+  ShowMessage('Series: '+IntToStr(cxGridGraficoChartView.SeriesCount)+sLineBreak
+             +'Columns'+IntToStr(I)+sLineBreak+sCols);}
 end;
 
 procedure TFrmConsultaPersonalizada.BtNegritoClick(Sender: TObject);
@@ -1263,51 +1529,51 @@ var
   i  : integer;
   Bold, Italic : Boolean;
 begin
-  Result:= False;
-
-  AtualizaCamposGrid;
-
-  FUltimaConfig:= QryVisualizacoesID.AsInteger;
-
-  FNomeIni:= ExtractFilePath(Application.ExeName)+'temp\ConsultasConfig.ini';
-
-  if not DirectoryExists(ExtractFilePath(FNomeIni)) then
-    CreateDir(ExtractFilePath(FNomeIni));
-
-  if FileExists(FNomeIni) then
-    DeleteFile(FNomeIni);
-
-  QryVisualizacoesArquivo.SaveToFile(FNomeIni);
-
-//  cxGridTabelaDBTableView1.RestoreFromIniFile(FNomeIni, False, False, [gsoUseSummary], 'Tabela');
-  DBPivotGrid.RestoreFromIniFile(FNomeIni, False);
-  cxGridGraficoChartView.RestoreFromIniFile(FNomeIni, False, False, [gsoUseSummary], 'Grafico');
-
-  ArqIni := TIniFile.Create(FNomeIni);
-  try
-    SizeLegend := ArqIni.ReadInteger('CONFIG', 'SIZE_LEGEND_ITEM',10);
-    Bold := ArqIni.ReadBool('CONFIG', 'BOLD_LEGEND_ITEM',false);
-    Italic := ArqIni.ReadBool('CONFIG', 'ITALIC_LEGEND_ITEM',false);
-
-  finally
-    ArqIni.Free;
-  end;
-
   DBPivotGrid.BeginUpdate;
+  try
+    Result:= False;
+
+    AtualizaCamposGrid;
+
+    FUltimaConfig:= QryVisualizacoesID.AsInteger;
+
+    FNomeIni:= ExtractFilePath(Application.ExeName)+'temp\ConsultasConfig.ini';
+
+    if not DirectoryExists(ExtractFilePath(FNomeIni)) then
+      CreateDir(ExtractFilePath(FNomeIni));
+
+    if FileExists(FNomeIni) then
+      DeleteFile(FNomeIni);
+
+    QryVisualizacoesArquivo.SaveToFile(FNomeIni);
+
+  //  cxGridTabelaDBTableView1.RestoreFromIniFile(FNomeIni, False, False, [gsoUseSummary], 'Tabela');
+    DBPivotGrid.RestoreFromIniFile(FNomeIni, False);
+    cxGridGraficoChartView.RestoreFromIniFile(FNomeIni, False, False, [gsoUseSummary], 'Grafico');
+
+    ArqIni := TIniFile.Create(FNomeIni);
     try
-      AjustaPropriedadesPivoGrid;
-{      for I := 0 to DBPivotGrid.FieldCount - 1 do
-        DBPivotGrid.Fields[I].ExpandAll;    }
+      SizeLegend := ArqIni.ReadInteger('CONFIG', 'SIZE_LEGEND_ITEM',10);
+      Bold := ArqIni.ReadBool('CONFIG', 'BOLD_LEGEND_ITEM',false);
+      Italic := ArqIni.ReadBool('CONFIG', 'ITALIC_LEGEND_ITEM',false);
+
     finally
-      DBPivotGrid.EndUpdate;
+      ArqIni.Free;
     end;
 
-    Proc_Atualiza_LegenItem(SizeLegend, Bold, Italic );
+      AjustaPropriedadesPivoGrid;
+  {      for I := 0 to DBPivotGrid.FieldCount - 1 do
+          DBPivotGrid.Fields[I].ExpandAll;    }
 
-    AtualizaTitulo;
+      Proc_Atualiza_LegenItem(SizeLegend, Bold, Italic );
 
-    Result:= True;
-//  IR_EXECUTANDOCONSULTAClick(Sender);
+      AtualizaTitulo;
+
+      Result:= True;
+  finally
+    DBPivotGrid.EndUpdate;
+  end;
+  //  IR_EXECUTANDOCONSULTAClick(Sender);
 end;
 
 procedure TFrmConsultaPersonalizada.QryConfiguracoesBeforeOpen(
@@ -1361,12 +1627,21 @@ begin
   vArSQLObrigator := TStringList.Create;
   vArExcel        := TStringList.Create;
   vArResultado    := TStringList.Create;
+
+  FExpressionParser:= TExpressionParser.Create;
+  FExpressionParser.TokenUpperCase:= True;
 //  Self.BorderStyle:= bsSizeable;
 end;
 
 procedure TFrmConsultaPersonalizada.FormDestroy(Sender: TObject);
 begin
   FDm.Free;
+  FExpressionParser.Free;
+  vArSQLCampoTab.Free;
+  vArSQLCampoTela.Free;
+  vArSQLObrigator.Free;
+  vArExcel.Free;
+  vArResultado.Free;
 end;
 
 procedure TFrmConsultaPersonalizada.FormShow(Sender: TObject);
@@ -1393,34 +1668,6 @@ begin
     FocaPrimeiroParametro;
     FPrimeiroShow:= False;
   end;
-end;
-
-procedure TFrmConsultaPersonalizada.Button1Click(Sender: TObject);
-var
-  TIni, TFim : TDateTime;
-begin
-{  MemoSqlGerado.Text:= FDm.GeraSqlEvolutivo(FDm.SqlOriginal, Now-90, Now, True, 1);
-
-  TIni:=Now();
-  QryCruzamento.Active:=False;
-  QryCruzamento.SQL.Clear;
-  QryCruzamento.SQL.Add(MemoSqlGerado.Text);
-  QryCruzamento.ExecSQL;
-  QryCruzamento.Active:=True;
-
-  AtualizaCamposGrid;
-
-  TFim:=Now();
-
-  QryConfiguracoes.Active := False;
-  QryConfiguracoes.Parameters[0].Value:= Self.Name;
-  QryConfiguracoes.Parameters[1].Value:= FDm.QryConsultaPersonalizadaConCodigo.AsString;
-  QryConfiguracoes.Active := True;
-
-  PageControlAtiva(2);
-  LabelCount.Caption:='Total de Registros: '+InttoStr(QryCruzamento.RecordCount);
-  LbTime.Caption:=FormatDateTime('HH:MM:SS', TFim-TIni);
-                                                               }
 end;
 
 function TFrmConsultaPersonalizada.ExportaTabelaDinamica(pNomeArquivo: String): Boolean;
@@ -1530,20 +1777,22 @@ end;
 procedure TFrmConsultaPersonalizada.CategoriesGetValueDisplayText(
   Sender: TObject; const AValue: Variant; var ADisplayText: string);
 var
-  FmtStr: String;
+  FDisplay: String;
+  I: Integer;
+  FPivotGridField: TcxDBPivotGridField;
 begin
-//  ShowMessage(TCxGridChartSeries(Sender).ValueCaptionFormat);
-//  FmtStr:= TCxGridChartSeries(Sender).ValueCaptionFormat;
-                       {
-    for I := 0 to AStorage.Columns.Count - 1 do
-      AGridChartView.ViewData.Categories[I] := AStorage.Columns.Strings[I];
-                      }
-  if TCxGridChartSeries(Sender).ValueCaptionFormat <> '' then Exit;
+  if not (Sender is TCxGridChartSeries) then Exit;
 
-  FmtStr:= '#,##0.00';
+  FPivotGridField:= (GetSeriesSourceField(cxPivotGridChartConnection, TCxGridChartSeries(Sender).Index) as TcxDBPivotGridField);
 
-  if (FmtStr <> '') and (VarIsFloat(AValue)) then
-    ADisplayText:= FormatFloat(FmtStr, AValue);
+  if not Assigned(FPivotGridField) then
+    Exit;
+
+ FDisplay:= GetFieldisplayText(FPivotGridField.DataBinding.FieldName, AValue);
+  if FDisplay='' then
+    Exit;
+
+  ADisplayText:= FDisplay;
 end;
 
 procedure TFrmConsultaPersonalizada.cxGridChartViewCategoriesGetValueDisplayText(
@@ -1562,7 +1811,7 @@ procedure TFrmConsultaPersonalizada.cxGridGraficoChartViewCustomDrawLegendItem(
   Sender: TcxGridChartView; ACanvas: TcxCanvas;
   AViewInfo: TcxGridChartLegendItemViewInfo; var ADone: Boolean);
 begin
-  AViewInfo.Text:= StringReplace(AViewInfo.Text, 'Grand Total - ', '', [rfIgnoreCase]);
+//  AViewInfo.Text:= StringReplace(AViewInfo.Text, 'Grand Total - ', '', [rfIgnoreCase]);
 end;
 
 function TFrmConsultaPersonalizada.PegaCorDoGrid(pSeries: TcxGridChartSeries; pCorBase: TColor): TColor;
@@ -1584,7 +1833,6 @@ procedure TFrmConsultaPersonalizada.cxChangeLegendColorCustomDrawLegendItem(
   Sender: TcxGridChartDiagram; ACanvas: TcxCanvas;
   AViewInfo: TcxGridChartLegendItemViewInfo; var ADone: Boolean);
 begin
-
   if Assigned(AViewInfo.Series) then
     AViewInfo.LegendKeyParams.Color := PegaCorDoGrid(AViewInfo.Series, AViewInfo.LegendKeyParams.Color);
 
@@ -1634,7 +1882,6 @@ procedure TFrmConsultaPersonalizada.cxPivotGridChartConnectionGetSeriesDisplayTe
   var ADisplayText: String);
 begin
   ASeries.OnGetValueDisplayText:= CategoriesGetValueDisplayText;
-  ASeries.ValueCaptionFormat:= 'R$ #,##0.00';
 end;
 
 procedure TFrmConsultaPersonalizada.cbTamFonteGraficoClick(Sender: TObject);

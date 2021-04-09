@@ -7,7 +7,7 @@ uses
   FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
   FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
   FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet, FireDAC.Comp.Client,
-  uConSqlServer, System.Generics.Collections, uConClasses;
+  uConSqlServer, System.Generics.Collections, System.Generics.Defaults, uConClasses;
 
 type
   TDmGeradorConsultas = class(TDataModule)
@@ -46,8 +46,11 @@ type
     QryConsultasIDPai: TIntegerField;
     QryConsultasFonteDados: TIntegerField;
     QryCamposFormatacao: TIntegerField;
+    QryCamposFormula: TStringField;
+    QryCamposDisplayFormat: TStringField;
     procedure DataModuleCreate(Sender: TObject);
     procedure QryParametrosAfterInsert(DataSet: TDataSet);
+    procedure DataModuleDestroy(Sender: TObject);
   private
     FDmConnection: TDmConnection;
     procedure CriaListaParams;
@@ -62,6 +65,7 @@ type
     procedure SetDmConnection(const Value: TDmConnection);
     procedure OnGetTextPercentual(Sender: TField; var Text: string;
       DisplayText: Boolean);
+    procedure SaveFieldInfo;
   public
 (*    SQLCampoTabList  : TStringList;
     CampoTelaList : TStringList;
@@ -72,6 +76,7 @@ type
 //    Params: TObjectList<TParametroCon>;
     Params: TParametros;
     SqlGerado: String;
+    FFieldDisplayText: TDictionary<String, String>;
 
     constructor Create(AOwner: TComponent; pDmConnection: TDmConnection); virtual;
 
@@ -644,6 +649,13 @@ end;
 procedure TDmGeradorConsultas.DataModuleCreate(Sender: TObject);
 begin
   Params:= TParametros.Create;
+  FFieldDisplayText:= TDictionary<String, String>.Create(TIStringComparer.Ordinal);
+end;
+
+procedure TDmGeradorConsultas.DataModuleDestroy(Sender: TObject);
+begin
+  FFieldDisplayText.Free;
+  Params.Free;
 end;
 
 function TDmGeradorConsultas.GetSqlOriginal: String;
@@ -691,11 +703,39 @@ begin
   QryConsultas.Connection:= FDmConnection.FDConnection;
 end;
 
+procedure TDmGeradorConsultas.SaveFieldInfo;
+var
+  FDisplayText: String;
+begin
+  FFieldDisplayText.Clear;
+  QryCampos.First;
+  while not QryCampos.Eof do
+  begin
+    if Trim(QryCamposDisplayFormat.AsString)<>'' then
+      FFieldDisplayText.AddOrSetValue(QryCamposNomeCampo.AsString, QryCamposDisplayFormat.AsString)
+    else if QryCamposFormatacao.AsInteger = Ord(fcMoeda) then
+      FFieldDisplayText.AddOrSetValue(QryCamposNomeCampo.AsString, 'R$ #,##0.00')
+    else if QryCamposFormatacao.AsInteger = Ord(fcPorcentagem) then
+      FFieldDisplayText.AddOrSetValue(QryCamposNomeCampo.AsString, '%')
+    else if QryCamposFormatacao.AsInteger = Ord(fcNumero) then
+      FFieldDisplayText.AddOrSetValue(QryCamposNomeCampo.AsString, '#,##0.##');
+
+{      if FFieldDisplayText.TryGetValue(QryCamposNomeCampo.AsString, FDisplayText) then
+      if FDisplayText <> '%' then
+        if Assigned(QryConsultas.FindField(QryCamposNomeCampo.AsString)) then
+          QryConsultas.FieldByName(QryCamposNomeCampo.AsString).DisplayFormat:= FDisplayText;}
+
+    QryCampos.Next;
+  end;
+end;
+
 procedure TDmGeradorConsultas.SetEstilosCamposQry(Qry: TDataSet);
 var
   I: Integer;
   FField: TField;
+  FDisplayText: String;
 begin
+  SaveFieldInfo;
   Qry.DisableControls;
   try
     for I:= 0 to Qry.FieldCount - 1 do
@@ -707,11 +747,14 @@ begin
         FField.DisplayWidth:= QryCamposTamanhoCampo.AsInteger;
         FField.Visible:= QryCamposVisivel.AsBoolean;
 
-        if QryCamposFormatacao.AsInteger = Ord(fcMoeda) then
-          SetFieldDisplayFormat(FField, 'R$ #,##0.00')
-        else if QryCamposFormatacao.AsInteger = Ord(fcPorcentagem) then
-          FField.OnGetText:= OnGetTextPercentual;
+        if FFieldDisplayText.TryGetValue(QryCamposNomeCampo.AsString, FDisplayText) then
+        begin
+          if FDisplayText = '%' then
+            FField.OnGetText:= OnGetTextPercentual
+          else
+            SetFieldDisplayFormat(FField, FDisplayText);
 
+        end;
       end;
     end;
   finally

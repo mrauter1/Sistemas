@@ -9,7 +9,7 @@ type
   TTipoParametro = (ptNada, ptComboBox, ptTexto, ptDateTime, ptCheckListBox);
   TTipoConsulta = (tcNormal, tcEvolutivo, tcParametros);
   TTipoVisualizacao = (tvTabela, tvTabelaDinamica, tvGrafico);
-  TFormatacaoCampo = (fcTexto, fcMoeda, fcPorcentagem);
+  TFormatacaoCampo = (fcTexto=0, fcMoeda, fcPorcentagem, fcNumero);
 
   TParametroCon = class(TObject)
   private

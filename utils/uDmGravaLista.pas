@@ -28,16 +28,13 @@ type
     QryListaSidicomACRECIMOLISTA: TCurrencyField;
     QryListaSidicomCUSTOSLISTA: TCurrencyField;
     QryListaSidicomCODFAIXA_DESC_LOTE: TIntegerField;
-    QryListaRealLucroBruto: TBCDField;
-    QryListaRealImpostoFaturamento: TBCDField;
     QryListaRealapresentacao: TStringField;
-    QryListaRealIDLog: TIntegerField;
     QryListaRealCODPRODUTO: TStringField;
     QryListaRealCodGrupoSub: TStringField;
     QryListaRealCodAplicacao: TStringField;
-    QryListaRealComEmbalagem: TBooleanField;
-    QryListaRealPreco: TBCDField;
     QryListaRealCodGrupo: TStringField;
+    QryListaRealTABELAICM: TStringField;
+    QryListaRealPRECO: TFMTBCDField;
     procedure DataModuleCreate(Sender: TObject);
   private
     procedure LerEAtualizarListaDePrecoSidicom(NomeListaGoogle: String;
@@ -46,7 +43,7 @@ type
     { Private declarations }
   public
     { Public declarations }
-    procedure AtualizaPrecoListaSidicom(LucroBruto, ImpostoFaturamento, ICM, PisCofins, IPI: Double);
+//    procedure AtualizaPrecoListaSidicom(LucroBruto, ImpostoFaturamento, ICM, PisCofins, IPI: Double);
     class procedure AtualizaTodasListasDePreco;
   end;
 
@@ -79,7 +76,7 @@ begin
  else
     WriteLog('Monitor.log', 'Caminho do executável python ou arquivo '+FListaPrecoPy+' não encontrado!');
 end;
-
+{
 procedure TDmGravaLista.AtualizaPrecoListaSidicom(LucroBruto, ImpostoFaturamento, ICM, PisCofins, IPI: Double);
 
   function RetornaPrecoCalculado: Double;
@@ -114,7 +111,7 @@ begin
     end;
     QryListaSidicom.Next;
   end;
-end;
+end;        }
 
 procedure TDmGravaLista.LerEAtualizarListaDePrecoSidicom(NomeListaGoogle: String; CodListaSidicom: String);
 
@@ -123,6 +120,21 @@ procedure TDmGravaLista.LerEAtualizarListaDePrecoSidicom(NomeListaGoogle: String
     cSql = 'UPDATE ListaPre SET PrecoVenda=0, PrecoCompra=0 where CodLista=''%s'' ';
   begin
      ConFirebird.ExecutaComando(Format(cSql, [CodListaSidicom]));
+  end;
+
+  function IcmPisCofins(NomeListaGoogle: String): Currency;
+  begin
+    if NomeListaGoogle = 'IPC2725' then
+      Result:= 0.2725
+    else if NomeListaGoogle = 'IPC2125' then
+      Result:= 0.2125
+    else if NomeListaGoogle = 'IPC12' then
+      Result:= 0.12
+    else if NomeListaGoogle = 'ND' then
+      Result:= 0.0
+    else
+      raise Exception.Create(Format('ICM para a lista %s não encontrado.', [NomeListaGoogle]));
+
   end;
 
 begin
@@ -136,7 +148,7 @@ begin
   QryListaSidicom.Open;
 
   QryListaReal.Close;
-  QryListaReal.ParamByName('NomeLista').AsString:= NomeListaGoogle;
+  QryListaReal.ParamByName('IcmPisCofins').AsCurrency:= IcmPisCofins(NomeListaGoogle);
   QryListaReal.Open;
 
   QryListaReal.First;
@@ -153,8 +165,6 @@ begin
     QryListaReal.Next;
   end;
 end;
-
-
 
 class procedure TDmGravaLista.AtualizaTodasListasDePreco;
 var

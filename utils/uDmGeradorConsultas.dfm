@@ -1,6 +1,7 @@
 object DmGeradorConsultas: TDmGeradorConsultas
   OldCreateOrder = False
   OnCreate = DataModuleCreate
+  OnDestroy = DataModuleDestroy
   Height = 497
   Width = 549
   object DsPara: TDataSource
@@ -67,13 +68,25 @@ object DmGeradorConsultas: TDmGeradorConsultas
       Origin = 'Visivel'
     end
     object QryCamposFormatacao: TIntegerField
-      DisplayLabel = 'Formata'#231#227'o'
+      DisplayLabel = 'Tipo'
       FieldName = 'Formatacao'
       Origin = 'Formatacao'
+    end
+    object QryCamposDisplayFormat: TStringField
+      DisplayLabel = 'Formata'#231#227'o'
+      FieldName = 'DisplayFormat'
+      Origin = 'DisplayFormat'
+      Size = 255
     end
     object QryCamposAgrupamento: TIntegerField
       FieldName = 'Agrupamento'
       Origin = 'Agrupamento'
+    end
+    object QryCamposFormula: TStringField
+      DisplayLabel = 'F'#243'rmula'
+      FieldName = 'Formula'
+      Origin = 'Formula'
+      Size = 255
     end
     object QryCamposCor: TIntegerField
       FieldName = 'Cor'

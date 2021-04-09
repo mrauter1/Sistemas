@@ -280,7 +280,7 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
         Top = 28
         Width = 816
         Height = 478
-        ActivePage = TsTabela
+        ActivePage = TsGrafico
         Align = alClient
         Style = tsFlatButtons
         TabOrder = 0
@@ -351,94 +351,18 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
               Height = 445
               Align = alClient
               TabOrder = 0
-              object cxGridGrafico: TcxGrid
-                Left = 1
-                Top = 78
-                Width = 804
-                Height = 366
-                Align = alClient
-                TabOrder = 0
-                object cxGridGraficoChartView: TcxGridChartView
-                  Categories.OnGetValueDisplayText = cxGridChartViewCategoriesGetValueDisplayText
-                  DiagramArea.OnCustomDrawLegendItem = cxChangeLegendColorCustomDrawLegendItem
-                  DiagramArea.OnCustomDrawValue = cxChangeSectionColorCustomDrawValue
-                  DiagramArea.Styles.Legend = FontSizeStyle
-                  DiagramArea.Styles.ValueCaptions = FontSizeStyle
-                  DiagramArea.Values.CaptionPosition = ldvcpAbove
-                  DiagramArea.Values.LineWidth = 2
-                  DiagramArea.Values.MarkerStyle = cmsDiamond
-                  DiagramBar.OnCustomDrawLegendItem = cxChangeLegendColorCustomDrawLegendItem
-                  DiagramBar.OnCustomDrawValue = cxChangeSectionColorCustomDrawValue
-                  DiagramBar.Styles.Legend = FontSizeStyle
-                  DiagramBar.Styles.ValueCaptions = FontSizeStyle
-                  DiagramBar.Values.BorderWidth = 2
-                  DiagramBar.Values.CaptionPosition = cdvcpOutsideEnd
-                  DiagramColumn.OnCustomDrawLegendItem = cxChangeLegendColorCustomDrawLegendItem
-                  DiagramColumn.OnCustomDrawValue = cxChangeSectionColorCustomDrawValue
-                  DiagramColumn.Styles.Legend = FontSizeStyle
-                  DiagramColumn.Styles.ValueCaptions = FontSizeStyle
-                  DiagramColumn.Values.CaptionPosition = cdvcpOutsideEnd
-                  DiagramLine.OnCustomDrawLegendItem = cxChangeLegendColorCustomDrawLegendItem
-                  DiagramLine.OnCustomDrawValue = cxChangeSectionColorCustomDrawValue
-                  DiagramLine.AxisCategory.TickMarkKind = tmkCross
-                  DiagramLine.AxisValue.TickMarkKind = tmkCross
-                  DiagramLine.Styles.Legend = FontSizeStyle
-                  DiagramLine.Styles.ValueCaptions = FontSizeStyle
-                  DiagramLine.Values.VaryColorsByCategory = True
-                  DiagramLine.Values.CaptionPosition = ldvcpAbove
-                  DiagramLine.Values.LineWidth = 3
-                  DiagramLine.Values.MarkerStyle = cmsTriangle
-                  DiagramPie.Active = True
-                  DiagramPie.OnCustomDrawLegendItem = cxChangeLegendColorCustomDrawLegendItem
-                  DiagramPie.OnCustomDrawValue = cxChangeSectionColorCustomDrawValue
-                  DiagramPie.SeriesColumnCount = 4
-                  DiagramPie.Styles.Legend = FontSizeStyle
-                  DiagramPie.Styles.ValueCaptions = FontSizeStyle
-                  DiagramPie.Values.CaptionPosition = pdvcpOutsideEndWithLeaderLines
-                  DiagramPie.Values.CaptionItems = [pdvciCategory, pdvciPercentage]
-                  DiagramPie.Values.CaptionItemSeparator = ' - '
-                  DiagramStackedArea.OnCustomDrawLegendItem = cxChangeLegendColorCustomDrawLegendItem
-                  DiagramStackedArea.OnCustomDrawValue = cxChangeSectionColorCustomDrawValue
-                  DiagramStackedArea.Styles.Legend = FontSizeStyle
-                  DiagramStackedArea.Styles.ValueCaptions = FontSizeStyle
-                  DiagramStackedArea.Values.CaptionPosition = ldvcpAbove
-                  DiagramStackedArea.Values.LineWidth = 2
-                  DiagramStackedArea.Values.MarkerStyle = cmsDiamond
-                  DiagramStackedBar.OnCustomDrawLegendItem = cxChangeLegendColorCustomDrawLegendItem
-                  DiagramStackedBar.OnCustomDrawValue = cxChangeSectionColorCustomDrawValue
-                  DiagramStackedBar.Styles.Legend = FontSizeStyle
-                  DiagramStackedBar.Styles.ValueAxis = FontSizeStyle
-                  DiagramStackedBar.Values.CaptionPosition = cdvcpOutsideEnd
-                  DiagramStackedColumn.OnCustomDrawLegendItem = cxChangeLegendColorCustomDrawLegendItem
-                  DiagramStackedColumn.OnCustomDrawValue = cxChangeSectionColorCustomDrawValue
-                  DiagramStackedColumn.Styles.Legend = FontSizeStyle
-                  DiagramStackedColumn.Styles.ValueCaptions = FontSizeStyle
-                  DiagramStackedColumn.Values.CaptionPosition = cdvcpOutsideEnd
-                  Legend.Alignment = cpaStart
-                  Legend.Border = lbSingle
-                  Legend.Position = cppBottom
-                  Styles.Title = cxStyleTitulo
-                  ToolBox.CustomizeButton = True
-                  ToolBox.DiagramSelector = True
-                  OnActiveDiagramChanged = cxGridGraficoChartViewActiveDiagramChanged
-                  OnCustomDrawLegendItem = cxGridGraficoChartViewCustomDrawLegendItem
-                end
-                object cxGridGraficoLevel: TcxGridLevel
-                  GridView = cxGridGraficoChartView
-                end
-              end
               object PanelTabelaDinamica: TPanel
                 Left = 1
                 Top = 1
                 Width = 804
-                Height = 72
+                Height = 200
                 Align = alTop
-                TabOrder = 1
+                TabOrder = 0
                 object DBPivotGrid: TcxDBPivotGrid
                   Left = 1
                   Top = 1
                   Width = 802
-                  Height = 54
+                  Height = 182
                   Align = alClient
                   DataSource = DsConsulta
                   Groups = <>
@@ -447,10 +371,12 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
                   OptionsView.ColumnGrandTotalWidth = 151
                   OptionsView.RowGrandTotalWidth = 851
                   TabOrder = 0
+                  OnLayoutChanged = DBPivotGridLayoutChanged
+                  ExplicitTop = -5
                 end
                 object PanelControlesGrafico: TPanel
                   Left = 1
-                  Top = 55
+                  Top = 183
                   Width = 802
                   Height = 16
                   Align = alBottom
@@ -541,12 +467,108 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
               end
               object cxSplitterResultado: TcxSplitter
                 Left = 1
-                Top = 73
+                Top = 201
                 Width = 804
                 Height = 5
                 AlignSplitter = salTop
                 MinSize = 20
                 Control = PanelTabelaDinamica
+              end
+              object PanelGrafInterno: TPanel
+                Left = 1
+                Top = 206
+                Width = 804
+                Height = 238
+                Align = alClient
+                TabOrder = 2
+                ExplicitTop = 328
+                ExplicitHeight = 116
+                object cxGridGrafico: TcxGrid
+                  Left = 1
+                  Top = 1
+                  Width = 802
+                  Height = 236
+                  Align = alClient
+                  TabOrder = 0
+                  ExplicitTop = 2
+                  object cxGridGraficoChartView: TcxGridChartView
+                    Categories.OnGetValueDisplayText = cxGridChartViewCategoriesGetValueDisplayText
+                    DiagramArea.OnCustomDrawLegendItem = cxChangeLegendColorCustomDrawLegendItem
+                    DiagramArea.OnCustomDrawValue = cxChangeSectionColorCustomDrawValue
+                    DiagramArea.Styles.Legend = FontSizeStyle
+                    DiagramArea.Styles.ValueCaptions = FontSizeStyle
+                    DiagramArea.Values.CaptionPosition = ldvcpAbove
+                    DiagramArea.Values.LineWidth = 2
+                    DiagramArea.Values.MarkerStyle = cmsDiamond
+                    DiagramBar.OnCustomDrawLegendItem = cxChangeLegendColorCustomDrawLegendItem
+                    DiagramBar.OnCustomDrawValue = cxChangeSectionColorCustomDrawValue
+                    DiagramBar.Styles.Legend = FontSizeStyle
+                    DiagramBar.Styles.ValueCaptions = FontSizeStyle
+                    DiagramBar.Values.BorderWidth = 2
+                    DiagramBar.Values.CaptionPosition = cdvcpOutsideEnd
+                    DiagramColumn.OnCustomDrawLegendItem = cxChangeLegendColorCustomDrawLegendItem
+                    DiagramColumn.OnCustomDrawValue = cxChangeSectionColorCustomDrawValue
+                    DiagramColumn.Styles.Legend = FontSizeStyle
+                    DiagramColumn.Styles.ValueCaptions = FontSizeStyle
+                    DiagramColumn.Values.CaptionPosition = cdvcpOutsideEnd
+                    DiagramLine.OnCustomDrawLegendItem = cxChangeLegendColorCustomDrawLegendItem
+                    DiagramLine.OnCustomDrawValue = cxChangeSectionColorCustomDrawValue
+                    DiagramLine.AxisCategory.TickMarkKind = tmkCross
+                    DiagramLine.AxisValue.TickMarkKind = tmkCross
+                    DiagramLine.Styles.Legend = FontSizeStyle
+                    DiagramLine.Styles.ValueCaptions = FontSizeStyle
+                    DiagramLine.Values.VaryColorsByCategory = True
+                    DiagramLine.Values.CaptionPosition = ldvcpAbove
+                    DiagramLine.Values.LineWidth = 3
+                    DiagramLine.Values.MarkerStyle = cmsTriangle
+                    DiagramPie.Active = True
+                    DiagramPie.OnCustomDrawLegendItem = cxChangeLegendColorCustomDrawLegendItem
+                    DiagramPie.OnCustomDrawValue = cxChangeSectionColorCustomDrawValue
+                    DiagramPie.SeriesColumnCount = 4
+                    DiagramPie.Styles.Legend = FontSizeStyle
+                    DiagramPie.Styles.ValueCaptions = FontSizeStyle
+                    DiagramPie.Values.CaptionPosition = pdvcpOutsideEndWithLeaderLines
+                    DiagramPie.Values.CaptionItems = [pdvciCategory, pdvciPercentage]
+                    DiagramPie.Values.CaptionItemSeparator = ' - '
+                    DiagramStackedArea.OnCustomDrawLegendItem = cxChangeLegendColorCustomDrawLegendItem
+                    DiagramStackedArea.OnCustomDrawValue = cxChangeSectionColorCustomDrawValue
+                    DiagramStackedArea.Styles.Legend = FontSizeStyle
+                    DiagramStackedArea.Styles.ValueCaptions = FontSizeStyle
+                    DiagramStackedArea.Values.CaptionPosition = ldvcpAbove
+                    DiagramStackedArea.Values.LineWidth = 2
+                    DiagramStackedArea.Values.MarkerStyle = cmsDiamond
+                    DiagramStackedBar.OnCustomDrawLegendItem = cxChangeLegendColorCustomDrawLegendItem
+                    DiagramStackedBar.OnCustomDrawValue = cxChangeSectionColorCustomDrawValue
+                    DiagramStackedBar.Styles.Legend = FontSizeStyle
+                    DiagramStackedBar.Styles.ValueAxis = FontSizeStyle
+                    DiagramStackedBar.Values.CaptionPosition = cdvcpOutsideEnd
+                    DiagramStackedColumn.OnCustomDrawLegendItem = cxChangeLegendColorCustomDrawLegendItem
+                    DiagramStackedColumn.OnCustomDrawValue = cxChangeSectionColorCustomDrawValue
+                    DiagramStackedColumn.Styles.Legend = FontSizeStyle
+                    DiagramStackedColumn.Styles.ValueCaptions = FontSizeStyle
+                    DiagramStackedColumn.Values.CaptionPosition = cdvcpOutsideEnd
+                    Legend.Alignment = cpaStart
+                    Legend.Border = lbSingle
+                    Legend.Position = cppBottom
+                    Styles.Title = cxStyleTitulo
+                    ToolBox.CustomizeButton = True
+                    ToolBox.DiagramSelector = True
+                    OnActiveDiagramChanged = cxGridGraficoChartViewActiveDiagramChanged
+                    OnCustomDrawLegendItem = cxGridGraficoChartViewCustomDrawLegendItem
+                  end
+                  object cxGridGraficoLevel: TcxGridLevel
+                    GridView = cxGridGraficoChartView
+                  end
+                end
+                object BtnOpcoesGrafico: TButton
+                  Left = 28
+                  Top = 20
+                  Width = 94
+                  Height = 27
+                  Caption = 'Op'#231#245'es'
+                  TabOrder = 1
+                  OnClick = BtnOpcoesGraficoClick
+                end
               end
             end
           end
@@ -883,7 +905,9 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
             Top = 3
             Width = 76
             Height = 21
+            ItemIndex = 1
             TabOrder = 2
+            Text = '10'
             OnClick = cbTamFonteGraficoClick
             Items.Strings = (
               '8'
@@ -1086,8 +1110,8 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
     Top = 432
   end
   object cxStyleRepository: TcxStyleRepository
-    Left = 227
-    Top = 104
+    Left = 291
+    Top = 88
     PixelsPerInch = 96
     object cxStyleLinhaPar: TcxStyle
       AssignedValues = [svColor, svFont]

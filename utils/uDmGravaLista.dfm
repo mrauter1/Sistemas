@@ -95,11 +95,8 @@ object DmGravaLista: TDmGravaLista
   object QryListaReal: TFDQuery
     Connection = ConSqlServer.FDConnection
     SQL.Strings = (
-      
-        'Select logl.LucroBruto, logl.ImpostoFaturamento, p.apresentacao,' +
-        ' l.*, GS.CodGrupo'
-      'from lista.PrecoProduto(:NomeLista) l'
-      'inner join lista.LogListaPreco logl on logl.ID = l.IDLog'
+      'Select p.apresentacao, l.*, GS.CodGrupo'
+      'from lista.PrecoProdutoIcm(:IcmPisCofins, getdate()) l'
       'inner join PRODUTO p on p.CODPRODUTO = l.CODPRODUTO'
       'inner join GrupoSub GS on GS.CodGrupoSub =  P.CodGrupoSub'
       'order by CodGrupoSub, CodAplicacao')
@@ -107,31 +104,15 @@ object DmGravaLista: TDmGravaLista
     Top = 120
     ParamData = <
       item
-        Name = 'NOMELISTA'
-        DataType = ftString
-        FDDataType = dtAnsiString
+        Name = 'ICMPISCOFINS'
+        DataType = ftCurrency
+        FDDataType = dtCurrency
         ParamType = ptInput
-        Value = 'ND'
       end>
-    object QryListaRealLucroBruto: TBCDField
-      FieldName = 'LucroBruto'
-      Origin = 'LucroBruto'
-      Precision = 16
-    end
-    object QryListaRealImpostoFaturamento: TBCDField
-      FieldName = 'ImpostoFaturamento'
-      Origin = 'ImpostoFaturamento'
-      Precision = 16
-    end
     object QryListaRealapresentacao: TStringField
       FieldName = 'apresentacao'
       Origin = 'apresentacao'
       Size = 80
-    end
-    object QryListaRealIDLog: TIntegerField
-      FieldName = 'IDLog'
-      Origin = 'IDLog'
-      Required = True
     end
     object QryListaRealCODPRODUTO: TStringField
       FieldName = 'CODPRODUTO'
@@ -154,21 +135,23 @@ object DmGravaLista: TDmGravaLista
       FixedChar = True
       Size = 4
     end
-    object QryListaRealComEmbalagem: TBooleanField
-      FieldName = 'ComEmbalagem'
-      Origin = 'ComEmbalagem'
-      Required = True
-    end
-    object QryListaRealPreco: TBCDField
-      FieldName = 'Preco'
-      Origin = 'Preco'
-      Precision = 14
-    end
     object QryListaRealCodGrupo: TStringField
       FieldName = 'CodGrupo'
       Origin = 'CodGrupo'
       FixedChar = True
       Size = 3
+    end
+    object QryListaRealTABELAICM: TStringField
+      FieldName = 'TABELAICM'
+      Required = True
+      Size = 7
+    end
+    object QryListaRealPRECO: TFMTBCDField
+      FieldName = 'PRECO'
+      Origin = 'PRECO'
+      ReadOnly = True
+      Precision = 23
+      Size = 7
     end
   end
 end

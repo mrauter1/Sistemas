@@ -163,6 +163,8 @@ begin
    Result:= False;
 end;
 
+{ TDmGeradorConsultas }
+
 function TDmGeradorConsultas.DeletaConsulta(pIDConsulta: Integer): Boolean;
 begin
   Result:= True;

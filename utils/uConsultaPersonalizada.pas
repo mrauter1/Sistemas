@@ -35,7 +35,7 @@ uses
   FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet,
   FireDAC.Comp.Client, uConFirebird, System.Generics.Collections, Vcl.Imaging.pngImage,
   uConClasses, uDmConnection, Ladder.ServiceLocator, SynCommons, ExpressionParser, cxUtils,
-  uFormPropriedadesGrafico;
+  uFormPropriedadesGrafico, uConsultaChartController;
 
 type
   TPosicaoPanelDinamico = (cMinimizado, cMeio, cMaximizado);
@@ -86,11 +86,6 @@ type
     BtnMeio: TSpeedButton;
     cxSplitterResultado: TcxSplitter;
     FontSizeStyle: TcxStyle;
-    PnFont: TPanel;
-    Button4: TButton;
-    Button3: TButton;
-    Label3: TLabel;
-    cbTamFonteGrafico: TComboBox;
     BtnGravar: TBitBtn;
     BtnCancelar: TBitBtn;
     DBMemoDescricao: TDBMemo;
@@ -118,6 +113,7 @@ type
     cxGridGraficoChartView: TcxGridChartView;
     cxGridGraficoLevel: TcxGridLevel;
     BtnOpcoesGrafico: TButton;
+    cxStyle1: TcxStyle;
     procedure BtnFecharClick(Sender: TObject);
     procedure VOLTAR_PARAMETROSClick(Sender: TObject);
     procedure IR_EXECUTANDOCONSULTAClick(Sender: TObject);
@@ -134,13 +130,7 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure BtnExcelcxGridTarefaClick(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
-    procedure cxPivotGridChartConnectionGetSeriesDisplayText(
-      Sender: TcxPivotGridChartConnection; ASeries: TcxGridChartSeries;
-      var ADisplayText: String);
     procedure cbxConfiguracoesClick(Sender: TObject);
-    procedure cxGridGraficoChartViewCustomDrawLegendItem(Sender: TcxGridChartView;
-      ACanvas: TcxCanvas; AViewInfo: TcxGridChartLegendItemViewInfo;
-      var ADone: Boolean);
     procedure cxGridChartViewCategoriesGetValueDisplayText(Sender: TObject;
       const AValue: Variant; var ADisplayText: string);
     procedure BtnMaximizarClick(Sender: TObject);
@@ -156,7 +146,6 @@ type
     procedure cxChangeSectionColorCustomDrawValue(
       Sender: TcxGridChartDiagram; ACanvas: TcxCanvas;
       AViewInfo: TcxGridChartDiagramValueViewInfo; var ADone: Boolean);
-    procedure cbTamFonteGraficoClick(Sender: TObject);
     procedure BtNegritoClick(Sender: TObject);
     procedure BtItalicoClick(Sender: TObject);
     procedure BtnCancelarClick(Sender: TObject);
@@ -179,9 +168,10 @@ type
     FResultDocVariant: TDocVariantData;
     FExpressionParser: TExpressionParser;
     FPivotLayoutChanged: Boolean;
+    FChartController: TChartController;
     procedure PageControlAtiva(Pagina:Integer);
     function PopulaParametrosDM: Boolean;
-    function Func_GetColorChartView(pAViewInfoDesc: string): Variant;
+    function GetSeriesColorByField(AFieldName: string): Variant;
     procedure AtualizaCamposGrid;
     procedure CategoriesGetValueDisplayText(Sender: TObject;
       const AValue: Variant; var ADisplayText: string);
@@ -189,8 +179,6 @@ type
     procedure DiminuiPanelTabela;
     procedure MaximizaPanelTabela;
     procedure AtualizaPanelTabelaDinamica;
-    function PegaCorDoGrid(pSeries: TcxGridChartSeries;
-      pCorBase: TColor): TColor;
 
     function Func_ParseStyleLegendItemForTFontStyle(pBold: integer; pItalic : integer): Variant;
     function Func_LegendaNegrito: Boolean;
@@ -199,7 +187,6 @@ type
     function Apenas_Parametros: Boolean;
     procedure ConfiguraTipoFormulario;
     function CarregaVisualizacaoAtual: Boolean;
-    procedure AtualizaTitulo;
     procedure LoadParamsFromDic(Params: TDictionary<string, variant>);
 //    procedure PopulaComboBoxQry(pComboBox: TComboBox; pQry: TDataSet; ValorPadrao: variant);
 //    procedure PopulaCheckListBoxQry(pCheckListBox: TCheckListBox; pQry: TDataSet; ValorPadrao: variant);
@@ -210,8 +197,12 @@ type
       ASummary: TcxPivotGridCrossCellSummary);
     procedure OnGetDisplayTextPivot(Sender: TcxPivotGridField;
       ACell: TcxPivotGridDataCellViewInfo; var AText: string);
-    function GetFieldisplayText(const AName: String; AValue: Variant): String;
+    procedure GetFieldisplayText(const AName: String; AValue: Variant; var ADisplayText: String);
     procedure RebuildChartConf;
+    function GetTituloOriginal: String;
+
+    procedure SetColorFromSeries(ASeries: TcxGridChartSeries;
+      var AColor: TColor);
    public
     { Public declarations }
     function ExecutaConsulta: Boolean;
@@ -235,11 +226,11 @@ type
                       pVisualizacao: String = ''): String;
   end;
 
+
 var
   FrmConsultaPersonalizada: TFrmConsultaPersonalizada;
   Glo_Para : Integer;
 
-  SizeLegend : Integer;
   BoldLegend : Integer;
 
   vArSQLCampoTab  : TStringList;
@@ -257,19 +248,6 @@ implementation
 uses Utils, System.UITypes, jpeg, Ladder.Activity.LadderVarToSql, Ladder.ORM.DaoUtils, Ladder.Parser, Ladder.Utils;
 
 {$R *.dfm}
-
-function TryVarToFloat(pVar: Variant; var AValor: Double): Boolean;
-begin
-  if VarIsNull(pVar) then
-    Result:= False
-  else
-  try
-    AValor:= pVar;
-    Result:= True;
-  except
-    Result:= False;
-  end;
-end;
 
 function GetDaoUtils: TDaoUtils;
 begin
@@ -467,7 +445,7 @@ begin
   if pExecutar then
     Proc_Go_Para();
 
-  AtualizaTitulo;
+  cxGridGraficoChartView.Title.Text:= GetTituloOriginal;
 end;
 
 procedure TFrmConsultaPersonalizada.TsGraficoResize(Sender: TObject);
@@ -587,22 +565,23 @@ end;
 procedure TFrmConsultaPersonalizada.RebuildChartConf;
 var
   I: Integer;
+  FSeries: TcxGridChartSeries;
+  FSeriesConf: TSeriesConf;
 begin
   if not FPivotLayoutChanged then // Check this flag to execute once per change
     Exit;
 
-  for I := 0 to cxGridGraficoChartView.SeriesCount-1 do
-  begin
-    cxGridGraficoChartView.Series[I].DisplayText:= GetSeriesFullName(cxPivotGridChartConnection, cxGridGraficoChartView.Series[I]);
-    cxGridGraficoChartView.Series[I].OnGetValueDisplayText:= CategoriesGetValueDisplayText;
-  end;
+  FChartController.RebuildSeriesConf(True);
+
+  cxGridGrafico.Invalidate(True);
+
   FPivotLayoutChanged:= False;
 end;
 
 procedure TFrmConsultaPersonalizada.DBPivotGridLayoutChanged(Sender: TObject);
 begin
   FPivotLayoutChanged:= True;
-  ExecuteAsync(RebuildChartConf);
+  ExecuteAsync(Self, RebuildChartConf);
 end;
 
 procedure TFrmConsultaPersonalizada.DiminuiPanelTabela;
@@ -791,8 +770,10 @@ begin
     Refresh;
 
     PopulaParametrosDM;
+    StatusBar1.SimpleText:= 'Carregando...';
     if not ExecutaConsulta then
     begin
+      StatusBar1.SimpleText:= '';
       PageControlAtiva(0);
       Application.MessageBox('Atenção: Não Foram Preenchidos Todos os Parâmetros Necessários para Executar o Cruzamento.','Atenção',MB_ICONERROR);
     end
@@ -1052,7 +1033,7 @@ begin
   Result:= True;
 end;
 
-function TFrmConsultaPersonalizada.GetFieldisplayText(const AName: String; AValue: Variant): String;
+procedure TFrmConsultaPersonalizada.GetFieldisplayText(const AName: String; AValue: Variant; var ADisplayText: String);
 var
   FDisplayMask: String;
   FVal: Double;
@@ -1061,31 +1042,13 @@ begin
   if not FDm.FFieldDisplayText.TryGetValue(AName, FDisplayMask) then
     Exit;
 
-  if Trim(FDisplayMask) = '' then
-    Exit;
-
-  if not TryVarToFloat(AValue, FVal) then
-  begin
-    Result:= '';
-    Exit;
-  end;
-
-  if FDisplayMask = '%' then
-    Result:= FormatFloat('###0.00', FVal*100)+' %'
-  else
-    Result:= FormatFloat(FDisplayMask, FVal);
+  GetDisplayText(FDisplayMask, AValue, ADisplayText);
 end;
 
 procedure TFrmConsultaPersonalizada.OnGetDisplayTextPivot(Sender: TcxPivotGridField;
   ACell: TcxPivotGridDataCellViewInfo; var AText: string);
-var
-  FDisplay: String;
 begin
-  FDisplay:= GetFieldisplayText(TcxDBPivotGridFieldDataBinding(Sender.DataBinding).FieldName, ACell.Value);
-  if FDisplay='' then
-    Exit;
-
-  AText:= FDisplay;
+  GetFieldisplayText(TcxDBPivotGridFieldDataBinding(Sender.DataBinding).FieldName, ACell.Value, AText);
 end;
 
 procedure TFrmConsultaPersonalizada.AjustaPropriedadesPivoGrid;
@@ -1204,10 +1167,11 @@ end;
 
 procedure TFrmConsultaPersonalizada.BtnNovoFiltroClick(Sender: TObject);
 var
-  ArqIni: TIniFile;
+  ArqIni: TCustomIniFile;
   FNomeIni, FDescricao: String;
+  FTituloModificado: Boolean;
 begin
-
+  FTituloModificado:= (cxGridGraficoChartView.Title.Text <> GetTituloOriginal);
   FDescricao:= InputBox('Nova visão', 'Digite o nome da visão:', cbxConfiguracoes.Text);
   if FDescricao = '' then
     Exit;
@@ -1231,17 +1195,21 @@ begin
   cxGridGraficoChartView.StoreToIniFile(FNomeIni, False, [gsoUseSummary], 'Grafico');
 
   //Gravar o tamanho da Legenda do gráfico
-  ArqIni := TIniFile.Create(FNomeIni);
+  ArqIni := TMemIniFile.Create(FNomeIni);
 
   try
-    ArqIni.WriteInteger('CONFIG', 'SIZE_LEGEND_ITEM', SizeLegend);
+    ArqIni.WriteInteger('CONFIG', 'SIZE_LEGEND_ITEM', FontSizeStyle.Font.Size);
     ArqIni.WriteBool('CONFIG', 'BOLD_LEGEND_ITEM', Func_LegendaNegrito());
     ArqIni.WriteBool('CONFIG', 'ITALIC_LEGEND_ITEM', Func_LegendaItalico());
 
+    if FTituloModificado then
+      ArqIni.WriteString('CONFIG', 'TITULO', AnsiString(cxGridGraficoChartView.Title.Text));
+
+    ArqIni.WriteString('CONFIG', 'SERIES', FChartController.SerializeSeriesConf);
+    ArqIni.UpdateFile;
   finally
     ArqIni.Free;
   end;
-
 
   if QryVisualizacoes.Locate('Descricao', FDescricao, []) then
   begin
@@ -1261,14 +1229,18 @@ begin
 
   cbxConfiguracoes.KeyValue:= QryVisualizacoesID.AsInteger;
 
+  if not FTituloModificado then
+    cxGridGraficoChartView.Title.Text:= GetTituloOriginal;
+
 end;
 
 procedure TFrmConsultaPersonalizada.BtnOpcoesGraficoClick(Sender: TObject);
 var
   FFrm: TFormPropriedadesGrafico;
 begin
-  FFrm:= TFormPropriedadesGrafico.Create(Self, cxPivotGridChartConnection);
+  FFrm:= TFormPropriedadesGrafico.Create(Self, FChartController, FontSizeStyle);
   FFrm.ShowModal;
+  cxGridGraficoChartView.Invalidate(True);
 end;
 
 procedure TFrmConsultaPersonalizada.BtnSalvaImgClick(Sender: TObject);
@@ -1344,7 +1316,7 @@ var
 var
   FCell: TcxPivotGridCrossCellSummary;
 begin
-{ sRows:= ''
+  sRows:= '';
   sCols:= '';
 
   if DBPivotGrid.ViewData.RowCount=0 then
@@ -1430,11 +1402,11 @@ end;
 procedure TFrmConsultaPersonalizada.Proc_Atualiza_LegenItem(pSize: Integer; pBold : Boolean; pItalic : Boolean);
 begin
   FontSizeStyle.Font.Size := pSize;
-  cbTamFonteGrafico.Text :=  IntToStr(pSize);
 
- if pBold then FontSizeStyle.Font.Style := [fsBold];
- if pItalic then FontSizeStyle.Font.Style := [fsItalic];
+  FontSizeStyle.Font.Style:= [];
 
+ if pBold then FontSizeStyle.Font.Style := FontSizeStyle.Font.Style+[fsBold];
+ if pItalic then FontSizeStyle.Font.Style := FontSizeStyle.Font.Style+[fsItalic];
 end;
 
 //Parse do Style do CharGrid para o Arquivo INI;
@@ -1442,7 +1414,6 @@ function TFrmConsultaPersonalizada.Func_LegendaNegrito: Boolean;
 var
  fFont : TFont;
 begin
-
  fFont := FontSizeStyle.Font;
  Result := (fsBold in fFont.Style );
 end;
@@ -1471,6 +1442,12 @@ end;
 function TFrmConsultaPersonalizada.GetParams: TParametros;
 begin
   Result:= FDm.Params;
+end;
+
+function TFrmConsultaPersonalizada.GetSeriesColorByField(
+  AFieldName: string): Variant;
+begin
+
 end;
 
 procedure TFrmConsultaPersonalizada.BtnDeleteConfiguracaoClick(
@@ -1504,9 +1481,9 @@ begin
   Close;
 end;
 
-procedure TFrmConsultaPersonalizada.AtualizaTitulo;
+function TFrmConsultaPersonalizada.GetTituloOriginal: String;
 begin
-  cxGridGraficoChartView.Title.Text:= FDM.QryConsultasDescricao.AsString+' - '+QryVisualizacoesDescricao.AsString;
+  Result:= FDM.QryConsultasDescricao.AsString+' - '+QryVisualizacoesDescricao.AsString;
 end;
 
 procedure TFrmConsultaPersonalizada.BtnCarregaFiltroClick(Sender: TObject);
@@ -1522,58 +1499,78 @@ begin
     Result:= CarregaVisualizacaoAtual;
 end;
 
+procedure TFrmConsultaPersonalizada.CategoriesGetValueDisplayText(
+  Sender: TObject; const AValue: Variant; var ADisplayText: string);
+begin
+
+end;
+
 function TFrmConsultaPersonalizada.CarregaVisualizacaoAtual: Boolean;
 var
-  ArqIni: TIniFile;
   FNomeIni: String;
   i  : integer;
   Bold, Italic : Boolean;
-begin
-  DBPivotGrid.BeginUpdate;
-  try
-    Result:= False;
 
-    AtualizaCamposGrid;
-
-    FUltimaConfig:= QryVisualizacoesID.AsInteger;
-
-    FNomeIni:= ExtractFilePath(Application.ExeName)+'temp\ConsultasConfig.ini';
-
-    if not DirectoryExists(ExtractFilePath(FNomeIni)) then
-      CreateDir(ExtractFilePath(FNomeIni));
-
-    if FileExists(FNomeIni) then
-      DeleteFile(FNomeIni);
-
-    QryVisualizacoesArquivo.SaveToFile(FNomeIni);
-
-  //  cxGridTabelaDBTableView1.RestoreFromIniFile(FNomeIni, False, False, [gsoUseSummary], 'Tabela');
-    DBPivotGrid.RestoreFromIniFile(FNomeIni, False);
-    cxGridGraficoChartView.RestoreFromIniFile(FNomeIni, False, False, [gsoUseSummary], 'Grafico');
-
-    ArqIni := TIniFile.Create(FNomeIni);
+  procedure CarregaConfGrafico(ANomeIni: String);
+  var
+    ArqIni: TCustomIniFile;
+  begin
+    FChartController.RebuildSeriesConf(True);
+    ArqIni := TMemIniFile.Create(ANomeIni);
     try
-      SizeLegend := ArqIni.ReadInteger('CONFIG', 'SIZE_LEGEND_ITEM',10);
+      FontSizeStyle.Font.Size := ArqIni.ReadInteger('CONFIG', 'SIZE_LEGEND_ITEM',10);
       Bold := ArqIni.ReadBool('CONFIG', 'BOLD_LEGEND_ITEM',false);
       Italic := ArqIni.ReadBool('CONFIG', 'ITALIC_LEGEND_ITEM',false);
-
+      cxGridGraficoChartView.Title.Text:= ArqIni.ReadString('CONFIG', 'TITULO', GetTituloOriginal);
+      FChartController.UnserializeConf(ArqIni.ReadString('CONFIG', 'SERIES',''), False);
     finally
       ArqIni.Free;
     end;
-
-      AjustaPropriedadesPivoGrid;
-  {      for I := 0 to DBPivotGrid.FieldCount - 1 do
-          DBPivotGrid.Fields[I].ExpandAll;    }
-
-      Proc_Atualiza_LegenItem(SizeLegend, Bold, Italic );
-
-      AtualizaTitulo;
-
-      Result:= True;
-  finally
-    DBPivotGrid.EndUpdate;
+    Proc_Atualiza_LegenItem(FontSizeStyle.Font.Size, Bold, Italic );
+    cxGridGraficoChartView.RestoreFromIniFile(FNomeIni, False, False, [gsoUseSummary], 'Grafico');
   end;
-  //  IR_EXECUTANDOCONSULTAClick(Sender);
+
+begin
+  try
+    cxGridGraficoChartView.BeginUpdate;  // É fazer o Begin Update no ChartView e depois no DBPivotGrid
+    try
+      DBPivotGrid.BeginUpdate;
+      try
+        Result:= False;
+
+        AtualizaCamposGrid;
+
+        FUltimaConfig:= QryVisualizacoesID.AsInteger;
+
+        FNomeIni:= ExtractFilePath(Application.ExeName)+'temp\ConsultasConfig.ini';
+
+        if not DirectoryExists(ExtractFilePath(FNomeIni)) then
+          CreateDir(ExtractFilePath(FNomeIni));
+
+        if FileExists(FNomeIni) then
+          DeleteFile(FNomeIni);
+
+        QryVisualizacoesArquivo.SaveToFile(FNomeIni);
+
+    //  cxGridTabelaDBTableView1.RestoreFromIniFile(FNomeIni, False, False, [gsoUseSummary], 'Tabela');
+
+        DBPivotGrid.RestoreFromIniFile(FNomeIni, False);
+
+        AjustaPropriedadesPivoGrid;
+    {      for I := 0 to DBPivotGrid.FieldCount - 1 do
+            DBPivotGrid.Fields[I].ExpandAll;    }
+
+        Result:= True;
+      finally
+        DBPivotGrid.EndUpdate;
+      end;
+      CarregaConfGrafico(FNomeIni);
+    finally
+      cxGridGraficoChartView.EndUpdate;
+    end;
+  except
+    //TODO: Log error;
+  end;
 end;
 
 procedure TFrmConsultaPersonalizada.QryConfiguracoesBeforeOpen(
@@ -1631,6 +1628,8 @@ begin
   FExpressionParser:= TExpressionParser.Create;
   FExpressionParser.TokenUpperCase:= True;
 //  Self.BorderStyle:= bsSizeable;
+
+  FChartController:= TChartController.Create(Self, cxPivotGridChartConnection, FDm);
 end;
 
 procedure TFrmConsultaPersonalizada.FormDestroy(Sender: TObject);
@@ -1642,6 +1641,8 @@ begin
   vArSQLObrigator.Free;
   vArExcel.Free;
   vArResultado.Free;
+
+  FChartController.Free;
 end;
 
 procedure TFrmConsultaPersonalizada.FormShow(Sender: TObject);
@@ -1774,27 +1775,6 @@ begin
   end;
 end;
 
-procedure TFrmConsultaPersonalizada.CategoriesGetValueDisplayText(
-  Sender: TObject; const AValue: Variant; var ADisplayText: string);
-var
-  FDisplay: String;
-  I: Integer;
-  FPivotGridField: TcxDBPivotGridField;
-begin
-  if not (Sender is TCxGridChartSeries) then Exit;
-
-  FPivotGridField:= (GetSeriesSourceField(cxPivotGridChartConnection, TCxGridChartSeries(Sender).Index) as TcxDBPivotGridField);
-
-  if not Assigned(FPivotGridField) then
-    Exit;
-
- FDisplay:= GetFieldisplayText(FPivotGridField.DataBinding.FieldName, AValue);
-  if FDisplay='' then
-    Exit;
-
-  ADisplayText:= FDisplay;
-end;
-
 procedure TFrmConsultaPersonalizada.cxGridChartViewCategoriesGetValueDisplayText(
   Sender: TObject; const AValue: Variant; var ADisplayText: string);
 begin
@@ -1807,88 +1787,36 @@ begin
   ADiagram.Legend.Position := cppBottom;
 end;
 
-procedure TFrmConsultaPersonalizada.cxGridGraficoChartViewCustomDrawLegendItem(
-  Sender: TcxGridChartView; ACanvas: TcxCanvas;
-  AViewInfo: TcxGridChartLegendItemViewInfo; var ADone: Boolean);
-begin
-//  AViewInfo.Text:= StringReplace(AViewInfo.Text, 'Grand Total - ', '', [rfIgnoreCase]);
-end;
-
-function TFrmConsultaPersonalizada.PegaCorDoGrid(pSeries: TcxGridChartSeries; pCorBase: TColor): TColor;
+procedure TFrmConsultaPersonalizada.SetColorFromSeries(ASeries: TcxGridChartSeries; var AColor: TColor);
 var
-  Color2: Variant;
-  FCorBase: Integer;
+  FColor: TColor;
+  FSeriesConf: TSeriesConf;
 begin
-  Result:= pCorBase;
-  FCorBase:= BlendColors(pCorBase, clBlack, 50);
-  if Assigned(pSeries) then
-  begin
-    Color2 := Func_GetColorChartView(pSeries.GetDisplayText);
-    if not VarIsNull(Color2) then
-      Result :=  BlendColors(FCorBase, Color2, 40);
-  end;
+  FSeriesConf:= FChartController.GetSeriesConf(ASeries);
+  if not Assigned(FSeriesConf) then
+    Exit;
+
+  if FSeriesConf.Color <> clNone then
+    AColor:= FSeriesConf.Color;
 end;
 
 procedure TFrmConsultaPersonalizada.cxChangeLegendColorCustomDrawLegendItem(
   Sender: TcxGridChartDiagram; ACanvas: TcxCanvas;
   AViewInfo: TcxGridChartLegendItemViewInfo; var ADone: Boolean);
 begin
-  if Assigned(AViewInfo.Series) then
-    AViewInfo.LegendKeyParams.Color := PegaCorDoGrid(AViewInfo.Series, AViewInfo.LegendKeyParams.Color);
-
+  SetColorFromSeries(AViewInfo.Series, AViewInfo.LegendKeyParams.Color);
 end;
 
 procedure TFrmConsultaPersonalizada.cxChangeSectionColorCustomDrawValue(
   Sender: TcxGridChartDiagram; ACanvas: TcxCanvas;
   AViewInfo: TcxGridChartDiagramValueViewInfo; var ADone: Boolean);
-begin
-  if Assigned(AViewInfo.Series) then
-  begin
-    Acanvas.Brush.Color:= PegaCorDoGrid(AViewInfo.Series, ACanvas.Brush.Color);
-    AViewInfo.CaptionViewInfo.Params.TextColor:= Acanvas.Brush.Color;
-  end;
-
-end;
-
-function TFrmConsultaPersonalizada.Func_GetColorChartView(pAViewInfoDesc: string): Variant;
 var
-  AValueCaption : string;
-  AvalueCor : integer;
-
+  FColor: TColor;
 begin
-  Result:= null;
-
-  FDm.QryCampos.First;
-  while not FDm.QryCampos.Eof do
-  begin
-
-    AvalueCaption := fdm.QryCamposDescricao.AsString;
-    AvalueCor := fdm.QryCamposCor.AsInteger;
-
-    if AnsiContainsStr(uppercase(pAViewInfoDesc),uppercase(AValueCaption)) then
-    begin
-      if (fdm.QryCamposCor.IsNull = False) then
-        if TColor(AValueCor) <> clNone then
-          Result := AvalueCor;
-    end;
-
-    FDm.QryCampos.Next;
-  end;
-
-end;
-
-procedure TFrmConsultaPersonalizada.cxPivotGridChartConnectionGetSeriesDisplayText(
-  Sender: TcxPivotGridChartConnection; ASeries: TcxGridChartSeries;
-  var ADisplayText: String);
-begin
-  ASeries.OnGetValueDisplayText:= CategoriesGetValueDisplayText;
-end;
-
-procedure TFrmConsultaPersonalizada.cbTamFonteGraficoClick(Sender: TObject);
-
-begin
- SizeLegend := StrToIntDef(cbTamFonteGrafico.Text,10);
- FontSizeStyle.Font.Size := SizeLegend;
+  SetColorFromSeries(AViewInfo.Series, AViewInfo.CaptionViewInfo.Params.TextColor);
+  FColor:= AViewInfo.CaptionViewInfo.Params.TextColor;
+  SetColorFromSeries(AViewInfo.Series, FColor);
+  Acanvas.Brush.Color:= FColor;
 end;
 
 procedure TFrmConsultaPersonalizada.cbxConfiguracoesClick(Sender: TObject);
@@ -1896,5 +1824,6 @@ begin
   if FUltimaConfig <> QryVisualizacoesID.AsInteger then
     BtnCarregaFiltro.Click;
 end;
+
 
 end.

@@ -372,7 +372,6 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
                   OptionsView.RowGrandTotalWidth = 851
                   TabOrder = 0
                   OnLayoutChanged = DBPivotGridLayoutChanged
-                  ExplicitTop = -5
                 end
                 object PanelControlesGrafico: TPanel
                   Left = 1
@@ -481,8 +480,6 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
                 Height = 238
                 Align = alClient
                 TabOrder = 2
-                ExplicitTop = 328
-                ExplicitHeight = 116
                 object cxGridGrafico: TcxGrid
                   Left = 1
                   Top = 1
@@ -490,7 +487,6 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
                   Height = 236
                   Align = alClient
                   TabOrder = 0
-                  ExplicitTop = 2
                   object cxGridGraficoChartView: TcxGridChartView
                     Categories.OnGetValueDisplayText = cxGridChartViewCategoriesGetValueDisplayText
                     DiagramArea.OnCustomDrawLegendItem = cxChangeLegendColorCustomDrawLegendItem
@@ -550,11 +546,12 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
                     Legend.Alignment = cpaStart
                     Legend.Border = lbSingle
                     Legend.Position = cppBottom
+                    OptionsCustomize.DataGroupMoving = False
+                    OptionsCustomize.SeriesCustomization = False
                     Styles.Title = cxStyleTitulo
                     ToolBox.CustomizeButton = True
                     ToolBox.DiagramSelector = True
                     OnActiveDiagramChanged = cxGridGraficoChartViewActiveDiagramChanged
-                    OnCustomDrawLegendItem = cxGridGraficoChartViewCustomDrawLegendItem
                   end
                   object cxGridGraficoLevel: TcxGridLevel
                     GridView = cxGridGraficoChartView
@@ -841,85 +838,6 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
           TabOrder = 1
           OnClick = BtnExcelcxGridTarefaClick
         end
-        object PnFont: TPanel
-          Left = 283
-          Top = 0
-          Width = 177
-          Height = 25
-          Anchors = [akLeft, akTop, akRight, akBottom]
-          AutoSize = True
-          DockSite = True
-          TabOrder = 2
-          DesignSize = (
-            177
-            25)
-          object Label3: TLabel
-            Left = 73
-            Top = 4
-            Width = 23
-            Height = 13
-            Anchors = [akLeft, akBottom]
-            Caption = 'Size:'
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clBlue
-            Font.Height = -11
-            Font.Name = 'MS Sans Serif'
-            Font.Style = []
-            ParentFont = False
-            ExplicitTop = 5
-          end
-          object Button4: TButton
-            Left = 1
-            Top = 1
-            Width = 33
-            Height = 23
-            Caption = 'N'
-            DragCursor = crHandPoint
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWindowText
-            Font.Height = -11
-            Font.Name = 'MS Sans Serif'
-            Font.Style = [fsBold]
-            ParentFont = False
-            TabOrder = 0
-            OnClick = BtNegritoClick
-          end
-          object Button3: TButton
-            Left = 34
-            Top = 1
-            Width = 33
-            Height = 23
-            Caption = 'I'
-            DragCursor = crHandPoint
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWindowText
-            Font.Height = -11
-            Font.Name = 'MS Sans Serif'
-            Font.Style = [fsBold]
-            ParentFont = False
-            TabOrder = 1
-            OnClick = BtItalicoClick
-          end
-          object cbTamFonteGrafico: TComboBox
-            Left = 100
-            Top = 3
-            Width = 76
-            Height = 21
-            ItemIndex = 1
-            TabOrder = 2
-            Text = '10'
-            OnClick = cbTamFonteGraficoClick
-            Items.Strings = (
-              '8'
-              '10'
-              '12'
-              '14'
-              '16'
-              '18'
-              '20'
-              '')
-          end
-        end
         object BtnSalvaImg: TBitBtn
           Left = 173
           Top = 0
@@ -962,7 +880,7 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
             0000000000000000000000000000000000000000000000000000000000000000
             0000000000000000000000000000000000000000000000000000000000000000
             0000000000000000000000000000000000000000000000000000}
-          TabOrder = 3
+          TabOrder = 2
           Visible = False
           OnClick = BtnSalvaImgClick
         end
@@ -973,7 +891,7 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
           Height = 17
           Anchors = [akRight, akBottom]
           Caption = 'Formato Nativo'
-          TabOrder = 4
+          TabOrder = 3
         end
       end
     end
@@ -1028,7 +946,6 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
   object cxPivotGridChartConnection: TcxPivotGridChartConnection
     GridChartView = cxGridGraficoChartView
     PivotGrid = DBPivotGrid
-    OnGetSeriesDisplayText = cxPivotGridChartConnectionGetSeriesDisplayText
     Left = 72
     Top = 104
   end
@@ -1054,6 +971,12 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
     Top = 282
     PixelsPerInch = 96
     object FontSizeStyle: TcxStyle
+      AssignedValues = [svFont]
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = []
     end
     object cxStyleTitulo: TcxStyle
       AssignedValues = [svFont]
@@ -1062,6 +985,8 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
       Font.Height = -19
       Font.Name = 'Times New Roman'
       Font.Style = [fsBold, fsUnderline]
+    end
+    object cxStyle1: TcxStyle
     end
   end
   object QryVisualizacoes: TFDQuery

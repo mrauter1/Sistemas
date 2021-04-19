@@ -11,7 +11,8 @@ function GetColumnValueByFieldName(ACxGridDBTableView: TcxGridDBTableView; AFiel
 function FindPivotFieldByFieldName(ADBPivotGrid: TcxDBPivotGrid; const AName: String): TcxDBPivotGridField;
 function GetSeriesSourceField(AcxPivotGridChartConnection: TcxPivotGridChartConnection; ASeriesIndex: integer): TcxPivotGridField;
 function GetSeriesColumnDataItem(AcxPivotGridChartConnection: TcxPivotGridChartConnection; ASeriesIndex: Integer): TcxPivotGridViewDataItem;
-function GetSeriesFullName(AcxPivotGridChartConnection: TcxPivotGridChartConnection; ASeries: TcxGridChartSeries): String;
+function FindSeriesByFullName(AChartConnection: TcxPivotGridChartConnection; AFullName: String): TCxGridChartSeries;
+function GetSeriesFullName(AChartConnection: TcxPivotGridChartConnection; ASeries: TcxGridChartSeries): String;
 function GetViewDataItemFullName(AItem: TcxPivotGridViewDataItem): String;
 
 implementation
@@ -76,6 +77,27 @@ var
   FCol: TcxPivotGridViewDataItem;
   FSeriesCnt: Integer;
   FDBPivotGrid: TcxDBPivotGrid;
+
+  function VisibleSummaryFieldCount: Integer;
+  var
+    I: Integer;
+  begin
+    Result:= 0;
+    for I := 0 to FDBPivotGrid.SummaryFields.Count-1 do
+      if FDBPivotGrid.SummaryFields[I].Visible then
+        Inc(Result);
+  end;
+
+  function FirstVisibleSummaryField: TcxPivotGridField;
+  var
+    I: Integer;
+  begin
+    for I := 0 to FDBPivotGrid.SummaryFields.Count-1 do
+      if FDBPivotGrid.SummaryFields[I].Visible then
+        Exit(FDBPivotGrid.SummaryFields[I]);
+
+    Result:= nil;
+  end;
 begin
   Result:= nil;
 
@@ -84,9 +106,9 @@ begin
   if not Assigned(FDBPivotGrid) then
     Exit;
 
-  if FDBPivotGrid.SummaryFields.Count=1 then
+  if VisibleSummaryFieldCount=1 then
   begin
-    Result:= FDBPivotGrid.SummaryFields[0];
+    Result:= FirstVisibleSummaryField;
     Exit;
   end;
 
@@ -117,27 +139,60 @@ begin
 end;
 
 function GetViewDataItemFullName(AItem: TcxPivotGridViewDataItem): String;
-begin
-  Result:= AItem.GetDisplayText;
 
-  if Assigned(AItem.Parent) and (AItem.Parent.Value <> '') then
+  function GetItemDisplayText(pItem: TcxPivotGridViewDataItem): String;
   begin
-    if AItem.Parent.GetDisplayText.ToUpper = 'GRAND TOTAL' then
+    Result:= AItem.GetDisplayText;
+{    if not pItem.Field.Visible and (pItem.Field.Group <> nil) then
+      Result := pItem.Field.Group.Caption
+    else
+      Result := pItem.Field.Caption;}
+  end;
+begin
+  // TODO: Resolver bug
+//  Result:= AItem.GetDisplayText;
+  if AItem.Field = nil then
+    Exit('');
+
+  Result:= GetItemDisplayText(AItem);
+
+  if Assigned(AItem.Parent) and Assigned(AItem.Parent.Field) then
+  begin
+//    if AItem.Parent.GetDisplayText.ToUpper = 'GRAND TOTAL' then
+    if GetItemDisplayText(AItem.Parent).ToUpper = 'GRAND TOTAL' then
       Exit;
+
     Result:= GetViewDataItemFullName(AItem.Parent)+' - '+Result;
   end;
 end;
 
-function GetSeriesFullName(AcxPivotGridChartConnection: TcxPivotGridChartConnection; ASeries: TcxGridChartSeries): String;
+function FindSeriesByFullName(AChartConnection: TcxPivotGridChartConnection;
+  AFullName: String): TCxGridChartSeries;
+var
+  I: Integer;
+begin
+  for I := 0 to AChartConnection.GridChartView.SeriesCount-1 do
+    if GetSeriesFullName(AChartConnection, AChartConnection.GridChartView.Series[I]) = AFullName then
+    begin
+      Result:= AChartConnection.GridChartView.Series[I];
+      Exit;
+    end;
+  Result:= nil;
+end;
+
+function GetSeriesFullName(AChartConnection: TcxPivotGridChartConnection; ASeries: TcxGridChartSeries): String;
 var
   FCol: TcxPivotGridViewDataItem;
 begin
   Result:= '';
-  FCol:= GetSeriesColumnDataItem(AcxPivotGridChartConnection, ASeries.Index);
+  FCol:= GetSeriesColumnDataItem(AChartConnection, ASeries.Index);
   if not Assigned(FCol) then
     Exit;
 
   Result:= GetViewDataItemFullName(FCol);
+  if Trim(Result)='' then
+    Result:= '<Sem nome>';
+
 end;
 
 end.

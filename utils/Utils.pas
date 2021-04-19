@@ -26,7 +26,7 @@ type
 
 TProcedure = reference to procedure;
 
-procedure ExecuteAsync(AProcedure: TProcedure; AInterval: Integer=10);
+procedure ExecuteAsync(AOwner: TComponent; AProcedure: TProcedure; AInterval: Integer=10);
 
 function ExecAndWait(const pFile, pParametros: String; const ShowCmd: Word; pTimeOut: Integer; WorkDir: String = ''): boolean;
 
@@ -45,6 +45,8 @@ function VarArrayLength(pVar: variant; Dim: Integer=1): Integer;
 function StringToVarArray(pSeparador, pString: String): Variant;
 function VarToIntDef(pVar: Variant; pDefault: Integer = 0): Integer;
 function VarToFloatDef(pVar: Variant; pDefault: Double = 0): Double;
+function TryVarToFloat(pVar: Variant; var AValor: Double): Boolean;
+procedure GetDisplayText(const ADisplayFormat: String; AValue: Variant; var ADisplayText: String);
 
 function Func_Date_SqlServer(parData: TDate): String;
 
@@ -77,9 +79,9 @@ implementation
 uses
   SysUtils, System.TypInfo, DateUtils, Vcl.Imaging.pngImage;
 
-procedure ExecuteAsync(AProcedure: TProcedure; AInterval: Integer=10);
+procedure ExecuteAsync(AOwner: TComponent; AProcedure: TProcedure; AInterval: Integer=10);
 begin
-  TAsyncTimer.Create(nil, AProcedure, AInterval);
+  TAsyncTimer.Create(AOwner, AProcedure, AInterval);
 end;
 
 function ExecAndWait(const pFile, pParametros: String; const ShowCmd: Word; pTimeOut: Integer; WorkDir: String = ''): boolean;
@@ -312,6 +314,19 @@ begin
   end;
 end;
 
+function TryVarToFloat(pVar: Variant; var AValor: Double): Boolean;
+begin
+  if VarIsNull(pVar) then
+    Result:= False
+  else
+  try
+    AValor:= pVar;
+    Result:= True;
+  except
+    Result:= False;
+  end;
+end;
+
 function VarToIntDef(pVar: Variant; pDefault: Integer = 0): Integer;
 begin
   if VarIsNull(pVar) then
@@ -322,6 +337,23 @@ begin
   except
     Result:= pDefault;
   end;
+end;
+
+procedure GetDisplayText(const ADisplayFormat: String;
+  AValue: Variant; var ADisplayText: String);
+var
+  FVal: Double;
+begin
+  if ADisplayFormat = '' then
+    Exit;
+
+  if not TryVarToFloat(AValue, FVal) then
+    Exit;
+
+  if ADisplayFormat = '%' then
+    ADisplayText:= FormatFloat('###0.00', FVal*100)+' %'
+  else
+    ADisplayText:= FormatFloat(ADisplayFormat, FVal);
 end;
 
 procedure AbortMessage(pMensagem, pTitulo: String);

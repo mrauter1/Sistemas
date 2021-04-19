@@ -68,7 +68,8 @@ uses
   uFormCompraProdutos in 'Fontes\uFormCompraProdutos.pas' {FormCompraProduto},
   uFormConsultaDataSet in 'Fontes\uFormConsultaDataSet.pas' {FormConsultaDataSet},
   uFormComprasAgendadas in 'Fontes\uFormComprasAgendadas.pas' {FormComprasAgendadas},
-  uFormPropriedadesGrafico in 'Fontes\uFormPropriedadesGrafico.pas' {FormPropriedadesGrafico};
+  uFormPropriedadesGrafico in '..\utils\uFormPropriedadesGrafico.pas' {FormPropriedadesGrafico},
+  uConsultaChartController in '..\utils\uConsultaChartController.pas';
 
 {$R *.res}
 

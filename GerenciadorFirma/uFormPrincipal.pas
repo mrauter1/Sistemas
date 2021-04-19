@@ -164,6 +164,8 @@ type
     procedure AtualizarDadosNegociaes1Click(Sender: TObject);
     procedure ComprasporGrupo1Click(Sender: TObject);
     procedure ComprasAgendadas1Click(Sender: TObject);
+    procedure TreeViewMenuDragDropTreeNode(Destination, Source: TTreeNode;
+      var Accept: Boolean);
   private
     FDmGeradorConsultas: TDmGeradorConsultas;
     FPopupActive: Boolean;
@@ -634,6 +636,12 @@ begin
   AbrirConsulta1.Click;
 end;
 
+procedure TFormPrincipal.TreeViewMenuDragDropTreeNode(Destination,
+  Source: TTreeNode; var Accept: Boolean);
+begin
+  Accept:= True;
+end;
+
 procedure TFormPrincipal.TreeViewMenuKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
@@ -643,7 +651,6 @@ begin
 
    VK_RETURN:
      AbrirConsulta1.Click;
-
  end;
 end;
 

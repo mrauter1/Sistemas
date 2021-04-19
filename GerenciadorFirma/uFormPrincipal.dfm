@@ -366,6 +366,8 @@ object FormPrincipal: TFormPrincipal
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 1
+      ExplicitLeft = -2
+      ExplicitTop = 26
     end
   end
   object TreeViewMenu: TdxDBTreeView
@@ -375,6 +377,7 @@ object FormPrincipal: TFormPrincipal
     Height = 386
     RightClickSelect = True
     ShowNodeHint = True
+    OnDragDropTreeNode = TreeViewMenuDragDropTreeNode
     DataSource = DsMenu
     KeyField = 'ID'
     ListField = 'Descricao'
@@ -394,6 +397,8 @@ object FormPrincipal: TFormPrincipal
     OnDblClick = TreeViewMenuDblClick
     OnKeyDown = TreeViewMenuKeyDown
     PopupMenu = PopupMenuTreeView
+    ExplicitLeft = 2
+    ExplicitTop = -6
   end
   object cxSplitter1: TcxSplitter
     Left = 225

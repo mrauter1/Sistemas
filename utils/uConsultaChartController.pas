@@ -52,7 +52,7 @@ type
 implementation
 
 uses
-  Utils;
+  Utils, Data.DB;
 
 function GetDefaultValueColor(AIndex: Integer): TColor;
 const
@@ -154,24 +154,14 @@ var
 begin
   Result:= null;
 
-  FDm.QryCampos.First;
-  while not FDm.QryCampos.Eof do
-  begin
+  if not FDm.QryCampos.Locate('NOMECAMPO', AFieldName, [loCaseInsensitive]) then
+    Exit;
 
-    FFieldName := fdm.QryCamposNomeCampo.AsString;
-    AvalueCor := fdm.QryCamposCor.AsInteger;
+  if fdm.QryCamposCor.IsNull then
+    Exit;
 
-    if AnsiContainsStr(uppercase(AFieldName),uppercase(FFieldName)) then
-    begin
-      if (fdm.QryCamposCor.IsNull = False) then
-        if TColor(AValueCor) <> clNone then
-        begin
-          Result := AvalueCor;
-          Exit;
-        end;
-    end;
-    FDm.QryCampos.Next;
-  end;
+  if TColor(fdm.QryCamposCor.AsInteger) <> clNone then
+    Result:= TColor(fdm.QryCamposCor.AsInteger);
 end;
 
 function TChartController.GetSeriesConf(ASeries: TcxGridChartSeries): TSeriesConf;
@@ -188,8 +178,27 @@ end;
 function TChartController.GetSeriesCustomColor(pSeries: TcxGridChartSeries; pCorBase: TColor): TColor;
 var
   Color2: Variant;
-  FCorBase: Integer;
   FSourceField: TcxPivotGridField;
+
+  function FirstSeriesOfSummary(ASeries: TcxGridChartSeries): Boolean;
+  begin
+    Result:= ASeries.Order+1 <= VisibleSummaryFieldCount(FChartConnection.PivotGrid);
+  end;
+function GetDefaultValueColor(AIndex: Integer): TColor;
+const
+  ColorCount = 24;
+  Colors: array[0..ColorCount - 1] of TColor =
+    ($60C1FF, $B4835C, $7C58A5, $657C6C, $6379E6, $9AA05B, $605DCF, $6A8846,
+     $61A3F5, $58999E, $5A8CFF, $AD977A, $808E54, $95C9B9, $6763A5, $AC8C4D,
+     $80E4FB, $956349, $4D50C0, $67B48B, $D6A584, $73D8DD, $89674D, $9CB5A5);
+begin
+  Result := Colors[AIndex mod ColorCount];
+end;
+  function GetBlendColor(ACorOriginal: TColor; AOrder: Integer): TColor;
+  begin
+    Result:= BlendColors(ACorOriginal, clBlack, 10 * ((AOrder mod 4)+4));
+    Result:= BlendColors(Result, clWhite, 10 * (((AOrder+2) mod 4)+7));
+  end;
 begin
   Result:= pCorBase;
   if Assigned(pSeries) then
@@ -201,11 +210,19 @@ begin
     if not (FSourceField is TcxDBPivotGridField) then
       Exit;
 
-    FCorBase:= pCorBase;
-//    FCorBase:= BlendColors(pCorBase, clBlack, 70);
     Color2 := GetSeriesColorByField(TcxDBPivotGridField(FSourceField).DataBinding.FieldName);
-    if not VarIsNull(Color2) then
-      Result :=  BlendColors(FCorBase, Color2, 75);
+
+    if VarIsNull(Color2) then
+      Exit;
+
+ // Se for a primeira série de um campo summary que tenha Cor Padrão definida, pega a cor padrão, se não faz uma mistura para diferenciar as séries;
+    if FirstSeriesOfSummary(pSeries) then
+      Result:= Color2
+    else
+    begin
+      Result:= GetBlendColor(pCorBase, pSeries.Index);
+      Result :=  BlendColors(Color2, Result, 33);
+    end;
   end;
 end;
 

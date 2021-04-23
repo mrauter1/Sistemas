@@ -9,6 +9,7 @@ uses
 
 function GetColumnValueByFieldName(ACxGridDBTableView: TcxGridDBTableView; AFieldName: String): Variant; // Returns null if Field is not found
 function FindPivotFieldByFieldName(ADBPivotGrid: TcxDBPivotGrid; const AName: String): TcxDBPivotGridField;
+function VisibleSummaryFieldCount(APivotGrid: TcxCustomPivotGrid): Integer;
 function GetSeriesSourceField(AcxPivotGridChartConnection: TcxPivotGridChartConnection; ASeriesIndex: integer): TcxPivotGridField;
 function GetSeriesColumnDataItem(AcxPivotGridChartConnection: TcxPivotGridChartConnection; ASeriesIndex: Integer): TcxPivotGridViewDataItem;
 function FindSeriesByFullName(AChartConnection: TcxPivotGridChartConnection; AFullName: String): TCxGridChartSeries;
@@ -72,21 +73,21 @@ begin
 
 end;
 
+function VisibleSummaryFieldCount(APivotGrid: TcxCustomPivotGrid): Integer;
+var
+  I: Integer;
+begin
+  Result:= 0;
+  for I := 0 to APivotGrid.SummaryFields.Count-1 do
+    if APivotGrid.SummaryFields[I].Visible then
+      Inc(Result);
+end;
+
 function GetSeriesSourceField(AcxPivotGridChartConnection: TcxPivotGridChartConnection; ASeriesIndex : integer) : TcxPivotGridField;
 var
   FCol: TcxPivotGridViewDataItem;
   FSeriesCnt: Integer;
   FDBPivotGrid: TcxDBPivotGrid;
-
-  function VisibleSummaryFieldCount: Integer;
-  var
-    I: Integer;
-  begin
-    Result:= 0;
-    for I := 0 to FDBPivotGrid.SummaryFields.Count-1 do
-      if FDBPivotGrid.SummaryFields[I].Visible then
-        Inc(Result);
-  end;
 
   function FirstVisibleSummaryField: TcxPivotGridField;
   var
@@ -106,7 +107,7 @@ begin
   if not Assigned(FDBPivotGrid) then
     Exit;
 
-  if VisibleSummaryFieldCount=1 then
+  if VisibleSummaryFieldCount(FDBPivotGrid)=1 then
   begin
     Result:= FirstVisibleSummaryField;
     Exit;

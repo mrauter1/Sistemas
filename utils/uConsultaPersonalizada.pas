@@ -1515,7 +1515,8 @@ var
   var
     ArqIni: TCustomIniFile;
   begin
-    FChartController.RebuildSeriesConf(True);
+//    FChartController.RebuildSeriesConf(False);
+    cxGridGraficoChartView.RestoreFromIniFile(FNomeIni, False, False, [gsoUseSummary], 'Grafico');
     ArqIni := TMemIniFile.Create(ANomeIni);
     try
       FontSizeStyle.Font.Size := ArqIni.ReadInteger('CONFIG', 'SIZE_LEGEND_ITEM',10);
@@ -1523,11 +1524,11 @@ var
       Italic := ArqIni.ReadBool('CONFIG', 'ITALIC_LEGEND_ITEM',false);
       cxGridGraficoChartView.Title.Text:= ArqIni.ReadString('CONFIG', 'TITULO', GetTituloOriginal);
       FChartController.UnserializeConf(ArqIni.ReadString('CONFIG', 'SERIES',''), False);
+      FChartController.RebuildSeriesConf(True); // Rebuild the series that are not loaded from the Ini File
     finally
       ArqIni.Free;
     end;
     Proc_Atualiza_LegenItem(FontSizeStyle.Font.Size, Bold, Italic );
-    cxGridGraficoChartView.RestoreFromIniFile(FNomeIni, False, False, [gsoUseSummary], 'Grafico');
   end;
 
 begin

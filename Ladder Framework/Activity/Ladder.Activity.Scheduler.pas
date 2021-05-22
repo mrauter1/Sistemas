@@ -4,11 +4,10 @@ interface
 
 uses
   Ladder.Activity.Classes, Ladder.ServiceLocator, System.Generics.Collections, System.Classes, maxCron, Ladder.Activity.Classes.Dao, SyncObjs,
-  Spring, Spring.Events;
+  Spring, Spring.Events, Ladder.Logger;
 
 type
-  TLogType = (ltNotification, ltError);
-  TLogEvent = procedure(ALogType: TLogType; AMessage: String) of object;
+  TScheduledActivityStatus = (saWaiting=0, saExecuting=1, saError=2);
 
   TNotifyThread = class(TFrwThread)
   public
@@ -22,19 +21,27 @@ type
   private
     FCronScheduler: TCronSchedulePlan;
     FCronExpression: String;
-    FExecuting: Boolean;
+//    FExecuting: Boolean;
     FLastExecutionTime: TDateTime;
     FNextExecutionTime: TDateTime;
+    FStartedExecutionTime: TDateTime;
+    FStatus: TScheduledActivityStatus;
+    FErrorCount: Integer;
     procedure SetCronExpression(const Value: String);
     procedure SetLastExecutionTime(const Value: TDateTime);
     function GetNextExecutionTime: TDateTime;
+    function GetExecuting: Boolean;
+    procedure GetStatus(const Value: TScheduledActivityStatus);
   public
     constructor Create(AExpressionEvaluator: IExpressionEvaluator); override;
   published
     property CronExpression: String read FCronExpression write SetCronExpression;
+    property StartedExecutionTime: TDateTime read FStartedExecutionTime write FStartedExecutionTime;
     property LastExecutionTime: TDateTime read FLastExecutionTime write SetLastExecutionTime;
     property NextExecutionTime: TDateTime read GetNextExecutionTime; //write FNextExecutionTime;
-    property Executing: Boolean read FExecuting; //write FExecuting;
+    property Executing: Boolean read GetExecuting; //write FExecuting;
+    property Status: TScheduledActivityStatus read FStatus write GetStatus;
+    property ErrorCount: Integer read FErrorCount write FErrorCount;
   end;
 
   TScheduledActivities = TObjectList<TScheduledActivity>;
@@ -56,7 +63,6 @@ type
     procedure ExecuteActivity(AActivity: TScheduledActivity);
     procedure DoLogEvent(ALogType: TLogType; AMessage: String);
   public
-    OnLogEvent: IEvent<TLogEvent>;
     constructor Create(ALoadScheduledActivities: Boolean = True; AStopped: Boolean = False);
     destructor Destroy; override;
 
@@ -83,11 +89,28 @@ begin
   inherited Create(AExpressionEvaluator);
   FCronScheduler:= TCronSchedulePlan.Create;
   FLastExecutionTime:= Now;
+  Status:= saWaiting;
+  FErrorCount:= 0;
+end;
+
+function TScheduledActivity.GetExecuting: Boolean;
+begin
+  Result:= (Status = saExecuting);
 end;
 
 function TScheduledActivity.GetNextExecutionTime: TDateTime;
 begin
+  if Status=saError then
+  begin
+    Result:= IncSecond(StartedExecutionTime,10*ErrorCount); // Para cada erro aumenta em 10 segundos o tempo desde a última tentativa;
+    Exit;
+  end;
   Result:= FNextExecutionTime;
+end;
+
+procedure TScheduledActivity.GetStatus(const Value: TScheduledActivityStatus);
+begin
+  FStatus := Value;
 end;
 
 procedure TScheduledActivity.SetCronExpression(const Value: String);
@@ -107,7 +130,7 @@ end;
 
 constructor TNotifyThread.Create(AOnExecute: TNotifyEvent; ASender: TObject);
 begin
-  inherited Create(True);
+  inherited Create(True, TFrwServiceLocator.Factory.ConnectionParams);
   OnExecute:= AOnExecute;
   Sender:= ASender;
 end;
@@ -130,7 +153,6 @@ begin
   FListCriticalSection:= TCriticalSection.Create;
 
   FScheduledActivities:= TScheduledActivities.Create;
-  OnLogEvent:= TEvent<TLogEvent>.Create;
 
   FLoopingThread:= TNotifyThread.Create(OnExecute, Self);
 
@@ -149,7 +171,6 @@ begin
   FLoopingThread.Terminate;
   FLoopingThread.WaitFor;
 
-  OnLogEvent:= nil;
   FScheduledActivities.Free;
   FLoopingThread.Free;
   FListCriticalSection.Free;
@@ -158,32 +179,39 @@ end;
 
 procedure TScheduler.DoLogEvent(ALogType: TLogType; AMessage: String);
 begin
-  if OnLogEvent.CanInvoke then
-    TLogEvent(OnLogEvent.Invoke)(ALogType, AMessage);
+  TFrwServiceLocator.Logger.LogEvent(ALogType, AMessage);
 end;
 
 procedure TScheduler.ExecuteActivity(AActivity: TScheduledActivity);
 begin
   // Execute on main Thread
-  AActivity.FExecuting:= True;
-  FDao.UpdateProperties(AActivity, 'Executing');
+  AActivity.Status:= saExecuting;
+  AActivity.StartedExecutionTime:= Now;
   try
+//    FDao.Update(AActivity, 'Executing');
+    FDao.UpdateNoChild(AActivity);
     TFrwServiceLocator.Synchronize(
     procedure
     begin
       try
         DoLogEvent(ltNotification, Format('Activity %s started.', [AActivity.Name]));
         AActivity.Executar(AActivity.ExpressionEvaluator);
+        AActivity.ErrorCount:= 0;
+        AActivity.Status:= saWaiting;
         DoLogEvent(ltNotification, Format('Activity %s finished.', [AActivity.Name]));
       except
         on E: Exception do
+        begin
+          AActivity.Status:= saError;
+          AActivity.ErrorCount:= AActivity.ErrorCount+1;
           DoLogEvent(ltError, Format('Error executing activity %s: %s', [AActivity.Name, E.Message]));
+        end;
       end;
     end);
   finally
     AActivity.LastExecutionTime:= Now;
-    AActivity.FExecuting:= False;
-    FDao.UpdateProperties(AActivity, 'LastExecutionTime, Executing');
+    FDao.UpdateNoChild(AActivity);
+//    FDao.UpdateProperties(AActivity, 'LastExecutionTime, Executing');
   end;
 end;
 
@@ -231,6 +259,8 @@ begin
         while FStop do
         begin
           FStopped:= True;
+          if FLoopingThread.Terminated then
+            Exit;
           Sleep(100);
         end;
         FStopped:= False;

@@ -3,7 +3,8 @@ unit Ladder.Activity.Manager;
 interface
 
 uses
-  Ladder.Activity.Classes, System.Generics.Collections, System.Generics.Defaults, SysUtils, System.Classes, Forms;
+  Ladder.Activity.Classes, System.Generics.Collections, System.Generics.Defaults, SysUtils, System.Classes, Forms,
+  System.SyncObjs;
 
 type
   IProcessEditor = interface(IInterface)
@@ -24,6 +25,7 @@ type
   private
     FExecutorDictionary: TExecutorDictionary;
     FProcessEditorDictionary: TProcessEditorDictionary;
+    FCriticalSection: TCriticalSection;
   public
     property ExecutorDictionary: TExecutorDictionary read FExecutorDictionary; //write FExecutorDictionary;
 
@@ -53,6 +55,7 @@ implementation
 constructor TActivityManager.Create;
 begin
   inherited Create;
+  FCriticalSection:= TCriticalSection.Create;
   FExecutorDictionary:= TExecutorDictionary.Create;
   FProcessEditorDictionary:= TProcessEditorDictionary.Create;
 end;
@@ -60,6 +63,7 @@ end;
 destructor TActivityManager.Destroy;
 begin
   FExecutorDictionary.Free;
+  FCriticalSection.Free;
   inherited Destroy;
 end;
 
@@ -125,29 +129,49 @@ end;
 procedure TActivityManager.RegisterExecutor(ExecutorClass: TExecutorClass;
   pGetExecutor: TOnGetExecutor);
 begin
-  if FExecutorDictionary.ContainsKey(ExecutorClass.ClassName) then
-    UnregisterExecutor(ExecutorClass.ClassName);
-//    raise Exception.Create('TActivityManager.RegisterExecutorClass: Executor "'+ExecutorClass.ClassName+'" already registered!');
+  FCriticalSection.Acquire;
+  try
+    if FExecutorDictionary.ContainsKey(ExecutorClass.ClassName) then
+      UnregisterExecutor(ExecutorClass.ClassName);
+  //    raise Exception.Create('TActivityManager.RegisterExecutorClass: Executor "'+ExecutorClass.ClassName+'" already registered!');
 
-  FExecutorDictionary.Add(ExecutorClass.ClassName, pGetExecutor);
+    FExecutorDictionary.Add(ExecutorClass.ClassName, pGetExecutor);
+  finally
+    FCriticalSection.Release;
+  end;
 end;
 
 procedure TActivityManager.UnregisterExecutor(ExecutorClassName: string);
 begin
-  FExecutorDictionary.Remove(ExecutorClassName);
+  FCriticalSection.Acquire;
+  try
+    FExecutorDictionary.Remove(ExecutorClassName);
+  finally
+    FCriticalSection.Release;
+  end;
 end;
 
 procedure TActivityManager.RegisterProcessEditor(ExecutorClass: TExecutorClass; pGetProcessEditor: TOnGetProcessEditor);
 begin
-  if FProcessEditorDictionary.ContainsKey(ExecutorClass.ClassName) then
-    UnregisterProcessEditor(ExecutorClass.ClassName);
+  FCriticalSection.Acquire;
+  try
+    if FProcessEditorDictionary.ContainsKey(ExecutorClass.ClassName) then
+      UnregisterProcessEditor(ExecutorClass.ClassName);
 
-  FProcessEditorDictionary.Add(ExecutorClass.ClassName, pGetProcessEditor);
+    FProcessEditorDictionary.Add(ExecutorClass.ClassName, pGetProcessEditor);
+  finally
+    FCriticalSection.Release;
+  end;
 end;
 
 procedure TActivityManager.UnregisterProcessEditor(ExecutorClassName: string);
 begin
-  FProcessEditorDictionary.Remove(ExecutorClassName);
+  FCriticalSection.Acquire;
+  try
+    FProcessEditorDictionary.Remove(ExecutorClassName);
+  finally
+    FCriticalSection.Release;
+  end;
 end;
 
 end.

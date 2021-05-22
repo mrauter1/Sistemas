@@ -22,7 +22,6 @@ object FormProcessEditor: TFormProcessEditor
     Height = 81
     Align = alTop
     TabOrder = 0
-    ExplicitWidth = 614
     DesignSize = (
       597
       81)
@@ -59,7 +58,6 @@ object FormProcessEditor: TFormProcessEditor
       Caption = 'OK'
       TabOrder = 0
       OnClick = BtnOKClick
-      ExplicitLeft = 490
     end
     object DBEditIDConsulta: TDBEdit
       Left = 97
@@ -80,7 +78,6 @@ object FormProcessEditor: TFormProcessEditor
       DataField = 'Name'
       DataSource = DsProcesso
       TabOrder = 2
-      ExplicitWidth = 284
     end
     object DBEdit1: TDBEdit
       Left = 97
@@ -91,7 +88,6 @@ object FormProcessEditor: TFormProcessEditor
       DataField = 'Description'
       DataSource = DsProcesso
       TabOrder = 3
-      ExplicitWidth = 501
     end
   end
   object Panel2: TPanel
@@ -101,7 +97,6 @@ object FormProcessEditor: TFormProcessEditor
     Height = 324
     Align = alClient
     TabOrder = 1
-    ExplicitWidth = 614
     object Splitter1: TSplitter
       Left = 1
       Top = 159
@@ -120,7 +115,6 @@ object FormProcessEditor: TFormProcessEditor
       Align = alClient
       Caption = 'Inputs'
       TabOrder = 0
-      ExplicitWidth = 612
       object ScrollBoxParametros: TScrollBox
         Left = 2
         Top = 15
@@ -132,8 +126,6 @@ object FormProcessEditor: TFormProcessEditor
         BevelOuter = bvNone
         BorderStyle = bsNone
         TabOrder = 0
-        ExplicitLeft = -54
-        ExplicitWidth = 645
       end
     end
     object GroupBoxOutputs: TGroupBox
@@ -144,7 +136,6 @@ object FormProcessEditor: TFormProcessEditor
       Align = alBottom
       Caption = 'Outputs'
       TabOrder = 1
-      ExplicitWidth = 612
       object cxGridOutputs: TcxGrid
         Left = 2
         Top = 15
@@ -152,7 +143,6 @@ object FormProcessEditor: TFormProcessEditor
         Height = 143
         Align = alClient
         TabOrder = 0
-        ExplicitWidth = 608
         object cxGridDBTableView1: TcxGridDBTableView
           Navigator.Buttons.CustomButtons = <>
           DataController.DataSource = DsOutput

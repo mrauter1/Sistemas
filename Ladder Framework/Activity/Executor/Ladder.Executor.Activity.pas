@@ -116,6 +116,6 @@ begin
 end;
 
 initialization
-  TFrwServiceLocator.Context.ActivityManager.RegisterExecutor(TExecutorActivity, TExecutorActivity.GetExecutor);
+  TFrwServiceLocator.ActivityManager.RegisterExecutor(TExecutorActivity, TExecutorActivity.GetExecutor);
 
 end.

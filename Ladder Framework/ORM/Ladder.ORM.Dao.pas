@@ -73,7 +73,8 @@ type
 
     procedure Insert(pObject: TObject; pMasterInstance: TObject = nil);
     function Update(pObject: TObject; pMasterInstance: TObject = nil): Boolean;
-    function UpdateProperties(pObject: TObject; APropertyNames: String; pMasterInstance: TObject=nil): Boolean;
+    function UpdateNoChild(pObject: TObject; pMasterInstance: TObject = nil): Boolean; // Update only the properties of the main class that are not saved by a ChildDao
+    function UpdateProperties(pObject: TObject; APropertyNames: String; pMasterInstance: TObject=nil): Boolean; // Update only the properties listed on APropertyNames
 
     procedure Save(pObject: TObject; pMasterInstance: TObject = nil);
     procedure SaveList(pObjectList: TObjectList; pMasterInstance: TObject = nil); overload;
@@ -170,7 +171,7 @@ type
 
     constructor Create; overload;
     constructor Create(pModeloBD: TModeloBD; pOwnsModelo: Boolean = true); overload;
-    constructor Create(pNomeTabela: String; pCampoChave: string; pItemClass: TClass); overload;
+    constructor Create(pNomeTabela: String; pCampoChave: string; pItemClass: TClass; pAutoMapOption: TAutoMapOption = amPublicAndPublished); overload;
     destructor Destroy; override;
 
     function ObjectExists(pObject: TObject): Boolean; // Check if object exists on database
@@ -178,6 +179,7 @@ type
 
     procedure Insert(pObject: TObject; pMasterInstance: TObject = nil); virtual;
     function Update(pObject: TObject; pMasterInstance: TObject = nil): Boolean; virtual;
+    function UpdateNoChild(pObject: TObject; pMasterInstance: TObject = nil): Boolean; virtual; // Update only the properties of the main class that are not saved by a ChildDao
     function UpdateProperties(pObject: TObject; APropertyNames: String; pMasterInstance: TObject=nil): Boolean; virtual;
 
     procedure Save(pObject: TObject; pMasterInstance: TObject = nil); virtual;
@@ -222,8 +224,8 @@ type
   public
     constructor Create; overload;
     constructor Create(pModeloBD: TModeloBD; pOwnsModelo: Boolean = true); overload;
-    constructor Create(pNomeTabela: String; pCampoChave: string); overload;
-    constructor Create(pNomeTabela: String; pCampoChave: string; pItemClass: TClass); overload;
+    constructor Create(pNomeTabela: String; pCampoChave: string; pAutoMapOption: TAutoMapOption = amPublished); overload;
+    constructor Create(pNomeTabela: String; pCampoChave: string; pItemClass: TClass; pAutoMapOption: TAutoMapOption = amPublished); overload;
     destructor Destroy; override;
 
     procedure SelectKey(pObject: T; FChave: Integer); reintroduce; overload; virtual;
@@ -545,12 +547,13 @@ begin
 end;
 
 constructor TDaoBase.Create(pNomeTabela, pCampoChave: string;
-  pItemClass: TClass);
+  pItemClass: TClass; pAutoMapOption: TAutoMapOption = amPublicAndPublished);
 begin
-  Create(TModeloBD.Create(pNomeTabela, pCampoChave, pItemClass), True);
+  Create(TModeloBD.Create(pNomeTabela, pCampoChave, pItemClass, pAutoMapOption), True);
 end;
 
 procedure TDaoBase.CreateTableAndFields;
+// TODO: Check if schema exists and create if not
 var
   FTableExists: Boolean;
   fChildDao: TChildDaoDefs;
@@ -1105,6 +1108,17 @@ begin
   end;
 end;
 
+function TDaoBase.UpdateNoChild(pObject, pMasterInstance: TObject): Boolean;
+var
+  fChildDaoDef: TChildDaoDefs;
+begin
+  Result:= DaoUtils.ExecuteNoResult(QueryBuilder.Update(pObject, pMasterInstance)) > 0;
+
+  for fChildDaoDef in fChildDaoList do
+    if fChildDaoDef is TCompositeChildDaoDefs then // Composite Dao should be updated
+      Result:= Result or fChildDaoDef.Dao.UpdateNoChild(pObject, pObject); // Property might be part of a composite DAO
+end;
+
 function TDaoBase.UpdateProperties(pObject: TObject; APropertyNames: String; pMasterInstance: TObject=nil): Boolean;
 var
   fChildDaoDef: TChildDaoDefs;
@@ -1251,14 +1265,14 @@ begin
   inherited Create(pModeloBD, pOwnsModelo);
 end;
 
-constructor TDaoGeneric<T>.Create(pNomeTabela, pCampoChave: string);
+constructor TDaoGeneric<T>.Create(pNomeTabela, pCampoChave: string; pAutoMapOption: TAutoMapOption = amPublished);
 begin
-  Create(pNomeTabela, pCampoChave, T);
+  Create(pNomeTabela, pCampoChave, T, pAutoMapOption);
 end;
 
-constructor TDaoGeneric<T>.Create(pNomeTabela, pCampoChave: string; pItemClass: TClass);
+constructor TDaoGeneric<T>.Create(pNomeTabela, pCampoChave: string; pItemClass: TClass; pAutoMapOption: TAutoMapOption = amPublished);
 begin
-  inherited Create(pNomeTabela, pCampoChave, pItemClass);
+  inherited Create(pNomeTabela, pCampoChave, pItemClass, pAutoMapOption);
 end;
 
 destructor TDaoGeneric<T>.Destroy;

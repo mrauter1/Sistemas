@@ -63,7 +63,7 @@ end;
 
 function TProcessoDao<T>.ActivityManager: TActivityManager;
 begin
-  Result:= TFrwServiceLocator.Context.ActivityManager;
+  Result:= TFrwServiceLocator.ActivityManager;
 end;
 
 function TProcessoDao<T>.GetExecutorClass(const pFieldName: String; Instance: TObject; MasterInstance: TObject=nil): Variant;

@@ -19,6 +19,12 @@ uses
 type
   // Test methods for class TFieldMapping
 
+  TTestPublic = class
+  public
+    ID: Integer;
+    Num: Integer;
+  end;
+
   TestTFieldMapping = class(TTestCase)
   strict private
     FFieldMapping: TFieldMapping;
@@ -54,6 +60,7 @@ type
   published
     procedure TestMapProperty;
     procedure TestObjectListFromSql;
+    procedure TestMapPublicFields;
 //    procedure TestObjectListFromSqlMormot;
   end;
   // Test methods for class TQueryBuilderBase
@@ -143,6 +150,22 @@ begin
   Check(ReturnValue[0].Childs.Count = 3);
   Check(ReturnValue[0].Childs[0].Num = 1);
   Check(ReturnValue[0].Childs[1].Num = 2);
+end;
+
+procedure TestTModeloBD.TestMapPublicFields;
+var
+  FPubModeloBD: TModeloBD;
+  ReturnValue: TObjectList<TTestPublic>;
+begin
+  FPubModeloBD := TModeloBD.Create('TESTCHILD', 'ID', TTestPublic, amPublicAndPublished);
+  try
+    ReturnValue:= FPubModeloBD.ObjectListFromSql<TTestPublic>('SELECT * FROM TESTCHILD');
+    Check(ReturnValue.Count > 0);
+    Check(ReturnValue[0].ID > 0);
+    Check(ReturnValue[0].Num > 0);
+  finally
+    FPubModeloBD.Free;
+  end;
 end;
 
 procedure TestTModeloBD.TestObjectFromDataSet;

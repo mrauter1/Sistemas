@@ -24,7 +24,7 @@ implementation
 { TExecutorConsultaPersonalizada }
 
 uses
-  Variants, SynCommons;
+  Variants, SynCommons, System.UITypes;
 
 procedure TExecutorConsultaPersonalizada.CheckInputs;
 begin
@@ -111,9 +111,9 @@ begin
   TFrwServiceLocator.Synchronize(
     procedure begin
       if IDConsulta <> 0 then
-        FConsultaPersonalizada:= TFrmConsultaPersonalizada.AbreConsultaPersonalizada(IDConsulta, False)
+        FConsultaPersonalizada:= TFrmConsultaPersonalizada.AbreConsultaPersonalizada(IDConsulta, False, umLogMessages)
       else
-        FConsultaPersonalizada:= TFrmConsultaPersonalizada.AbreConsultaPersonalizadaByName(NomeConsulta, False);
+        FConsultaPersonalizada:= TFrmConsultaPersonalizada.AbreConsultaPersonalizadaByName(NomeConsulta, False, TWindowState.wsNormal, umLogMessages);
     end
   );
 
@@ -164,13 +164,12 @@ begin
   Result:= Outputs;
 end;
 
-
 class function TExecutorConsultaPersonalizada.GetExecutor: IExecutorBase;
 begin
   Result:= TExecutorConsultaPersonalizada.Create;
 end;
 
 initialization
-  TFrwServiceLocator.Context.ActivityManager.RegisterExecutor(TExecutorConsultaPersonalizada, TExecutorConsultaPersonalizada.GetExecutor);
+  TFrwServiceLocator.ActivityManager.RegisterExecutor(TExecutorConsultaPersonalizada, TExecutorConsultaPersonalizada.GetExecutor);
 
 end.

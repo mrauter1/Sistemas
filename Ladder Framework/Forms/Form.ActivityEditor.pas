@@ -239,7 +239,7 @@ end;
 
 function TFormActivityEditor.Manager: TActivityManager;
 begin
-  Result:= TFrwServiceLocator.Context.ActivityManager;
+  Result:= TFrwServiceLocator.ActivityManager;
 end;
 
 procedure TFormActivityEditor.ConfigurarProcesso;

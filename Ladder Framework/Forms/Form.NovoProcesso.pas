@@ -8,7 +8,7 @@ uses
   Ladder.Activity.Manager, Ladder.ServiceLocator, FireDAC.Stan.Intf,
   FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS,
   FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
-  Data.DB, FireDAC.Comp.DataSet, FireDAC.Comp.Client, uConSqlServer, uConClasses,
+  Data.DB, FireDAC.Comp.DataSet, FireDAC.Comp.Client, uConClasses,
   Ladder.Executor.ConsultaPersonalizada, Ladder.Executor.Email;
 
 type
@@ -82,7 +82,7 @@ var
 begin
   ResultClass:= '';
 
-  FActivityManager:= TFrwServiceLocator.Context.ActivityManager;
+  FActivityManager:= TFrwServiceLocator.ActivityManager;
 
   for FClass in FActivityManager.ExecutorDictionary.Keys do
      CbxExecutors.Items.Add(FClass);

@@ -21,7 +21,7 @@ uses
   dxSkinDevExpressStyle, dxSkinSharpPlus, Ladder.Activity.Classes, dxSkinBlue,
   dxSkinOffice2013DarkGray, FireDAC.Comp.DataSet, dxSkinOffice2010Silver,
   Vcl.ExtCtrls, FireDAC.DApt.Intf, dxSkinOffice2016Colorful, cxDataStorage,
-  FireDAC.Comp.Client, dxSkinOffice2013LightGray, uConSqlServer, Vcl.Mask,
+  FireDAC.Comp.Client, dxSkinOffice2013LightGray, Vcl.Mask,
   dxSkinMetropolisDark, dxSkinTheAsphaltWorld, FireDAC.Stan.Option, dxSkinSeven,
   cxGrid, dxSkinBlack, dxSkinLilian, FireDAC.Stan.Error, cxGridLevel,
   dxSkinVisualStudio2013Dark, Vcl.Graphics, Vcl.Forms, dxSkinMoneyTwins, cxEdit,

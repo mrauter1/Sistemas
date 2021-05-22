@@ -55,7 +55,6 @@ inherited FormConsultaEditor: TFormConsultaEditor
       inherited ScrollBoxParametros: TScrollBox
         Width = 584
         Height = 147
-        ExplicitLeft = 2
         ExplicitWidth = 601
         ExplicitHeight = 147
       end

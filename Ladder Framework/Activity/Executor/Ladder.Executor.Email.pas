@@ -76,6 +76,6 @@ begin
 end;
 
 initialization
-  TFrwServiceLocator.Context.ActivityManager.RegisterExecutor(TExecutorSendMail, TExecutorSendMail.GetExecutor);
+  TFrwServiceLocator.ActivityManager.RegisterExecutor(TExecutorSendMail, TExecutorSendMail.GetExecutor);
 
 end.

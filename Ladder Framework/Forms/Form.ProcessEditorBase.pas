@@ -401,7 +401,7 @@ end;
 
 class function TFormProcessEditorBase.ActivityManager: TActivityManager;
 begin
-  Result:= TFrwServiceLocator.Context.ActivityManager;
+  Result:= TFrwServiceLocator.ActivityManager;
 end;
 
 function TFormProcessEditorBase.ControlToExpression(pComponent: TComponent; pParametroCon: TParametroCon): String;

@@ -97,11 +97,11 @@ type
     function GetCompositeDao: IDaoGeneric<TTesteComposite>;
   end;
 
-procedure CreateTables;
+procedure CreateTestTables;
 
 implementation
 
-procedure CreateTables;
+procedure CreateTestTables;
 var
   FTestDao: TDaoGeneric<TTeste>;
   FCompositeDao: IDaoComposite;
@@ -193,11 +193,11 @@ begin
 
   NewObjectFunction:= NewObject; // Since ItemClass is baseclass, baseclass will be created by default, here we override
 
-  FModeloBD:= TModeloBD.Create(TTesteComposite, False);
+  FModeloBD:= TModeloBD.Create(TTesteComposite, amNone);
   FModeloBD.NomeTabela:= 'TestComposite';
   FModeloBD.NomePropChave:= 'ID';
   FModeloBD.ChaveIncremental:= False;
-  FModeloBD.DoMapPublishedFields(True); // Only map published field of TTesteComposite (don't map fields from base class)
+  FModeloBD.DoMapFields(amPublished); // Only map published field of TTesteComposite (don't map fields from base class)
   FModeloBD.Map('ID', 'ID'); // Since ID is a member of Base Class it must be explicitly added;
 
   FCompositeDao:= TDaoGeneric<TTesteComposite>.Create(FModeloBD);
@@ -214,8 +214,5 @@ function TDaoComposite.NewObject(pDBRows: ISqlDBRows): TObject;
 begin
   Result:= TTesteComposite.Create;
 end;
-
-initialization
-  CreateTables;
 
 end.

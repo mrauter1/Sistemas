@@ -50,9 +50,9 @@ type
     constructor Create(pItemClass: TClass);
   end;
 
-  TOpcaoMapeamento = (ApenasExplicitos);
+  TAutoMapOption = (amNone, amPublished, amPublicAndPublished);
 
-  TOpcoesMapeamento = set of TOpcaoMapeamento;
+//  TAutoMapOptions = set of TAutoMapOption;
 
   TSelectOption = (Top0);
   TSelectOptions = set of TSelectOption;
@@ -74,7 +74,7 @@ type
     FChaveIncremental: Boolean;
     FItemClass: TClass;
     FMappedFieldList: TFieldMappingList;
-    fOpcoesMapeamento: TOpcoesMapeamento;
+//    fOpcoesMapeamento: TOpcoesMapeamento;
     fNewObjectFunction: TFunNewObject;
     fAfterLoadObjectEvent: IEvent<TNotifyEvent>;
     //FOnAfterLoad: TNotifyEvent;
@@ -121,8 +121,8 @@ type
     property AfterLoadObjectEvent: IEvent<TNotifyEvent> read fAfterLoadObjectEvent;
     //property OnAfterLoad: TNotifyEvent read FOnAfterLoad write FOnAfterLoad;
 
-    constructor Create(pItemClass: TClass; pMapAllPublishedFields: Boolean = True); overload;
-    constructor Create(pNomeTabela: String; pNomePropChave: string; pItemClass: TClass); overload;
+    constructor Create(pItemClass: TClass; pAutoMapOption: TAutoMapOption = amPublished); overload;
+    constructor Create(pNomeTabela: String; pNomePropChave: string; pItemClass: TClass; pAutoMapOption: TAutoMapOption = amPublished); overload;
     destructor Destroy; override;
 
     function Connection: TSQLDBConnectionProperties;
@@ -140,9 +140,9 @@ type
     function MapField(pField: String; pFieldType: TFieldType; pFunGetFieldValue: TFunGetFieldValue): TFieldMappingList;
     function MapProperty(pPropName: String; pFunGetPropValue: TFunGetPropValue): TFieldMappingList;
 
-    procedure DoMapPublishedFields; overload;
-    procedure DoMapPublishedFields(pOnlyImmediate: Boolean); overload;
-    procedure DoMapPublishedFields(pItemClass: TClass; pOnlyImmediate: Boolean = False); overload;
+    procedure DoMapFields(pAutoMapOption: TAutoMapOption); overload;
+    procedure DoMapFields(pAutoMapOption: TAutoMapOption; pDoNotMapFieldsFromInheritedClasses: Boolean); overload;
+    procedure DoMapFields(pItemClass: TClass; pAutoMapOption: TAutoMapOption; pDoNotMapFieldsFromInheritedClasses: Boolean = False); overload;
 
     procedure AddFieldInUpdateDeleteWhere(pFieldName: String);
 
@@ -456,21 +456,22 @@ begin
   Result:= FazMapeamentoECopiaValores(pObjeto, pDataSet, tmObjectToDataSet, nil);
 end;
 
-procedure TModeloBD.DoMapPublishedFields(pItemClass: TClass; pOnlyImmediate: Boolean = False);
+procedure TModeloBD.DoMapFields(pItemClass: TClass; pAutoMapOption: TAutoMapOption; pDoNotMapFieldsFromInheritedClasses: Boolean = False);
 var
   RttiType: TRttiType;
   Prop: TRttiProperty;
   Field: TRttiField;
+  FVisibility: set of TMemberVisibility;
 
   procedure MapFieldOrProperty(pFieldOrProp: TRttiMember);
   begin
-    if pFieldOrProp.Visibility <> TMemberVisibility.mvPublished then
+    if not (pFieldOrProp.Visibility in FVisibility) then
       Exit;
 
     if PropertyToFieldType(pFieldOrProp) = ftUnknown then
       Exit;
 
-    if pOnlyImmediate and (pFieldOrProp.Parent.AsInstance.MetaclassType <> pItemClass) then
+    if pDoNotMapFieldsFromInheritedClasses and (pFieldOrProp.Parent.AsInstance.MetaclassType <> pItemClass) then
       Exit;
 
     if Assigned(FMappedFieldList.GetFieldMappingByPropName(pFieldOrProp.Name)) then // Field already mapped
@@ -480,6 +481,15 @@ var
   end;
 
 begin
+  if pAutoMapOption = amNone then
+    Exit;
+
+  if pAutoMapOption = amPublished then
+    FVisibility:= [TMemberVisibility.mvPublished];
+
+  if pAutoMapOption = amPublicAndPublished then
+    FVisibility:= [TMemberVisibility.mvPublished, TMemberVisibility.mvPublic];
+
   RttiType := RttiContext.GetType(pItemClass);
 
   for Prop in RttiType.GetProperties do
@@ -538,10 +548,10 @@ end;
 procedure TModeloBD.InicializaObjeto;
 begin
   FChaveIncremental:= True;
-  fOpcoesMapeamento:= [];
+//  fOpcoesMapeamento:= [];
 end;
 
-constructor TModeloBD.Create(pItemClass: TClass; pMapAllPublishedFields: Boolean = True);
+constructor TModeloBD.Create(pItemClass: TClass; pAutoMapOption: TAutoMapOption = amPublished);
 begin
   inherited Create;
   FUpdateOptions:= [uoDeleteMissingChilds]; // Delete missing childs by default
@@ -555,8 +565,7 @@ begin
 
   InicializaObjeto;
 
-  if pMapAllPublishedFields then
-    DoMapPublishedFields;
+  DoMapFields(pAutoMapOption);
 end;
 
 function TModeloBD.Connection: TSQLDBConnectionProperties;
@@ -569,9 +578,9 @@ begin
   Result:= TFrwServiceLocator.Context.DaoUtils;
 end;
 
-constructor TModeloBD.Create(pNomeTabela, pNomePropChave: string; pItemClass: TClass);
+constructor TModeloBD.Create(pNomeTabela, pNomePropChave: string; pItemClass: TClass; pAutoMapOption: TAutoMapOption = amPublished);
 begin
-  Create(pItemClass);
+  Create(pItemClass, pAutoMapOption);
 
   FNomeTabela:= pNomeTabela;
   NomePropChave:= pNomePropChave;
@@ -592,14 +601,14 @@ begin
   inherited;
 end;
 
-procedure TModeloBD.DoMapPublishedFields;
+procedure TModeloBD.DoMapFields(pAutoMapOption: TAutoMapOption);
 begin
-  DoMapPublishedFields(ItemClass, False);
+  DoMapFields(ItemClass, pAutoMapOption, False);
 end;
 
-procedure TModeloBD.DoMapPublishedFields(pOnlyImmediate: Boolean);
+procedure TModeloBD.DoMapFields(pAutoMapOption: TAutoMapOption; pDoNotMapFieldsFromInheritedClasses: Boolean);
 begin
-  DoMapPublishedFields(ItemClass, pOnlyImmediate);
+  DoMapFields(ItemClass, pAutoMapOption, pDoNotMapFieldsFromInheritedClasses);
 end;
 
 procedure TModeloBD.AddFieldInUpdateDeleteWhere(pFieldName: String);

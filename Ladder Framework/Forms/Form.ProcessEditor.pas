@@ -27,7 +27,7 @@ uses
   FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
   FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
   FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet, FireDAC.Comp.Client,
-  uConSqlServer, cxDBLookupComboBox, Ladder.ServiceLocator, Vcl.ComCtrls,
+  cxDBLookupComboBox, Ladder.ServiceLocator, Vcl.ComCtrls,
   Vcl.CheckLst, Ladder.Activity.Classes, Form.ProcessEditorBase, Ladder.ORM.DAO,
   Ladder.ORM.ObjectDataSet, Ladder.Activity.Classes.Dao,
   System.Generics.Collections, uConClasses, Ladder.Activity.Manager, cxSplitter;
@@ -272,6 +272,6 @@ begin
 end;
 
 initialization
-  TFrwServiceLocator.Context.ActivityManager.RegisterProcessEditor(TExecutorSendMail, TFormProcessEditor.GetProcessEmailEditor);
+  TFrwServiceLocator.ActivityManager.RegisterProcessEditor(TExecutorSendMail, TFormProcessEditor.GetProcessEmailEditor);
 
 end.

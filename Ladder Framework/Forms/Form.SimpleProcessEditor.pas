@@ -108,6 +108,6 @@ begin
 end;
 
 initialization
-  TFrwServiceLocator.Context.ActivityManager.RegisterProcessEditor(TExecutorSimple, TFormSimpleProcessEditor.GetSimpleEditor);
+  TFrwServiceLocator.ActivityManager.RegisterProcessEditor(TExecutorSimple, TFormSimpleProcessEditor.GetSimpleEditor);
 
 end.

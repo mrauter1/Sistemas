@@ -92,7 +92,7 @@ begin
   Result.Inputs.Add(FInput);
 
   Result.Inputs.Add(TParameter.Create('geDataIni', tbValue,'"2020/04/01"'));
-  Result.Inputs.Add(TParameter.Create('geDataFim', tbValue, '"2020/04/30"'));
+  Result.Inputs.Add(TParameter.Create('geDataFim', tbValue, '"2020/04/04"'));
 
   FExport:= TParameter.Create('Export', tbValue);
     FTipoExport:= TParameter.Create('Grafico', tbValue);

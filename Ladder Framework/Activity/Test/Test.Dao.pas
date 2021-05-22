@@ -109,6 +109,7 @@ var
 begin
   FDaoRecursive:= TDaoGeneric<TRecursiveObject>.Create('test.RecursiveObject', 'ID', TRecursiveObject);
   FDaoRecursive.AddChildDao('Childs', 'ID', 'IDMaster', FDaoRecursive);
+  FDaoRecursive.CreateTableAndFields;
 
   FObject:= TRecursiveObject.Create;
   FChild:= AddNewObject(AddNewObject(AddNewObject(FObject)));

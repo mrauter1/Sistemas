@@ -209,7 +209,7 @@ begin
 end;
 
 initialization
-  TFrwServiceLocator.Context.ActivityManager.RegisterProcessEditor(TExecutorActivity, TFormProcessActivityEditor.GetProcessEditor);
+  TFrwServiceLocator.ActivityManager.RegisterProcessEditor(TExecutorActivity, TFormProcessActivityEditor.GetProcessEditor);
 
 
 end.

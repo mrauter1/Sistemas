@@ -10,16 +10,17 @@ inherited FormSimpleProcessEditor: TFormSimpleProcessEditor
   end
   inherited Panel2: TPanel
     Height = 337
+    ExplicitHeight = 337
     inherited Splitter1: TSplitter
       Top = 172
       ExplicitTop = 173
     end
     inherited GroupBoxInputs: TGroupBox
       Height = 171
+      ExplicitHeight = 171
       inherited ScrollBoxParametros: TScrollBox
         Height = 154
-        ExplicitLeft = 2
-        ExplicitTop = 15
+        ExplicitHeight = 154
         object cxGridInputs: TcxGrid
           Left = 0
           Top = 0
@@ -74,6 +75,7 @@ inherited FormSimpleProcessEditor: TFormSimpleProcessEditor
     end
     inherited GroupBoxOutputs: TGroupBox
       Top = 176
+      ExplicitTop = 176
       inherited cxGridOutputs: TcxGrid
         inherited cxGridDBTableView1: TcxGridDBTableView
           Navigator.Buttons.First.Visible = False

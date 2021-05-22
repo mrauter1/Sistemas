@@ -37,6 +37,6 @@ begin
 end;
 
 initialization
-  TFrwServiceLocator.Context.ActivityManager.RegisterExecutor(TExecutorSimple, TExecutorSimple.GetExecutor);
+  TFrwServiceLocator.ActivityManager.RegisterExecutor(TExecutorSimple, TExecutorSimple.GetExecutor);
 
 end.

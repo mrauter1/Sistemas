@@ -37,7 +37,6 @@ uses
   Ladder.ORM.SQLDBRowsDataSet in '..\..\ORM\Ladder.ORM.SQLDBRowsDataSet.pas',
   uDmConnection in '..\..\..\utils\uDmConnection.pas' {DmConnection: TDataModule},
   uDmGeradorConsultas in '..\..\..\utils\uDmGeradorConsultas.pas' {DmGeradorConsultas: TDataModule},
-  uConSqlServer in '..\..\..\utils\uConSqlServer.pas' {ConSqlServer: TDataModule},
   Test.Classes.Dao in 'Test.Classes.Dao.pas',
   Ladder.Activity.LadderVarToSql in '..\Ladder.Activity.LadderVarToSql.pas',
   Test.LadderVarToSql in 'Test.LadderVarToSql.pas',
@@ -69,26 +68,39 @@ uses
   Form.ActivityEditor in '..\..\Forms\Form.ActivityEditor.pas' {FormActivityEditor},
   Ladder.Activity.Scheduler.Dao in '..\Ladder.Activity.Scheduler.Dao.pas',
   Form.PesquisaAviso in '..\..\Forms\Form.PesquisaAviso.pas' {FormPesquisaAviso},
-  Root in '..\..\Root.pas';
+  Root in '..\..\Root.pas',
+  Ladder.Types in '..\..\Ladder.Types.pas',
+  Ladder.Logger in '..\..\Ladder.Logger.pas';
 
 {$R *.RES}
 
 var
   FRootClass: TRootClass;
+  FConnectionParams: TConnectionParams;
 
 begin
+  FConnectionParams.DriverID:= 'MSSQL';
+  FConnectionParams.Server:= '127.0.0.1';
+  FConnectionParams.Protocol:= 'TCPIP';
+  FConnectionParams.Port:= 1433;
+  FConnectionParams.Database:= 'LOGISTEC';
+  FConnectionParams.User:= 'User';
+  FConnectionParams.Password:= '28021990';
+
   ReportMemoryLeaksOnShutdown := True;
+  TFrwServiceLocator.Inicializar(TFrwServiceFactory.Create(FConnectionParams));
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
+
   FRootClass:= TRootClass.Create;
   try
     FRootClass.CreateAllTables;
   finally
     FRootClass.Free;
   end;
+  CreateTestTables;
 
   DUnitTestRunner.RunRegisteredTests;
-  Application.CreateForm(TConSqlServer, ConSqlServer);
   Application.Run;
 end.
 

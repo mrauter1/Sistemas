@@ -27,12 +27,12 @@ var
 begin
   inherited Create;
 
-  FModeloBD:= TModeloBD.Create(TScheduledActivity, False);
+  FModeloBD:= TModeloBD.Create(TScheduledActivity, amNone);
   FModeloBD.NomeTabela:= 'ladder.ScheduledActivity';
   FModeloBD.Map('ID', 'ID'); // Since ID is a member of Base Class it must be explicitly added;
   FModeloBD.NomePropChave:= 'ID';
   FModeloBD.ChaveIncremental:= False; // Shold not be autoincremented, since ID is going to work as a foreign key to Ldder.Processos ID Field
-  FModeloBD.DoMapPublishedFields(True); // Only map published field of TScheduledActivity, and not from base class
+  FModeloBD.DoMapFields(amPublished, True); // Only map published field of TScheduledActivity, and not from base class
 
   FCompositeDao:= TDaoGeneric<TScheduledActivity>.Create(FModeloBD);
 

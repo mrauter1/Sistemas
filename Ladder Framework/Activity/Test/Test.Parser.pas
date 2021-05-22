@@ -12,7 +12,7 @@ unit Test.Parser;
 interface
 
 uses
-  TestFramework, Variants, System.SysUtils, Utils, Ladder.Parser, StrUtils, uConSqlServer,
+  TestFramework, Variants, System.SysUtils, Utils, Ladder.Parser, StrUtils,
   Ladder.ServiceLocator, SynDB, SynCommons, Ladder.Utils;
 
 type
@@ -21,7 +21,6 @@ type
   TestTActivityParser = class(TTestCase)
   strict private
     FActivityParser: THackActivityParser;
-    FConSqlServer: TConSqlServer;
   private
     procedure FunElementEval(const pElement: String; var Return: Variant);
     procedure FunSqlEval(const pSql: String; var Return: Variant);
@@ -90,8 +89,6 @@ begin
   FActivityParser := THackActivityParser.Create;
   FActivityParser.OnElementEval:= FunElementEval;
   FActivityParser.OnSqlEval:= FunSqlEval;
-
-  FConSqlServer:= TConSqlServer.Create(nil);
 end;
 
 procedure TestTActivityParser.TestExtractTextDelimitedBy;
@@ -166,8 +163,6 @@ procedure TestTActivityParser.TearDown;
 begin
   FActivityParser.Free;
   FActivityParser := nil;
-
-  FConSqlServer.Free;
 end;
 
 procedure TestTActivityParser.TestParseSql;

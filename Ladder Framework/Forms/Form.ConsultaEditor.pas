@@ -279,7 +279,7 @@ const
           '  union all '+
           '  select pai.Descricao, pai.IDPAi '+
           '  from cons.Menu pai '+
-          '  inner join Menu m on m.IDPai = pai.ID '+
+          '  inner join Menu m on m.IDPai = pai.ID and pai.ID <> pai.IDPai '+
           ')   '+
           'select * from Menu ';
 var
@@ -341,7 +341,7 @@ begin
 end;
 
 initialization
-  TFrwServiceLocator.Context.ActivityManager.RegisterProcessEditor(TExecutorConsultaPersonalizada, TFormConsultaEditor.GetProcessEditor);
+  TFrwServiceLocator.ActivityManager.RegisterProcessEditor(TExecutorConsultaPersonalizada, TFormConsultaEditor.GetProcessEditor);
 
 
 end.

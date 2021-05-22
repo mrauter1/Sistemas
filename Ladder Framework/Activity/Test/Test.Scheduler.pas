@@ -20,6 +20,7 @@ type
   private
   public
     function Executar: TOutputList; override;
+    class function GetExecutor: IExecutorBase;
   end;
 
   // Test methods for class TScheduledActivity
@@ -117,18 +118,21 @@ var
   FScheduledTime: TDateTime;
   FExecutedTime: TDateTime;
   FActivity: TScheduledActivity;
+  FNextExecution: TDateTime;
 begin
   FScheduler.Stop;
   FScheduler.ScheduledActivities.Clear;
 
-  FActivity:= NewScheduledActivity('* * * * * *');
-  FScheduler.ScheduledActivities.Add(FActivity); // Each minute
+  FActivity:= NewScheduledActivity('* * * * * *'); // Start of the next minute
+  FNextExecution:= FActivity.NextExecutionTime;
+
+  FScheduler.ScheduledActivities.Add(FActivity);
   FScheduler.Start;
 
   FScheduledTime:= DateOf(Now)+EncodeTime(HourOf(Now), MinuteOf(Now), 0, 0);
-  FScheduledTime:= IncMinute(FScheduledTime, 1); // Should execute at the start of the next minute
+  FScheduledTime:= IncMinute(FScheduledTime, 1); // Should start on the start of the next minute
 
-  while FActivity.LastExecutionTime < FScheduledTime do
+  while FNextExecution = FActivity.NextExecutionTime do
     Application.ProcessMessages;
 
   FExecutedTime:= LadderVarToDateTime(FActivity.Processos[0].Inputs.ParamValue('Time'));
@@ -148,7 +152,13 @@ begin
   Inputs.Param('Time').Value:= Now;
 end;
 
+class function TMockExecutor.GetExecutor: IExecutorBase;
+begin
+  Result:= TMockExecutor.Create;
+end;
+
 initialization
+  TFrwServiceLocator.ActivityManager.RegisterExecutor(TMockExecutor, TMockExecutor.GetExecutor);
   // Register any test cases with the test runner
   RegisterTest(TestTScheduledActivity.Suite);
   RegisterTest(TestTScheduler.Suite);

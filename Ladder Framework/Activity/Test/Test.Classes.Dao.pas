@@ -119,7 +119,7 @@ begin
 
   FDate:= LadderVarToDateTime('2020/04/01');
   Result.Inputs.Add(TParameter.Create('geDataIni', tbValue, LadderDateToStr(StartOfTheMonth(FDate), True))); // select first day of the month
-  Result.Inputs.Add(TParameter.Create('geDataFim', tbValue, LadderDateToStr(EndOfTheMonth(FDate), True)));
+  Result.Inputs.Add(TParameter.Create('geDataFim', tbValue, LadderDateToStr('2020/04/03', True)));
 
 
   FTipoExport:= TParameter.Create('Grafico', tbValue);

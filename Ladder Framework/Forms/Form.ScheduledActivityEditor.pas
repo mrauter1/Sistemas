@@ -28,7 +28,7 @@ uses
   cxGrid, Vcl.Grids, Vcl.DBGrids, Vcl.Buttons, FireDAC.Stan.Intf,
   FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS,
   FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
-  FireDAC.Comp.DataSet, FireDAC.Comp.Client, uConSqlServer, Ladder.Activity.Classes,
+  FireDAC.Comp.DataSet, FireDAC.Comp.Client, Ladder.Activity.Classes,
   Ladder.ORM.Dao, Ladder.Activity.Scheduler.Dao, Ladder.Activity.Scheduler,
   Ladder.ORM.ObjectDataSet, Ladder.Activity.Manager, Vcl.ComCtrls;
 
@@ -216,7 +216,7 @@ end;
 
 function TFormScheduledActivityEditor.Manager: TActivityManager;
 begin
-  Result:= TFrwServiceLocator.Context.ActivityManager;
+  Result:= TFrwServiceLocator.ActivityManager;
 end;
 
 procedure TFormScheduledActivityEditor.ConfigurarProcesso;

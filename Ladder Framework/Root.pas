@@ -7,7 +7,8 @@ uses
 
 type
   TRootClass = class
-    procedure CreateAllTables;
+  public
+    procedure CreateAllTables; virtual;
   end;
 
 implementation

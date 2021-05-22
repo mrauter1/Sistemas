@@ -169,3 +169,17 @@ Connection timed out.
 19082020-15:23:02 -> TOleDBConnection: Erro não especificado - 
 19082020-15:33:00 -> TOleDBConnection: Erro não especificado - 
 19082020-16:33:11 -> TOleDBConnection: Erro não especificado - 
+16042021-17:50:25 -> Access violation at address 0141FE4E in module 'Monitor.exe'. Read of address 2E363071
+16042021-17:50:28 -> Access violation at address 0141FE4E in module 'Monitor.exe'. Read of address 2E363071
+16042021-17:50:29 -> Access violation at address 0141FE4E in module 'Monitor.exe'. Read of address 2E363071
+16042021-17:50:30 -> Access violation at address 0141FE4E in module 'Monitor.exe'. Read of address 2E363071
+16042021-17:54:38 -> Access violation at address 0148087C in module 'Monitor.exe'. Read of address 2E363071
+16042021-17:55:01 -> Access violation at address 0148087C in module 'Monitor.exe'. Read of address 2E363071
+16042021-17:55:17 -> Access violation at address 0148087C in module 'Monitor.exe'. Read of address 2E363071
+16042021-17:55:22 -> Access violation at address 0148087C in module 'Monitor.exe'. Read of address 2E363071
+16042021-17:55:38 -> Access violation at address 0148087C in module 'Monitor.exe'. Read of address 2E363071
+16042021-17:56:08 -> Access violation at address 0148087C in module 'Monitor.exe'. Read of address 2E363071
+19042021-18:54:02 -> Socket Error # 10060
+Connection timed out.
+20042021-19:01:49 -> Socket Error # 11001
+Host not found.

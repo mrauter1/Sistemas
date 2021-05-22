@@ -3,7 +3,7 @@ unit uMonitorRoot;
 interface
 
 uses
-  Root, Ladder.Activity.Scheduler;
+  Root, Ladder.Activity.Scheduler, Ladder.ServiceLocator, Ladder.Logger;
 
 type
   TMonitorRoot = class(TRootClass)
@@ -29,7 +29,7 @@ uses
 constructor TMonitorRoot.Create;
 begin
   FScheduler:= TScheduler.Create(False, True);
-  FScheduler.OnLogEvent.Add(OnLogEvent);
+  TFrwServiceLocator.Logger.AddListener(OnLogEvent);
   Scheduler.ReloadScheduledActivities;
   inherited;
 end;
@@ -40,13 +40,13 @@ begin
   while not FScheduler.Stopped do
     Application.ProcessMessages;
 
-  FScheduler.OnLogEvent.Remove(OnLogEvent);
+  TFrwServiceLocator.Logger.RemoveListener(OnLogEvent);
   FScheduler.Free;
 end;
 
 procedure TMonitorRoot.OnLogEvent(ALogType: TLogType; AMessage: String);
 begin
-  WriteLog('Monitor.log', AMessage);
+//  WriteLog('Monitor.log', AMessage);
   if ALogType = ltError then
     WriteLog('Error.log', AMessage);
 

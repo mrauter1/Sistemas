@@ -1159,3 +1159,99 @@
 25082020-16:14:15 -> Script para atualizar lista de preço incializado.
 25082020-16:15:48 -> Iniciando script de atualização da lista remota ND para a lista do Sidicom 0007
 25082020-16:16:56 -> Script para atualizar lista de preço incializado.
+16042021-17:47:39 -> Iniciando monitor...
+16042021-17:47:40 -> Criando TConSqlServer
+16042021-17:47:40 -> Criando TConFirebird
+16042021-17:47:42 -> Criando TMonitorMain
+16042021-17:47:42 -> Criando TDmSqlUtils
+16042021-17:47:42 -> Criando TCon
+16042021-17:47:42 -> Carregando Gatihlos.xml
+16042021-17:47:46 -> Inicializando message loop
+16042021-17:51:55 -> Iniciando monitor...
+16042021-17:51:56 -> Criando TConSqlServer
+16042021-17:51:56 -> Criando TConFirebird
+16042021-17:51:56 -> Criando TMonitorMain
+16042021-17:51:56 -> Criando TDmSqlUtils
+16042021-17:51:56 -> Criando TCon
+16042021-17:51:56 -> Carregando Gatihlos.xml
+16042021-17:52:31 -> Inicializando message loop
+16042021-17:56:42 -> Iniciando monitor...
+16042021-17:56:43 -> Criando TConSqlServer
+16042021-17:56:43 -> Criando TConFirebird
+16042021-17:56:43 -> Criando TMonitorMain
+16042021-17:56:43 -> Criando TDmSqlUtils
+16042021-17:56:43 -> Criando TCon
+16042021-17:56:43 -> Carregando Gatihlos.xml
+16042021-17:56:47 -> Inicializando message loop
+16042021-18:04:56 -> Iniciando monitor...
+16042021-18:04:57 -> Criando TConSqlServer
+16042021-18:04:57 -> Criando TConFirebird
+16042021-18:04:57 -> Criando TMonitorMain
+16042021-18:04:57 -> Criando TDmSqlUtils
+16042021-18:04:57 -> Criando TCon
+16042021-18:04:57 -> Carregando Gatihlos.xml
+16042021-18:05:00 -> Inicializando message loop
+19042021-18:47:08 -> Iniciando monitor...
+19042021-18:47:09 -> Criando TConSqlServer
+19042021-18:47:09 -> Criando TConFirebird
+19042021-18:47:10 -> Criando TMonitorMain
+19042021-18:47:10 -> Criando TDmSqlUtils
+19042021-18:47:10 -> Criando TCon
+19042021-18:47:10 -> Carregando Gatihlos.xml
+19042021-18:47:32 -> Inicializando message loop
+19042021-18:50:59 -> Iniciando monitor...
+19042021-18:51:00 -> Criando TConSqlServer
+19042021-18:51:00 -> Criando TConFirebird
+19042021-18:51:00 -> Criando TMonitorMain
+19042021-18:51:00 -> Criando TDmSqlUtils
+19042021-18:51:00 -> Criando TCon
+19042021-18:51:00 -> Carregando Gatihlos.xml
+19042021-18:51:37 -> Inicializando message loop
+19042021-18:54:24 -> Iniciando monitor...
+19042021-18:54:25 -> Criando TConSqlServer
+19042021-18:54:25 -> Criando TConFirebird
+19042021-18:54:26 -> Criando TMonitorMain
+19042021-18:54:26 -> Criando TDmSqlUtils
+19042021-18:54:26 -> Criando TCon
+19042021-18:54:26 -> Carregando Gatihlos.xml
+19042021-18:54:33 -> Inicializando message loop
+20042021-18:59:17 -> Iniciando monitor...
+20042021-18:59:18 -> Criando TConSqlServer
+20042021-18:59:18 -> Criando TConFirebird
+20042021-18:59:18 -> Criando TMonitorMain
+20042021-18:59:18 -> Criando TDmSqlUtils
+20042021-18:59:18 -> Criando TCon
+20042021-18:59:18 -> Carregando Gatihlos.xml
+20042021-18:59:29 -> Inicializando message loop
+22042021-10:34:57 -> Iniciando monitor...
+22042021-10:34:58 -> Criando TConSqlServer
+22042021-10:34:58 -> Criando TConFirebird
+22042021-10:34:59 -> Criando TMonitorMain
+22042021-10:34:59 -> Criando TDmSqlUtils
+22042021-10:34:59 -> Criando TCon
+22042021-10:34:59 -> Carregando Gatihlos.xml
+22042021-10:35:30 -> Inicializando message loop
+23042021-10:10:09 -> Iniciando monitor...
+23042021-10:10:11 -> Criando TConSqlServer
+23042021-10:10:11 -> Criando TConFirebird
+23042021-10:10:14 -> Criando TMonitorMain
+23042021-10:10:14 -> Criando TDmSqlUtils
+23042021-10:10:14 -> Criando TCon
+23042021-10:10:14 -> Carregando Gatihlos.xml
+23042021-10:10:19 -> Inicializando message loop
+23042021-10:20:28 -> Iniciando monitor...
+23042021-10:20:29 -> Criando TConSqlServer
+23042021-10:20:29 -> Criando TConFirebird
+23042021-10:20:29 -> Criando TMonitorMain
+23042021-10:20:29 -> Criando TDmSqlUtils
+23042021-10:20:29 -> Criando TCon
+23042021-10:20:29 -> Carregando Gatihlos.xml
+23042021-10:20:34 -> Inicializando message loop
+23042021-11:06:39 -> Iniciando monitor...
+23042021-11:06:40 -> Criando TConSqlServer
+23042021-11:06:40 -> Criando TConFirebird
+23042021-11:06:40 -> Criando TMonitorMain
+23042021-11:06:40 -> Criando TDmSqlUtils
+23042021-11:06:40 -> Criando TCon
+23042021-11:06:40 -> Carregando Gatihlos.xml
+23042021-11:06:43 -> Inicializando message loop

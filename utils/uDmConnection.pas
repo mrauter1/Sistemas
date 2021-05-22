@@ -9,8 +9,8 @@ uses
   Variants, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error,
   FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
   FireDAC.Phys, FireDAC.Phys.FB, FireDAC.Phys.FBDef, FireDAC.ConsoleUI.Wait,
-  FireDAC.Comp.Client, Utils, System.Rtti, uAppConfig, Ladder.Parser,
-  FireDAC.VCLUI.Wait;
+  FireDAC.Comp.Client, Utils, System.Rtti, Ladder.Parser,
+  FireDAC.VCLUI.Wait, Ladder.Types;
 
 type
  cfMapField = record
@@ -511,10 +511,13 @@ end;
 procedure TDmConnection.LerConnectionParams(pConParams: TConnectionParams; pOpen: Boolean=True);
 begin
   FDConnection.Close;
+  FDConnection.Params.Values['DriverID'] := pConParams.DriverID;
   FDConnection.Params.Values['Server'] := pConParams.Server;
   FDConnection.Params.Values['Port'] := IntToStr(pConParams.Port);
   FDConnection.Params.Values['Database'] := pConParams.Database;
   FDConnection.Params.Values['Protocol'] := pConParams.Protocol;
+  FDConnection.Params.Values['User_Name'] := pConParams.User;
+  FDConnection.Params.Values['Password'] := pConParams.Password;
 
   if pOpen then
     FDConnection.Open;

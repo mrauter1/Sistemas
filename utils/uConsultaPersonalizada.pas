@@ -35,10 +35,11 @@ uses
   FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet,
   FireDAC.Comp.Client, uConFirebird, System.Generics.Collections, Vcl.Imaging.pngImage,
   uConClasses, uDmConnection, Ladder.ServiceLocator, SynCommons, ExpressionParser, cxUtils,
-  uFormPropriedadesGrafico, uConsultaChartController;
+  uFormPropriedadesGrafico, uConsultaChartController, Ladder.Logger;
 
 type
   TPosicaoPanelDinamico = (cMinimizado, cMeio, cMaximizado);
+  TUserMessageOptions = (umShowDialog, umLogMessages, umShowAndLogMessages);
 
   TFrmConsultaPersonalizada = class(TForm)
     BtnFechar: TBitBtn;
@@ -160,6 +161,16 @@ type
     procedure BtnOpcoesGraficoClick(Sender: TObject);
   private
     { Private declarations }
+    Glo_Para : Integer;
+
+    BoldLegend : Integer;
+
+    vArSQLCampoTab  : TStringList;
+    vArSQLCampoTela : TStringList;
+    vArSQLObrigator : TStringList;
+    vArExcel    : TStringList;
+    vArResultado: TStringList;
+
     UpdatingPage: Boolean;
     PosicaoPanelDinamico: TPosicaoPanelDinamico;
     FDm: TDmGeradorConsultas;
@@ -169,6 +180,7 @@ type
     FExpressionParser: TExpressionParser;
     FPivotLayoutChanged: Boolean;
     FChartController: TChartController;
+    FUserMessageOption: TUserMessageOptions;
     procedure PageControlAtiva(Pagina:Integer);
     function PopulaParametrosDM: Boolean;
     function GetSeriesColorByField(AFieldName: string): Variant;
@@ -203,6 +215,7 @@ type
 
     procedure SetColorFromSeries(ASeries: TcxGridChartSeries;
       var AColor: TColor);
+    procedure UserMessage(AMessageType: TLogType; AMessage: String);
    public
     { Public declarations }
     function ExecutaConsulta: Boolean;
@@ -217,27 +230,15 @@ type
     procedure AbrirConsultaPersonalizada(Consulta :string; pExecutar: Boolean = True);
 
     property Params: TParametros read GetParams;
+    property UserMessageOption: TUserMessageOptions read FUserMessageOption write FUserMessageOption;
 
-    class function AbreConsultaPersonalizadaByName(NomeConsulta: String; pExecutar: Boolean = True; pWindowState: TWindowState = wsNormal): TFrmConsultaPersonalizada; static;
-    class function AbreConsultaPersonalizada(pIDConsulta: Integer; pExecutar: Boolean = True): TFrmConsultaPersonalizada;
+    class function AbreConsultaPersonalizadaByName(NomeConsulta: String; pExecutar: Boolean = True; pWindowState: TWindowState = wsNormal; pUserMessageOption: TUserMessageOptions = umShowDialog): TFrmConsultaPersonalizada; static;
+    class function AbreConsultaPersonalizada(pIDConsulta: Integer; pExecutar: Boolean = True; pUserMessageOption: TUserMessageOptions = umShowDialog): TFrmConsultaPersonalizada;
     class function ExportaTabelaParaExcel(NomeConsulta: String; pNomeArquivo: String;
                       Params: TDictionary<string, variant> = nil;
                       pTipoVisualizacao: TTipoVisualizacao = tvTabela;
-                      pVisualizacao: String = ''): String;
+                      pVisualizacao: String = ''; pUserMessageOption: TUserMessageOptions = umShowDialog): String;
   end;
-
-
-var
-  FrmConsultaPersonalizada: TFrmConsultaPersonalizada;
-  Glo_Para : Integer;
-
-  BoldLegend : Integer;
-
-  vArSQLCampoTab  : TStringList;
-  vArSQLCampoTela : TStringList;
-  vArSQLObrigator : TStringList;
-  vArExcel    : TStringList;
-  vArResultado: TStringList;
 
 procedure ExportarCxGridParaImagem(cxGridView: TcxGridChartView; pFileName: String);
 procedure PopulaCheckListBoxQry(pCheckListBox: TCheckListBox; pSql: String; pValor: variant);
@@ -400,11 +401,12 @@ end;
     FreeAndNil(b);
   finally
   end;}
-class function TFrmConsultaPersonalizada.AbreConsultaPersonalizada(pIDConsulta: Integer; pExecutar: Boolean = True): TFrmConsultaPersonalizada;
+class function TFrmConsultaPersonalizada.AbreConsultaPersonalizada(pIDConsulta: Integer; pExecutar: Boolean = True; pUserMessageOption: TUserMessageOptions = umShowDialog): TFrmConsultaPersonalizada;
 var
   FFrmConsulta: TFrmConsultaPersonalizada;
 begin
   FFrmConsulta:= TFrmConsultaPersonalizada.Create(Application);
+  FFrmConsulta.UserMessageOption:= pUserMessageOption;
   FFrmConsulta.AbrirConsultaPersonalizada(IntToStr(pIDConsulta), pExecutar);
   Result:= FFrmConsulta;
 end;
@@ -414,7 +416,8 @@ begin
   Result:= TFrwServiceLocator.Context.DmConnection;
 end;
 
-class function TFrmConsultaPersonalizada.AbreConsultaPersonalizadaByName(NomeConsulta: String; pExecutar: Boolean = True; pWindowState: TWindowState = wsNormal): TFrmConsultaPersonalizada;
+class function TFrmConsultaPersonalizada.AbreConsultaPersonalizadaByName(NomeConsulta: String; pExecutar: Boolean = True; pWindowState: TWindowState = wsNormal;
+                    pUserMessageOption: TUserMessageOptions = umShowDialog): TFrmConsultaPersonalizada;
 var
   FCodRelatorio: Integer;
 const
@@ -425,12 +428,9 @@ begin
   FCodRelatorio:= Conn.RetornaValor(Format(cSql, [QuotedStr(NomeConsulta)]));
 
   if FCodRelatorio = 0 then
-  begin
-    ShowMessage('Relatório '+NomeConsulta+' não encontrado!');
-    Exit;
-  end;
+    raise Exception.Create(Format('TFrmConsultaPersonalizada.AbreConsultaPersonalizadaByName: Relatório "%s" não encontrado.', [NomeConsulta]));
 
-  Result:= TFrmConsultaPersonalizada.AbreConsultaPersonalizada(FCodRelatorio, pExecutar);
+  Result:= TFrmConsultaPersonalizada.AbreConsultaPersonalizada(FCodRelatorio, pExecutar, pUserMessageOption);
 end;
 
 procedure TFrmConsultaPersonalizada.AbrirConsultaPersonalizada(Consulta :string; pExecutar: Boolean = True);
@@ -481,6 +481,9 @@ begin
     cMeio: AumentaPanelTabela;
     cMaximizado: MaximizaPanelTabela;
   end;
+  BtnOpcoesGrafico.Top:= 20;
+  BtnOpcoesGrafico.Left:= 28;
+  BtnOpcoesGrafico.BringToFront;
 end;
 
 procedure TFrmConsultaPersonalizada.MaximizaPanelTabela;
@@ -600,14 +603,14 @@ end;
 
 class function TFrmConsultaPersonalizada.ExportaTabelaParaExcel(NomeConsulta,
   pNomeArquivo: String; Params: TDictionary<string, variant>; pTipoVisualizacao: TTipoVisualizacao;
-  pVisualizacao: String): String;
+  pVisualizacao: String; pUserMessageOption: TUserMessageOptions): String;
 var
   FFrmConsulta: TFrmConsultaPersonalizada;
   FKey: String;
 begin
   Result:= '';
 
-  FFrmConsulta:= TFrmConsultaPersonalizada.AbreConsultaPersonalizadaByName(NomeConsulta);
+  FFrmConsulta:= TFrmConsultaPersonalizada.AbreConsultaPersonalizadaByName(NomeConsulta, True, wsNormal, pUserMessageOption);
   try
     FFrmConsulta.LoadParamsFromDic(Params);
 
@@ -759,7 +762,7 @@ begin
     on E: Exception do
     begin
        PageControlAtiva(0);
-       ShowMessage('Erro ao Executar a Consulta Personalizada. Erro: '+E.Message);
+       raise Exception.Create('Erro ao Executar a Consulta Personalizada. Erro: '+E.Message);
     end;
   end;
 end;
@@ -1078,7 +1081,6 @@ begin
       DBPivotGrid.Fields[I].Visible:= FDm.QryCamposVisivel.AsBoolean;
 
     end;
-  //  ShowMessage(TcxDBPivotGridFieldDataBinding(DBPivotGrid.Fields[i].DataBinding).FieldName);
 //    DBPivotGrid.Fields[i].ExpandAll;
   end;
 end;
@@ -1098,21 +1100,12 @@ begin
   DBPivotGrid.Refresh;
 
 //  cxPivotGridChartConnection.Refresh;
-
- { for I:= 0 to DBPivotGrid.FieldCount-1 do
-  begin
-    if TcxDBPivotGridFieldDataBinding(DBPivotGrid.Fields[i].DataBinding).FieldName = 'ValorPonto' then
-      DBPivotGrid.Fields[i].DisplayFormat:= '#,##0.00';
-  //  ShowMessage(TcxDBPivotGridFieldDataBinding(DBPivotGrid.Fields[i].DataBinding).FieldName);
-  end;             }
-
 end;
 
 procedure TFrmConsultaPersonalizada.FormClose(Sender: TObject;
   var Action: TCloseAction);
 begin
   Action := caFree;
-  FrmConsultaPersonalizada := nil;
 end;
 
 function TFrmConsultaPersonalizada.Valida_Consulta: Boolean;
@@ -1257,7 +1250,7 @@ begin
     else if PageControlVisualizacoes.ActivePage = TsGrafico then
       ExportarCxGridParaBmp(cxGridChartView, SaveDialog.FileName);
 
-    showmessage('Arquivo Exportado com Sucesso.');
+    UserMessage(ltNotification, 'Arquivo Exportado com Sucesso.');
     ShellExecute(Handle, 'open', pchar(SaveDialog.FileName), nil, nil, SW_SHOW);
   end;          }
 end;
@@ -1316,6 +1309,8 @@ var
 var
   FCell: TcxPivotGridCrossCellSummary;
 begin
+  Exit;
+
   sRows:= '';
   sCols:= '';
 
@@ -1339,7 +1334,7 @@ begin
 
 //    sRows:= sRows+ PrintRow(DBPivotGrid.ViewData.Rows[I]);
 
-  ShowMessage(sCols);
+//  ShowMessage(sCols);
 {  sCols:= '';
   I:= 0;
 
@@ -1611,10 +1606,14 @@ procedure TFrmConsultaPersonalizada.FormCreate(Sender: TObject);
 begin
   UpdatingPage:= False;
   FPrimeiroShow:= True;
+  FUserMessageOption:= umShowDialog;
 
   FUltimaConfig:= 0;
 
   FDm:= TDmGeradorConsultas.Create(Self, TFrwServiceLocator.Context.DmConnection);
+
+  QryConsulta.Connection:= Conn.FDConnection;
+  QryVisualizacoes.Connection:= Conn.FDConnection;
 
   PageControlAtiva(0);
 
@@ -1637,8 +1636,8 @@ procedure TFrmConsultaPersonalizada.FormDestroy(Sender: TObject);
 begin
   FDm.Free;
   FExpressionParser.Free;
-  vArSQLCampoTab.Free;
   vArSQLCampoTela.Free;
+  vArSQLCampoTab.Free;
   vArSQLObrigator.Free;
   vArExcel.Free;
   vArResultado.Free;
@@ -1704,6 +1703,19 @@ begin
   end;
 end;
 
+procedure TFrmConsultaPersonalizada.UserMessage(AMessageType: TLogType; AMessage: String);
+begin
+  case UserMessageOption of
+    umShowDialog: ShowMessage(AMessage);
+    umLogMessages: TFrwServiceLocator.Logger.LogEvent(AMessageType, AMessage);
+    umShowAndLogMessages: begin
+      TFrwServiceLocator.Logger.LogEvent(AMessageType, AMessage);
+      ShowMessage(AMessage);
+    end;
+  end;
+
+end;
+
 function TFrmConsultaPersonalizada.ExportaTabelaParaExcelInterno(pNomeArquivo: String; pMostraDialog: Boolean = False; pUsarFormatoNativo: Boolean = False): Boolean;
 begin
   Result:= False;
@@ -1711,7 +1723,7 @@ begin
   if cxGridTabelaDBTableView1.DataController.FilteredRecordCount > 65000 then
   begin
     if pMostraDialog then
-      ShowMessage('Não é possível exportar mais de 65000 linhas para o excel! Faça um filtro e tente novamente.');
+      UserMessage(ltError, 'Não é possível exportar mais de 65000 linhas para o excel! Faça um filtro e tente novamente.');
 
     Exit;
   end;
@@ -1731,7 +1743,7 @@ begin
     begin
       if ExportaTabelaParaExcelInterno(SaveDialog.FileName, True, CbxFormatoNativo.Checked) then
       begin
-        showmessage('Arquivo Exportado com Sucesso.');
+        UserMessage(ltNotification, 'Arquivo Exportado com Sucesso.');
         ShellExecute(Handle, 'open', pchar(SaveDialog.FileName), nil, nil, SW_SHOW);
       end;
     end;
@@ -1744,7 +1756,7 @@ begin
     if SaveDialog.Execute then
       begin
         ExportaTabelaDinamica(SaveDialog.FileName);
-        showmessage('Arquivo Exportado com Sucesso.');
+        UserMessage(ltNotification, 'Arquivo Exportado com Sucesso.');
         ShellExecute(Handle, 'open', pchar(SaveDialog.FileName), nil, nil, SW_SHOW);
       end;
   end
@@ -1756,7 +1768,7 @@ begin
     if SaveDialog.Execute then
       begin
         ExportaGrafico(SaveDialog.FileName);
-        showmessage('Arquivo Exportado com Sucesso.');
+        UserMessage(ltNotification, 'Arquivo Exportado com Sucesso.');
         ShellExecute(Handle, 'open', pchar(SaveDialog.FileName), nil, nil, SW_SHOW);
       end;
   end;

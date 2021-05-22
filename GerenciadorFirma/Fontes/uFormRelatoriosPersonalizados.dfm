@@ -97,7 +97,10 @@ object FormRelatoriosPersonalizados: TFormRelatoriosPersonalizados
         ExplicitWidth = 706
         object TabCadastro: TTabSheet
           Caption = 'Cadastro'
+          ExplicitLeft = 0
+          ExplicitTop = 0
           ExplicitWidth = 698
+          ExplicitHeight = 0
           DesignSize = (
             802
             418)
@@ -268,7 +271,10 @@ object FormRelatoriosPersonalizados: TFormRelatoriosPersonalizados
         object TabParametros: TTabSheet
           Caption = 'Par'#226'metros'
           ImageIndex = 1
+          ExplicitLeft = 0
+          ExplicitTop = 0
           ExplicitWidth = 698
+          ExplicitHeight = 0
           object cxGridParams: TcxGrid
             Left = 0
             Top = 0
@@ -356,7 +362,10 @@ object FormRelatoriosPersonalizados: TFormRelatoriosPersonalizados
         object TabCampos: TTabSheet
           Caption = 'Campos'
           ImageIndex = 2
+          ExplicitLeft = 0
+          ExplicitTop = 0
           ExplicitWidth = 698
+          ExplicitHeight = 0
           object cxGridCampos: TcxGrid
             Left = 0
             Top = 0
@@ -529,7 +538,10 @@ object FormRelatoriosPersonalizados: TFormRelatoriosPersonalizados
         object TabSql: TTabSheet
           Caption = 'Sql'
           ImageIndex = 3
+          ExplicitLeft = 0
+          ExplicitTop = 0
           ExplicitWidth = 698
+          ExplicitHeight = 0
           object MemoSqlGerado: TMemo
             Left = 0
             Top = 0

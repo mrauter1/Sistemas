@@ -168,6 +168,12 @@ type
     cxGrid1DBTableView1DiasParaVencimento: TcxGridDBColumn;
     cxGrid1DBTableView1SATUSAVENCER: TcxGridDBColumn;
     AjustarEmbalagens1: TMenuItem;
+    QryEmbalagensSEQUENCIADOPRODUTO: TIntegerField;
+    QryEmbalagensENVIADOAVENCER: TBooleanField;
+    QryEmbalagensDataVencimento: TDateField;
+    QryEmbalagensValorPendente: TFMTBCDField;
+    QryAVencerSEQUENCIADOPRODUTO: TIntegerField;
+    QryAVencerDESCSTATUS: TStringField;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure QryEmbalagensCalcFields(DataSet: TDataSet);
@@ -523,8 +529,7 @@ begin
   if FQry.FieldByName('ChaveNFPro').AsString = '' then
     Exit;
 
-  TFormEmbalagensClientes.IgnoraEmbalagem(FQry.FieldByName('ChaveNFPro')
-    .AsString);
+  TFormEmbalagensAVencer.IgnoraEmbalagem(FQry.FieldByName('ChaveNFPro').AsString, FQry.FieldByName('SequenciaDoProduto').AsInteger);
   FQry.Refresh;
 end;
 
@@ -633,8 +638,6 @@ begin
 end;
 
 procedure TFormGravaEmbalagens.DeixardeIgnorarEmbalagem1Click(Sender: TObject);
-const
-  cSqlDelete = 'DELETE FROM MCLIPROSTATUSRECB WHERE CHAVENFPRO= ''%s'' ';
 var
   FQry: TFDQuery;
 begin
@@ -643,8 +646,10 @@ begin
   if FQry.FieldByName('ChaveNFPro').AsString = '' then
     Exit;
 
-  ConSqlServer.ExecutaComando(Format(cSqlDelete,
-    [FQry.FieldByName('ChaveNFPro').AsString]));
+  TFormEmbalagensAVencer.DeixarDeIgnorarEmbalagem(FQry.FieldByName('ChaveNFPro').AsString, FQry.FieldByName('SequenciaDoProduto').AsInteger);
+
+//  ConSqlServer.ExecutaComando(Format(cSqlDelete,
+//    [FQry.FieldByName('ChaveNFPro').AsString, FQry.FieldByName('SequenciaDoProduto').AsInteger]));
   FQry.Refresh;
 end;
 

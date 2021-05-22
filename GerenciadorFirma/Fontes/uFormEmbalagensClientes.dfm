@@ -341,6 +341,10 @@ object FormEmbalagensClientes: TFormEmbalagensClientes
       FixedChar = True
       Size = 21
     end
+    object QryEmbalagensCliSEQUENCIADOPRODUTO: TIntegerField
+      FieldName = 'SEQUENCIADOPRODUTO'
+      Origin = 'SEQUENCIADOPRODUTO'
+    end
     object QryEmbalagensCliCODCLIENTE: TStringField
       DisplayLabel = 'Cod. Cliente'
       FieldName = 'CODCLIENTE'
@@ -480,6 +484,11 @@ object FormEmbalagensClientes: TFormEmbalagensClientes
       currency = True
       Precision = 38
       Size = 6
+    end
+    object QryEmbalagensCliENVIADOAVENCER: TBooleanField
+      FieldName = 'ENVIADOAVENCER'
+      Origin = 'ENVIADOAVENCER'
+      Required = True
     end
   end
   object PopupMenu: TPopupMenu

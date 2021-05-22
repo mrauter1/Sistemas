@@ -106,6 +106,8 @@ type
     QryEmbalagensCliValorPendente: TFMTBCDField;
     cxGridViewEmbalagensValorPendente: TcxGridDBColumn;
     QryTextoEmailCorpo: TMemoField;
+    QryEmbalagensCliSEQUENCIADOPRODUTO: TIntegerField;
+    QryEmbalagensCliENVIADOAVENCER: TBooleanField;
     procedure Ignorarembalagem1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure BtnAtualizarClick(Sender: TObject);
@@ -141,7 +143,6 @@ type
     procedure EnviaEmailTeste(AEmailDestino: String);
     procedure CarregaEmbalagensCliente(ACodCliente: String; AIdentificador: String);
     class procedure AbreEmbalagensCliente(ACodCliente: String; AIdentificador: String);
-    class procedure IgnoraEmbalagem(AChaveNFPRo: String); static;
   end;
 
 var
@@ -150,7 +151,7 @@ var
 implementation
 
 uses
-  IdMessageBuilder, IdAttachmentMemory, uFormSelecionaEmailCliente, uFormAjustaInconsistencias;
+  IdMessageBuilder, IdAttachmentMemory, uFormSelecionaEmailCliente, uFormAjustaInconsistencias, uFormEmbalagensAVencer;
 
 {$R *.dfm}
 
@@ -266,10 +267,8 @@ end;
 
 procedure TFormEmbalagensClientes.DeixardeIgnorarEmbalagem1Click(
   Sender: TObject);
-const
-  cSqlDelete = 'DELETE FROM MCLIPROSTATUSRECB WHERE CHAVENFPRO= ''%s'' ';
 begin
-  ConSqlServer.ExecutaComando(Format(cSqlDelete, [QryEmbalagensCliChaveNFPRo.AsString]));
+  TFormEmbalagensAVencer.DeixarDeIgnorarEmbalagem(QryEmbalagensCliChaveNFPRo.AsString, QryEmbalagensCliSEQUENCIADOPRODUTO.AsInteger);
   QryEmbalagensCli.Refresh;
 end;
 
@@ -403,13 +402,11 @@ begin
 end;
 
 procedure TFormEmbalagensClientes.MarcarEmbalagensComoEnviadas;
-const
-  cSqlStatus = 'exec AlteraMCLIPROSTATUSRECB ''%s'', %d, ''%s'' ';
 begin
   QryEmbalagensCli.First;
   while not QryEmbalagensCli.Eof do
   begin
-    ConSqlServer.ExecutaComando(Format(cSqlStatus, [QryEmbalagensCliChaveNFPro.AsString, 1, 'Email enviado']));
+    TFormEmbalagensAVencer.AlteraStatusEmbalagem(QryEmbalagensCliChaveNFPro.AsString, QryEmbalagensCliSEQUENCIADOPRODUTO.AsInteger, 1, 'Email enviado.');
     QryEmbalagensCli.Next;
   end;
 end;
@@ -437,34 +434,9 @@ begin
   FListaEmbalagensRecentes.Free;
 end;
 
-class procedure TFormEmbalagensClientes.IgnoraEmbalagem(AChaveNFPRo: String);
-const
-  cSqlInsert = 'exec AlteraMCLIPROSTATUSRECB ''%s'', %d, ''%s'' ';
-var
-  fMensagem: String;
-begin
-  if AChaveNFPRo = '' then
-    Exit;
-
-  if MessageDlg('Você tem certeza que deseja ignorar esta nota de embalagem?'+
-                sLineBreak+'Após a nota de embalagem ser ignorada ela não irá mais aparecer para envio de email para o cliente.', mtConfirmation,
-                [mbYes, mbNo], 0
-                ) = mrNo then
-    Exit;
-
-  FMensagem:= InputBox('Digite a justificativa', 'Mínimo de 5 caracteres', '');
-  if Length(FMensagem) < 5 then
-  begin
-    ShowMessage('Justificativa deve ter um minímo de 5 caracteres.');
-    Exit;
-  end;
-
-  ConSqlServer.ExecutaComando(Format(cSqlInsert, [AChaveNFPRo, 2, FMensagem]));
-end;
-
 procedure TFormEmbalagensClientes.Ignorarembalagem1Click(Sender: TObject);
 begin
-  TFormEmbalagensClientes.IgnoraEmbalagem(QryEmbalagensCliCHAVENFPRO.AsString);
+  TFormEmbalagensAVencer.IgnoraEmbalagem(QryEmbalagensCliCHAVENFPRO.AsString, QryEmbalagensCliSEQUENCIADOPRODUTO.AsInteger);
   QryEmbalagensCli.Refresh;
 end;
 

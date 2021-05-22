@@ -11,6 +11,7 @@ object FormPermissoes: TFormPermissoes
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  OnClose = FormClose
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
@@ -57,8 +58,6 @@ object FormPermissoes: TFormPermissoes
       Height = 119
       Align = alClient
       TabOrder = 0
-      ExplicitLeft = 0
-      ExplicitTop = -4
       object cxGridDBTableView1: TcxGridDBTableView
         Navigator.Buttons.CustomButtons = <>
         FilterBox.Visible = fvNever

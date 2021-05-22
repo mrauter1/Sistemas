@@ -44,7 +44,6 @@ uses
   uFormLogistica in 'Fontes\uFormLogistica.pas' {FormLogistica},
   uFormEntregaPorProduto in 'Fontes\uFormEntregaPorProduto.pas' {FormEntregaPorProduto},
   Root,
-  Form.ActivityEditor in '..\Ladder Framework\Forms\Form.ActivityEditor.pas' {FormActivityEditor},
   Form.ConsultaEditor in '..\Ladder Framework\Forms\Form.ConsultaEditor.pas',
   Form.ProcessActivityEditor in '..\Ladder Framework\Forms\Form.ProcessActivityEditor.pas',
   Form.SimpleProcessEditor in '..\Ladder Framework\Forms\Form.SimpleProcessEditor.pas',
@@ -69,14 +68,19 @@ uses
   uFormConsultaDataSet in 'Fontes\uFormConsultaDataSet.pas' {FormConsultaDataSet},
   uFormComprasAgendadas in 'Fontes\uFormComprasAgendadas.pas' {FormComprasAgendadas},
   uFormPropriedadesGrafico in '..\utils\uFormPropriedadesGrafico.pas' {FormPropriedadesGrafico},
-  uConsultaChartController in '..\utils\uConsultaChartController.pas';
+  uConsultaChartController in '..\utils\uConsultaChartController.pas',
+  UserModel in 'Fontes\UserModel.pas',
+  uGerenciadorConfig in 'Fontes\uGerenciadorConfig.pas',
+  Form.ActivityEditor in '..\Ladder Framework\Forms\Form.ActivityEditor.pas' {FormActivityEditor},
+  Form.ProcessEditor in '..\Ladder Framework\Forms\Form.ProcessEditor.pas' {FormProcessEditor},
+  Form.ProcessEditorBase in '..\Ladder Framework\Forms\Form.ProcessEditorBase.pas' {FormProcessEditorBase};
 
 {$R *.res}
 
-var
-  FRootClass: TRootClass;
-
 begin
+  GerenciadorConfig:= TGerenciadorConfig.Create;
+  GerenciadorConfig.LerConfig;
+
   with TUpdater.Create(AppConfig.PastaUpdate) do
   try
     CheckAndUpdate;
@@ -84,19 +88,17 @@ begin
     Free;
   end;
 
-  FRootClass:= TRootClass.Create;
-  try
-    FRootClass.CreateAllTables;
-  finally
-    FRootClass.Free;
-  end;
+
+  GerenciadorConfig.Inicializar;
 
   Application.Initialize;
 //  Application.MainFormOnTaskbar := True;
   Application.CreateForm(TConSqlServer, ConSqlServer);
-  AppConfig.UserID:= TFormLogin.Login;
-  if AppConfig.UserID = 0 then
+  GerenciadorConfig.UserID:= TFormLogin.Login;
+  if GerenciadorConfig.UserID = 0 then
     Exit;
+
+//  FRootClass.Usuario:= FRootClass.IUsuarioDao.SelectKey(GerenciadorConfig.UserID);
   Application.CreateForm(TConFirebird, ConFirebird);
   Application.CreateForm(TPedidos, Pedidos);
   Application.CreateForm(TFormPrincipal, FormPrincipal);

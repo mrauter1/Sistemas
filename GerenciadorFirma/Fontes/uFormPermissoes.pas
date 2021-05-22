@@ -105,6 +105,7 @@ type
       AShift: TShiftState; var AHandled: Boolean);
     procedure cxGridDBTableViewMenusDefaultMenuPropertiesChange(
       Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     FMainMenu: TMainMenu;
     procedure CarregaPermissoesConsulta(AUserID: Integer);
@@ -391,6 +392,11 @@ begin
   end;
   if not TablePermissaoConsulta.Eof then
     TablePermissaoConsulta.Prior;
+end;
+
+procedure TFormPermissoes.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Action:= caFree;
 end;
 
 procedure TFormPermissoes.FormCreate(Sender: TObject);

@@ -12,7 +12,7 @@ uses
   Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Menus, FireDAC.Stan.Intf, FireDAC.Stan.Option,
   FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf,
   FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet,
-  FireDAC.Comp.Client, Vcl.ComCtrls, uConSqlServer, Utils;
+  FireDAC.Comp.Client, Vcl.ComCtrls, uConSqlServer, Utils, Vcl.DBCtrls;
 
 type
   TFormCiclosVenda = class(TForm)
@@ -171,6 +171,16 @@ type
     cxGridDBTableView5DiasUteisEntreCompras: TcxGridDBColumn;
     cxGridDBTableView5DiasUteisSemComprar: TcxGridDBColumn;
     cxGridDBTableView5CiclosSemCompra: TcxGridDBColumn;
+    cxStyleRepository1: TcxStyleRepository;
+    cxStyleVermelho: TcxStyle;
+    cxStyleAmarelo: TcxStyle;
+    cxGridParaComprarDBTableViewDiasSemContato: TcxGridDBColumn;
+    QryRecuperarDiasSemContato: TIntegerField;
+    cxGridDBTableView2DiasSemContato: TcxGridDBColumn;
+    QryCiclosDiasSemContato: TIntegerField;
+    PanelTop: TPanel;
+    Vendedor: TLabel;
+    CbxVendedores: TDBLookupComboBox;
     procedure BtnOpcoesClick(Sender: TObject);
     procedure BtnAtualizaClick(Sender: TObject);
     procedure BtnExcelcxGridTarefaClick(Sender: TObject);
@@ -179,7 +189,12 @@ type
     procedure Relembrarem30dias1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure Deixardeignorar1Click(Sender: TObject);
-    procedure FormShow(Sender: TObject);
+    procedure cxGridParaComprarDBTableViewStylesGetContentStyle(
+      Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;
+      AItem: TcxCustomGridTableItem; var AStyle: TcxStyle);
+    procedure cxGridDBTableView2StylesGetContentStyle(
+      Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;
+      AItem: TcxCustomGridTableItem; var AStyle: TcxStyle);
   private
     procedure SaveParaComprar(pCxGrid: TcxGrid; pNomeArquivo: String);
     procedure GravaLembreteCiclo(pCodCliente, pCodProduto: String; pData: TDate; pCodMotivo: Integer; pObs: String);
@@ -198,7 +213,7 @@ implementation
 {$R *.dfm}
 
 uses
-  cxGridExportLink, WinApi.ShellApi, uFormMotivoParaIgnorar;
+  cxGridExportLink, WinApi.ShellApi, uFormMotivoParaIgnorar, GerenciadorUtils;
 
 procedure TFormCiclosVenda.BtnAtualizaClick(Sender: TObject);
 begin
@@ -258,6 +273,34 @@ begin
   end;
 end;
 
+procedure TFormCiclosVenda.cxGridDBTableView2StylesGetContentStyle(
+  Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;
+  AItem: TcxCustomGridTableItem; var AStyle: TcxStyle);
+var
+  ADias: TDateTime;
+begin
+  ADias:= VarToIntDef(Sender.DataController.Values[ARecord.RecordIndex, cxGridDBTableView2DiasSemContato.Index]);
+
+  if ADias >= 10 then
+    AStyle := cxStyleVermelho
+  else if ADias >= 3 then
+    AStyle := cxStyleAmarelo;
+end;
+
+procedure TFormCiclosVenda.cxGridParaComprarDBTableViewStylesGetContentStyle(
+  Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;
+  AItem: TcxCustomGridTableItem; var AStyle: TcxStyle);
+var
+  ADias: TDateTime;
+begin
+  ADias:= VarToIntDef(Sender.DataController.Values[ARecord.RecordIndex, cxGridParaComprarDBTableViewDiasSemContato.Index]);
+
+  if ADias >= 10 then
+    AStyle := cxStyleVermelho
+  else if ADias >= 3 then
+    AStyle := cxStyleAmarelo;
+end;
+
 procedure TFormCiclosVenda.Deixardeignorar1Click(Sender: TObject);
 const
   cSql = 'DELETE FROM LEMBRETECICLOS WHERE CODCLIENTE = ''%s'' AND CODPRODUTO = ''%s'' ';
@@ -267,16 +310,21 @@ begin
 end;
 
 procedure TFormCiclosVenda.FormCreate(Sender: TObject);
+
+  function SqlLookupVendedores: String;
+  begin
+
+  end;
+
 begin
+  FazLookup(CbxVendedores, 'select 0 as Cod, ''TODOS DA EQUIPE'' as Descricao');
+
   if not QryCiclos.Active then
     QryCiclos.Open;
 
   if not QryRecuperar.Active then
     QryRecuperar.Open;
-end;
 
-procedure TFormCiclosVenda.FormShow(Sender: TObject);
-begin
   PageControl1.ActivePage:= TabParaComprar;
 end;
 

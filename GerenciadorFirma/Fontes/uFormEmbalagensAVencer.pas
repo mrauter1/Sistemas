@@ -109,6 +109,7 @@ type
     QryAVencerSATUSAVENCER: TStringField;
     cxGridViewEmbalagensSATUSAVENCER: TcxGridDBColumn;
     cxGridViewEmbalagensstatus: TcxGridDBColumn;
+    QryAVencerSEQUENCIADOPRODUTO: TIntegerField;
     procedure Ignorarembalagem1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure BtnAtualizarClick(Sender: TObject);
@@ -143,8 +144,13 @@ type
     function EnviaEmailAVencer: Boolean;
     procedure EnviaEmailTeste(AEmailDestino: String);
     procedure CarregaEmbalagensAVencer(ACodCliente: string; ADataMaxVencimento: TDateTime);
+    class procedure AlteraStatusEmbalagem(AChaveNFPro: String;
+      ASequenciaDoProduto, ACodStatus: Integer; AMensagem: String); static;
     class procedure AbreEmbalagensAVencer(ACodCliente: String; AIdentificador: String; ADataMaxVencimento: TDate);
-    class procedure IgnoraEmbalagem(AChaveNFPRo: String); static;
+    class procedure IgnoraEmbalagem(AChaveNFPRo: String; ASequenciaDoProduto: Integer); static;
+    class procedure DeixarDeIgnorarEmbalagem(AChaveNFPRo: String; ASequenciaDoProduto: Integer); static;
+    class procedure AltFlagEnviadoAVencer(AChaveNFPro: String; ASequenciaDoProduto: Integer; AEnviado: Boolean); static;
+    class procedure AlteraQtdDevolvida(AChaveNFPro: String; ASequenciaDoProduto, AQtd: Integer); static;
   end;
 
 var
@@ -253,12 +259,17 @@ begin
     AStyle := cxStyleAmarelo;
 end;
 
+class procedure TFormEmbalagensAVencer.DeixarDeIgnorarEmbalagem(
+  AChaveNFPRo: String; ASequenciaDoProduto: Integer);
+begin
+  AlteraStatusEmbalagem(AChaveNFPRo, ASequenciaDoProduto, 0, 'Embalagem pendente.');
+end;
+
 procedure TFormEmbalagensAVencer.DeixardeIgnorarEmbalagem1Click(
   Sender: TObject);
-const
-  cSqlDelete = 'DELETE FROM MCLIPROSTATUSRECB WHERE CHAVENFPRO= ''%s'' ';
 begin
-  ConSqlServer.ExecutaComando(Format(cSqlDelete, [QryAVencerChaveNFPro.AsString]));
+  DeixarDeIgnorarEmbalagem(QryAVencerchavenfpro.AsString, QryAVencerSEQUENCIADOPRODUTO.AsInteger);
+//  ConSqlServer.ExecutaComando(Format(cSqlDelete, [QryAVencerChaveNFPro.AsString, QryAVencerSequenciaDoProduto.AsInteger]));
   QryAVencer.Refresh;
 end;
 
@@ -381,13 +392,11 @@ begin
 end;
 
 procedure TFormEmbalagensAVencer.MarcarEmbalagensAVencerComoEnviadas;
-const
-  cSqlStatus = 'exec SetAVencerMCLIPROSTATUSRECB ''%s'', %d';
 begin
   QryAVencer.First;
   while not QryAVencer.Eof do
   begin
-    ConSqlServer.ExecutaComando(Format(cSqlStatus, [QryAVencerChaveNFPro.AsString, 1]));
+    AltFlagEnviadoAVencer(QryAVencerChaveNFPro.AsString, QryAVencerSEQUENCIADOPRODUTO.AsInteger, True);
     QryAVencer.Next;
   end;
 end;
@@ -416,9 +425,37 @@ begin
   FListaEmbalagensRecentes.Free;
 end;
 
-class procedure TFormEmbalagensAVencer.IgnoraEmbalagem(AChaveNFPRo: String);
+class procedure TFormEmbalagensAVencer.AlteraStatusEmbalagem(AChaveNFPro: String; ASequenciaDoProduto: Integer; ACodStatus: Integer; AMensagem: String);
 const
-  cSqlInsert = 'exec AlteraMCLIPROSTATUSRECB ''%s'', %d, ''%s'' ';
+  cSql = 'exec AltMCLIPROSTATUSRECB ''%s'', %d, %d, ''%s'' ';
+begin
+  if AChaveNFPRo = '' then
+    Exit;
+
+  ConSqlServer.ExecutaComando(Format(cSql, [AChaveNFPRo, ASequenciaDoProduto, ACodStatus, AMensagem]));
+end;
+
+class procedure TFormEmbalagensAVencer.AlteraQtdDevolvida(AChaveNFPro: String; ASequenciaDoProduto: Integer; AQtd: Integer);
+const
+  cSql = 'exec AltQtdDevolvidaMCLIPROSTATUSRECB ''%s'', %d, %d';
+begin
+  ConSqlServer.ExecutaComando(Format(cSql, [AChaveNFPro, ASequenciaDoProduto, AQtd]));
+end;
+
+class procedure TFormEmbalagensAVencer.AltFlagEnviadoAVencer(
+  AChaveNFPro: String; ASequenciaDoProduto: Integer; AEnviado: Boolean);
+const
+  cSqlStatus = 'exec AltAVencerMCLIPROSTATUSRECB ''%s'', %d, %d';
+var
+  FFlag: Integer;
+begin
+  if AEnviado then
+    FFlag:= 1
+  else FFlag:= 0;
+  ConSqlServer.ExecutaComando(Format(cSqlStatus, [AChaveNFPro, ASequenciaDoProduto, FFlag]));
+end;
+
+class procedure TFormEmbalagensAVencer.IgnoraEmbalagem(AChaveNFPRo: String; ASequenciaDoProduto: Integer);
 var
   fMensagem: String;
 begin
@@ -438,12 +475,12 @@ begin
     Exit;
   end;
 
-  ConSqlServer.ExecutaComando(Format(cSqlInsert, [AChaveNFPRo, 2, FMensagem]));
+  AlteraStatusEmbalagem(AChaveNFPro, ASequenciaDoProduto, 2, FMensagem);
 end;
 
 procedure TFormEmbalagensAVencer.Ignorarembalagem1Click(Sender: TObject);
 begin
-  IgnoraEmbalagem(QryAVencerCHAVENFPRO.AsString);
+  IgnoraEmbalagem(QryAVencerCHAVENFPRO.AsString, QryAVencerSEQUENCIADOPRODUTO.AsInteger);
   QryAVencer.Refresh;
 end;
 

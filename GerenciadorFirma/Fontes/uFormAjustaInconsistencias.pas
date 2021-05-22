@@ -94,6 +94,8 @@ type
     FDMemAjusteEmbalagensValorDevolvido: TCurrencyField;
     cxGridViewClientesValorDevolvido: TcxGridDBColumn;
     FDMemAjusteEmbalagensRAZAOSOCIAL: TStringField;
+    QryEmbalagensSEQUENCIADOPRODUTO: TIntegerField;
+    FDMemAjusteEmbalagensSEQUENCIADOPRODUTO: TIntegerField;
     procedure FormCreate(Sender: TObject);
     procedure FDMemAjusteEmbalagensCalcFields(DataSet: TDataSet);
     procedure FDMemAjusteEmbalagensAfterPost(DataSet: TDataSet);
@@ -122,6 +124,9 @@ var
 
 implementation
 
+uses
+  uFormEmbalagensAVencer;
+
 {$R *.dfm}
 
 { TFormAjustaInconsistencias }
@@ -142,13 +147,11 @@ begin
 end;
 
 procedure TFormAjustaInconsistencias.SalvaQtdDevolvida;
-const
-  cSqlStatus = 'exec SetQtdDevolvidaMCLIPROSTATUSRECB ''%s'', %d';
 begin
   FDMemAjusteEmbalagens.First;
   while not FDMemAjusteEmbalagens.Eof do
   begin
-    ConSqlServer.ExecutaComando(Format(cSqlStatus, [FDMemAjusteEmbalagensCHAVENFPRO.AsString, FDMemAjusteEmbalagensQuantDevolvida.AsInteger]));
+    TFormEmbalagensAVencer.AlteraQtdDevolvida(FDMemAjusteEmbalagensCHAVENFPRO.AsString, FDMemAjusteEmbalagensSEQUENCIADOPRODUTO.AsInteger, FDMemAjusteEmbalagensQuantDevolvida.AsInteger);
     FDMemAjusteEmbalagens.Next;
   end;
 end;

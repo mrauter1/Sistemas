@@ -14,7 +14,7 @@ uses
   dxSkinscxPCPainter, cxFilter, cxData, cxDataStorage, cxEdit, cxNavigator,
   cxDBData, cxGridLevel, cxClasses, cxGridCustomView, cxGridCustomTableView,
   cxGridTableView, cxGridDBTableView, cxGrid, cxImageComboBox, cxTextEdit,
-  cxColorComboBox, uDmGeradorConsultas, uAppConfig, cxContainer, cxMaskEdit,
+  cxColorComboBox, uDmGeradorConsultas, uGerenciadorConfig, cxContainer, cxMaskEdit,
   cxDropDownEdit, cxDBEdit, uConFirebird, GerenciadorUtils, uConClasses;
 
 type
@@ -346,7 +346,7 @@ end;
 
 procedure TFormRelatoriosPersonalizados.FormShow(Sender: TObject);
 begin
-  if not (puDesenvolvedor in AppConfig.GruposUsuario) then
+  if not (puDesenvolvedor in GerenciadorConfig.GruposUsuario) then
     PostMessage(Self.Handle,wm_close,0,0);
 end;
 

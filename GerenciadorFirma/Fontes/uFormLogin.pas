@@ -48,7 +48,7 @@ implementation
 {$R *.dfm}
 
 uses
-  SynCrypto, uAppConfig;
+  SynCrypto, uGerenciadorConfig;
 
 class function TFormLogin.EncryptStringAES(AString: RawByteString; AKey: RawByteString)
   : RawByteString;
@@ -63,7 +63,7 @@ end;
 
 class function TFormLogin.GetKey: String;
 begin
-  Result:= AppConfig.GetAppDataFolder;
+  Result:= GerenciadorConfig.GetAppDataFolder;
 end;
 
 class function TFormLogin.Login: Integer;
@@ -72,11 +72,11 @@ var
 begin
   FFrm := TFormLogin.Create(nil);
   try
-    AppConfig.LerConfig;
-    if AppConfig.UserName <> '' then
+    GerenciadorConfig.LerConfig;
+    if GerenciadorConfig.UserName <> '' then
     begin
-      Result:= FFrm.RetornaIDUser(String(AppConfig.UserName),
-            String(DecryptStringAES(AppConfig.EncryptedPassword, GetKey)));
+      Result:= FFrm.RetornaIDUser(String(GerenciadorConfig.UserName),
+            String(DecryptStringAES(GerenciadorConfig.EncryptedPassword, GetKey)));
       if Result > 0 then
         Exit;
     end;
@@ -128,7 +128,7 @@ begin
   end;
 
   if CbxLoginAutomatico.Checked then
-    AppConfig.SalvarUsuarioESenha(EditUser.Text,
+    GerenciadorConfig.SalvarUsuarioESenha(EditUser.Text,
       EncryptStringAES(EditSenha.Text, GetKey));
 
   Close;

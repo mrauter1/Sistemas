@@ -21,7 +21,6 @@ object FormAjustaInconsistencias: TFormAjustaInconsistencias
     Height = 75
     Align = alTop
     TabOrder = 0
-    ExplicitWidth = 663
     object Label1: TLabel
       Left = 16
       Top = 8
@@ -32,7 +31,7 @@ object FormAjustaInconsistencias: TFormAjustaInconsistencias
     object Label2: TLabel
       Left = 224
       Top = 27
-      Width = 75
+      Width = 74
       Height = 13
       Caption = 'Valor Devolvido'
     end
@@ -117,9 +116,6 @@ object FormAjustaInconsistencias: TFormAjustaInconsistencias
     Height = 233
     Align = alClient
     TabOrder = 1
-    ExplicitTop = 63
-    ExplicitWidth = 543
-    ExplicitHeight = 229
     object cxGridViewClientes: TcxGridDBTableView
       Navigator.Buttons.CustomButtons = <>
       FilterBox.Visible = fvNever
@@ -272,8 +268,6 @@ object FormAjustaInconsistencias: TFormAjustaInconsistencias
     Height = 41
     Align = alBottom
     TabOrder = 2
-    ExplicitTop = 251
-    ExplicitWidth = 543
     DesignSize = (
       678
       41)
@@ -286,7 +280,6 @@ object FormAjustaInconsistencias: TFormAjustaInconsistencias
       Caption = 'OK'
       TabOrder = 0
       OnClick = BtnOKClick
-      ExplicitLeft = 232
     end
   end
   object QryEmbalagens: TFDQuery
@@ -356,6 +349,10 @@ object FormAjustaInconsistencias: TFormAjustaInconsistencias
       Required = True
       FixedChar = True
       Size = 21
+    end
+    object QryEmbalagensSEQUENCIADOPRODUTO: TIntegerField
+      FieldName = 'SEQUENCIADOPRODUTO'
+      Origin = 'SEQUENCIADOPRODUTO'
     end
     object QryEmbalagensdatacomprovante: TDateField
       DisplayLabel = 'Data Emiss'#227'o'
@@ -496,6 +493,10 @@ object FormAjustaInconsistencias: TFormAjustaInconsistencias
       FieldName = 'CHAVENFPRO'
       FixedChar = True
       Size = 21
+    end
+    object FDMemAjusteEmbalagensSEQUENCIADOPRODUTO: TIntegerField
+      FieldName = 'SEQUENCIADOPRODUTO'
+      Origin = 'SEQUENCIADOPRODUTO'
     end
     object FDMemAjusteEmbalagensRAZAOSOCIAL: TStringField
       DisplayLabel = 'Nome Cliente'

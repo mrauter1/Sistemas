@@ -23,7 +23,6 @@ object FormEmbalagensAVencer: TFormEmbalagensAVencer
     Height = 65
     Align = alTop
     TabOrder = 0
-    ExplicitWidth = 903
     object Label1: TLabel
       Left = 190
       Top = 10
@@ -91,8 +90,6 @@ object FormEmbalagensAVencer: TFormEmbalagensAVencer
     Height = 397
     Align = alClient
     TabOrder = 1
-    ExplicitTop = 62
-    ExplicitWidth = 903
     object cxGridViewEmbalagens: TcxGridDBTableView
       PopupMenu = PopupMenu
       Navigator.Buttons.CustomButtons = <>
@@ -496,6 +493,10 @@ object FormEmbalagensAVencer: TFormEmbalagensAVencer
       Required = True
       FixedChar = True
       Size = 21
+    end
+    object QryAVencerSEQUENCIADOPRODUTO: TIntegerField
+      FieldName = 'SEQUENCIADOPRODUTO'
+      Origin = 'SEQUENCIADOPRODUTO'
     end
     object QryAVencerDESCSTATUS: TStringField
       DisplayLabel = 'Status'

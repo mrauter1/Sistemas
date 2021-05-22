@@ -4,7 +4,7 @@ object FormCiclosVenda: TFormCiclosVenda
   Align = alClient
   Caption = 'Ciclos de Venda por Produto'
   ClientHeight = 544
-  ClientWidth = 920
+  ClientWidth = 928
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -13,29 +13,30 @@ object FormCiclosVenda: TFormCiclosVenda
   Font.Style = []
   OldCreateOrder = False
   OnCreate = FormCreate
-  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object Panel1: TPanel
     Left = 0
     Top = 502
-    Width = 920
+    Width = 928
     Height = 42
     Align = alBottom
     Caption = 'Panel1'
     TabOrder = 0
+    ExplicitWidth = 920
     DesignSize = (
-      920
+      928
       42)
     object BtnAtualiza: TButton
       Left = 272
       Top = 9
-      Width = 369
+      Width = 377
       Height = 25
       Anchors = [akLeft, akRight, akBottom]
       Caption = 'Atualiza'
       TabOrder = 0
       OnClick = BtnAtualizaClick
+      ExplicitWidth = 369
     end
     object BtnOpcoes: TBitBtn
       Left = 5
@@ -92,21 +93,30 @@ object FormCiclosVenda: TFormCiclosVenda
   end
   object PageControl1: TPageControl
     Left = 0
-    Top = 0
-    Width = 920
-    Height = 502
-    ActivePage = TabIgnorados
+    Top = 35
+    Width = 928
+    Height = 467
+    ActivePage = TabParaComprar
     Align = alClient
     TabOrder = 1
+    ExplicitTop = 0
+    ExplicitWidth = 920
+    ExplicitHeight = 502
     object TabParaComprar: TTabSheet
       Caption = 'Clientes que est'#227'o para Comprar'
+      ExplicitWidth = 912
+      ExplicitHeight = 474
       object cxGridParaComprar: TcxGrid
         Left = 0
         Top = 0
-        Width = 912
-        Height = 474
+        Width = 920
+        Height = 439
         Align = alClient
         TabOrder = 0
+        ExplicitLeft = 1
+        ExplicitTop = -2
+        ExplicitWidth = 912
+        ExplicitHeight = 474
         object cxGridParaComprarDBTableView: TcxGridDBTableView
           PopupMenu = PopupMenuOpcoes
           Navigator.Buttons.CustomButtons = <>
@@ -123,19 +133,25 @@ object FormCiclosVenda: TFormCiclosVenda
           OptionsSelection.CellSelect = False
           OptionsView.GroupByBox = False
           OptionsView.HeaderAutoHeight = True
+          Styles.OnGetContentStyle = cxGridParaComprarDBTableViewStylesGetContentStyle
           Styles.StyleSheet = FormGlobal.cxGridTableViewStyleSheet1
+          object cxGridParaComprarDBTableViewDiasSemContato: TcxGridDBColumn
+            DataBinding.FieldName = 'DiasSemContato'
+            Width = 52
+          end
           object cxGridParaComprarDBTableViewCodCliente: TcxGridDBColumn
             DataBinding.FieldName = 'CodCliente'
           end
           object cxGridParaComprarDBTableViewNOMECLIENTE: TcxGridDBColumn
             DataBinding.FieldName = 'NOMECLIENTE'
+            Width = 164
           end
           object cxGridParaComprarDBTableViewCodProduto: TcxGridDBColumn
             DataBinding.FieldName = 'CodProduto'
           end
           object cxGridParaComprarDBTableViewProduto: TcxGridDBColumn
             DataBinding.FieldName = 'Produto'
-            Width = 168
+            Width = 163
           end
           object cxGridParaComprarDBTableViewCODVENDEDOR2: TcxGridDBColumn
             DataBinding.FieldName = 'CODVENDEDOR2'
@@ -143,7 +159,7 @@ object FormCiclosVenda: TFormCiclosVenda
           end
           object cxGridParaComprarDBTableViewVendedor: TcxGridDBColumn
             DataBinding.FieldName = 'Vendedor'
-            Width = 91
+            Width = 90
           end
           object cxGridParaComprarDBTableViewTicketMedio: TcxGridDBColumn
             DataBinding.FieldName = 'TicketMedio'
@@ -191,13 +207,17 @@ object FormCiclosVenda: TFormCiclosVenda
     object TabRecuperar: TTabSheet
       Caption = 'Clientes para Recuperar'
       ImageIndex = 1
+      ExplicitWidth = 912
+      ExplicitHeight = 474
       object cxGridParaRecuperar: TcxGrid
         Left = 0
         Top = 0
-        Width = 912
-        Height = 474
+        Width = 920
+        Height = 439
         Align = alClient
         TabOrder = 0
+        ExplicitWidth = 912
+        ExplicitHeight = 474
         object cxGridDBTableView2: TcxGridDBTableView
           PopupMenu = PopupMenuOpcoes
           Navigator.Buttons.CustomButtons = <>
@@ -214,7 +234,12 @@ object FormCiclosVenda: TFormCiclosVenda
           OptionsSelection.CellSelect = False
           OptionsView.GroupByBox = False
           OptionsView.HeaderAutoHeight = True
+          Styles.OnGetContentStyle = cxGridDBTableView2StylesGetContentStyle
           Styles.StyleSheet = FormGlobal.cxGridTableViewStyleSheet1
+          object cxGridDBTableView2DiasSemContato: TcxGridDBColumn
+            DataBinding.FieldName = 'DiasSemContato'
+            Width = 54
+          end
           object cxGridDBColumn1: TcxGridDBColumn
             DataBinding.FieldName = 'CodCliente'
           end
@@ -279,15 +304,17 @@ object FormCiclosVenda: TFormCiclosVenda
     object TabIgnorados: TTabSheet
       Caption = 'Clientes Ignorados'
       ImageIndex = 2
+      ExplicitWidth = 912
+      ExplicitHeight = 474
       object cxGridClientesIgnorados: TcxGrid
         Left = 0
         Top = 0
-        Width = 912
-        Height = 474
+        Width = 920
+        Height = 439
         Align = alClient
         TabOrder = 0
-        ExplicitLeft = -3
-        ExplicitTop = -2
+        ExplicitWidth = 912
+        ExplicitHeight = 474
         object cxGridDBTableView1: TcxGridDBTableView
           PopupMenu = PopupMenuIgnorados
           Navigator.Buttons.CustomButtons = <>
@@ -386,13 +413,17 @@ object FormCiclosVenda: TFormCiclosVenda
     object TabSheet1: TTabSheet
       Caption = 'Todos os Clientes'
       ImageIndex = 3
+      ExplicitWidth = 912
+      ExplicitHeight = 474
       object cxGridTodosClientes: TcxGrid
         Left = 0
         Top = 0
-        Width = 912
-        Height = 474
+        Width = 920
+        Height = 439
         Align = alClient
         TabOrder = 0
+        ExplicitWidth = 912
+        ExplicitHeight = 474
         object cxGridDBTableView5: TcxGridDBTableView
           Navigator.Buttons.CustomButtons = <>
           DataController.DataSource = DsTodosClientes
@@ -476,6 +507,29 @@ object FormCiclosVenda: TFormCiclosVenda
       end
     end
   end
+  object PanelTop: TPanel
+    Left = 0
+    Top = 0
+    Width = 928
+    Height = 35
+    Align = alTop
+    TabOrder = 2
+    object Vendedor: TLabel
+      Left = 96
+      Top = 11
+      Width = 58
+      Height = 13
+      Alignment = taRightJustify
+      Caption = 'Vendedor'
+    end
+    object CbxVendedores: TDBLookupComboBox
+      Left = 160
+      Top = 8
+      Width = 305
+      Height = 21
+      TabOrder = 0
+    end
+  end
   object SaveDialog: TSaveDialog
     DefaultExt = '.xls'
     Title = 'Definir o Caminho e o Nome do Arquivo para Exporta'#231#227'o'
@@ -501,18 +555,30 @@ object FormCiclosVenda: TFormCiclosVenda
   object QryCiclos: TFDQuery
     Connection = ConSqlServer.FDConnection
     SQL.Strings = (
-      'select cc.*, C.Cidade, C.Estado'
+      
+        'select dateDiff(day, ag.UltimoContato, getdate()) as DiasSemCont' +
+        'ato,  cc.*, C.Cidade, C.Estado'
       'from CicloCompras cc'
       'inner join Cliente C on C.CodCliente = cc.CodCliente'
+      
+        'left join UltimoContatoAgenda ag on ag.CODCADASTRO = c.CODCLIENT' +
+        'E'
       'where cc.CiclosSemCompra between 0.9 and 3'
       'and NroCompras > 4'
       
         'and getdate() >= IsNull((select DataRelembrar from LembreteCiclo' +
         's lc where lc.codCliente = cc.CodCliente and lc.CodProduto = cc.' +
         'CodProduto), getdate())'
-      'order by CiclosSemCompra, cc.CodCliente, CodProduto')
+      'order by CiclosSemCompra, cc.CodCliente, CodProduto'
+      '')
     Left = 160
     Top = 56
+    object QryCiclosDiasSemContato: TIntegerField
+      DisplayLabel = 'Dias Sem Contato'
+      FieldName = 'DiasSemContato'
+      Origin = 'DiasSemContato'
+      ReadOnly = True
+    end
     object QryCiclosCodCliente: TStringField
       DisplayLabel = 'Cod. Cliente'
       FieldName = 'CodCliente'
@@ -614,9 +680,14 @@ object FormCiclosVenda: TFormCiclosVenda
   object QryRecuperar: TFDQuery
     Connection = ConSqlServer.FDConnection
     SQL.Strings = (
-      'select cc.*, C.Cidade, C.Estado'
+      
+        'select dateDiff(day, ag.UltimoContato, getdate()) as DiasSemCont' +
+        'ato,  cc.*, C.Cidade, C.Estado'
       'from CicloCompras cc'
       'inner join Cliente C on C.CodCliente = cc.CodCliente'
+      
+        'left join UltimoContatoAgenda ag on ag.CODCADASTRO = c.CODCLIENT' +
+        'E'
       'where cc.CiclosSemCompra > 3'
       'and NroCompras > 2'
       
@@ -628,6 +699,12 @@ object FormCiclosVenda: TFormCiclosVenda
         'dProduto')
     Left = 160
     Top = 168
+    object QryRecuperarDiasSemContato: TIntegerField
+      DisplayLabel = 'Dias Sem Contato'
+      FieldName = 'DiasSemContato'
+      Origin = 'DiasSemContato'
+      ReadOnly = True
+    end
     object QryRecuperarCodCliente: TStringField
       DisplayLabel = 'Cod. Cliente'
       FieldName = 'CodCliente'
@@ -973,5 +1050,24 @@ object FormCiclosVenda: TFormCiclosVenda
     DataSet = QryTodosClientes
     Left = 296
     Top = 360
+  end
+  object cxStyleRepository1: TcxStyleRepository
+    Left = 768
+    Top = 8
+    PixelsPerInch = 96
+    object cxStyleVermelho: TcxStyle
+      AssignedValues = [svColor, svFont, svTextColor]
+      Color = 2105599
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Arial'
+      Font.Style = [fsBold]
+      TextColor = clWhite
+    end
+    object cxStyleAmarelo: TcxStyle
+      AssignedValues = [svColor]
+      Color = clYellow
+    end
   end
 end

@@ -75,6 +75,7 @@
         <DCC_UsePackage>DBXOdbcDriver;DBXSybaseASEDriver;vclimg;vclactnband;vcldb;vcldsnap;bindcompvcl;vclie;vcltouch;DBXDb2Driver;websnap;VclSmp;vcl;DBXMSSQLDriver;dsnapcon;vclx;webdsnap;$(DCC_UsePackage)</DCC_UsePackage>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
+        <DCC_MapFile>3</DCC_MapFile>
         <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
         <DCC_Optimize>false</DCC_Optimize>
         <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
@@ -82,14 +83,15 @@
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <DCC_DebugDCUs>true</DCC_DebugDCUs>
         <BRCC_IncludePath>F:\Sistemas\utils\DelphiEncryptionCompendium;$(BRCC_IncludePath)</BRCC_IncludePath>
         <DCC_UnitSearchPath>F:\Sistemas\Ladder Framework\Forms;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
-        <VerInfo_Build>19</VerInfo_Build>
+        <VerInfo_Build>24</VerInfo_Build>
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
         <VerInfo_Release>2</VerInfo_Release>
         <VerInfo_MajorVer>0</VerInfo_MajorVer>
         <VerInfo_MinorVer>9</VerInfo_MinorVer>
-        <VerInfo_Keys>CompanyName=;FileVersion=0.9.2.19;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=;FileVersion=0.9.2.24;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <DCC_ExeOutput>.\bin</DCC_ExeOutput>
         <BT_BuildType>Debug</BT_BuildType>
@@ -104,6 +106,7 @@
         <DCC_DebugInformation>0</DCC_DebugInformation>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
+        <BT_BuildType>Debug</BT_BuildType>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <DCC_ExeOutput>F:\Sistemas\GerenciadorFirma\bin\</DCC_ExeOutput>
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
@@ -228,9 +231,6 @@
         <DCCReference Include="Fontes\uFormEntregaPorProduto.pas">
             <Form>FormEntregaPorProduto</Form>
         </DCCReference>
-        <DCCReference Include="..\Ladder Framework\Forms\Form.ActivityEditor.pas">
-            <Form>FormActivityEditor</Form>
-        </DCCReference>
         <DCCReference Include="..\Ladder Framework\Forms\Form.ConsultaEditor.pas"/>
         <DCCReference Include="..\Ladder Framework\Forms\Form.ProcessActivityEditor.pas"/>
         <DCCReference Include="..\Ladder Framework\Forms\Form.SimpleProcessEditor.pas"/>
@@ -304,6 +304,20 @@
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\utils\uConsultaChartController.pas"/>
+        <DCCReference Include="Fontes\UserModel.pas"/>
+        <DCCReference Include="Fontes\uGerenciadorConfig.pas"/>
+        <DCCReference Include="..\Ladder Framework\Forms\Form.ActivityEditor.pas">
+            <Form>FormActivityEditor</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\Ladder Framework\Forms\Form.ProcessEditor.pas">
+            <Form>FormProcessEditor</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\Ladder Framework\Forms\Form.ProcessEditorBase.pas">
+            <Form>FormProcessEditorBase</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

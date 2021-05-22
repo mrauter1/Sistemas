@@ -367,7 +367,7 @@ object FormPrincipal: TFormPrincipal
       BevelOuter = bvNone
       TabOrder = 1
       ExplicitLeft = -2
-      ExplicitTop = 26
+      ExplicitTop = 38
     end
   end
   object TreeViewMenu: TdxDBTreeView
@@ -397,8 +397,6 @@ object FormPrincipal: TFormPrincipal
     OnDblClick = TreeViewMenuDblClick
     OnKeyDown = TreeViewMenuKeyDown
     PopupMenu = PopupMenuTreeView
-    ExplicitLeft = 2
-    ExplicitTop = -6
   end
   object cxSplitter1: TcxSplitter
     Left = 225

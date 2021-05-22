@@ -16,7 +16,7 @@ uses
   FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
   FireDAC.Comp.DataSet, FireDAC.Comp.Client, uFrmConsulta, Vcl.ComCtrls, dxtree,
   dxdbtree, uConSqlServer, uConsultaPersonalizada, cxSplitter, ChromeTabs,
-  ChromeTabsClasses, ChromeTabsTypes, uAppConfig, uDmGeradorConsultas, uFormLogistica,
+  ChromeTabsClasses, ChromeTabsTypes, uGerenciadorConfig, uDmGeradorConsultas, uFormLogistica,
   Form.ScheduledActivities, Form.PesquisaAviso;
 
 type
@@ -26,9 +26,9 @@ type
     Form: TForm;
     Tab: TChromeTab;
     OwnsForm: Boolean;
-    FCriado: Boolean;
-    FSendoDestruido: Boolean;
-    FFormFechou: Boolean;
+    FFormCarregando: Boolean;
+    FFormFechando: Boolean;
+    FTabFechando: Boolean;
     FID: Integer;
 
     constructor Create(AParent: TWinControl; pTab: TChromeTab; pForm: TForm; pOwnsForm: Boolean = True); overload;
@@ -168,13 +168,12 @@ type
       var Accept: Boolean);
   private
     FDmGeradorConsultas: TDmGeradorConsultas;
-    FPopupActive: Boolean;
     FIDNodeSelecionado: Integer;
+    FCreatingWithTab: Boolean;
     procedure CarregaConsultas;
     procedure OnConsultaClick(Sender: TObject);
     function ObterKeyValueSelecionado(pTreeView: TdxDBTreeView): Variant;
     function SelecionaNodeNoMouse: Boolean;
-    procedure MostraNovoForm(pForm: TForm);
     procedure AtualizaTabAtiva(pTab: TChromeTab);
     function BuscaTabPorForm(pForm: TForm): TChromeTab;
     procedure CreateParams(var Params: TCreateParams); override;
@@ -190,6 +189,8 @@ type
     { Private declarations }
   public
     { Public declarations }
+    constructor Create(AOwner: TComponent); overload; override;
+    constructor Create(AOwner: TComponent; ACreatingWithTab: Boolean); overload;
     constructor CreateWithTab(pTab: TChromeTab);
     procedure AbrirFormEmNovaAba(pForm: TForm; pTabOwnsForm: Boolean = True);
   end;
@@ -216,7 +217,7 @@ end;
 procedure TFormPrincipal.CarregaMenusPermissoes(AUserID: Integer);
 var
   I: Integer;
-  FMenuItem, FMenuDefault: TMenuItem;
+  FMenuDefault: TMenuItem;
 
   function FindMenu(AMenuBase: TMenuItem; AMenuName: String): TMenuItem;
   var
@@ -253,18 +254,19 @@ var
         SetMenuVisible(AMenuItem.Items[I], AIsAdmin);
   end;
 begin
-  CloseAllTabs;
+  if not FCreatingWithTab then
+    CloseAllTabs;
 
-  AppConfig.GruposUsuario:= [];
+  GerenciadorConfig.GruposUsuario:= [];
   QryUser.Close;
   QryUser.ParamByName('userID').AsInteger:= AUserID;
   QryUser.Open;
 
   if QryUserProducao.AsBoolean then
-    AppConfig.GruposUsuario:= [puGerenteProducao];
+    GerenciadorConfig.GruposUsuario:= [puGerenteProducao];
 
   if QryUserDesenvolvedor.AsBoolean then
-    AppConfig.GruposUsuario:= [puDesenvolvedor];
+    GerenciadorConfig.GruposUsuario:= [puDesenvolvedor];
 
   QryPermissaoMenu.Close;
   QryPermissaoMenu.ParamByName('userID').AsInteger:= AUserID;
@@ -286,7 +288,7 @@ begin
       Break;
   end;
 
-  if Assigned(FMenuDefault) then
+  if Assigned(FMenuDefault) and (not FCreatingWithTab) then
     FMenuDefault.Click;
 
   StatusBar1.SimpleText:= 'Usuário: '+QryUserNome.AsString;
@@ -355,7 +357,7 @@ var
   FFrm: TForm;
   FOwnsForm: Boolean;
 begin
-  Create(Application);
+  Create(Application, True);
 
   if not Assigned(pTab.Data) then
     Exit;
@@ -404,7 +406,7 @@ end;
 
 procedure TFormPrincipal.FormShow(Sender: TObject);
 begin
-  Atividades1.Visible:= (puDesenvolvedor in AppConfig.GruposUsuario);
+  Atividades1.Visible:= (puDesenvolvedor in GerenciadorConfig.GruposUsuario);
 
 {  if Application.MainForm = Self then
     AbrirFormEmNovaAba(TFormPedidos.Create(Self), True);   }
@@ -468,12 +470,11 @@ begin
   if Application.MainForm = Self then
     CarregaConsultas;
 
-  CarregaMenusPermissoes(AppConfig.UserID);
+  CarregaMenusPermissoes(GerenciadorConfig.UserID);
 end;
 
 function TFormPrincipal.ObterKeyValueSelecionado(pTreeView: TdxDBTreeView): Variant;
 var
-  FHitTests: THitTests;
   FNode: TTreeNode;
   FPos: TPoint;
 begin
@@ -502,7 +503,7 @@ var
   FIDPai: Integer;
   FIDConsulta: Integer;
 begin
-  if not (puDesenvolvedor in AppConfig.GruposUsuario) then
+  if not (puDesenvolvedor in GerenciadorConfig.GruposUsuario) then
     Exit;
 
   ObterKeyValueSelecionado(TreeViewMenu);
@@ -527,7 +528,7 @@ var
   FNomeGrupo: String;
   FIDPai: Integer;
 begin
-  if not (puDesenvolvedor in AppConfig.GruposUsuario) then
+  if not (puDesenvolvedor in GerenciadorConfig.GruposUsuario) then
     Exit;
 
   FIDPai:= FIDNodeSelecionado;// VarToIntDef(ObterKeyValueSelecionado(TreeViewMenu), 0);
@@ -572,7 +573,7 @@ end;
 
 procedure TFormPrincipal.EditarConsulta1Click(Sender: TObject);
 begin
-  if not (puDesenvolvedor in AppConfig.GruposUsuario) then
+  if not (puDesenvolvedor in GerenciadorConfig.GruposUsuario) then
     Exit;
 
   if QryMenuTipo.AsInteger <> 1 then
@@ -585,7 +586,7 @@ procedure TFormPrincipal.Excluir1Click(Sender: TObject);
 var
   FIDConsulta: Integer;
 begin
-  if not (puDesenvolvedor in AppConfig.GruposUsuario) then
+  if not (puDesenvolvedor in GerenciadorConfig.GruposUsuario) then
     Exit;
 
   if Application.MessageBox('Tem certeza que deseja deletar?', 'Atenção', MB_YESNO) = ID_YES then
@@ -844,8 +845,6 @@ end;
 procedure TFormPrincipal.AbrirFormEmNovaAba(pForm: TForm; pTabOwnsForm: Boolean = True);
 var
   FTab: TChromeTab;
-  FTabPanel: TTabPanel;
-  FFormParent: TForm;
 begin
   if not Assigned(pForm) then
     Exit;
@@ -905,10 +904,6 @@ begin
     TDmGravaLista.AtualizaTodasListasDePreco;
 end;
 
-procedure TFormPrincipal.MostraNovoForm(pForm: TForm);
-begin
-end;
-
 procedure TFormPrincipal.ChromeTabs1NeedDragImageControl(Sender: TObject;
   ATab: TChromeTab; var DragControl: TWinControl);
 begin
@@ -951,19 +946,24 @@ begin
      else
       begin
         // Create a new form
-        NewForm := TFormPrincipal.CreateWithTab(DragTabObject.DragTab);
+        FCreatingWithTab:= True;
+        try
+          NewForm := TFormPrincipal.CreateWithTab(DragTabObject.DragTab);
 
-        // Set the new form position
-        NewForm.Position := poDesigned;
-        NewForm.Left := WinX;
-        NewForm.Top := WinY;
+          // Set the new form position
+          NewForm.Position := poDesigned;
+          NewForm.Left := WinX;
+          NewForm.Top := WinY;
 
-        // Show the form
-        NewForm.Show;
+          // Show the form
+          NewForm.Show;
 
-        // Remove the original tab
-        // TabDropOptions := [tdDeleteDraggedTab];
-        TabDropOptions := [];
+          // Remove the original tab
+          // TabDropOptions := [tdDeleteDraggedTab];
+          TabDropOptions := [];
+        finally
+          FCreatingWithTab:= False;
+        end;
       end;
     end
    else
@@ -979,9 +979,8 @@ procedure TFormPrincipal.MoverTab(DragTabObject: IDragTabObject);
 var
   FTab: TChromeTab;
   FTabPanel: TTabPanel;
-  FFormIn, FFormOut, FFormTab: TForm;
+  FFormIn, FFormTab: TForm;
   FOwnsForm: Boolean;
-  FChromeTab: TChromeTab;
 begin
   FTab:= DragTabObject.DragTab;
 
@@ -1007,6 +1006,18 @@ begin
 
 end;
 
+constructor TFormPrincipal.Create(AOwner: TComponent);
+begin
+  Create(AOwner, False);
+end;
+
+constructor TFormPrincipal.Create(AOwner: TComponent;
+  ACreatingWithTab: Boolean);
+begin
+  FCreatingWithTab:= ACreatingWithTab;
+  inherited Create(AOwner);
+end;
+
 procedure TFormPrincipal.CreateParams(var Params: TCreateParams);
 begin
   inherited;
@@ -1026,9 +1037,9 @@ constructor TTabPanel.Create(AParent: TWinControl; pTab: TChromeTab; pForm: TFor
 begin
   inherited Create(AParent);
   FID:= Random(1000);
-  FCriado:= False;
-  FSendoDestruido:= False;
-  FFormFechou:= False;
+  FTabFechando:= False;
+  FFormFechando:= False;
+  FFormCarregando:= True;
   try
     Caption:= '';
     Align:= alClient;
@@ -1039,18 +1050,18 @@ begin
     Tab:= pTab;
     Form:= pForm;
 
-    if OwnsForm then
+{    if OwnsForm then
       InsertComponent(pForm) // Changes the owner of the form to the tab;
-    else
-      pForm.FreeNotification(Self);
+    else                   }
+     pForm.FreeNotification(Self);
   finally
-    FCriado:= True;
+    FFormCarregando:= False;
   end;
 end;
 
 destructor TTabPanel.Destroy;
 begin
-  FSendoDestruido:= True;
+  FTabFechando:= True;
   Form.RemoveFreeNotification(Self);
   if Form.Parent = Self then
   begin
@@ -1058,9 +1069,15 @@ begin
     Form.Visible:= False;
   end;
 
-  // Se form Fechou, já está sendo destruído
-  if (not FFormFechou) and OwnsForm then
-    Form.Free;
+  if OwnsForm then
+  begin
+    if not (csDestroying in Form.ComponentState) then
+      Form.Free;
+{    if (csDestroying in Form.ComponentState) then
+      Application.InsertComponent(Form) // Este TTabPanel não pode ser o owner do Form ou ele vai ser destruído duas vezes causando AV
+    else
+      Form.Free;}
+  end;
 
   inherited;
 end;
@@ -1072,7 +1089,7 @@ begin
   OwnsForm:= False;
   RemoveTab;
 
-  // Remove o Owner de pTabPanel
+  // Remove este TTAbPanel como owner do Form;
   if Form.Owner = Self then
     Application.InsertComponent(Form);
 
@@ -1097,14 +1114,16 @@ procedure TTabPanel.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
 
-  if (Operation = opRemove) and (AComponent = Form) and FCriado then
+  if (Operation = opRemove) and (AComponent = Form) and (FFormCarregando=False) then
   begin
-    FFormFechou:= True;
+    if FFormFechando then Exit;
+
+    FFormFechando:= True;
 
     if Application.Terminated then
       Exit;
 
-    if not FSendoDestruido then
+    if not FTabFechando then
     begin
       RemoveTab;
       Free;

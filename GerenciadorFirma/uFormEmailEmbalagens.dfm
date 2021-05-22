@@ -20,7 +20,7 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
     Top = 0
     Width = 955
     Height = 529
-    ActivePage = TabPendentes
+    ActivePage = TabSheetAVencer
     Align = alClient
     TabOrder = 0
     OnChange = PageControl1Change
@@ -64,7 +64,6 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
           Height = 392
           Align = alClient
           TabOrder = 0
-          ExplicitLeft = 0
           object cxGridViewClientes: TcxGridDBTableView
             PopupMenu = PopupMenu
             Navigator.Buttons.CustomButtons = <>
@@ -498,8 +497,6 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
           Height = 392
           Align = alClient
           TabOrder = 0
-          ExplicitLeft = 0
-          ExplicitTop = 33
           object cxGrid1DBTableView1: TcxGridDBTableView
             PopupMenu = PopupMenu
             Navigator.Buttons.CustomButtons = <>
@@ -685,6 +682,10 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
       FixedChar = True
       Size = 21
     end
+    object QryEmbalagensSEQUENCIADOPRODUTO: TIntegerField
+      FieldName = 'SEQUENCIADOPRODUTO'
+      Origin = 'SEQUENCIADOPRODUTO'
+    end
     object QryEmbalagensdatacomprovante: TDateField
       DisplayLabel = 'Data Emiss'#227'o'
       FieldName = 'datacomprovante'
@@ -774,6 +775,22 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
       DisplayLabel = 'Qtd. Pendente'
       FieldName = 'QuantPendente'
       Origin = 'QuantPendente'
+      ReadOnly = True
+      Precision = 38
+      Size = 6
+    end
+    object QryEmbalagensENVIADOAVENCER: TBooleanField
+      FieldName = 'ENVIADOAVENCER'
+      Origin = 'ENVIADOAVENCER'
+      Required = True
+    end
+    object QryEmbalagensDataVencimento: TDateField
+      FieldName = 'DataVencimento'
+      Origin = 'DataVencimento'
+    end
+    object QryEmbalagensValorPendente: TFMTBCDField
+      FieldName = 'ValorPendente'
+      Origin = 'ValorPendente'
       ReadOnly = True
       Precision = 38
       Size = 6
@@ -891,6 +908,10 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
       Required = True
       FixedChar = True
       Size = 21
+    end
+    object QryAVencerSEQUENCIADOPRODUTO: TIntegerField
+      FieldName = 'SEQUENCIADOPRODUTO'
+      Origin = 'SEQUENCIADOPRODUTO'
     end
     object QryAVencercodcliente: TStringField
       DisplayLabel = 'Cod. Cliente'
@@ -1043,6 +1064,12 @@ object FormGravaEmbalagens: TFormGravaEmbalagens
       FieldName = 'SATUSAVENCER'
       Origin = 'SATUSAVENCER'
       ReadOnly = True
+      Required = True
+      Size = 11
+    end
+    object QryAVencerDESCSTATUS: TStringField
+      FieldName = 'DESCSTATUS'
+      Origin = 'DESCSTATUS'
       Required = True
       Size = 11
     end

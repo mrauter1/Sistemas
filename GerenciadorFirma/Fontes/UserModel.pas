@@ -29,6 +29,8 @@ type
     DefaultMenu: String;
     Producao: Boolean;
     Desenvolvedor: Boolean;
+    CodSidicom: String;
+    CodVendedor: String;
     PermissaoMenus: TObjectList<TPermissaoMenus>;
     PermissaoConsultas: TObjectList<TPermissaoConsultas>;
   end;

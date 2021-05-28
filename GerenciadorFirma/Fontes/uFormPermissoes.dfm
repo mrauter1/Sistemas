@@ -3,7 +3,7 @@ object FormPermissoes: TFormPermissoes
   Top = 0
   Caption = 'Permiss'#245'es'
   ClientHeight = 508
-  ClientWidth = 609
+  ClientWidth = 669
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,12 +18,13 @@ object FormPermissoes: TFormPermissoes
   object Panel1: TPanel
     Left = 0
     Top = 467
-    Width = 609
+    Width = 669
     Height = 41
     Align = alBottom
     TabOrder = 0
+    ExplicitWidth = 609
     DesignSize = (
-      609
+      669
       41)
     object BtnOK: TBitBtn
       Left = 16
@@ -35,29 +36,33 @@ object FormPermissoes: TFormPermissoes
       OnClick = BtnOKClick
     end
     object BtnAtualizarMenus: TBitBtn
-      Left = 480
+      Left = 540
       Top = 6
       Width = 97
       Height = 25
       Anchors = [akTop, akRight]
       Caption = 'Atualizar'
       TabOrder = 1
+      ExplicitLeft = 480
     end
   end
   object PanelLeft: TPanel
     Left = 0
     Top = 0
-    Width = 609
+    Width = 669
     Height = 153
     Align = alTop
     TabOrder = 1
+    ExplicitWidth = 609
     object cxGridUsuarios: TcxGrid
       Left = 1
       Top = 1
-      Width = 607
+      Width = 667
       Height = 119
       Align = alClient
       TabOrder = 0
+      ExplicitLeft = 0
+      ExplicitTop = -4
       object cxGridDBTableView1: TcxGridDBTableView
         Navigator.Buttons.CustomButtons = <>
         FilterBox.Visible = fvNever
@@ -98,6 +103,14 @@ object FormPermissoes: TFormPermissoes
           DataBinding.FieldName = 'Desenvolvedor'
           Width = 80
         end
+        object cxGridDBTableView1CodSidicom: TcxGridDBColumn
+          DataBinding.FieldName = 'CodSidicom'
+          Width = 75
+        end
+        object cxGridDBTableView1CodVendedor: TcxGridDBColumn
+          DataBinding.FieldName = 'CodVendedor'
+          Width = 77
+        end
       end
       object cxGridDBTableView4: TcxGridDBTableView
         Navigator.Buttons.CustomButtons = <>
@@ -129,22 +142,24 @@ object FormPermissoes: TFormPermissoes
     object Panel3: TPanel
       Left = 1
       Top = 120
-      Width = 607
+      Width = 667
       Height = 32
       Align = alBottom
       TabOrder = 2
+      ExplicitWidth = 607
       object DBNavigator1: TDBNavigator
         Left = 1
         Top = 1
-        Width = 527
+        Width = 587
         Height = 30
         DataSource = DsUsuarios
         VisibleButtons = [nbInsert, nbDelete, nbEdit, nbPost, nbCancel]
         Align = alClient
         TabOrder = 0
+        ExplicitWidth = 527
       end
       object BtnAlterarSenha: TButton
-        Left = 528
+        Left = 588
         Top = 1
         Width = 78
         Height = 30
@@ -153,41 +168,47 @@ object FormPermissoes: TFormPermissoes
         TabOrder = 1
         WordWrap = True
         OnClick = BtnAlterarSenhaClick
+        ExplicitLeft = 528
       end
     end
   end
   object Panel2: TPanel
     Left = 0
     Top = 153
-    Width = 609
+    Width = 669
     Height = 314
     Align = alClient
     TabOrder = 2
+    ExplicitWidth = 609
     object GroupBox1: TGroupBox
       Left = 1
       Top = 1
-      Width = 607
+      Width = 667
       Height = 312
       Align = alClient
       Caption = 'Permiss'#245'es'
       TabOrder = 0
+      ExplicitWidth = 607
       object PageControlPermissoes: TPageControl
         Left = 2
         Top = 15
-        Width = 603
+        Width = 663
         Height = 295
         ActivePage = TabMenus
         Align = alClient
         TabOrder = 0
+        ExplicitWidth = 603
         object TabSheetConsultas: TTabSheet
           Caption = 'Consultas'
+          ExplicitWidth = 595
           object cxGridPermissaoConsulta: TcxGrid
             Left = 0
             Top = 0
-            Width = 595
+            Width = 655
             Height = 267
             Align = alClient
             TabOrder = 0
+            ExplicitWidth = 595
             object cxGridDBTableView2: TcxGridDBTableView
               Navigator.Buttons.CustomButtons = <>
               FilterBox.Visible = fvNever
@@ -242,13 +263,15 @@ object FormPermissoes: TFormPermissoes
         object TabMenus: TTabSheet
           Caption = 'Menus'
           ImageIndex = 1
+          ExplicitWidth = 595
           object cxGrid1: TcxGrid
             Left = 0
             Top = 0
-            Width = 595
+            Width = 655
             Height = 267
             Align = alClient
             TabOrder = 0
+            ExplicitWidth = 595
             object cxGridDBTableViewMenus: TcxGridDBTableView
               Navigator.Buttons.CustomButtons = <>
               FilterBox.Visible = fvNever
@@ -360,6 +383,20 @@ object FormPermissoes: TFormPermissoes
     object QryUsuariosDesenvolvedor: TBooleanField
       FieldName = 'Desenvolvedor'
       Origin = 'Desenvolvedor'
+    end
+    object QryUsuariosCodSidicom: TStringField
+      DisplayLabel = 'Cod. Usu'#225'rio Sidicom'
+      FieldName = 'CodSidicom'
+      Origin = 'CodSidicom'
+      FixedChar = True
+      Size = 6
+    end
+    object QryUsuariosCodVendedor: TStringField
+      DisplayLabel = 'Cod. Vendedor'
+      FieldName = 'CodVendedor'
+      Origin = 'CodVendedor'
+      FixedChar = True
+      Size = 6
     end
   end
   object DsUsuarios: TDataSource

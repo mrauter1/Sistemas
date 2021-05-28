@@ -23,7 +23,6 @@ object FormCiclosVenda: TFormCiclosVenda
     Align = alBottom
     Caption = 'Panel1'
     TabOrder = 0
-    ExplicitWidth = 920
     DesignSize = (
       928
       42)
@@ -36,7 +35,6 @@ object FormCiclosVenda: TFormCiclosVenda
       Caption = 'Atualiza'
       TabOrder = 0
       OnClick = BtnAtualizaClick
-      ExplicitWidth = 369
     end
     object BtnOpcoes: TBitBtn
       Left = 5
@@ -96,16 +94,13 @@ object FormCiclosVenda: TFormCiclosVenda
     Top = 35
     Width = 928
     Height = 467
-    ActivePage = TabParaComprar
+    ActivePage = TabTodosClientes
     Align = alClient
     TabOrder = 1
-    ExplicitTop = 0
-    ExplicitWidth = 920
-    ExplicitHeight = 502
+    OnChange = PageControl1Change
+    ExplicitTop = 41
     object TabParaComprar: TTabSheet
       Caption = 'Clientes que est'#227'o para Comprar'
-      ExplicitWidth = 912
-      ExplicitHeight = 474
       object cxGridParaComprar: TcxGrid
         Left = 0
         Top = 0
@@ -113,10 +108,7 @@ object FormCiclosVenda: TFormCiclosVenda
         Height = 439
         Align = alClient
         TabOrder = 0
-        ExplicitLeft = 1
         ExplicitTop = -2
-        ExplicitWidth = 912
-        ExplicitHeight = 474
         object cxGridParaComprarDBTableView: TcxGridDBTableView
           PopupMenu = PopupMenuOpcoes
           Navigator.Buttons.CustomButtons = <>
@@ -207,8 +199,6 @@ object FormCiclosVenda: TFormCiclosVenda
     object TabRecuperar: TTabSheet
       Caption = 'Clientes para Recuperar'
       ImageIndex = 1
-      ExplicitWidth = 912
-      ExplicitHeight = 474
       object cxGridParaRecuperar: TcxGrid
         Left = 0
         Top = 0
@@ -216,8 +206,6 @@ object FormCiclosVenda: TFormCiclosVenda
         Height = 439
         Align = alClient
         TabOrder = 0
-        ExplicitWidth = 912
-        ExplicitHeight = 474
         object cxGridDBTableView2: TcxGridDBTableView
           PopupMenu = PopupMenuOpcoes
           Navigator.Buttons.CustomButtons = <>
@@ -304,8 +292,6 @@ object FormCiclosVenda: TFormCiclosVenda
     object TabIgnorados: TTabSheet
       Caption = 'Clientes Ignorados'
       ImageIndex = 2
-      ExplicitWidth = 912
-      ExplicitHeight = 474
       object cxGridClientesIgnorados: TcxGrid
         Left = 0
         Top = 0
@@ -313,8 +299,8 @@ object FormCiclosVenda: TFormCiclosVenda
         Height = 439
         Align = alClient
         TabOrder = 0
-        ExplicitWidth = 912
-        ExplicitHeight = 474
+        ExplicitLeft = 3
+        ExplicitTop = 4
         object cxGridDBTableView1: TcxGridDBTableView
           PopupMenu = PopupMenuIgnorados
           Navigator.Buttons.CustomButtons = <>
@@ -410,11 +396,9 @@ object FormCiclosVenda: TFormCiclosVenda
         end
       end
     end
-    object TabSheet1: TTabSheet
+    object TabTodosClientes: TTabSheet
       Caption = 'Todos os Clientes'
       ImageIndex = 3
-      ExplicitWidth = 912
-      ExplicitHeight = 474
       object cxGridTodosClientes: TcxGrid
         Left = 0
         Top = 0
@@ -422,8 +406,7 @@ object FormCiclosVenda: TFormCiclosVenda
         Height = 439
         Align = alClient
         TabOrder = 0
-        ExplicitWidth = 912
-        ExplicitHeight = 474
+        ExplicitTop = -2
         object cxGridDBTableView5: TcxGridDBTableView
           Navigator.Buttons.CustomButtons = <>
           DataController.DataSource = DsTodosClientes
@@ -515,9 +498,9 @@ object FormCiclosVenda: TFormCiclosVenda
     Align = alTop
     TabOrder = 2
     object Vendedor: TLabel
-      Left = 96
+      Left = 108
       Top = 11
-      Width = 58
+      Width = 46
       Height = 13
       Alignment = taRightJustify
       Caption = 'Vendedor'
@@ -528,6 +511,7 @@ object FormCiclosVenda: TFormCiclosVenda
       Width = 305
       Height = 21
       TabOrder = 0
+      OnCloseUp = CbxVendedoresCloseUp
     end
   end
   object SaveDialog: TSaveDialog
@@ -561,6 +545,9 @@ object FormCiclosVenda: TFormCiclosVenda
       'from CicloCompras cc'
       'inner join Cliente C on C.CodCliente = cc.CodCliente'
       
+        'left  join EquipeVendedores ev on ev.CodVendedor = cc.CodVendedo' +
+        'r2'
+      
         'left join UltimoContatoAgenda ag on ag.CODCADASTRO = c.CODCLIENT' +
         'E'
       'where cc.CiclosSemCompra between 0.9 and 3'
@@ -569,6 +556,7 @@ object FormCiclosVenda: TFormCiclosVenda
         'and getdate() >= IsNull((select DataRelembrar from LembreteCiclo' +
         's lc where lc.codCliente = cc.CodCliente and lc.CodProduto = cc.' +
         'CodProduto), getdate())'
+      '/*Filtro*/'
       'order by CiclosSemCompra, cc.CodCliente, CodProduto'
       '')
     Left = 160
@@ -686,6 +674,9 @@ object FormCiclosVenda: TFormCiclosVenda
       'from CicloCompras cc'
       'inner join Cliente C on C.CodCliente = cc.CodCliente'
       
+        'left  join EquipeVendedores ev on ev.CodVendedor = cc.CodVendedo' +
+        'r2'
+      
         'left join UltimoContatoAgenda ag on ag.CODCADASTRO = c.CODCLIENT' +
         'E'
       'where cc.CiclosSemCompra > 3'
@@ -694,6 +685,7 @@ object FormCiclosVenda: TFormCiclosVenda
         'and getdate() >= IsNull((select DataRelembrar from LembreteCiclo' +
         's lc where lc.codCliente = cc.CodCliente and lc.CodProduto = cc.' +
         'CodProduto), getdate())'
+      ' /*Filtro*/'
       
         'order by cc.TicketMedio desc, CiclosSemCompra, cc.CodCliente, Co' +
         'dProduto')
@@ -814,7 +806,11 @@ object FormCiclosVenda: TFormCiclosVenda
       
         'inner join LembreteCiclos lc on lc.CodCliente = cc.CODCLIENTE an' +
         'd lc.CodProduto = cc.CODPRODUTO'
+      
+        'left  join EquipeVendedores ev on ev.CodVendedor = cc.CodVendedo' +
+        'r2'
       'left join MotivoIgnorarCiclo mi on mi.Cod = lc.CodMotivo'
+      'where 1=1 /*Filtro*/'
       
         'order by DataRelembrar desc, cc.TicketMedio desc, CiclosSemCompr' +
         'a, cc.CodCliente, CodProduto')
@@ -949,6 +945,10 @@ object FormCiclosVenda: TFormCiclosVenda
       'select cc.*, C.Cidade, C.Estado'
       'from CicloCompras cc'
       'inner join Cliente C on C.CodCliente = cc.CodCliente'
+      
+        'left  join EquipeVendedores ev on ev.CodVendedor = cc.CodVendedo' +
+        'r2'
+      'where 1=1 /*filtro*/'
       'order by Cidade, DataUltimaCompra, cc.CodCliente, CodProduto')
     Left = 160
     Top = 360

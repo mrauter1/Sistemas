@@ -91,6 +91,10 @@ type
     QryUsuariosDesenvolvedor: TBooleanField;
     cxGridDBTableView1Desenvolvedor: TcxGridDBColumn;
     cxGridDBTableView1Producao: TcxGridDBColumn;
+    QryUsuariosCodSidicom: TStringField;
+    cxGridDBTableView1CodSidicom: TcxGridDBColumn;
+    QryUsuariosCodVendedor: TStringField;
+    cxGridDBTableView1CodVendedor: TcxGridDBColumn;
     procedure QryUsuariosAfterInsert(DataSet: TDataSet);
     procedure FormCreate(Sender: TObject);
     procedure BtnOKClick(Sender: TObject);

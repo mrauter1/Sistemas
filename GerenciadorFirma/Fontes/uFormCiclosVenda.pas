@@ -12,7 +12,7 @@ uses
   Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Menus, FireDAC.Stan.Intf, FireDAC.Stan.Option,
   FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf,
   FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet,
-  FireDAC.Comp.Client, Vcl.ComCtrls, uConSqlServer, Utils, Vcl.DBCtrls;
+  FireDAC.Comp.Client, Vcl.ComCtrls, uConSqlServer, Utils, Vcl.DBCtrls, uGerenciadorConfig;
 
 type
   TFormCiclosVenda = class(TForm)
@@ -136,7 +136,7 @@ type
     Deixardeignorar1: TMenuItem;
     QryIgnoradosObs: TMemoField;
     cxGridDBTableView1Obs: TcxGridDBColumn;
-    TabSheet1: TTabSheet;
+    TabTodosClientes: TTabSheet;
     QryTodosClientes: TFDQuery;
     DsTodosClientes: TDataSource;
     cxGridTodosClientes: TcxGrid;
@@ -195,11 +195,24 @@ type
     procedure cxGridDBTableView2StylesGetContentStyle(
       Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;
       AItem: TcxCustomGridTableItem; var AStyle: TcxStyle);
+    procedure CbxVendedoresCloseUp(Sender: TObject);
+    procedure PageControl1Change(Sender: TObject);
   private
+    FSqlQryCiclos: String;
+    FSqlQryRecuperar: String;
+    FSqlQryTodosClientes: String;
+    FSqlQryIgnorados: String;
     procedure SaveParaComprar(pCxGrid: TcxGrid; pNomeArquivo: String);
     procedure GravaLembreteCiclo(pCodCliente, pCodProduto: String; pData: TDate; pCodMotivo: Integer; pObs: String);
     procedure IgnorarCiclo(pData: TDate);
-    procedure RefreshCiclos;
+    procedure SetDefaultLookupValue;
+    procedure RefreshQueries;
+    function GetFiltro: String;
+    procedure RefreshQryCiclos;
+    procedure RefreshQryRecuperar;
+    procedure RefreshActiveQry;
+    procedure RefreshQryTodosClientes;
+    procedure RefreshQryIgnorados;
     { Private declarations }
   public
     { Public declarations }
@@ -213,21 +226,70 @@ implementation
 {$R *.dfm}
 
 uses
-  cxGridExportLink, WinApi.ShellApi, uFormMotivoParaIgnorar, GerenciadorUtils;
+  cxGridExportLink, WinApi.ShellApi, uFormMotivoParaIgnorar, GerenciadorUtils, Ladder.Utils, Ladder.ServiceLocator;
+
+function TFormCiclosVenda.GetFiltro: String;
+var
+  FKeyVendedor: String;
+begin
+  Result:= '';
+
+  FKeyVendedor:= CbxVendedores.KeyValue;
+  if FKeyVendedor[1] = 'E' then // Equipe
+    Result:= Format('ev.CodEquipe = %s', [Copy(FKeyVendedor, 2, Length(FKeyVendedor)-1)])
+  else if FKeyVendedor[1] = 'T' then
+    Result:= '1=1'
+  else
+    Result:= Format('cc.CodVendedor2 = ''%s'' ', [FKeyVendedor]);
+
+  Result:= Format(' and %s ',[Result]);
+end;
+
+procedure TFormCiclosVenda.RefreshQryCiclos;
+begin
+  QryCiclos.Close;
+  QryCiclos.Open(StringReplace(FSqlQryCiclos, '/*Filtro*/', GetFiltro, [rfReplaceAll, rfIgnoreCase]));
+end;
+
+procedure TFormCiclosVenda.RefreshQryRecuperar;
+begin
+  QryRecuperar.Close;
+  QryRecuperar.Open(StringReplace(FSqlQryRecuperar, '/*Filtro*/', GetFiltro, [rfReplaceAll, rfIgnoreCase]));
+end;
+
+procedure TFormCiclosVenda.RefreshQryIgnorados;
+begin
+  QryIgnorados.Close;
+  QryIgnorados.Open(StringReplace(FSqlQryIgnorados, '/*Filtro*/', GetFiltro, [rfReplaceAll, rfIgnoreCase]));
+end;
+
+procedure TFormCiclosVenda.RefreshQryTodosClientes;
+begin
+  QryTodosClientes.Close;
+  QryTodosClientes.Open(StringReplace(FSqlQryTodosClientes, '/*Filtro*/', GetFiltro, [rfReplaceAll, rfIgnoreCase]));
+end;
+
+procedure TFormCiclosVenda.RefreshQueries;
+begin
+  RefreshQryCiclos;
+  RefreshQryRecuperar;
+end;
+
+procedure TFormCiclosVenda.RefreshActiveQry;
+begin
+  if PageControl1.ActivePage = TabParaComprar then
+    RefreshQryCiclos
+ else if PageControl1.ActivePage = TabRecuperar then
+    RefreshQryRecuperar
+ else if PageControl1.ActivePage = TabIgnorados then
+  RefreshQryIgnorados
+ else if PageControl1.ActivePage = TabTodosClientes then
+   RefreshQryTodosClientes;
+end;
 
 procedure TFormCiclosVenda.BtnAtualizaClick(Sender: TObject);
 begin
-  if PageControl1.ActivePage = TabParaComprar then
-  begin
-    QryCiclos.Close;
-    QryCiclos.Open;
-  end
- else
-  if PageControl1.ActivePage = TabRecuperar then
-  begin
-    QryRecuperar.Close;
-    QryRecuperar.Open;
-  end;
+  RefreshActiveQry;
 end;
 
 procedure TFormCiclosVenda.SaveParaComprar(pCxGrid: TcxGrid; pNomeArquivo: String);
@@ -273,6 +335,11 @@ begin
   end;
 end;
 
+procedure TFormCiclosVenda.CbxVendedoresCloseUp(Sender: TObject);
+begin
+  RefreshActiveQry;
+end;
+
 procedure TFormCiclosVenda.cxGridDBTableView2StylesGetContentStyle(
   Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;
   AItem: TcxCustomGridTableItem; var AStyle: TcxStyle);
@@ -306,36 +373,97 @@ const
   cSql = 'DELETE FROM LEMBRETECICLOS WHERE CODCLIENTE = ''%s'' AND CODPRODUTO = ''%s'' ';
 begin
   ConSqlServer.ExecutaComando(Format(cSql, [QryIgnoradosCodCliente.AsString, QryIgnoradosCodProduto.AsString]));
-  RefreshCiclos;
+  RefreshActiveQry;
+end;
+
+type
+  TEquipe = record
+    CodEquipe: Integer;
+    NomeEquipe: String;
+  end;
+
+function GetSqlCodEquipe: String;
+const
+  cSql = ' select ''E''+cast(eq.CodEquipe as varchar(max)) as Cod, eq.NomeEquipe as Nome '+
+         ' from EquipeVendas eq '+
+         ' where Eq.CodEquipe in '+
+      	 ' (Select CodEquipe from EquipeVendedores where %s) ';
+ //        ' order by Nome ';
+var
+  FSqlEquipes: String;
+begin
+
+  Result:= '';
+  if GerenciadorConfig.Usuario.admin then
+    FSqlEquipes:= Format(cSql,['1=1'])
+  else
+    FSqlEquipes:= Format(cSql,[Format('Nivel>=1 and CodVendedor=''%s'' ',[GerenciadorConfig.Usuario.CodVendedor])]);
+
+  Result:= FSqlEquipes;
+end;
+
+function GetCodEquipes: String;
+var
+  FEquipes: TArray<String>;
+begin
+  if GerenciadorConfig.Usuario.admin then
+    FEquipes:= ConSqlServer.RetornaArray<String>('SELECT cast(CODEQUIPE as varchar(max)) FROM EQUIPEVENDAS', '')
+  else FEquipes:= ConSqlServer.RetornaArray<String>(Format('SELECT cast(CODEQUIPE as varchar(max)) FROM EQUIPEVENDEDORES WHERE CODVENDEDOR=''%s'' and NIVEL>=1 GROUP BY CODEQUIPE', [GerenciadorConfig.Usuario.CodVendedor]),'');
+
+  Result:= JoinStringArray(FEquipes, ',', '-1');
+end;
+
+function GetSqlVendedores: String;
+const
+  cSql = ' SELECT ev.CodVendedor, v.NOMEVENDEDOR '+
+         ' FROM EquipeVendedores EV '+
+         ' inner join vendedor v on v.CODVENDEDOR = ev.CodVendedor '+
+         ' where %s ';
+//         ' order by v.NOMEVENDEDOR desc ';
+begin
+  if GerenciadorConfig.Usuario.admin then
+    Result:= Format(cSql, ['1=1'])
+  else
+    Result:= Format(cSql, ['ev.CodEquipe in ('+GetCodEquipes+')']);
+
+  Result:= Result+Format(' or (ev.CodVendedor=''%s'') ', [GerenciadorConfig.Usuario.CodVendedor]);
+end;
+
+procedure TFormCiclosVenda.SetDefaultLookupValue;
+begin
+  if GerenciadorConfig.Usuario.admin then
+    CbxVendedores.KeyValue:= 'T'
+  else
+    if not CbxVendedores.ListSource.DataSet.IsEmpty then
+      CbxVendedores.KeyValue:= CbxVendedores.ListSource.DataSet.Fields[0].AsString;
 end;
 
 procedure TFormCiclosVenda.FormCreate(Sender: TObject);
-
   function SqlLookupVendedores: String;
+  var
+    cSqlWhere: String;
   begin
+    Result:= GetSqlCodEquipe;
 
+    if GerenciadorConfig.Usuario.admin then
+      Result:= Result+' union all select ''T'' AS COD, ''TODOS'' as Nome ';
+
+    Result:= Result+' union all '+GetSqlVendedores;
   end;
 
 begin
-  FazLookup(CbxVendedores, 'select 0 as Cod, ''TODOS DA EQUIPE'' as Descricao');
+  FSqlQryCiclos:= QryCiclos.SQL.Text;
+  FSqlQryRecuperar:= QryRecuperar.SQL.Text;
+  FSqlQryTodosClientes:= QryTodosClientes.SQL.Text;
+  FSqlQryIgnorados:= QryIgnorados.SQL.Text;
 
-  if not QryCiclos.Active then
-    QryCiclos.Open;
+  FazLookup(CbxVendedores, SqlLookupVendedores);
 
-  if not QryRecuperar.Active then
-    QryRecuperar.Open;
+  SetDefaultLookupValue();
 
   PageControl1.ActivePage:= TabParaComprar;
-end;
 
-procedure TFormCiclosVenda.RefreshCiclos;
-begin
-  QryCiclos.Close;
-  QryCiclos.Open;
-  QryRecuperar.Close;
-  QryRecuperar.Open;
-  QryIgnorados.Close;
-  QryIgnorados.Open;
+  RefreshActiveQry;
 end;
 
 procedure TFormCiclosVenda.IgnorarCiclo(pData: TDate);
@@ -360,7 +488,12 @@ begin
   end;
 
   GravaLembreteCiclo(fCodCliente, fCodProduto, Trunc(Now)+10, fCodMotivo, fObs);
-  RefreshCiclos;
+  RefreshActiveQry;
+end;
+
+procedure TFormCiclosVenda.PageControl1Change(Sender: TObject);
+begin
+  RefreshActiveQry;
 end;
 
 procedure TFormCiclosVenda.Relembrarem10dias1Click(Sender: TObject);

@@ -46,8 +46,10 @@ begin
     Exit;
   end;
 
-  FRootClass:= TMonitorRoot.Create;
-  FRootClass.CreateAllTables;
+  MonitorAppConfig:= TMonitorAppConfig.Create;
+  MonitorAppConfig.LerConfig;
+
+  MonitorAppConfig.Inicializar;
 
   Application.Initialize;
   Application.MainFormOnTaskbar := True;

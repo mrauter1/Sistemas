@@ -1255,3 +1255,41 @@
 23042021-11:06:40 -> Criando TCon
 23042021-11:06:40 -> Carregando Gatihlos.xml
 23042021-11:06:43 -> Inicializando message loop
+28052021-12:26:01 -> Iniciando monitor...
+28052021-12:35:01 -> Iniciando monitor...
+28052021-12:37:10 -> Iniciando monitor...
+28052021-12:37:12 -> Criando TConSqlServer
+28052021-12:38:44 -> Iniciando monitor...
+28052021-12:38:52 -> Criando TConSqlServer
+28052021-12:39:08 -> Criando TConFirebird
+28052021-12:40:07 -> Iniciando monitor...
+28052021-12:40:08 -> Criando TConSqlServer
+28052021-12:41:34 -> Iniciando monitor...
+28052021-12:41:38 -> Criando TConSqlServer
+28052021-12:41:43 -> Criando TConFirebird
+28052021-12:43:25 -> Iniciando monitor...
+28052021-12:43:28 -> Criando TConSqlServer
+28052021-12:43:29 -> Criando TConFirebird
+28052021-12:59:29 -> Iniciando monitor...
+28052021-12:59:30 -> Criando TConSqlServer
+28052021-12:59:31 -> Criando TConFirebird
+28052021-12:59:36 -> Criando TMonitorMain
+28052021-13:10:29 -> Iniciando monitor...
+28052021-13:12:04 -> Iniciando monitor...
+28052021-13:12:05 -> Criando TConSqlServer
+28052021-13:12:05 -> Criando TConFirebird
+28052021-13:12:05 -> Criando TMonitorMain
+28052021-13:12:05 -> Criando TDmSqlUtils
+28052021-13:12:05 -> Criando TCon
+28052021-13:12:05 -> Carregando Gatihlos.xml
+28052021-13:12:09 -> Inicializando message loop
+28052021-13:12:17 -> Notification: Activity VendaMargemBaixaOntem started.
+28052021-13:12:39 -> Iniciando monitor...
+28052021-13:12:40 -> Criando TConSqlServer
+28052021-13:12:40 -> Criando TConFirebird
+28052021-13:12:40 -> Criando TMonitorMain
+28052021-13:12:40 -> Criando TDmSqlUtils
+28052021-13:12:40 -> Criando TCon
+28052021-13:12:41 -> Carregando Gatihlos.xml
+28052021-13:12:42 -> Inicializando message loop
+28052021-13:12:52 -> Notification: Activity VendaMargemBaixaOntem started.

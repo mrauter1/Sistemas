@@ -4,7 +4,7 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.AppEvnts, Vcl.ExtCtrls, Vcl.Menus;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.AppEvnts, Vcl.ExtCtrls, Vcl.Menus, uMonitorAppConfig;
 
 type
   TMonitorMain = class(TForm)
@@ -86,7 +86,7 @@ end;
 
 procedure TMonitorMain.SetMenuIniciarCaption;
 begin
-  if FRootClass.Scheduler.Stopped then
+  if MonitorAppConfig.Scheduler.Stopped then
     MenuIniciar.Caption:= 'Iniciar agendador'
   else
     MenuIniciar.Caption:= 'Parar agendador'
@@ -111,18 +111,18 @@ procedure TMonitorMain.MenuIniciarClick(Sender: TObject);
 begin
   try
     MenuIniciar.Enabled:= False;
-    if FRootClass.Scheduler.Stopped then
+    if MonitorAppConfig.Scheduler.Stopped then
     begin
-      FRootClass.Scheduler.Start;
+      MonitorAppConfig.Scheduler.Start;
       MenuIniciar.Caption:= 'Iniciando...';
-        while FRootClass.Scheduler.Stopped do
+        while MonitorAppConfig.Scheduler.Stopped do
           Application.ProcessMessages;
     end
    else
     begin
-      FRootClass.Scheduler.Stop;
+      MonitorAppConfig.Scheduler.Stop;
       MenuIniciar.Caption:= 'Pausando...';
-        while not FRootClass.Scheduler.Stopped do
+        while not MonitorAppConfig.Scheduler.Stopped do
           Application.ProcessMessages;
     end;
   finally
@@ -133,7 +133,7 @@ end;
 
 procedure TMonitorMain.RefreshAgendamentos1Click(Sender: TObject);
 begin
-  FRootClass.Scheduler.ReloadScheduledActivities;
+  MonitorAppConfig.Scheduler.ReloadScheduledActivities;
 end;
 
 end.

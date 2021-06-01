@@ -192,7 +192,7 @@ begin
     Exit;
   end;
 
-  FRootClass.Scheduler.Start;
+  MonitorAppConfig.Scheduler.Start;
 
   if not CdsGatilhos.Active then
     CdsGatilhos.CreateDataSet;

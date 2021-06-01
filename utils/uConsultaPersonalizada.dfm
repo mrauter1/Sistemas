@@ -281,6 +281,10 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
     object TabSheetResultado: TTabSheet
       Caption = 'RESULTADO'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object PageControlVisualizacoes: TPageControl
         Left = 0
         Top = 28
@@ -351,6 +355,10 @@ object FrmConsultaPersonalizada: TFrmConsultaPersonalizada
           Caption = 'Gr'#225'fico'
           ImageIndex = 2
           OnResize = TsGraficoResize
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object PanelTsGrafico: TPanel
             Left = 0
             Top = 0

@@ -64,8 +64,8 @@ begin
   PastaUpdate:= AIniFile.ReadString('GERAL', 'PastaUpdate', '');
   ConSqlServer:= LerConfigBanco(AIniFile, 'SQLSERVER');
   ConSqlServer.DriverID:= 'MSSQL';
-  ConSqlServer.User:= 'user';
-  ConSqlServer.Password:= '28021990';
+  ConSqlServer.User:= 'Gerenciador';
+  ConSqlServer.Password:= 'ProjetoGerenciador!@0';
   ConFirebird:= LerConfigBanco(AIniFile, 'FIREBIRD');
   ConFirebird.DriverID:= 'FB';
   ConFirebird.User:= 'SYSDBA';

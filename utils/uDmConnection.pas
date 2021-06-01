@@ -56,7 +56,7 @@ type
 
     function RetornaArray<T>(Sql: String; ValDefault: T): TArray<T>; // Retorna o primeiro campo de múltiplos registros
     function RetornaVarArray(const Sql: String; ValDefault: Variant): Variant; // Retorna o primeiro campo de múltiplos registros
-    function RetornaValores(const pSql: String): Variant; //Retorna múltiplos campos de um memos registro
+    function RetornaValores(const pSql: String): Variant; //Retorna múltiplos campos de um mesmo registro
 
     procedure DataSetToVarArray(const pSql: string; var Return: Variant; OnReturnData: TOnReturnData); overload;
     //DataSetToVarArray: Retorna múltiplos campos de múltiplos registros, se AddFieldNames for True, adiciona os nomes dos campos no index -1

@@ -4,7 +4,7 @@ interface
 
 uses System.SysUtils, System.Variants, System.Classes, Data.DB, Datasnap.DBClient, Forms,
   Vcl.DbCtrls, uConSqlServer, FireDac.Comp.Client, cxDBData, cxGridDBTableView, cxDBLookupComboBox,
-  Ladder.ServiceLocator;
+  Ladder.ServiceLocator, SynCommons;
 
 function SortClientDataSet(ClientDataSet: TClientDataSet;
   const FieldName: String): Boolean;

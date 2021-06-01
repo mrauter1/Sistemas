@@ -63,6 +63,8 @@ function RemoveAcento(aText : string) : string;
 procedure CopyRecord(pSource: TDataSet; pTarget: TDataSet);
 
 procedure CopyRecordsDataSet(pSource: TDataSet; pTarget: TDataSet; pClearTarget: Boolean = False);
+// ADefault will be the return value if the array is empty
+function JoinStringArray(AArr: TArray<String>; ASeparator: String; ADefault: string = ''): String;
 
 type
   TAsyncTimer = class(TTimer)
@@ -171,6 +173,20 @@ begin
     pSource.Next;
   end;
 
+end;
+
+function JoinStringArray(AArr: TArray<String>; ASeparator: String; ADefault: string = ''): String;
+var
+  I: Integer;
+begin
+  Result:= '';
+  for I := Low(AArr) to High(AArr) do
+    if Result = '' then
+      Result:= Result+AArr[I]
+    else Result:= Result+ASeparator+AArr[I];
+
+  if Result='' then
+    Result:= ADefault;
 end;
 
 function RemoveAcento(aText : string) : string;

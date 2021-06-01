@@ -94,11 +94,10 @@ object FormCiclosVenda: TFormCiclosVenda
     Top = 35
     Width = 928
     Height = 467
-    ActivePage = TabTodosClientes
+    ActivePage = TabRecuperar
     Align = alClient
     TabOrder = 1
     OnChange = PageControl1Change
-    ExplicitTop = 41
     object TabParaComprar: TTabSheet
       Caption = 'Clientes que est'#227'o para Comprar'
       object cxGridParaComprar: TcxGrid
@@ -108,7 +107,6 @@ object FormCiclosVenda: TFormCiclosVenda
         Height = 439
         Align = alClient
         TabOrder = 0
-        ExplicitTop = -2
         object cxGridParaComprarDBTableView: TcxGridDBTableView
           PopupMenu = PopupMenuOpcoes
           Navigator.Buttons.CustomButtons = <>
@@ -125,7 +123,7 @@ object FormCiclosVenda: TFormCiclosVenda
           OptionsSelection.CellSelect = False
           OptionsView.GroupByBox = False
           OptionsView.HeaderAutoHeight = True
-          Styles.OnGetContentStyle = cxGridParaComprarDBTableViewStylesGetContentStyle
+          Styles.OnGetContentStyle = OnGetStyleDiasSemContato
           Styles.StyleSheet = FormGlobal.cxGridTableViewStyleSheet1
           object cxGridParaComprarDBTableViewDiasSemContato: TcxGridDBColumn
             DataBinding.FieldName = 'DiasSemContato'
@@ -206,6 +204,8 @@ object FormCiclosVenda: TFormCiclosVenda
         Height = 439
         Align = alClient
         TabOrder = 0
+        ExplicitLeft = 1
+        ExplicitTop = -2
         object cxGridDBTableView2: TcxGridDBTableView
           PopupMenu = PopupMenuOpcoes
           Navigator.Buttons.CustomButtons = <>
@@ -222,7 +222,7 @@ object FormCiclosVenda: TFormCiclosVenda
           OptionsSelection.CellSelect = False
           OptionsView.GroupByBox = False
           OptionsView.HeaderAutoHeight = True
-          Styles.OnGetContentStyle = cxGridDBTableView2StylesGetContentStyle
+          Styles.OnGetContentStyle = OnGetStyleDiasSemContato
           Styles.StyleSheet = FormGlobal.cxGridTableViewStyleSheet1
           object cxGridDBTableView2DiasSemContato: TcxGridDBColumn
             DataBinding.FieldName = 'DiasSemContato'
@@ -254,6 +254,7 @@ object FormCiclosVenda: TFormCiclosVenda
           end
           object cxGridDBColumn9: TcxGridDBColumn
             DataBinding.FieldName = 'DiasUteisEntreCompras'
+            Width = 55
           end
           object cxGridDBColumn10: TcxGridDBColumn
             DataBinding.FieldName = 'CiclosSemCompra'
@@ -261,6 +262,7 @@ object FormCiclosVenda: TFormCiclosVenda
           end
           object cxGridDBColumn11: TcxGridDBColumn
             DataBinding.FieldName = 'DiasUteisSemComprar'
+            Width = 63
           end
           object cxGridDBColumn12: TcxGridDBColumn
             DataBinding.FieldName = 'DataUltimaCompra'
@@ -289,6 +291,105 @@ object FormCiclosVenda: TFormCiclosVenda
         end
       end
     end
+    object TabTodosClientes: TTabSheet
+      Caption = 'Todos os Clientes'
+      ImageIndex = 3
+      object cxGridTodosClientes: TcxGrid
+        Left = 0
+        Top = 0
+        Width = 920
+        Height = 439
+        Align = alClient
+        TabOrder = 0
+        object cxGridDBTableView5: TcxGridDBTableView
+          Navigator.Buttons.CustomButtons = <>
+          DataController.DataSource = DsTodosClientes
+          DataController.Summary.DefaultGroupSummaryItems = <>
+          DataController.Summary.FooterSummaryItems = <>
+          DataController.Summary.SummaryGroups = <>
+          FilterRow.Visible = True
+          OptionsData.CancelOnExit = False
+          OptionsData.Deleting = False
+          OptionsData.DeletingConfirmation = False
+          OptionsData.Editing = False
+          OptionsData.Inserting = False
+          OptionsSelection.CellSelect = False
+          OptionsView.GroupByBox = False
+          OptionsView.HeaderAutoHeight = True
+          Styles.OnGetContentStyle = OnGetStyleDiasSemContato
+          Styles.StyleSheet = FormGlobal.cxGridTableViewStyleSheet1
+          object cxGridDBTableView5DiasSemContato: TcxGridDBColumn
+            Caption = 'Dias Sem Contato'
+            DataBinding.FieldName = 'DiasSemContato'
+          end
+          object cxGridDBTableView5CodCliente: TcxGridDBColumn
+            DataBinding.FieldName = 'CodCliente'
+            Width = 47
+          end
+          object cxGridDBTableView5NOMECLIENTE: TcxGridDBColumn
+            DataBinding.FieldName = 'NOMECLIENTE'
+            Width = 152
+          end
+          object cxGridDBTableView5Produto: TcxGridDBColumn
+            DataBinding.FieldName = 'Produto'
+            Width = 164
+          end
+          object cxGridDBTableView5CODVENDEDOR2: TcxGridDBColumn
+            DataBinding.FieldName = 'CODVENDEDOR2'
+            Visible = False
+          end
+          object cxGridDBTableView5Vendedor: TcxGridDBColumn
+            DataBinding.FieldName = 'Vendedor'
+            Width = 89
+          end
+          object cxGridDBTableView5CodProduto: TcxGridDBColumn
+            DataBinding.FieldName = 'CodProduto'
+          end
+          object cxGridDBTableView5NroCompras: TcxGridDBColumn
+            DataBinding.FieldName = 'NroCompras'
+            Width = 51
+          end
+          object cxGridDBTableView5CiclosSemCompra: TcxGridDBColumn
+            DataBinding.FieldName = 'CiclosSemCompra'
+            Width = 57
+          end
+          object cxGridDBTableView5TicketMedio: TcxGridDBColumn
+            DataBinding.FieldName = 'TicketMedio'
+            Width = 83
+          end
+          object cxGridDBTableView5DataUltimaCompra: TcxGridDBColumn
+            DataBinding.FieldName = 'DataUltimaCompra'
+          end
+          object cxGridDBTableView5Cidade: TcxGridDBColumn
+            DataBinding.FieldName = 'Cidade'
+          end
+          object cxGridDBTableView5Estado: TcxGridDBColumn
+            DataBinding.FieldName = 'Estado'
+          end
+          object cxGridDBTableView5DiasUteisEntreCompras: TcxGridDBColumn
+            DataBinding.FieldName = 'DiasUteisEntreCompras'
+          end
+          object cxGridDBTableView5DiasUteisSemComprar: TcxGridDBColumn
+            DataBinding.FieldName = 'DiasUteisSemComprar'
+          end
+        end
+        object cxGridDBTableView6: TcxGridDBTableView
+          Navigator.Buttons.CustomButtons = <>
+          DataController.DetailKeyFieldNames = 'CODPRODUTO'
+          DataController.KeyFieldNames = 'CODPRODUTO'
+          DataController.MasterKeyFieldNames = 'CODPRODUTO'
+          DataController.Summary.DefaultGroupSummaryItems = <>
+          DataController.Summary.FooterSummaryItems = <>
+          DataController.Summary.SummaryGroups = <>
+          OptionsSelection.CellSelect = False
+          OptionsView.GroupByBox = False
+          Styles.StyleSheet = FormGlobal.cxGridTableViewStyleSheet1
+        end
+        object cxGridLevel3: TcxGridLevel
+          GridView = cxGridDBTableView5
+        end
+      end
+    end
     object TabIgnorados: TTabSheet
       Caption = 'Clientes Ignorados'
       ImageIndex = 2
@@ -299,8 +400,6 @@ object FormCiclosVenda: TFormCiclosVenda
         Height = 439
         Align = alClient
         TabOrder = 0
-        ExplicitLeft = 3
-        ExplicitTop = 4
         object cxGridDBTableView1: TcxGridDBTableView
           PopupMenu = PopupMenuIgnorados
           Navigator.Buttons.CustomButtons = <>
@@ -396,99 +495,6 @@ object FormCiclosVenda: TFormCiclosVenda
         end
       end
     end
-    object TabTodosClientes: TTabSheet
-      Caption = 'Todos os Clientes'
-      ImageIndex = 3
-      object cxGridTodosClientes: TcxGrid
-        Left = 0
-        Top = 0
-        Width = 920
-        Height = 439
-        Align = alClient
-        TabOrder = 0
-        ExplicitTop = -2
-        object cxGridDBTableView5: TcxGridDBTableView
-          Navigator.Buttons.CustomButtons = <>
-          DataController.DataSource = DsTodosClientes
-          DataController.Summary.DefaultGroupSummaryItems = <>
-          DataController.Summary.FooterSummaryItems = <>
-          DataController.Summary.SummaryGroups = <>
-          FilterRow.Visible = True
-          OptionsData.CancelOnExit = False
-          OptionsData.Deleting = False
-          OptionsData.DeletingConfirmation = False
-          OptionsData.Editing = False
-          OptionsData.Inserting = False
-          OptionsSelection.CellSelect = False
-          OptionsView.GroupByBox = False
-          OptionsView.HeaderAutoHeight = True
-          Styles.StyleSheet = FormGlobal.cxGridTableViewStyleSheet1
-          object cxGridDBTableView5CodCliente: TcxGridDBColumn
-            DataBinding.FieldName = 'CodCliente'
-            Width = 47
-          end
-          object cxGridDBTableView5NOMECLIENTE: TcxGridDBColumn
-            DataBinding.FieldName = 'NOMECLIENTE'
-          end
-          object cxGridDBTableView5Produto: TcxGridDBColumn
-            DataBinding.FieldName = 'Produto'
-            Width = 177
-          end
-          object cxGridDBTableView5CODVENDEDOR2: TcxGridDBColumn
-            DataBinding.FieldName = 'CODVENDEDOR2'
-            Visible = False
-          end
-          object cxGridDBTableView5Vendedor: TcxGridDBColumn
-            DataBinding.FieldName = 'Vendedor'
-            Width = 89
-          end
-          object cxGridDBTableView5CodProduto: TcxGridDBColumn
-            DataBinding.FieldName = 'CodProduto'
-          end
-          object cxGridDBTableView5NroCompras: TcxGridDBColumn
-            DataBinding.FieldName = 'NroCompras'
-            Width = 51
-          end
-          object cxGridDBTableView5TicketMedio: TcxGridDBColumn
-            DataBinding.FieldName = 'TicketMedio'
-          end
-          object cxGridDBTableView5DataUltimaCompra: TcxGridDBColumn
-            DataBinding.FieldName = 'DataUltimaCompra'
-          end
-          object cxGridDBTableView5Cidade: TcxGridDBColumn
-            DataBinding.FieldName = 'Cidade'
-          end
-          object cxGridDBTableView5Estado: TcxGridDBColumn
-            DataBinding.FieldName = 'Estado'
-          end
-          object cxGridDBTableView5DiasUteisEntreCompras: TcxGridDBColumn
-            DataBinding.FieldName = 'DiasUteisEntreCompras'
-          end
-          object cxGridDBTableView5DiasUteisSemComprar: TcxGridDBColumn
-            DataBinding.FieldName = 'DiasUteisSemComprar'
-          end
-          object cxGridDBTableView5CiclosSemCompra: TcxGridDBColumn
-            DataBinding.FieldName = 'CiclosSemCompra'
-            Width = 66
-          end
-        end
-        object cxGridDBTableView6: TcxGridDBTableView
-          Navigator.Buttons.CustomButtons = <>
-          DataController.DetailKeyFieldNames = 'CODPRODUTO'
-          DataController.KeyFieldNames = 'CODPRODUTO'
-          DataController.MasterKeyFieldNames = 'CODPRODUTO'
-          DataController.Summary.DefaultGroupSummaryItems = <>
-          DataController.Summary.FooterSummaryItems = <>
-          DataController.Summary.SummaryGroups = <>
-          OptionsSelection.CellSelect = False
-          OptionsView.GroupByBox = False
-          Styles.StyleSheet = FormGlobal.cxGridTableViewStyleSheet1
-        end
-        object cxGridLevel3: TcxGridLevel
-          GridView = cxGridDBTableView5
-        end
-      end
-    end
   end
   object PanelTop: TPanel
     Left = 0
@@ -539,23 +545,11 @@ object FormCiclosVenda: TFormCiclosVenda
   object QryCiclos: TFDQuery
     Connection = ConSqlServer.FDConnection
     SQL.Strings = (
-      
-        'select dateDiff(day, ag.UltimoContato, getdate()) as DiasSemCont' +
-        'ato,  cc.*, C.Cidade, C.Estado'
-      'from CicloCompras cc'
-      'inner join Cliente C on C.CodCliente = cc.CodCliente'
-      
-        'left  join EquipeVendedores ev on ev.CodVendedor = cc.CodVendedo' +
-        'r2'
-      
-        'left join UltimoContatoAgenda ag on ag.CODCADASTRO = c.CODCLIENT' +
-        'E'
+      'select *'
+      'from CicloVendasDetalhe cc'
       'where cc.CiclosSemCompra between 0.9 and 3'
       'and NroCompras > 4'
-      
-        'and getdate() >= IsNull((select DataRelembrar from LembreteCiclo' +
-        's lc where lc.codCliente = cc.CodCliente and lc.CodProduto = cc.' +
-        'CodProduto), getdate())'
+      'and getdate() >= IsNull(DataRelembrar, getdate())'
       '/*Filtro*/'
       'order by CiclosSemCompra, cc.CodCliente, CodProduto'
       '')
@@ -666,25 +660,13 @@ object FormCiclosVenda: TFormCiclosVenda
     Top = 56
   end
   object QryRecuperar: TFDQuery
+    Active = True
     Connection = ConSqlServer.FDConnection
     SQL.Strings = (
-      
-        'select dateDiff(day, ag.UltimoContato, getdate()) as DiasSemCont' +
-        'ato,  cc.*, C.Cidade, C.Estado'
-      'from CicloCompras cc'
-      'inner join Cliente C on C.CodCliente = cc.CodCliente'
-      
-        'left  join EquipeVendedores ev on ev.CodVendedor = cc.CodVendedo' +
-        'r2'
-      
-        'left join UltimoContatoAgenda ag on ag.CODCADASTRO = c.CODCLIENT' +
-        'E'
-      'where cc.CiclosSemCompra > 3'
-      'and NroCompras > 2'
-      
-        'and getdate() >= IsNull((select DataRelembrar from LembreteCiclo' +
-        's lc where lc.codCliente = cc.CodCliente and lc.CodProduto = cc.' +
-        'CodProduto), getdate())'
+      'select *'
+      'from CicloVendasDetalhe cc'
+      'where IsNull(cc.CiclosSemCompra,100) > 3'
+      'and getdate() >= IsNull(DataRelembrar, getdate())'
       ' /*Filtro*/'
       
         'order by cc.TicketMedio desc, CiclosSemCompra, cc.CodCliente, Co' +
@@ -799,21 +781,20 @@ object FormCiclosVenda: TFormCiclosVenda
     Connection = ConSqlServer.FDConnection
     SQL.Strings = (
       
-        'select cc.*, C.Cidade, C.Estado, lc.DataRelembrar, mi.Motivo, lc' +
-        '.Obs'
-      'from CicloCompras cc'
-      'inner join Cliente C on C.CodCliente = cc.CodCliente'
+        'select cc.CodCliente, cc.NomeCliente, cc.Produto, cc.CodVendedor' +
+        '2, cc.Vendedor,'
+      
+        'cc.CodProduto, lc.DataRelembrar, cc.TicketMedio, cc.DataUltimaCo' +
+        'mpra, mi.Motivo, lc.Obs'
+      'from CicloVendasDetalhe cc'
       
         'inner join LembreteCiclos lc on lc.CodCliente = cc.CODCLIENTE an' +
         'd lc.CodProduto = cc.CODPRODUTO'
-      
-        'left  join EquipeVendedores ev on ev.CodVendedor = cc.CodVendedo' +
-        'r2'
       'left join MotivoIgnorarCiclo mi on mi.Cod = lc.CodMotivo'
       'where 1=1 /*Filtro*/'
       
-        'order by DataRelembrar desc, cc.TicketMedio desc, CiclosSemCompr' +
-        'a, cc.CodCliente, CodProduto')
+        'order by lc.DataRelembrar desc, cc.TicketMedio desc, CiclosSemCo' +
+        'mpra, cc.CodCliente, CodProduto')
     Left = 160
     Top = 256
     object QryIgnoradosDataRelembrar: TDateField
@@ -870,53 +851,6 @@ object FormCiclosVenda: TFormCiclosVenda
       FixedChar = True
       Size = 6
     end
-    object QryIgnoradosNroCompras: TIntegerField
-      FieldName = 'NroCompras'
-      Origin = 'DiasUteisEntreCompras'
-    end
-    object QryIgnoradosTicketMedio: TFMTBCDField
-      DisplayLabel = 'Ticket M'#233'dio'
-      DisplayWidth = 15
-      FieldName = 'TicketMedio'
-      Origin = 'TicketMedio'
-      currency = True
-      Precision = 38
-      Size = 6
-    end
-    object QryIgnoradosDataUltimaCompra: TDateField
-      DisplayLabel = 'Data Ultima Compra'
-      FieldName = 'DataUltimaCompra'
-      Origin = 'DataUltimaCompra'
-    end
-    object QryIgnoradosCidade: TStringField
-      DisplayWidth = 18
-      FieldName = 'Cidade'
-      Origin = 'Cidade'
-      FixedChar = True
-      Size = 35
-    end
-    object QryIgnoradosEstado: TStringField
-      DisplayWidth = 6
-      FieldName = 'Estado'
-      Origin = 'Estado'
-      FixedChar = True
-      Size = 2
-    end
-    object QryIgnoradosDiasUteisEntreCompras: TFloatField
-      DisplayLabel = 'Dias '#218'teis Entre Compras'
-      FieldName = 'DiasUteisEntreCompras'
-    end
-    object QryIgnoradosDiasUteisSemComprar: TIntegerField
-      DisplayLabel = 'Dias '#218'teis Sem Comprar'
-      FieldName = 'DiasUteisSemComprar'
-    end
-    object QryIgnoradosCiclosSemCompra: TBCDField
-      DisplayLabel = 'Ciclos Sem Compra'
-      FieldName = 'CiclosSemCompra'
-      ReadOnly = True
-      Precision = 18
-      Size = 1
-    end
     object QryIgnoradosObs: TMemoField
       DisplayWidth = 15
       FieldName = 'Obs'
@@ -942,16 +876,21 @@ object FormCiclosVenda: TFormCiclosVenda
   object QryTodosClientes: TFDQuery
     Connection = ConSqlServer.FDConnection
     SQL.Strings = (
-      'select cc.*, C.Cidade, C.Estado'
-      'from CicloCompras cc'
-      'inner join Cliente C on C.CodCliente = cc.CodCliente'
+      'select *'
+      'from ('
       
-        'left  join EquipeVendedores ev on ev.CodVendedor = cc.CodVendedo' +
-        'r2'
+        'select case when DiasSemContato is null then 1 else 0 end as Sem' +
+        'Contato, *'
+      'from CicloVendasDetalhe cc'
       'where 1=1 /*filtro*/'
-      'order by Cidade, DataUltimaCompra, cc.CodCliente, CodProduto')
+      ')X'
+      'order by SemContato desc, DiasSemContato desc')
     Left = 160
     Top = 360
+    object QryTodosClientesDiasSemContato: TIntegerField
+      FieldName = 'DiasSemContato'
+      ReadOnly = True
+    end
     object QryTodosClientesCodCliente: TStringField
       DisplayLabel = 'Cod. Cliente'
       FieldName = 'CodCliente'
@@ -1043,6 +982,13 @@ object FormCiclosVenda: TFormCiclosVenda
       ReadOnly = True
       Precision = 18
       Size = 1
+    end
+    object QryTodosClientesCodEquipe: TIntegerField
+      FieldName = 'CodEquipe'
+    end
+    object QryTodosClientesDataRelembrar: TDateField
+      FieldName = 'DataRelembrar'
+      ReadOnly = True
     end
   end
   object DsTodosClientes: TDataSource

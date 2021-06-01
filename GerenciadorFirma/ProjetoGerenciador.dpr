@@ -88,7 +88,6 @@ begin
     Free;
   end;
 
-
   GerenciadorConfig.Inicializar;
 
   Application.Initialize;

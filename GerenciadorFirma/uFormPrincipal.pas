@@ -111,6 +111,7 @@ type
     Compras1: TMenuItem;
     ComprasporGrupo1: TMenuItem;
     ComprasAgendadas1: TMenuItem;
+    Vendas1: TMenuItem;
     procedure Pedidos1Click(Sender: TObject);
     procedure Fila1Click(Sender: TObject);
     procedure Densidade1Click(Sender: TObject);
@@ -256,6 +257,8 @@ var
 begin
   if not FCreatingWithTab then
     CloseAllTabs;
+
+  GerenciadorConfig.UserID:= AUserID;
 
   GerenciadorConfig.GruposUsuario:= [];
   QryUser.Close;

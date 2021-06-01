@@ -105,14 +105,6 @@ type
     QryIgnoradosCODVENDEDOR2: TStringField;
     QryIgnoradosVendedor: TStringField;
     QryIgnoradosCodProduto: TStringField;
-    QryIgnoradosNroCompras: TIntegerField;
-    QryIgnoradosTicketMedio: TFMTBCDField;
-    QryIgnoradosDataUltimaCompra: TDateField;
-    QryIgnoradosCidade: TStringField;
-    QryIgnoradosEstado: TStringField;
-    QryIgnoradosDiasUteisEntreCompras: TFloatField;
-    QryIgnoradosDiasUteisSemComprar: TIntegerField;
-    QryIgnoradosCiclosSemCompra: TBCDField;
     cxGridClientesIgnorados: TcxGrid;
     cxGridDBTableView1: TcxGridDBTableView;
     cxGridDBTableView4: TcxGridDBTableView;
@@ -181,6 +173,10 @@ type
     PanelTop: TPanel;
     Vendedor: TLabel;
     CbxVendedores: TDBLookupComboBox;
+    QryTodosClientesDiasSemContato: TIntegerField;
+    QryTodosClientesCodEquipe: TIntegerField;
+    QryTodosClientesDataRelembrar: TDateField;
+    cxGridDBTableView5DiasSemContato: TcxGridDBColumn;
     procedure BtnOpcoesClick(Sender: TObject);
     procedure BtnAtualizaClick(Sender: TObject);
     procedure BtnExcelcxGridTarefaClick(Sender: TObject);
@@ -189,10 +185,7 @@ type
     procedure Relembrarem30dias1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure Deixardeignorar1Click(Sender: TObject);
-    procedure cxGridParaComprarDBTableViewStylesGetContentStyle(
-      Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;
-      AItem: TcxCustomGridTableItem; var AStyle: TcxStyle);
-    procedure cxGridDBTableView2StylesGetContentStyle(
+    procedure OnGetStyleDiasSemContato(
       Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;
       AItem: TcxCustomGridTableItem; var AStyle: TcxStyle);
     procedure CbxVendedoresCloseUp(Sender: TObject);
@@ -236,11 +229,11 @@ begin
 
   FKeyVendedor:= CbxVendedores.KeyValue;
   if FKeyVendedor[1] = 'E' then // Equipe
-    Result:= Format('ev.CodEquipe = %s', [Copy(FKeyVendedor, 2, Length(FKeyVendedor)-1)])
+    Result:= Format('CodEquipe = %s', [Copy(FKeyVendedor, 2, Length(FKeyVendedor)-1)])
   else if FKeyVendedor[1] = 'T' then
     Result:= '1=1'
   else
-    Result:= Format('cc.CodVendedor2 = ''%s'' ', [FKeyVendedor]);
+    Result:= Format('CodVendedor2 = ''%s'' ', [FKeyVendedor]);
 
   Result:= Format(' and %s ',[Result]);
 end;
@@ -340,27 +333,14 @@ begin
   RefreshActiveQry;
 end;
 
-procedure TFormCiclosVenda.cxGridDBTableView2StylesGetContentStyle(
+procedure TFormCiclosVenda.OnGetStyleDiasSemContato(
   Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;
   AItem: TcxCustomGridTableItem; var AStyle: TcxStyle);
 var
   ADias: TDateTime;
 begin
-  ADias:= VarToIntDef(Sender.DataController.Values[ARecord.RecordIndex, cxGridDBTableView2DiasSemContato.Index]);
-
-  if ADias >= 10 then
-    AStyle := cxStyleVermelho
-  else if ADias >= 3 then
-    AStyle := cxStyleAmarelo;
-end;
-
-procedure TFormCiclosVenda.cxGridParaComprarDBTableViewStylesGetContentStyle(
-  Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;
-  AItem: TcxCustomGridTableItem; var AStyle: TcxStyle);
-var
-  ADias: TDateTime;
-begin
-  ADias:= VarToIntDef(Sender.DataController.Values[ARecord.RecordIndex, cxGridParaComprarDBTableViewDiasSemContato.Index]);
+  ADias:= VarToIntDef(Sender.DataController.Values[ARecord.RecordIndex,
+            TcxGridDBTableView(Sender).GetColumnByFieldName('DiasSemContato').Index], 100);
 
   if ADias >= 10 then
     AStyle := cxStyleVermelho

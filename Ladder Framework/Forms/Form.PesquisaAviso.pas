@@ -153,7 +153,6 @@ begin
     Exit;
 
   FActivityDataSet.AddItem(FAtividade);
-  FActivityDataSet.Synchronize;
 end;
 
 procedure TFormPesquisaAviso.RemoveAviso;

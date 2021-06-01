@@ -12,9 +12,12 @@ uses
 type
   TFrwServiceLocator = class;
 
+  THackOleDBConnectionProperties = class(TOleDBConnectionProperties);
+
 // Not thread safe, use on main thread only
   TFrwServiceFactory = class(TObject)
   private
+
   public
     ConnectionParams: TConnectionParams;
     constructor Create; overload;
@@ -30,12 +33,15 @@ type
 
   TFrwContext = class // The context owns everything! Will free every stance when Freed, including the ServiceFactory!
   private
+    FOriginalOnCustomConnectionError: TOleDBOnCustomError;
     FServiceFactory: TFrwServiceFactory;
     FDmConnection: TDmConnection;
 //    Funcoes: TFuncoes;
     FDaoUtils: TDaoUtils;
     FServiceLocator: TServiceLocator;
     FConnection: TSQLDBConnectionProperties;
+    function OnCustomConnectionError(Connection: TOleDBConnection;
+      ErrorRecords: IErrorRecords; RecordNum: UINT): boolean;
     function GetConnection: TSQLDBConnectionProperties;
     function GetDaoUtils: TDaoUtils;
     function GetDmConnection: TDmConnection;
@@ -212,8 +218,13 @@ begin
   if ConnectionParams.Port <> 0 then
     FServerStr:= FServerStr+','+IntToStr(ConnectionParams.Port);
 
-  Result:= TOleDBMSSQL2012ConnectionProperties.Create(FServerStr, ConnectionParams.Database,
+//  Result:= TOleDBMSSQL2012ConnectionProperties.Create(FServerStr, ConnectionParams.Database,
+//                                                      ConnectionParams.User, ConnectionParams.Password);
+  Result:= TLadderSqlServerConnection.Create(FServerStr, ConnectionParams.Database,
                                                       ConnectionParams.User, ConnectionParams.Password);
+
+  Result.ReconnectAfterConnectionError:= True;
+//  Result.UseCache:= False; // Use Cache must be false for AutoReconnect to work;
   Result.ResetFieldDefinitions;
 {
   FServerStr:= 'MSSQL?Server='+AppConfig.ConSqlServer.Server;
@@ -286,7 +297,12 @@ end;
 function TFrwContext.GetConnection: TSQLDBConnectionProperties;
 begin
   if not Assigned(FConnection) then
+  begin
     FConnection:= ServiceFactory.NewConnection;
+//    FOriginalOnCustomConnectionError:= THackOleDBConnectionProperties(FConnection).OnCustomError;
+//    THackOleDBConnectionProperties(FConnection).OnCustomError:= OnCustomConnectionError;
+//    FConnection.ConnectionTimeOutMinutes:= 2;
+  end;
 
   Result:= FConnection;
 end;
@@ -321,6 +337,20 @@ begin
     FServiceLocator:= ServiceFactory.NewServiceLocator;
 
   Result:= FServiceLocator;
+end;
+
+function TFrwContext.OnCustomConnectionError(Connection: TOleDBConnection;
+  ErrorRecords: IErrorRecords; RecordNum: UINT): boolean;
+begin
+  if Assigned(FOriginalOnCustomConnectionError) then
+    FOriginalOnCustomConnectionError(Connection, ErrorRecords, RecordNum);
+
+  if (Connection.OleDBErrorMessage= '') or (Connection.LastErrorWasAboutConnection) then // Erro de conexao
+  begin
+    Connection.Disconnect;
+    Connection.Connect;
+  end;
+//    raise Exception.Create('Error Message: '+Connection.OleDBErrorMessage);
 end;
 
 procedure TFrwContext.SetServiceFactory(const Value: TFrwServiceFactory);

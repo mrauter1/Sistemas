@@ -1027,21 +1027,37 @@ end;
 procedure TObjectDataSet.Synchronize(ASelectedItem: TObject = nil);
 var
   FCurrent: TObject;
+  FLastIndex: Integer;
+
+  function GetNextSelectedModel: TObject;
+  begin
+    if Active and (FLastIndex > -1) and (FLastIndex < GetObjectCount) then
+      Result := fDataList.Items[FLastIndex]
+    else
+      Result:= nil;
+  end;
+
 begin
   if not Active then
     Exit;
 
+  FLastIndex:= Index;
+
   if Assigned(ASelectedItem) then
     FCurrent:= ASelectedItem
   else
-    FCurrent:= GetCurrentModel<TObject>;
+    FCurrent:= nil;
+//    FCurrent:= GetCurrentModel<TObject>;
 
   DisableControls;
   try
     Refresh;
     if Assigned(FCurrent) then
+    begin
       if fDataList.Contains(FCurrent) then
         Select(FCurrent);
+    end
+   else Select(GetNextSelectedModel);
 
   finally
     EnableControls;

@@ -8,7 +8,7 @@ uses
 type
   TSQLDBConnectionPropertiesHelper = class helper for TSQLDBConnectionProperties
   private
-    // slower version, use Ladder.Activity,LadderVarToSql InsertDocVariantData
+    // Warning: This implementation is a slower version, use Ladder.Activity,LadderVarToSql InsertDocVariantData
     procedure InsertDocVariantData(TableName: String; pDocVariant: TDocVariantData);
   public
     procedure ResetFieldDefinitions;

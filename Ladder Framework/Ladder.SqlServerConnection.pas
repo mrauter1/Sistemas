@@ -6,11 +6,28 @@ uses
   SynTable, SynCommons, SynDB, SynOLEDB;
 
 type
+  THackOleDBStatement = class(TOleDBStatement);
+
+  TMyOleDBConnection = class(TOleDBConnection)
+  protected
+    fLastConnectionErrorTick: Int64;
+    fLastSuccessTick: Int64;
+    FTestingConnection: Boolean;
+    function LastExecutionWasConnectionError: Boolean; virtual;
+    function CheckConnectionError: Boolean; virtual;
+    procedure OleDBCheck(aStmt: TSQLDBStatement; aResult: HRESULT;
+       const aStatus: TCardinalDynArray=nil); override;
+    function NewStatementPrepared(const aSQL: RawUTF8;
+        ExpectResults, RaiseExceptionOnError, AllowReconnect: Boolean): ISQLDBStatement; override;
+    public
+    constructor Create(aProperties: TSQLDBConnectionProperties); override;
+  end;
+
+
   TLadderSqlServerConnection = class(TOleDBMSSQL2012ConnectionProperties)
   private
-    // slower version, use Ladder.Activity,LadderVarToSql InsertDocVariantData
-    procedure InsertDocVariantData(TableName: String; pDocVariant: TDocVariantData);
   public
+    function NewConnection: TSQLDBConnection; override;
   end;
 
 implementation
@@ -20,112 +37,171 @@ uses
 
 { TLadderSqlServerConnection }
 
-procedure TLadderSqlServerConnection.InsertDocVariantData(
-  TableName: String; pDocVariant: TDocVariantData);
-var
-  FieldNames: TRawUTF8DynArray;
-  FieldTypes: TSQLDBFieldTypeArray;
-  FieldValues: TRawUTF8DynArrayDynArray;
-  FFieldCount: Integer;
-  FFirstRow: PDocVariantData;
-
-  procedure QuotePreviousValues(Col, CurrentRow: Integer);
-  var
-    Row: Integer;
-  begin
-    for Row := 0 to CurrentRow-1 do
-    begin
-      if FieldValues[Col, Row] <> 'null' then
-        FieldValues[Col, Row]:= QuotedStr(FieldValues[Col, Row]);
-    end;
 
 
-  end;
+{ TLadderSqlServerConnection }
 
-  procedure SetType(Col, Row: Integer; pValue: PVAriant);
-  var
-    FFieldType: TSQLDBFieldType;
-  begin
-    if FieldTypes[Col] = ftUTF8 then Exit; // If it is a string it does not need to be changed
-
-    FFieldType:= VariantVTypeToSQLDBFieldType(VarType(pValue^));
-
-    if FFieldType <= ftNull then  // if current col FieldType is ftnull or ftUnknown does not need to change
-      Exit;
-
-    if FieldTypes[Col] <= ftNull then
-    begin
-      if (FFieldType = ftUTF8) and (LadderVarIsIso8601(pValue^)) then
-        FieldTypes[Col]:= ftDate
-      else
-        FieldTypes[Col]:= FFieldType;
-
-      Exit;
-    end;
-
-    if FFieldType = FieldTypes[Col] then
-      Exit
-    else if Ord(FFieldType) > Ord(FieldTypes[Col]) then
-      FieldTypes[Col]:= FFieldType
-    else // Ord(FFieldType) < Ord(FieldTypes[Col]
-      if FieldTypes[Col] = ftDate then // if current column fieldtype is int, double or currency and prior fieldtype was date, must change to string
-        FieldTypes[Col]:= ftUTF8;
-
-    if FieldTypes[Col] = ftUtf8 then
-      QuotePreviousValues(Col, Row);
-  end;
-
-  procedure SetFieldValue(Row, Col: Integer);
-  var
-    basicType: Integer;
-    FVar: PVariant;
-  begin
-      FVar:= @pDocVariant._[Row].Values[Col];
-      SetType(Col, Row, FVar);
-      case FieldTypes[Col] of
-        ftUnknown, ftNull: FieldValues[Col, Row] := 'null';
-        ftUTF8: FieldValues[Col, Row]:= QuotedStr(VarToStr(FVar^));
-      else
-        FieldValues[Col, Row]:= VarToStr(FVar^);
-      end;
-  end;
-
-var
-  Col, Row: Integer;
-  sStart, sFim: TDateTime;
-
-const
-  cBatchSize = 750; // Optimum performance
+function TLadderSqlServerConnection.NewConnection: TSQLDBConnection;
 begin
-  if pDocVariant.Count=0 then
-    Exit;
-
-  FFirstRow:= @TDocVariantData(pDocVariant.Values[0]);
-  FFieldCount:= Length(FFirstRow^.Values);
-
-  Assert(FFieldCount <= Length(FieldTypes),
-    Format('TMySqlServerConnectionProperties.InsertDocVariantData: Maximum field count is %d.', [Length(FIeldTypes)]));
-
-  SetLength(FieldNames,FFieldCount);
-  for Col := 0 to FFieldCount-1 do
-  begin
-    FieldTypes[Col]:= ftNull;
-    FieldNames[Col]:= FFirstRow^.Names[Col];
-  end;
-
-  SetLength(FieldValues, FFieldCount);
-  for Col := 0 to FFieldCount-1 do
-  begin
-    SetLength(FieldValues[Col], pDocVariant.Count);
-    for Row := 0 to pDocVariant.Count-1 do
-      SetFieldValue(Row, Col);
-  end;
-
-  sStart:= now;
-  MultipleValuesInsert(Self, '##MFORTESTE', FieldNames, FieldTypes, pDocVariant.Count, FieldValues);
-  sFim:= now;
-  Assert(False, IntToStr(MilliSecondsBetween(sStart, sFim)));
+  Result:= TMyOleDBConnection.Create(Self);
 end;
+
+{ TMyOleDBConnection }
+
+constructor TMyOleDBConnection.Create(aProperties: TSQLDBConnectionProperties);
+begin
+  fLastConnectionErrorTick:= 0;
+  fLastSuccessTick:= 0;
+  FTestingConnection:= False;
+  inherited;
+end;
+
+function TMyOleDBConnection.LastExecutionWasConnectionError: Boolean;
+begin
+  Result:= fLastConnectionErrorTick > fLastSuccessTick;
+end;
+
+function TMyOleDBConnection.NewStatementPrepared(const aSQL: RawUTF8;
+  ExpectResults, RaiseExceptionOnError,
+  AllowReconnect: Boolean): ISQLDBStatement;
+
+  function IsThisConnectionOK: Boolean;
+  var
+    Stmt: ISQLDBStatement;
+  begin
+    FTestingConnection:= True;
+    try
+      try
+        Stmt:= Self.NewStatementPrepared('SELECT 0',false,true, True); // Warning! works only for Sql Server
+        Stmt.ExecutePrepared;
+      except
+        Result:= False;
+        Exit;
+      end;
+    finally
+      FTestingConnection:= False;
+    end;
+    Result:= True;
+  end;
+
+  procedure KeepTryingToReconnect;
+    procedure TryToReconnect;
+    begin
+      try
+        Self.Disconnect;
+        Self.Connect;
+      except
+      end;
+    end;
+  begin
+    TryToReconnect;
+    while not Self.Connected do
+    begin
+      TryToReconnect;
+      Sleep(300); // Try to reconnect every 500ms
+    end;
+  end;
+
+begin
+  if FTestingConnection then
+  begin
+    Result:= inherited;
+    Exit;
+  end;
+
+  if LastExecutionWasConnectionError then
+  begin
+    If not IsThisConnectionOK then
+      KeepTryingToReconnect;
+  end;
+  try
+    Result:= inherited;
+  except
+    raise;
+  end;
+end;
+
+function TMyOleDBConnection.CheckConnectionError: Boolean;
+var
+  FTestConnection: TOleDBConnection;
+  FIsConnectionOK: Boolean;
+
+  function GetIsConnectionOK: Boolean;
+  begin
+    try
+      FTestConnection.Connect;
+    except
+      Result:= False;
+      Exit;
+    end;
+    Result:= FTestConnection.IsConnected;
+  end;
+begin
+  FTestConnection:= TOleDBConnection.Create(Self.OleDBProperties);
+  try
+    FIsConnectionOK:= GetIsConnectionOK;
+    if FIsConnectionOK then
+      Exit(False)
+  else
+    begin // Connection error
+      while not GetIsConnectionOK do
+        Sleep(500); // Try to reconnect every 500ms
+      Exit(True); // Successfully reconnected
+    end;
+  finally
+    FTestConnection.Free;
+  end;
+end;
+
+procedure TMyOleDBConnection.OleDBCheck(aStmt: TSQLDBStatement;
+  aResult: HRESULT; const aStatus: TCardinalDynArray);
+begin
+  try
+    inherited;
+  except
+//    if LastErrorWasAboutConnection or (OleDBErrorMessage='') then // Can't reliably check if Error was about connection
+    fLastConnectionErrorTick:= GetTickCount64;
+
+    raise;
+  end;
+  fLastSuccessTick:= GetTickCount64;
+end;
+
+{procedure TMyOleDBConnection.OleDBCheck(aStmt: TSQLDBStatement;
+  aResult: HRESULT; const aStatus: TCardinalDynArray);
+begin
+  try
+    inherited;
+  except
+    if CheckConnectionError then // Returns true if there was connection error and connection was restablished
+    begin
+      THackOleDBStatement(aStmt).CloseRowSet;
+      Self.Disconnect;
+      Self.Connect;
+      OleDBCheck(aStmt, aResult, aStatus)
+    end
+    else
+    begin
+      if LastErrorWasAboutConnection or (OleDBErrorMessage='') then
+      begin
+        try
+          THackOleDBStatement(aStmt).CloseRowSet;
+          Self.Disconnect;
+          Self.Connect;
+        except
+        end;
+      end
+     else
+      raise;
+    end;
+//    if ConnectionError then
+
+//    raise Exception.Create('Error Message');
+//    if Self.LastErrorWasAboutConnection then
+//      TryReconnect;
+  end;
+end;
+}
 
 
 end.

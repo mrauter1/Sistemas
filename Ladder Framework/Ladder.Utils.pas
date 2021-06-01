@@ -3,7 +3,12 @@ unit Ladder.Utils;
 interface
 
 uses
-  RTTI, SynCommons, SysUtils, SynTable, DB;
+  RTTI, SynCommons, SysUtils, SynTable, DB, SynDB;
+
+function ReturnSqlAsJson(AConnectionProp: TSQLDBConnectionProperties; const ASql: string; AExpanded: Boolean = False): string;
+function FillRecordArrayFromSql(AConnectionProp: TSQLDBConnectionProperties; const ASql: string; var Rec; TypeInfo: pointer): Boolean; // Returns true if success
+// ReturnRecord will fill the record with the first result; Returns false if no result found
+function FillRecordFromSql(AConnectionProp: TSQLDBConnectionProperties; const ASql: string; var Rec; TypeInfo: pointer): Boolean;
 
 function LadderVarIsList(const pValue: Variant): Boolean;
 function DocVariantIsTable(const pDocVariantData: TDocVariantData): Boolean;
@@ -44,7 +49,60 @@ implementation
 uses
   Variants, Spring.Reflection, StrUtils;
 
-  function FieldTypeToSqlDBFieldType(AFieldType: TFieldType): TSqlDBFieldType;
+function ReturnSqlAsJson(AConnectionProp: TSQLDBConnectionProperties; const ASql: string; AExpanded: Boolean = False): string;
+begin
+  Result:= AConnectionProp.Execute(ASql, [], nil, True).FetchAllAsJSON(AExpanded);
+end;
+
+function FillRecordFromSql(AConnectionProp: TSQLDBConnectionProperties; const ASql: string; var Rec; TypeInfo: pointer): Boolean;
+var
+  FJSon: RawUTF8;
+  FDocVariant: Variant;
+  FRowCount: Integer;
+  Return: PUTF8Char;
+begin
+  Result:= False;
+
+  FJSon:= AConnectionProp.Execute(ASql, [], nil, True).FetchAllAsJSON(True, @FRowCount);
+  if FRowCount = 0 then
+    Exit;
+
+  FDocVariant:= _JsonFast(FJSon);
+  FJSon:= TDocVariantData(TDocVariantData(FDocVariant).Values[0]).ToJson;
+
+  TTextWriter.RegisterCustomJSONSerializerSetOptions(TypeInfo,
+      [soReadIgnoreUnknownFields],True);
+
+  Return:= RecordLoadJSON(Rec, Pointer(FJSon), TypeInfo);
+
+  Result:= Return<>nil;
+end;
+
+function FillRecordArrayFromSql(AConnectionProp: TSQLDBConnectionProperties; const ASql: string; var Rec; TypeInfo: pointer): Boolean; // Returns true if success
+var
+  FJSon: RawUTF8;
+  FRowCount: Integer;
+  FDynArray: TDynArray;
+  Return: PUTF8Char;
+begin
+  Result:= False;
+
+  FDynArray.Init(TypeInfo, Rec);
+  FDynArray.Clear;
+  FJSon:= AConnectionProp.Execute(ASql, [], nil, True).FetchAllAsJSON(True, @FRowCount);
+
+  if FRowCount<=0 then
+    Exit;
+
+  TTextWriter.RegisterCustomJSONSerializerSetOptions(TypeInfo,
+      [soReadIgnoreUnknownFields],True);
+
+  Return:= FDynArray.LoadFromJSON(Pointer(FJSon));
+
+  Result:= Return<>nil;
+end;
+
+function FieldTypeToSqlDBFieldType(AFieldType: TFieldType): TSqlDBFieldType;
 begin
   case AFieldType of
     ftString, ftVariant, ftWideString: Result:= ftUTF8;

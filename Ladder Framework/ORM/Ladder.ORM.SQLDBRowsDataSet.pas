@@ -26,6 +26,9 @@ type
     function ColumnString(Col: integer): string; overload;
     function ColumnVariant(Col: integer): Variant; overload;
     function ColumnToVariant(Col: integer; var Value: Variant): TSQLDBFieldType; overload;
+    procedure ColumnBlobToStream(Col: integer; Stream: TStream); overload;
+    procedure ColumnBlobFromStream(Col: integer; Stream: TStream); overload;
+
     function ColumnInt(const ColName: RawUTF8): Int64; overload;
     function ColumnDouble(const ColName: RawUTF8): double; overload;
     function ColumnDateTime(const ColName: RawUTF8): TDateTime; overload;
@@ -34,6 +37,8 @@ type
     function ColumnString(const ColName: RawUTF8): string; overload;
     function ColumnVariant(const ColName: RawUTF8): Variant; overload;
     function GetColumnVariant(const ColName: RawUTF8): Variant;
+    procedure ColumnBlobToStream(const ColName: RawUTF8; Stream: TStream); overload;
+    procedure ColumnBlobFromStream(const ColName: RawUTF8; Stream: TStream); overload;
     property Column[const ColName: RawUTF8]: Variant read GetColumnVariant; default;
 
     function Step(SeekFirst: boolean=false): boolean;
@@ -81,6 +86,22 @@ begin
 end;
 
 function TSqlDBRowDataSet.ColumnBlobBytes(const ColName: RawUTF8): TBytes;
+begin
+  RaiseNotImplementedError;
+end;
+
+procedure TSqlDBRowDataSet.ColumnBlobFromStream(const ColName: RawUTF8;
+  Stream: TStream);
+begin
+  RaiseNotImplementedError;
+end;
+
+procedure TSqlDBRowDataSet.ColumnBlobFromStream(Col: integer; Stream: TStream);
+begin
+  RaiseNotImplementedError;
+end;
+
+procedure TSqlDBRowDataSet.ColumnBlobToStream(Col: integer; Stream: TStream);
 begin
   RaiseNotImplementedError;
 end;
@@ -272,6 +293,12 @@ begin
 end;
 
 function TSqlDBRowDataSet.Step(SeekFirst: boolean): boolean;
+begin
+  RaiseNotImplementedError;
+end;
+
+procedure TSqlDBRowDataSet.ColumnBlobToStream(const ColName: RawUTF8;
+  Stream: TStream);
 begin
   RaiseNotImplementedError;
 end;

@@ -70,7 +70,8 @@ uses
   Form.PesquisaAviso in '..\..\Forms\Form.PesquisaAviso.pas' {FormPesquisaAviso},
   Root in '..\..\Root.pas',
   Ladder.Types in '..\..\Ladder.Types.pas',
-  Ladder.Logger in '..\..\Ladder.Logger.pas';
+  Ladder.Logger in '..\..\Ladder.Logger.pas',
+  Test.Ladder in '..\..\Test.Ladder.pas';
 
 {$R *.RES}
 
@@ -84,8 +85,8 @@ begin
   FConnectionParams.Protocol:= 'TCPIP';
   FConnectionParams.Port:= 1433;
   FConnectionParams.Database:= 'LOGISTEC';
-  FConnectionParams.User:= 'User';
-  FConnectionParams.Password:= '28021990';
+  FConnectionParams.User:= 'Gerenciador';
+  FConnectionParams.Password:= 'ProjetoGerenciador!@0';
 
   ReportMemoryLeaksOnShutdown := True;
   TFrwServiceLocator.Inicializar(TFrwServiceFactory.Create(FConnectionParams));
